@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.c2w</groupId>
+  <artifactId>c2w-foundation</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>C2 Windtunnel Java Foundation</name>
+  <description>Foundation packages and classes of C2 Windtunnel Java RTI and Federates</description>
+
+	<modules>
+		<module>c2w-logging</module>
+		<module>root</module>
+		<module>utils</module>
+		<module>base-events</module>
+		<module>federate-base</module>
+	</modules>	
+
+  <distributionManagement>
+    <repository>
+      <id>archiva.internal</id>
+      <name>Internal Release Repository</name>
+      <url>http://129.59.105.152:8080/repository/internal/</url>
+    </repository>
+    <snapshotRepository>
+      <id>archiva.snapshots</id>
+      <name>Internal Snapshot Repository</name>
+      <url>http://129.59.105.152:8080/repository/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
+  <scm>
+  <connection>scm:git:https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java</connection>
+  <developerConnection>https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java</developerConnection>
+  <url>https://vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java/folder/master/</url>
+  </scm>
+  
+</project>
