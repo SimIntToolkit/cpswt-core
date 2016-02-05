@@ -36,7 +36,7 @@ import org.portico.impl.hla13.types.DoubleTime;
 
 import c2w.hla.InteractionRoot;
 import c2w.hla.SynchronizedFederate;
-import c2w.hla.FedMgr.LOG_TYPE;
+import c2w.hla.LOG_TYPE;
 import c2w.util.FedUtil;
 
 /**

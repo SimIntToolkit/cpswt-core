@@ -6,4 +6,16 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>c2w-matlab</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.c2w</groupId>
+  		<artifactId>federate-base</artifactId>
+  		<version>0.0.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.c2w</groupId>
+  		<artifactId>utils</artifactId>
+  		<version>0.0.1</version>
+  	</dependency>
+  </dependencies>
 </project>
