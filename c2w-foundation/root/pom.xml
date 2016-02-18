@@ -9,14 +9,14 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.porticoproject</groupId>
-      <artifactId>portico</artifactId>
-      <version>2.0.2</version>
+      <groupId>org.c2w</groupId>
+      <artifactId>hla-wrapper</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.c2w</groupId>
       <artifactId>logging</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   

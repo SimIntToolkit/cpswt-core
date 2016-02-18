@@ -11,7 +11,7 @@
     <dependency>
       <groupId>org.c2w</groupId>
       <artifactId>base-events</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   

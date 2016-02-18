@@ -2,20 +2,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.c2w</groupId>
-    <artifactId>c2w-foundation</artifactId>
+    <artifactId>c2w-examples</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>c2w-matlab</artifactId>
+  <artifactId>HelloWorld</artifactId>
+  
   <dependencies>
-  	<dependency>
-  		<groupId>org.c2w</groupId>
-  		<artifactId>federate-base</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.c2w</groupId>
-  		<artifactId>utils</artifactId>
-  		<version>${project.version}</version>
-  	</dependency>
+    <dependency>
+      <groupId>org.c2w</groupId>
+      <artifactId>HelloWorld_base</artifactId>
+      <version>${c2w.version}</version>
+    </dependency>
   </dependencies>
+  
 </project>
