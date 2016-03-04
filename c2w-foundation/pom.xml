@@ -8,13 +8,18 @@
   <description>Foundation packages and classes of C2 Windtunnel Java RTI and Federates</description>
 
 	<modules>
+		<module>hla-wrapper</module>
 		<module>c2w-logging</module>
 		<module>root</module>
-		<module>utils</module>
 		<module>base-events</module>
+		<module>utils</module>
 		<module>federate-base</module>
-		<module>c2w-matlab</module>
-		<module>hla-wrapper</module>
+		<module>simple-federates</module>
+		<module>c2w-coa</module>
+		<module>c2w-coa-gui</module>
+		<module>federation-manager</module>
+		<module>c2w-gui</module>
+		<module>c2w-matlab</module>	
 	</modules>	
 
 	<build>
