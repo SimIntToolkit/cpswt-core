@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.c2w</groupId>
+    <artifactId>c2w-foundation</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>c2w-gui</artifactId>
+  
+  <dependencies>
+    <dependency>
+      <groupId>gnu.getopt</groupId>
+      <artifactId>java-getopt</artifactId>
+      <version>1.0.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.c2w</groupId>
+      <artifactId>base-events</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.c2w</groupId>
+      <artifactId>utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>   
+    <dependency>
+      <groupId>org.c2w</groupId>
+      <artifactId>c2w-coa-gui</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+    <dependency>
+      <groupId>org.c2w</groupId>
+      <artifactId>federation-manager</artifactId>
+      <version>${project.version}</version>
+    </dependency> 
+  </dependencies>
+  
+</project>

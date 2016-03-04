@@ -12,6 +12,10 @@
 		<module>processid</module>
 	</modules>
 
+	<properties>
+		<nar.version>3.3.0-SNAPSHOT</nar.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
