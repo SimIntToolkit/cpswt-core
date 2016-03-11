@@ -13,7 +13,7 @@
 	</modules>
 
 	<properties>
-		<nar.version>3.3.0-SNAPSHOT</nar.version>
+		<nar.version>3.3.0</nar.version>
 	</properties>
 
 	<dependencies>
