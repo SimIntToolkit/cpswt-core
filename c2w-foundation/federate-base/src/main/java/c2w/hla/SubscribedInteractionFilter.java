@@ -2,6 +2,7 @@ package c2w.hla;
 
 import java.util.TreeMap;
 
+
 public class SubscribedInteractionFilter {
 
     public enum OriginFedFilter { ORIGIN_FILTER_DISABLED, SELF, NON_SELF }
