@@ -60,7 +60,6 @@ import java.util.concurrent.SynchronousQueue;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
 
-//import c2w.hla.SynchronizedFederate.TIME_ADVANCE_MODE;
 import c2w.process.ProcessId;
 
 /**
@@ -374,7 +373,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 		}		
 	}
 	
-	//TODO:Find a better place for this:
 	/**
 	 * Ensures that the federate is subscribed to SimEnd interaction.
 	 */
@@ -494,7 +492,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	 * @throws RTIinternalError
 	 */
     public void readyToPopulate() throws FederateNotExecutionMember, RTIinternalError {
-    	//TODO:Find a better place for this
     	ensureSimEndSubscription();
     	
     	achieveSynchronizationPoint( ReadyToPopulateSynch );
@@ -986,12 +983,16 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     						synchronized( _rti ) {
     							if(_timeAdvanceMode == TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST) {
     								_rti.timeAdvanceRequest( timeRequest );
+    								// System.out.println( "TimeAdvanceThread: Called timeAdvanceRequest() to go to: " + timeRequest.getTime() );
     							} else if(_timeAdvanceMode == TIME_ADVANCE_MODE.NEXT_EVENT_REQUEST) {
     								_rti.nextEventRequest( timeRequest );
+    								// System.out.println( "TimeAdvanceThread: Using nextEventRequest() to go to: " + timeRequest.getTime() );
     							} else if(_timeAdvanceMode == TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST_AVAILABLE) {
     								_rti.timeAdvanceRequestAvailable( timeRequest );
+    								// System.out.println( "TimeAdvanceThread: Using timeAdvanceRequestAvailable() to go to: " + timeRequest.getTime() );
     							} else if(_timeAdvanceMode == TIME_ADVANCE_MODE.NEXT_EVENT_REQUEST_AVAILABLE) {
     								_rti.nextEventRequestAvailable( timeRequest );
+    								// System.out.println( "TimeAdvanceThread: Using nextEventRequestAvailable() to go to: " + timeRequest.getTime() );
     							}
     						}
     						tarNotCalled = false;
@@ -1051,11 +1052,45 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private static class InteractionRootComparator implements Comparator< InteractionRoot > {
         public int compare( InteractionRoot interactionRoot1, InteractionRoot interactionRoot2 ) {
+        	// System.out.println("Comparing IR1 and IR2");
+        	// System.out.println("IR1 = " + interactionRoot1);
+        	// System.out.println("IR2 = " + interactionRoot2);
+
+        	C2WInteractionRoot c2wIR1 = (C2WInteractionRoot) interactionRoot1;
+        	C2WInteractionRoot c2wIR2 = (C2WInteractionRoot) interactionRoot2;
+        	double agtIR1 = c2wIR1.get_actualLogicalGenerationTime();
+        	double agtIR2 = c2wIR2.get_actualLogicalGenerationTime();
+
             // System.out.println("IR1-ID = " + interactionRoot1.getUniqueID() + ", IR2-ID = " + interactionRoot2.getUniqueID());
-            if ( interactionRoot1.getTime() < interactionRoot2.getTime() ) return -1;
-            if ( interactionRoot1.getTime() > interactionRoot2.getTime() ) return 1;
-            if ( interactionRoot1.getUniqueID() < interactionRoot2.getUniqueID() ) return -1;
-            if ( interactionRoot1.getUniqueID() > interactionRoot2.getUniqueID() ) return 1;
+            // System.out.println("IR1-Time = " + interactionRoot1.getTime() + ", IR2-Time = " + interactionRoot2.getTime());
+            // System.out.println("IR1-ActualGenerationTime = " + agtIR1 + ", IR2-ActualGenerationTime = " + agtIR2);
+
+        	if ( interactionRoot1.getTime() < interactionRoot2.getTime() ) {
+        		// System.out.println("IR1-time < IR2-time, so returning -1");
+        		return -1;
+        	}
+            if ( interactionRoot1.getTime() > interactionRoot2.getTime() ) {
+            	// System.out.println("IR1-time > IR2-time, so, returning 1");
+            	return 1;
+            }
+            if ( agtIR1 < agtIR2 ) {
+            	// System.out.println("IR1-actualGenerationTime < IR2-actualGenerationTime, so returning -1");
+            	return -1;
+            }
+            if ( agtIR1 > agtIR2 ) {
+            	// System.out.println("IR1-actualGenerationTime > IR2-actualGenerationTime, so returning 1");
+            	return 1;
+            }
+            if ( interactionRoot1.getUniqueID() < interactionRoot2.getUniqueID() ) {
+            	// System.out.println("IR1-uniqueID < IR2-uniqueID, so returning -1");
+            	return -1;
+            }
+            if ( interactionRoot1.getUniqueID() > interactionRoot2.getUniqueID() ) {
+            	// .println("IR1-uniqueID > IR2-uniqueID, so returning 1");
+            	return 1;
+            }
+
+            // System.out.println("No difference at all between IR1 and IR2, so returning 0");
             return 0;
         }
     }
@@ -1135,6 +1170,29 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return interactionRoot;
     }
 
+    /**
+     * This should be overridden in the base classes of all federates
+     */
+    public boolean isMapperFederate() {
+    	return false;
+    }
+    
+	private boolean unmatchingFedFilterProvided( InteractionRoot interactionRoot ) {
+		if( !isMapperFederate() ) {
+		    C2WInteractionRoot c2wInteractionRoot = ( C2WInteractionRoot ) interactionRoot;
+		    String fedFilter = c2wInteractionRoot.get_federateFilter();
+		    if( fedFilter != null ) {
+		    	fedFilter = fedFilter.trim();
+	            if( ( fedFilter.length() > 0 ) && ( fedFilter.compareTo( getFederateId() ) != 0 ) ) {
+	                // System.out.println("Filtering due to fed filter: " + fedFilter);
+	                // System.out.println("Filtered interaction was: " + interactionRoot);
+	                return true;
+	            }
+		    }
+		}
+	    return false;
+	}
+
 
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchronizedFederate uses this method
@@ -1165,16 +1223,20 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         // called, but due to an RTI bug, it seemingly is getting called. So,
         // for now, use the federate's current time or LBTS whichever is greater
         // as the timestamp
+    	
         DoubleTime assumedTimestamp = new DoubleTime();
         if( getLBTS() >= getCurrentTime() ) {
         	assumedTimestamp.setTime( getLBTS() );
         } else {
         	assumedTimestamp.setTime( getCurrentTime() );
         }
-        //TODO:Find a better place for this
-        //handleIfSimEnd( interactionClass, theInteraction, assumedTimestamp );
-        addInteraction(  InteractionRoot.create_interaction( interactionClass, theInteraction )  );
-        createLog(interactionClass,theInteraction,assumedTimestamp);
+        
+        InteractionRoot ir = InteractionRoot.create_interaction( interactionClass, theInteraction );
+    	if (!unmatchingFedFilterProvided(ir)) {
+	    	handleIfSimEnd( interactionClass, theInteraction, assumedTimestamp );
+	        addInteraction( ir );
+	        createLog(interactionClass,theInteraction,assumedTimestamp);
+    	}
     }
 
 
@@ -1214,13 +1276,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      LogicalTime theTime,
      EventRetractionHandle retractionHandle
     ) {
-    	//TODO:Find a better place for this
-    	handleIfSimEnd( interactionClass, theInteraction, theTime );
-        addInteraction(  InteractionRoot.create_interaction( interactionClass, theInteraction, theTime )  );
-        createLog(interactionClass,theInteraction,theTime);
+    	InteractionRoot ir = InteractionRoot.create_interaction( interactionClass, theInteraction, theTime );
+    	if (!unmatchingFedFilterProvided(ir)) {
+	    	handleIfSimEnd( interactionClass, theInteraction, theTime );
+	        addInteraction( ir );
+	        createLog(interactionClass,theInteraction,theTime);
+    	}
     }
     
-    //TODO:Find a better place for this
     protected void handleIfSimEnd( int interactionClass, ReceivedInteraction theInteraction, LogicalTime theTime ) {
         if (  SimEnd.match( interactionClass )  ) {
             System.out.println( getFederateId() + ": SimEnd interaction received, exiting..." );

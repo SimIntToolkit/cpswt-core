@@ -28,6 +28,8 @@ public class HighPrio extends SimLog {
 	private static int _FedName_handle;
 	private static int _originFed_handle;
 	private static int _Comment_handle;
+	private static int _actualLogicalGenerationTime_handle;
+	private static int _federateFilter_handle;
 	
 	
 	/**
@@ -70,432 +72,462 @@ public class HighPrio extends SimLog {
 	*/
 	public static int get_Comment_handle() { return _Comment_handle; }
 	
+	/**
+	* Returns the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter of
+	* its containing interaction class.
+	*
+	* @return the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter
+	*/
+	public static int get_actualLogicalGenerationTime_handle() { return _actualLogicalGenerationTime_handle; }
+	
+	/**
+	* Returns the handle (RTI assigned) of the "federateFilter" parameter of
+	* its containing interaction class.
+	*
+	* @return the handle (RTI assigned) of the "federateFilter" parameter
+	*/
+	public static int get_federateFilter_handle() { return _federateFilter_handle; }
 	
 	
-private static boolean _isInitialized = false;
-
-private static int _handle;
-
-/**
-* Returns the handle (RTI assigned) of the HighPrio interaction class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return the handle of the class pertaining to the reference,\
-* rather than the handle of the class for the instance referred to by the reference.
-* For the polymorphic version of this method, use {@link #getClassHandle()}.
-*/
-public static int get_handle() { return _handle; }
-
-/**
-* Returns the fully-qualified (dot-delimited) name of the HighPrio
-* interaction class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return the name of the class pertaining to the reference,\
-* rather than the name of the class for the instance referred to by the reference.
-* For the polymorphic version of this method, use {@link #getClassName()}.
-*/
-public static String get_class_name() { return "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"; }
-
-/**
-* Returns the simple name (the last name in the dot-delimited fully-qualified
-* class name) of the HighPrio interaction class.
-*/
-public static String get_simple_class_name() { return "HighPrio"; }
-
-private static Set< String > _datamemberNames = new HashSet< String >();
-private static Set< String > _allDatamemberNames = new HashSet< String >();
-
-/**
-* Returns a set containing the names of all of the non-hidden parameters in the
-* HighPrio interaction class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return a set of parameter names pertaining to the reference,\
-* rather than the parameter names of the class for the instance referred to by
-* the reference.  For the polymorphic version of this method, use
-* {@link #getParameterNames()}.
-*/
-public static Set< String > get_parameter_names() {
-	return new HashSet< String >( _datamemberNames );
-}
-
-
-/**
-* Returns a set containing the names of all of the parameters in the
-* HighPrio interaction class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return a set of parameter names pertaining to the reference,\
-* rather than the parameter names of the class for the instance referred to by
-* the reference.  For the polymorphic version of this method, use
-* {@link #getParameterNames()}.
-*/
-public static Set< String > get_all_parameter_names() {
-	return new HashSet< String >( _allDatamemberNames );
-}
-
-
-
-
-static {
-	_classNameSet.add( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
-	_classNameClassMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", HighPrio.class );
 	
-	_datamemberClassNameSetMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", _datamemberNames );
-	_allDatamemberClassNameSetMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", _allDatamemberNames );
+	private static boolean _isInitialized = false;
 
-	
-	
-	_datamemberNames.add( "Time" );
-	_datamemberNames.add( "sourceFed" );
-	_datamemberNames.add( "FedName" );
-	_datamemberNames.add( "originFed" );
-	_datamemberNames.add( "Comment" );
-	
-	
-	_allDatamemberNames.add( "Time" );
-	_allDatamemberNames.add( "sourceFed" );
-	_allDatamemberNames.add( "FedName" );
-	_allDatamemberNames.add( "originFed" );
-	_allDatamemberNames.add( "Comment" );
-	
-	
-	_datamemberTypeMap.put( "Time", "double" );
-	_datamemberTypeMap.put( "sourceFed", "String" );
-	_datamemberTypeMap.put( "FedName", "String" );
-	_datamemberTypeMap.put( "originFed", "String" );
-	_datamemberTypeMap.put( "Comment", "String" );
+	private static int _handle;
 
+	/**
+	* Returns the handle (RTI assigned) of the HighPrio interaction class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return the handle of the class pertaining to the reference,\
+	* rather than the handle of the class for the instance referred to by the reference.
+	* For the polymorphic version of this method, use {@link #getClassHandle()}.
+	*/
+	public static int get_handle() { return _handle; }
 
+	/**
+	* Returns the fully-qualified (dot-delimited) name of the HighPrio
+	* interaction class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return the name of the class pertaining to the reference,\
+	* rather than the name of the class for the instance referred to by the reference.
+	* For the polymorphic version of this method, use {@link #getClassName()}.
+	*/
+	public static String get_class_name() { return "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"; }
 
-}
+	/**
+	* Returns the simple name (the last name in the dot-delimited fully-qualified
+	* class name) of the HighPrio interaction class.
+	*/
+	public static String get_simple_class_name() { return "HighPrio"; }
 
+	private static Set< String > _datamemberNames = new HashSet< String >();
+	private static Set< String > _allDatamemberNames = new HashSet< String >();
 
-private static String initErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not initialize:  ";
-protected static void init( RTIambassador rti ) {
-	if ( _isInitialized ) return;
-	_isInitialized = true;
-	
-	SimLog.init( rti );
-	
-	boolean isNotInitialized = true;
-	while( isNotInitialized ) {
-		try {
-			_handle = rti.getInteractionClassHandle( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
-			isNotInitialized = false;
-		} catch ( FederateNotExecutionMember f ) {
-			System.err.println( initErrorMessage + "Federate Not Execution Member" );
-			f.printStackTrace();
-			return;				
-		} catch ( NameNotFound n ) {
-			System.err.println( initErrorMessage + "Name Not Found" );
-			n.printStackTrace();
-			return;				
-		} catch ( Exception e ) {
-			e.printStackTrace();
-			try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
-		}
+	/**
+	* Returns a set containing the names of all of the non-hidden parameters in the
+	* HighPrio interaction class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return a set of parameter names pertaining to the reference,\
+	* rather than the parameter names of the class for the instance referred to by
+	* the reference.  For the polymorphic version of this method, use
+	* {@link #getParameterNames()}.
+	*/
+	public static Set< String > get_parameter_names() {
+		return new HashSet< String >( _datamemberNames );
 	}
 
-	_classNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", get_handle() );
-	_classHandleNameMap.put( get_handle(), "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
-	_classHandleSimpleNameMap.put( get_handle(), "HighPrio" );
 
-	
-	isNotInitialized = true;
-	while( isNotInitialized ) {
-		try {
-						
-			_Time_handle = rti.getParameterHandle( "Time", get_handle() );			
-			_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );			
-			_FedName_handle = rti.getParameterHandle( "FedName", get_handle() );			
-			_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );			
-			_Comment_handle = rti.getParameterHandle( "Comment", get_handle() );
-			isNotInitialized = false;
-		} catch ( FederateNotExecutionMember f ) {
-			System.err.println( initErrorMessage + "Federate Not Execution Member" );
-			f.printStackTrace();
-			return;				
-		} catch ( InteractionClassNotDefined i ) {
-			System.err.println( initErrorMessage + "Interaction Class Not Defined" );
-			i.printStackTrace();
-			return;				
-		} catch ( NameNotFound n ) {
-			System.err.println( initErrorMessage + "Name Not Found" );
-			n.printStackTrace();
-			return;				
-		} catch ( Exception e ) {
-			e.printStackTrace();
-			try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
-		}
+	/**
+	* Returns a set containing the names of all of the parameters in the
+	* HighPrio interaction class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return a set of parameter names pertaining to the reference,\
+	* rather than the parameter names of the class for the instance referred to by
+	* the reference.  For the polymorphic version of this method, use
+	* {@link #getParameterNames()}.
+	*/
+	public static Set< String > get_all_parameter_names() {
+		return new HashSet< String >( _allDatamemberNames );
 	}
-		
-		
-	_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,Time", get_Time_handle() );
-	_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,sourceFed", get_sourceFed_handle() );
-	_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,FedName", get_FedName_handle() );
-	_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,originFed", get_originFed_handle() );
-	_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,Comment", get_Comment_handle() );
-		
-		
-	_datamemberHandleNameMap.put( get_Time_handle(), "Time" );
-	_datamemberHandleNameMap.put( get_sourceFed_handle(), "sourceFed" );
-	_datamemberHandleNameMap.put( get_FedName_handle(), "FedName" );
-	_datamemberHandleNameMap.put( get_originFed_handle(), "originFed" );
-	_datamemberHandleNameMap.put( get_Comment_handle(), "Comment" );
+
+
 	
-}
 
+	static {
+		_classNameSet.add( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
+		_classNameClassMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", HighPrio.class );
+		
+		_datamemberClassNameSetMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", _datamemberNames );
+		_allDatamemberClassNameSetMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", _allDatamemberNames );
 
-private static boolean _isPublished = false;
-private static String publishErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not publish:  ";
-
-/**
-* Publishes the HighPrio interaction class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void publish( RTIambassador rti ) {
-	if ( _isPublished ) return;
+		
+		
+		_datamemberNames.add( "Time" );
+		_datamemberNames.add( "sourceFed" );
+		_datamemberNames.add( "FedName" );
+		_datamemberNames.add( "originFed" );
+		_datamemberNames.add( "Comment" );
+		_datamemberNames.add( "actualLogicalGenerationTime" );
+		_datamemberNames.add( "federateFilter" );
+		
+		
+		_allDatamemberNames.add( "Time" );
+		_allDatamemberNames.add( "sourceFed" );
+		_allDatamemberNames.add( "FedName" );
+		_allDatamemberNames.add( "originFed" );
+		_allDatamemberNames.add( "Comment" );
+		_allDatamemberNames.add( "actualLogicalGenerationTime" );
+		_allDatamemberNames.add( "federateFilter" );
+		
+		
+		_datamemberTypeMap.put( "Time", "double" );
+		_datamemberTypeMap.put( "sourceFed", "String" );
+		_datamemberTypeMap.put( "FedName", "String" );
+		_datamemberTypeMap.put( "originFed", "String" );
+		_datamemberTypeMap.put( "Comment", "String" );
+		_datamemberTypeMap.put( "actualLogicalGenerationTime", "double" );
+		_datamemberTypeMap.put( "federateFilter", "String" );
 	
-	init( rti );
+	
+
+	}
 
 
-
-	synchronized( rti ) {
-		boolean isNotPublished = true;
-		while( isNotPublished ) {
+	private static String initErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not initialize:  ";
+	protected static void init( RTIambassador rti ) {
+		if ( _isInitialized ) return;
+		_isInitialized = true;
+		
+		SimLog.init( rti );
+		
+		boolean isNotInitialized = true;
+		while( isNotInitialized ) {
 			try {
-				rti.publishInteractionClass( get_handle() );
-				isNotPublished = false;
+				_handle = rti.getInteractionClassHandle( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
+				isNotInitialized = false;
 			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( publishErrorMessage + "Federate Not Execution Member" );
+				System.err.println( initErrorMessage + "Federate Not Execution Member" );
 				f.printStackTrace();
-				return;
-			} catch ( InteractionClassNotDefined i ) {
-				System.err.println( publishErrorMessage + "Interaction Class Not Defined" );
-				i.printStackTrace();
-				return;
+				return;				
+			} catch ( NameNotFound n ) {
+				System.err.println( initErrorMessage + "Name Not Found" );
+				n.printStackTrace();
+				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
 			}
 		}
-	}
-	
-	_isPublished = true;
-}
 
-private static String unpublishErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not unpublish:  ";
-/**
-* Unpublishes the HighPrio interaction class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void unpublish( RTIambassador rti ) {
-	if ( !_isPublished ) return;
-	
-	init( rti );
-	synchronized( rti ) {
-		boolean isNotUnpublished = true;
-		while( isNotUnpublished ) {
-			try {
-				rti.unpublishInteractionClass( get_handle() );
-				isNotUnpublished = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( unpublishErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( InteractionClassNotDefined i ) {
-				System.err.println( unpublishErrorMessage + "Interaction Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( InteractionClassNotPublished i ) {
-				System.err.println( unpublishErrorMessage + "Interaction Class Not Published" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isPublished = false;
-}
+		_classNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", get_handle() );
+		_classHandleNameMap.put( get_handle(), "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio" );
+		_classHandleSimpleNameMap.put( get_handle(), "HighPrio" );
 
-private static boolean _isSubscribed = false;
-private static String subscribeErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not subscribe:  ";
-/**
-* Subscribes a federate to the HighPrio interaction class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void subscribe( RTIambassador rti ) {
-	if ( _isSubscribed ) return;
-	
-	init( rti );
-
-	
-	synchronized( rti ) {
-		boolean isNotSubscribed = true;
-		while( isNotSubscribed ) {
-			try {
-				rti.subscribeInteractionClass( get_handle() );
-				isNotSubscribed = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( subscribeErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( InteractionClassNotDefined i ) {
-				System.err.println( subscribeErrorMessage + "Interaction Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isSubscribed = true;
-}
-
-private static String unsubscribeErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not unsubscribe:  ";
-/**
-* Unsubscribes a federate from the HighPrio interaction class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void unsubscribe( RTIambassador rti ) {
-	if ( !_isSubscribed ) return;
-
-	init( rti );
-	synchronized( rti ) {
-		boolean isNotUnsubscribed = true;
-		while( isNotUnsubscribed ) {
-			try {
-				rti.unsubscribeInteractionClass( get_handle() );
-				isNotUnsubscribed = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( unsubscribeErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( InteractionClassNotDefined i ) {
-				System.err.println( unsubscribeErrorMessage + "Interaction Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( InteractionClassNotSubscribed i ) {
-				System.err.println( unsubscribeErrorMessage + "Interaction Class Not Subscribed" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isSubscribed = false;
-}
-
-/**
-* Return true if "handle" is equal to the handle (RTI assigned) of this class
-* (that is, the HighPrio interaction class).
-*
-* @param handle handle to compare to the value of the handle (RTI assigned) of
-* this class (the HighPrio interaction class).
-* @return "true" if "handle" matches the value of the handle of this class
-* (that is, the HighPrio interaction class).
-*/
-public static boolean match( int handle ) { return handle == get_handle(); }
-
-/**
-* Returns the handle (RTI assigned) of this instance's interaction class .
-* 
-* @return the handle (RTI assigned) if this instance's interaction class
-*/
-public int getClassHandle() { return get_handle(); }
-
-/**
-* Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
-* 
-* @return the fully-qualified (dot-delimited) name of this instance's interaction class
-*/
-public String getClassName() { return get_class_name(); }
-
-/**
-* Returns the simple name (last name in its fully-qualified dot-delimited name)
-* of this instance's interaction class.
-* 
-* @return the simple name of this instance's interaction class 
-*/
-public String getSimpleClassName() { return get_simple_class_name(); }
-
-/**
-* Returns a set containing the names of all of the non-hiddenparameters of an
-* interaction class instance.
-*
-* @return set containing the names of all of the parameters of an
-* interaction class instance
-*/
-public Set< String > getParameterNames() { return get_parameter_names(); }
-
-/**
-* Returns a set containing the names of all of the parameters of an
-* interaction class instance.
-*
-* @return set containing the names of all of the parameters of an
-* interaction class instance
-*/
-public Set< String > getAllParameterNames() { return get_all_parameter_names(); }
-
-/**
-* Publishes the interaction class of this instance of the class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void publishInteraction( RTIambassador rti ) { publish( rti ); }
-
-/**
-* Unpublishes the interaction class of this instance of this class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void unpublishInteraction( RTIambassador rti ) { unpublish( rti ); }
-
-/**
-* Subscribes a federate to the interaction class of this instance of this class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void subscribeInteraction( RTIambassador rti ) { subscribe( rti ); }
-
-/**
-* Unsubscribes a federate from the interaction class of this instance of this class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void unsubscribeInteraction( RTIambassador rti ) { unsubscribe( rti ); }
-
-
-
-public String toString() {
-	return "HighPrio("
 		
+		isNotInitialized = true;
+		while( isNotInitialized ) {
+			try {
+							
+				_Time_handle = rti.getParameterHandle( "Time", get_handle() );			
+				_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );			
+				_FedName_handle = rti.getParameterHandle( "FedName", get_handle() );			
+				_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );			
+				_Comment_handle = rti.getParameterHandle( "Comment", get_handle() );			
+				_actualLogicalGenerationTime_handle = rti.getParameterHandle( "actualLogicalGenerationTime", get_handle() );			
+				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );
+				isNotInitialized = false;
+			} catch ( FederateNotExecutionMember f ) {
+				System.err.println( initErrorMessage + "Federate Not Execution Member" );
+				f.printStackTrace();
+				return;				
+			} catch ( InteractionClassNotDefined i ) {
+				System.err.println( initErrorMessage + "Interaction Class Not Defined" );
+				i.printStackTrace();
+				return;				
+			} catch ( NameNotFound n ) {
+				System.err.println( initErrorMessage + "Name Not Found" );
+				n.printStackTrace();
+				return;				
+			} catch ( Exception e ) {
+				e.printStackTrace();
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+			}
+		}
+			
+			
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,Time", get_Time_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,sourceFed", get_sourceFed_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,FedName", get_FedName_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,originFed", get_originFed_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,Comment", get_Comment_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,actualLogicalGenerationTime", get_actualLogicalGenerationTime_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio,federateFilter", get_federateFilter_handle() );
+			
+			
+		_datamemberHandleNameMap.put( get_Time_handle(), "Time" );
+		_datamemberHandleNameMap.put( get_sourceFed_handle(), "sourceFed" );
+		_datamemberHandleNameMap.put( get_FedName_handle(), "FedName" );
+		_datamemberHandleNameMap.put( get_originFed_handle(), "originFed" );
+		_datamemberHandleNameMap.put( get_Comment_handle(), "Comment" );
+		_datamemberHandleNameMap.put( get_actualLogicalGenerationTime_handle(), "actualLogicalGenerationTime" );
+		_datamemberHandleNameMap.put( get_federateFilter_handle(), "federateFilter" );
 		
-		+ "Time:" + get_Time()
-		+ "," + "sourceFed:" + get_sourceFed()
-		+ "," + "FedName:" + get_FedName()
-		+ "," + "originFed:" + get_originFed()
-		+ "," + "Comment:" + get_Comment()
-		+ ")";
-}
+	}
+
+
+	private static boolean _isPublished = false;
+	private static String publishErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not publish:  ";
+
+	/**
+	* Publishes the HighPrio interaction class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void publish( RTIambassador rti ) {
+		if ( _isPublished ) return;
+		
+		init( rti );
+
+	
+
+		synchronized( rti ) {
+			boolean isNotPublished = true;
+			while( isNotPublished ) {
+				try {
+					rti.publishInteractionClass( get_handle() );
+					isNotPublished = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( publishErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( InteractionClassNotDefined i ) {
+					System.err.println( publishErrorMessage + "Interaction Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isPublished = true;
+	}
+
+	private static String unpublishErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not unpublish:  ";
+	/**
+	* Unpublishes the HighPrio interaction class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void unpublish( RTIambassador rti ) {
+		if ( !_isPublished ) return;
+		
+		init( rti );
+		synchronized( rti ) {
+			boolean isNotUnpublished = true;
+			while( isNotUnpublished ) {
+				try {
+					rti.unpublishInteractionClass( get_handle() );
+					isNotUnpublished = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( unpublishErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( InteractionClassNotDefined i ) {
+					System.err.println( unpublishErrorMessage + "Interaction Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( InteractionClassNotPublished i ) {
+					System.err.println( unpublishErrorMessage + "Interaction Class Not Published" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isPublished = false;
+	}
+
+	private static boolean _isSubscribed = false;
+	private static String subscribeErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not subscribe:  ";
+	/**
+	* Subscribes a federate to the HighPrio interaction class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void subscribe( RTIambassador rti ) {
+		if ( _isSubscribed ) return;
+		
+		init( rti );
+	
+		
+		synchronized( rti ) {
+			boolean isNotSubscribed = true;
+			while( isNotSubscribed ) {
+				try {
+					rti.subscribeInteractionClass( get_handle() );
+					isNotSubscribed = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( subscribeErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( InteractionClassNotDefined i ) {
+					System.err.println( subscribeErrorMessage + "Interaction Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isSubscribed = true;
+	}
+
+	private static String unsubscribeErrorMessage = "Error:  InteractionRoot.C2WInteractionRoot.SimLog.HighPrio:  could not unsubscribe:  ";
+	/**
+	* Unsubscribes a federate from the HighPrio interaction class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void unsubscribe( RTIambassador rti ) {
+		if ( !_isSubscribed ) return;
+
+		init( rti );
+		synchronized( rti ) {
+			boolean isNotUnsubscribed = true;
+			while( isNotUnsubscribed ) {
+				try {
+					rti.unsubscribeInteractionClass( get_handle() );
+					isNotUnsubscribed = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( unsubscribeErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( InteractionClassNotDefined i ) {
+					System.err.println( unsubscribeErrorMessage + "Interaction Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( InteractionClassNotSubscribed i ) {
+					System.err.println( unsubscribeErrorMessage + "Interaction Class Not Subscribed" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isSubscribed = false;
+	}
+
+	/**
+	* Return true if "handle" is equal to the handle (RTI assigned) of this class
+	* (that is, the HighPrio interaction class).
+	*
+	* @param handle handle to compare to the value of the handle (RTI assigned) of
+	* this class (the HighPrio interaction class).
+	* @return "true" if "handle" matches the value of the handle of this class
+	* (that is, the HighPrio interaction class).
+	*/
+	public static boolean match( int handle ) { return handle == get_handle(); }
+
+	/**
+	* Returns the handle (RTI assigned) of this instance's interaction class .
+	* 
+	* @return the handle (RTI assigned) if this instance's interaction class
+	*/
+	public int getClassHandle() { return get_handle(); }
+
+	/**
+	* Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
+	* 
+	* @return the fully-qualified (dot-delimited) name of this instance's interaction class
+	*/
+	public String getClassName() { return get_class_name(); }
+
+	/**
+	* Returns the simple name (last name in its fully-qualified dot-delimited name)
+	* of this instance's interaction class.
+	* 
+	* @return the simple name of this instance's interaction class 
+	*/
+	public String getSimpleClassName() { return get_simple_class_name(); }
+
+	/**
+	* Returns a set containing the names of all of the non-hiddenparameters of an
+	* interaction class instance.
+	*
+	* @return set containing the names of all of the parameters of an
+	* interaction class instance
+	*/
+	public Set< String > getParameterNames() { return get_parameter_names(); }
+
+	/**
+	* Returns a set containing the names of all of the parameters of an
+	* interaction class instance.
+	*
+	* @return set containing the names of all of the parameters of an
+	* interaction class instance
+	*/
+	public Set< String > getAllParameterNames() { return get_all_parameter_names(); }
+
+	/**
+	* Publishes the interaction class of this instance of the class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void publishInteraction( RTIambassador rti ) { publish( rti ); }
+
+	/**
+	* Unpublishes the interaction class of this instance of this class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void unpublishInteraction( RTIambassador rti ) { unpublish( rti ); }
+
+	/**
+	* Subscribes a federate to the interaction class of this instance of this class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void subscribeInteraction( RTIambassador rti ) { subscribe( rti ); }
+
+	/**
+	* Unsubscribes a federate from the interaction class of this instance of this class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void unsubscribeInteraction( RTIambassador rti ) { unsubscribe( rti ); }
+
+	
+
+	public String toString() {
+		return "HighPrio("
+			
+			
+			+ "Time:" + get_Time()
+			+ "," + "sourceFed:" + get_sourceFed()
+			+ "," + "FedName:" + get_FedName()
+			+ "," + "originFed:" + get_originFed()
+			+ "," + "Comment:" + get_Comment()
+			+ "," + "actualLogicalGenerationTime:" + get_actualLogicalGenerationTime()
+			+ "," + "federateFilter:" + get_federateFilter()
+			+ ")";
+	}
 	
 
 
@@ -511,6 +543,10 @@ public String toString() {
 	private String _originFed = "";
 	
 	private String _Comment = "";
+	
+	private double _actualLogicalGenerationTime = 0;
+	
+	private String _federateFilter = "";
 
 	
 	
@@ -588,6 +624,36 @@ public String toString() {
 	*/
 	public String get_Comment() { return _Comment; }
 	
+	
+	/**
+	* Set the value of the "actualLogicalGenerationTime" parameter to "value" for this parameter.
+	*
+	* @param value the new value for the "actualLogicalGenerationTime" parameter
+	*/
+	public void set_actualLogicalGenerationTime( double value ) { _actualLogicalGenerationTime = value; }
+	
+	/**
+	* Returns the value of the "actualLogicalGenerationTime" parameter of this interaction.
+	*
+	* @return the value of the "actualLogicalGenerationTime" parameter
+	*/
+	public double get_actualLogicalGenerationTime() { return _actualLogicalGenerationTime; }
+	
+	
+	/**
+	* Set the value of the "federateFilter" parameter to "value" for this parameter.
+	*
+	* @param value the new value for the "federateFilter" parameter
+	*/
+	public void set_federateFilter( String value ) { _federateFilter = value; }
+	
+	/**
+	* Returns the value of the "federateFilter" parameter of this interaction.
+	*
+	* @return the value of the "federateFilter" parameter
+	*/
+	public String get_federateFilter() { return _federateFilter; }
+	
 
 
 	protected HighPrio( ReceivedInteraction datamemberMap, boolean initFlag ) {
@@ -645,6 +711,8 @@ public String toString() {
 		set_FedName( HighPrio_var.get_FedName() );
 		set_originFed( HighPrio_var.get_originFed() );
 		set_Comment( HighPrio_var.get_Comment() );
+		set_actualLogicalGenerationTime( HighPrio_var.get_actualLogicalGenerationTime() );
+		set_federateFilter( HighPrio_var.get_federateFilter() );
 	}
 
 
@@ -666,6 +734,8 @@ public String toString() {
 		else if (  "FedName".equals( datamemberName )  ) return get_FedName();
 		else if (  "originFed".equals( datamemberName )  ) return get_originFed();
 		else if (  "Comment".equals( datamemberName )  ) return get_Comment();
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) return new Double( get_actualLogicalGenerationTime() );
+		else if (  "federateFilter".equals( datamemberName )  ) return get_federateFilter();
 		else return super.getParameter( datamemberName );
 	}
 	
@@ -687,6 +757,8 @@ public String toString() {
 		else if ( get_FedName_handle() == datamemberHandle ) return get_FedName();
 		else if ( get_originFed_handle() == datamemberHandle ) return get_originFed();
 		else if ( get_Comment_handle() == datamemberHandle ) return get_Comment();
+		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) return new Double( get_actualLogicalGenerationTime() );
+		else if ( get_federateFilter_handle() == datamemberHandle ) return get_federateFilter();
 		else return super.getParameter( datamemberHandle );
 	}
 	
@@ -700,6 +772,8 @@ public String toString() {
 		else if ( param_handle == get_FedName_handle() ) set_FedName( val );
 		else if ( param_handle == get_originFed_handle() ) set_originFed( val );
 		else if ( param_handle == get_Comment_handle() ) set_Comment( val );
+		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
+		else if ( param_handle == get_federateFilter_handle() ) set_federateFilter( val );
 		else retval = super.setParameterAux( param_handle, val );
 		
 		return retval;
@@ -714,7 +788,9 @@ public String toString() {
 		else if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( val );
 		else if (  "FedName".equals( datamemberName )  ) set_FedName( val );
 		else if (  "originFed".equals( datamemberName )  ) set_originFed( val );
-		else if (  "Comment".equals( datamemberName )  ) set_Comment( val );	
+		else if (  "Comment".equals( datamemberName )  ) set_Comment( val );
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
+		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( val );	
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -729,7 +805,9 @@ public String toString() {
 		else if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( (String)val );
 		else if (  "FedName".equals( datamemberName )  ) set_FedName( (String)val );
 		else if (  "originFed".equals( datamemberName )  ) set_originFed( (String)val );
-		else if (  "Comment".equals( datamemberName )  ) set_Comment( (String)val );		
+		else if (  "Comment".equals( datamemberName )  ) set_Comment( (String)val );
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( (Double)val );
+		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( (String)val );		
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -751,6 +829,10 @@ public String toString() {
 		
 			datamembers.add( get_Comment_handle(), get_Comment().getBytes() );
 		
+			datamembers.add( get_actualLogicalGenerationTime_handle(), Double.toString( get_actualLogicalGenerationTime() ).getBytes() );
+		
+			datamembers.add( get_federateFilter_handle(), get_federateFilter().getBytes() );
+		
 	
 		return datamembers;
 	}
@@ -767,6 +849,8 @@ public String toString() {
 				_FedName = data._FedName;
 				_originFed = data._originFed;
 				_Comment = data._Comment;
+				_actualLogicalGenerationTime = data._actualLogicalGenerationTime;
+				_federateFilter = data._federateFilter;
 			
 		}
 	}

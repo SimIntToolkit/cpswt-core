@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hla.rti.*;
-import c2w.hla.*;
 
 /**
 * The FederateObject class implements the FederateObject object in the
@@ -24,7 +23,8 @@ public class FederateObject extends ObjectRoot {
 	private static int _FederateHandle_handle;
 	private static int _FederateType_handle;
 	private static int _FederateHost_handle;
-
+	
+	
 	/**
 	* Returns the handle (RTI assigned) of the "FederateHandle" attribute of
 	* its containing object class.
@@ -48,8 +48,7 @@ public class FederateObject extends ObjectRoot {
 	* @return the handle (RTI assigned) of the "FederateHost" attribute
 	*/
 	public static int get_FederateHost_handle() { return _FederateHost_handle; }
-
-
+		
 	
 	private static boolean _isInitialized = false;
 

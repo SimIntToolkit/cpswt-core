@@ -1272,6 +1272,7 @@ public class FedMgr extends SynchronizedFederate {
     public void terminateSimulation() {
 
     	_killingFederation = true;
+        recordMainExecutionLoopEndTime();
 
     	synchronized ( getRTI() ) {
     		try {
@@ -1293,9 +1294,19 @@ public class FedMgr extends SynchronizedFederate {
 		}
 
         System.out.println("Simulation terminated");
-        recordMainExecutionLoopEndTime();
+        
         running = false;
         paused = false;
+
+    	// Wait for 10 seconds for Simulation to gracefully exit
+    	try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+    	// If simulation has still not exited gracefully, run kill command
+    	killEntireFederation();
     }
     
     public void killEntireFederation() {
@@ -1634,4 +1645,3 @@ public class FedMgr extends SynchronizedFederate {
     }
     
 }
-
