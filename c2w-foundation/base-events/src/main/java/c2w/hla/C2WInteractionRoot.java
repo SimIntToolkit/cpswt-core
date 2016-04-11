@@ -25,8 +25,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 	
 	private static int _sourceFed_handle;
 	private static int _originFed_handle;
-	private static int _actualLogicalGenerationTime_handle;
 	private static int _federateFilter_handle;
+	private static int _actualLogicalGenerationTime_handle;
 	
 	
 	/**
@@ -46,20 +46,20 @@ public class C2WInteractionRoot extends InteractionRoot {
 	public static int get_originFed_handle() { return _originFed_handle; }
 	
 	/**
-	* Returns the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter of
-	* its containing interaction class.
-	*
-	* @return the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter
-	*/
-	public static int get_actualLogicalGenerationTime_handle() { return _actualLogicalGenerationTime_handle; }
-	
-	/**
 	* Returns the handle (RTI assigned) of the "federateFilter" parameter of
 	* its containing interaction class.
 	*
 	* @return the handle (RTI assigned) of the "federateFilter" parameter
 	*/
 	public static int get_federateFilter_handle() { return _federateFilter_handle; }
+	
+	/**
+	* Returns the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter of
+	* its containing interaction class.
+	*
+	* @return the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter
+	*/
+	public static int get_actualLogicalGenerationTime_handle() { return _actualLogicalGenerationTime_handle; }
 	
 	
 	
@@ -134,22 +134,22 @@ public class C2WInteractionRoot extends InteractionRoot {
 
 		
 		
-		_datamemberNames.add( "sourceFed" );
-		_datamemberNames.add( "originFed" );
-		_datamemberNames.add( "actualLogicalGenerationTime" );
-		_datamemberNames.add( "federateFilter" );
+		
+		
+		
+		
 		
 		
 		_allDatamemberNames.add( "sourceFed" );
 		_allDatamemberNames.add( "originFed" );
-		_allDatamemberNames.add( "actualLogicalGenerationTime" );
 		_allDatamemberNames.add( "federateFilter" );
+		_allDatamemberNames.add( "actualLogicalGenerationTime" );
 		
 		
 		_datamemberTypeMap.put( "sourceFed", "String" );
 		_datamemberTypeMap.put( "originFed", "String" );
-		_datamemberTypeMap.put( "actualLogicalGenerationTime", "double" );
 		_datamemberTypeMap.put( "federateFilter", "String" );
+		_datamemberTypeMap.put( "actualLogicalGenerationTime", "double" );
 	
 	
 
@@ -193,8 +193,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 							
 				_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );			
 				_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );			
-				_actualLogicalGenerationTime_handle = rti.getParameterHandle( "actualLogicalGenerationTime", get_handle() );			
-				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );
+				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );			
+				_actualLogicalGenerationTime_handle = rti.getParameterHandle( "actualLogicalGenerationTime", get_handle() );
 				isNotInitialized = false;
 			} catch ( FederateNotExecutionMember f ) {
 				System.err.println( initErrorMessage + "Federate Not Execution Member" );
@@ -217,14 +217,14 @@ public class C2WInteractionRoot extends InteractionRoot {
 			
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,sourceFed", get_sourceFed_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,originFed", get_originFed_handle() );
-		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,actualLogicalGenerationTime", get_actualLogicalGenerationTime_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,federateFilter", get_federateFilter_handle() );
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,actualLogicalGenerationTime", get_actualLogicalGenerationTime_handle() );
 			
 			
 		_datamemberHandleNameMap.put( get_sourceFed_handle(), "sourceFed" );
 		_datamemberHandleNameMap.put( get_originFed_handle(), "originFed" );
-		_datamemberHandleNameMap.put( get_actualLogicalGenerationTime_handle(), "actualLogicalGenerationTime" );
 		_datamemberHandleNameMap.put( get_federateFilter_handle(), "federateFilter" );
+		_datamemberHandleNameMap.put( get_actualLogicalGenerationTime_handle(), "actualLogicalGenerationTime" );
 		
 	}
 
@@ -476,8 +476,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 			
 			+ "sourceFed:" + get_sourceFed()
 			+ "," + "originFed:" + get_originFed()
-			+ "," + "actualLogicalGenerationTime:" + get_actualLogicalGenerationTime()
 			+ "," + "federateFilter:" + get_federateFilter()
+			+ "," + "actualLogicalGenerationTime:" + get_actualLogicalGenerationTime()
 			+ ")";
 	}
 	
@@ -490,9 +490,9 @@ public class C2WInteractionRoot extends InteractionRoot {
 	
 	private String _originFed = "";
 	
-	private double _actualLogicalGenerationTime = 0;
-	
 	private String _federateFilter = "";
+	
+	private double _actualLogicalGenerationTime = 0;
 
 	
 	
@@ -527,21 +527,6 @@ public class C2WInteractionRoot extends InteractionRoot {
 	
 	
 	/**
-	* Set the value of the "actualLogicalGenerationTime" parameter to "value" for this parameter.
-	*
-	* @param value the new value for the "actualLogicalGenerationTime" parameter
-	*/
-	public void set_actualLogicalGenerationTime( double value ) { _actualLogicalGenerationTime = value; }
-	
-	/**
-	* Returns the value of the "actualLogicalGenerationTime" parameter of this interaction.
-	*
-	* @return the value of the "actualLogicalGenerationTime" parameter
-	*/
-	public double get_actualLogicalGenerationTime() { return _actualLogicalGenerationTime; }
-	
-	
-	/**
 	* Set the value of the "federateFilter" parameter to "value" for this parameter.
 	*
 	* @param value the new value for the "federateFilter" parameter
@@ -554,6 +539,21 @@ public class C2WInteractionRoot extends InteractionRoot {
 	* @return the value of the "federateFilter" parameter
 	*/
 	public String get_federateFilter() { return _federateFilter; }
+	
+	
+	/**
+	* Set the value of the "actualLogicalGenerationTime" parameter to "value" for this parameter.
+	*
+	* @param value the new value for the "actualLogicalGenerationTime" parameter
+	*/
+	public void set_actualLogicalGenerationTime( double value ) { _actualLogicalGenerationTime = value; }
+	
+	/**
+	* Returns the value of the "actualLogicalGenerationTime" parameter of this interaction.
+	*
+	* @return the value of the "actualLogicalGenerationTime" parameter
+	*/
+	public double get_actualLogicalGenerationTime() { return _actualLogicalGenerationTime; }
 	
 
 
@@ -609,8 +609,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		set_sourceFed( C2WInteractionRoot_var.get_sourceFed() );
 		set_originFed( C2WInteractionRoot_var.get_originFed() );
-		set_actualLogicalGenerationTime( C2WInteractionRoot_var.get_actualLogicalGenerationTime() );
 		set_federateFilter( C2WInteractionRoot_var.get_federateFilter() );
+		set_actualLogicalGenerationTime( C2WInteractionRoot_var.get_actualLogicalGenerationTime() );
 	}
 
 
@@ -629,8 +629,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		if (  "sourceFed".equals( datamemberName )  ) return get_sourceFed();
 		else if (  "originFed".equals( datamemberName )  ) return get_originFed();
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) return new Double( get_actualLogicalGenerationTime() );
 		else if (  "federateFilter".equals( datamemberName )  ) return get_federateFilter();
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) return new Double( get_actualLogicalGenerationTime() );
 		else return super.getParameter( datamemberName );
 	}
 	
@@ -649,8 +649,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		if ( get_sourceFed_handle() == datamemberHandle ) return get_sourceFed();
 		else if ( get_originFed_handle() == datamemberHandle ) return get_originFed();
-		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) return new Double( get_actualLogicalGenerationTime() );
 		else if ( get_federateFilter_handle() == datamemberHandle ) return get_federateFilter();
+		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) return new Double( get_actualLogicalGenerationTime() );
 		else return super.getParameter( datamemberHandle );
 	}
 	
@@ -661,8 +661,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		if ( param_handle == get_sourceFed_handle() ) set_sourceFed( val );
 		else if ( param_handle == get_originFed_handle() ) set_originFed( val );
-		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
 		else if ( param_handle == get_federateFilter_handle() ) set_federateFilter( val );
+		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
 		else retval = super.setParameterAux( param_handle, val );
 		
 		return retval;
@@ -675,8 +675,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( val );
 		else if (  "originFed".equals( datamemberName )  ) set_originFed( val );
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
-		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( val );	
+		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( val );
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );	
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -689,8 +689,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 		if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( (String)val );
 		else if (  "originFed".equals( datamemberName )  ) set_originFed( (String)val );
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( (Double)val );
-		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( (String)val );		
+		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( (String)val );
+		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( (Double)val );		
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -706,9 +706,9 @@ public class C2WInteractionRoot extends InteractionRoot {
 		
 			datamembers.add( get_originFed_handle(), get_originFed().getBytes() );
 		
-			datamembers.add( get_actualLogicalGenerationTime_handle(), Double.toString( get_actualLogicalGenerationTime() ).getBytes() );
-		
 			datamembers.add( get_federateFilter_handle(), get_federateFilter().getBytes() );
+		
+			datamembers.add( get_actualLogicalGenerationTime_handle(), Double.toString( get_actualLogicalGenerationTime() ).getBytes() );
 		
 	
 		return datamembers;
@@ -723,8 +723,8 @@ public class C2WInteractionRoot extends InteractionRoot {
 			
 				_sourceFed = data._sourceFed;
 				_originFed = data._originFed;
-				_actualLogicalGenerationTime = data._actualLogicalGenerationTime;
 				_federateFilter = data._federateFilter;
+				_actualLogicalGenerationTime = data._actualLogicalGenerationTime;
 			
 		}
 	}

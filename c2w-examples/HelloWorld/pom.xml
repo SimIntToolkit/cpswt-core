@@ -10,8 +10,8 @@
   <dependencies>
     <dependency>
       <groupId>org.c2w</groupId>
-      <artifactId>HelloWorld_base</artifactId>
-      <version>${c2w.version}</version>
+      <artifactId>HelloWorld-base-java</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   

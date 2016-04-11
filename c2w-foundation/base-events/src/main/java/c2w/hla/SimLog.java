@@ -24,12 +24,8 @@ public class SimLog extends C2WInteractionRoot {
 	
 	
 	private static int _Time_handle;
-	private static int _sourceFed_handle;
 	private static int _FedName_handle;
-	private static int _originFed_handle;
 	private static int _Comment_handle;
-	private static int _actualLogicalGenerationTime_handle;
-	private static int _federateFilter_handle;
 	
 	
 	/**
@@ -41,14 +37,6 @@ public class SimLog extends C2WInteractionRoot {
 	public static int get_Time_handle() { return _Time_handle; }
 	
 	/**
-	* Returns the handle (RTI assigned) of the "sourceFed" parameter of
-	* its containing interaction class.
-	*
-	* @return the handle (RTI assigned) of the "sourceFed" parameter
-	*/
-	public static int get_sourceFed_handle() { return _sourceFed_handle; }
-	
-	/**
 	* Returns the handle (RTI assigned) of the "FedName" parameter of
 	* its containing interaction class.
 	*
@@ -57,36 +45,12 @@ public class SimLog extends C2WInteractionRoot {
 	public static int get_FedName_handle() { return _FedName_handle; }
 	
 	/**
-	* Returns the handle (RTI assigned) of the "originFed" parameter of
-	* its containing interaction class.
-	*
-	* @return the handle (RTI assigned) of the "originFed" parameter
-	*/
-	public static int get_originFed_handle() { return _originFed_handle; }
-	
-	/**
 	* Returns the handle (RTI assigned) of the "Comment" parameter of
 	* its containing interaction class.
 	*
 	* @return the handle (RTI assigned) of the "Comment" parameter
 	*/
 	public static int get_Comment_handle() { return _Comment_handle; }
-	
-	/**
-	* Returns the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter of
-	* its containing interaction class.
-	*
-	* @return the handle (RTI assigned) of the "actualLogicalGenerationTime" parameter
-	*/
-	public static int get_actualLogicalGenerationTime_handle() { return _actualLogicalGenerationTime_handle; }
-	
-	/**
-	* Returns the handle (RTI assigned) of the "federateFilter" parameter of
-	* its containing interaction class.
-	*
-	* @return the handle (RTI assigned) of the "federateFilter" parameter
-	*/
-	public static int get_federateFilter_handle() { return _federateFilter_handle; }
 	
 	
 	
@@ -162,12 +126,12 @@ public class SimLog extends C2WInteractionRoot {
 		
 		
 		_datamemberNames.add( "Time" );
-		_datamemberNames.add( "sourceFed" );
+		
 		_datamemberNames.add( "FedName" );
-		_datamemberNames.add( "originFed" );
+		
 		_datamemberNames.add( "Comment" );
-		_datamemberNames.add( "actualLogicalGenerationTime" );
-		_datamemberNames.add( "federateFilter" );
+		
+		
 		
 		
 		_allDatamemberNames.add( "Time" );
@@ -175,17 +139,13 @@ public class SimLog extends C2WInteractionRoot {
 		_allDatamemberNames.add( "FedName" );
 		_allDatamemberNames.add( "originFed" );
 		_allDatamemberNames.add( "Comment" );
-		_allDatamemberNames.add( "actualLogicalGenerationTime" );
 		_allDatamemberNames.add( "federateFilter" );
+		_allDatamemberNames.add( "actualLogicalGenerationTime" );
 		
 		
 		_datamemberTypeMap.put( "Time", "double" );
-		_datamemberTypeMap.put( "sourceFed", "String" );
 		_datamemberTypeMap.put( "FedName", "String" );
-		_datamemberTypeMap.put( "originFed", "String" );
 		_datamemberTypeMap.put( "Comment", "String" );
-		_datamemberTypeMap.put( "actualLogicalGenerationTime", "double" );
-		_datamemberTypeMap.put( "federateFilter", "String" );
 	
 	
 
@@ -228,12 +188,8 @@ public class SimLog extends C2WInteractionRoot {
 			try {
 							
 				_Time_handle = rti.getParameterHandle( "Time", get_handle() );			
-				_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );			
 				_FedName_handle = rti.getParameterHandle( "FedName", get_handle() );			
-				_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );			
-				_Comment_handle = rti.getParameterHandle( "Comment", get_handle() );			
-				_actualLogicalGenerationTime_handle = rti.getParameterHandle( "actualLogicalGenerationTime", get_handle() );			
-				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );
+				_Comment_handle = rti.getParameterHandle( "Comment", get_handle() );
 				isNotInitialized = false;
 			} catch ( FederateNotExecutionMember f ) {
 				System.err.println( initErrorMessage + "Federate Not Execution Member" );
@@ -255,21 +211,13 @@ public class SimLog extends C2WInteractionRoot {
 			
 			
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,Time", get_Time_handle() );
-		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,sourceFed", get_sourceFed_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,FedName", get_FedName_handle() );
-		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,originFed", get_originFed_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,Comment", get_Comment_handle() );
-		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,actualLogicalGenerationTime", get_actualLogicalGenerationTime_handle() );
-		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.SimLog,federateFilter", get_federateFilter_handle() );
 			
 			
 		_datamemberHandleNameMap.put( get_Time_handle(), "Time" );
-		_datamemberHandleNameMap.put( get_sourceFed_handle(), "sourceFed" );
 		_datamemberHandleNameMap.put( get_FedName_handle(), "FedName" );
-		_datamemberHandleNameMap.put( get_originFed_handle(), "originFed" );
 		_datamemberHandleNameMap.put( get_Comment_handle(), "Comment" );
-		_datamemberHandleNameMap.put( get_actualLogicalGenerationTime_handle(), "actualLogicalGenerationTime" );
-		_datamemberHandleNameMap.put( get_federateFilter_handle(), "federateFilter" );
 		
 	}
 
@@ -520,12 +468,8 @@ public class SimLog extends C2WInteractionRoot {
 			
 			
 			+ "Time:" + get_Time()
-			+ "," + "sourceFed:" + get_sourceFed()
 			+ "," + "FedName:" + get_FedName()
-			+ "," + "originFed:" + get_originFed()
 			+ "," + "Comment:" + get_Comment()
-			+ "," + "actualLogicalGenerationTime:" + get_actualLogicalGenerationTime()
-			+ "," + "federateFilter:" + get_federateFilter()
 			+ ")";
 	}
 	
@@ -536,17 +480,9 @@ public class SimLog extends C2WInteractionRoot {
 	
 	private double _Time = 0;
 	
-	private String _sourceFed = "";
-	
 	private String _FedName = "";
 	
-	private String _originFed = "";
-	
 	private String _Comment = "";
-	
-	private double _actualLogicalGenerationTime = 0;
-	
-	private String _federateFilter = "";
 
 	
 	
@@ -566,21 +502,6 @@ public class SimLog extends C2WInteractionRoot {
 	
 	
 	/**
-	* Set the value of the "sourceFed" parameter to "value" for this parameter.
-	*
-	* @param value the new value for the "sourceFed" parameter
-	*/
-	public void set_sourceFed( String value ) { _sourceFed = value; }
-	
-	/**
-	* Returns the value of the "sourceFed" parameter of this interaction.
-	*
-	* @return the value of the "sourceFed" parameter
-	*/
-	public String get_sourceFed() { return _sourceFed; }
-	
-	
-	/**
 	* Set the value of the "FedName" parameter to "value" for this parameter.
 	*
 	* @param value the new value for the "FedName" parameter
@@ -596,21 +517,6 @@ public class SimLog extends C2WInteractionRoot {
 	
 	
 	/**
-	* Set the value of the "originFed" parameter to "value" for this parameter.
-	*
-	* @param value the new value for the "originFed" parameter
-	*/
-	public void set_originFed( String value ) { _originFed = value; }
-	
-	/**
-	* Returns the value of the "originFed" parameter of this interaction.
-	*
-	* @return the value of the "originFed" parameter
-	*/
-	public String get_originFed() { return _originFed; }
-	
-	
-	/**
 	* Set the value of the "Comment" parameter to "value" for this parameter.
 	*
 	* @param value the new value for the "Comment" parameter
@@ -623,36 +529,6 @@ public class SimLog extends C2WInteractionRoot {
 	* @return the value of the "Comment" parameter
 	*/
 	public String get_Comment() { return _Comment; }
-	
-	
-	/**
-	* Set the value of the "actualLogicalGenerationTime" parameter to "value" for this parameter.
-	*
-	* @param value the new value for the "actualLogicalGenerationTime" parameter
-	*/
-	public void set_actualLogicalGenerationTime( double value ) { _actualLogicalGenerationTime = value; }
-	
-	/**
-	* Returns the value of the "actualLogicalGenerationTime" parameter of this interaction.
-	*
-	* @return the value of the "actualLogicalGenerationTime" parameter
-	*/
-	public double get_actualLogicalGenerationTime() { return _actualLogicalGenerationTime; }
-	
-	
-	/**
-	* Set the value of the "federateFilter" parameter to "value" for this parameter.
-	*
-	* @param value the new value for the "federateFilter" parameter
-	*/
-	public void set_federateFilter( String value ) { _federateFilter = value; }
-	
-	/**
-	* Returns the value of the "federateFilter" parameter of this interaction.
-	*
-	* @return the value of the "federateFilter" parameter
-	*/
-	public String get_federateFilter() { return _federateFilter; }
 	
 
 
@@ -707,12 +583,8 @@ public class SimLog extends C2WInteractionRoot {
 		
 		
 		set_Time( SimLog_var.get_Time() );
-		set_sourceFed( SimLog_var.get_sourceFed() );
 		set_FedName( SimLog_var.get_FedName() );
-		set_originFed( SimLog_var.get_originFed() );
 		set_Comment( SimLog_var.get_Comment() );
-		set_actualLogicalGenerationTime( SimLog_var.get_actualLogicalGenerationTime() );
-		set_federateFilter( SimLog_var.get_federateFilter() );
 	}
 
 
@@ -730,12 +602,8 @@ public class SimLog extends C2WInteractionRoot {
 		
 		
 		if (  "Time".equals( datamemberName )  ) return new Double( get_Time() );
-		else if (  "sourceFed".equals( datamemberName )  ) return get_sourceFed();
 		else if (  "FedName".equals( datamemberName )  ) return get_FedName();
-		else if (  "originFed".equals( datamemberName )  ) return get_originFed();
 		else if (  "Comment".equals( datamemberName )  ) return get_Comment();
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) return new Double( get_actualLogicalGenerationTime() );
-		else if (  "federateFilter".equals( datamemberName )  ) return get_federateFilter();
 		else return super.getParameter( datamemberName );
 	}
 	
@@ -753,12 +621,8 @@ public class SimLog extends C2WInteractionRoot {
 				
 		
 		if ( get_Time_handle() == datamemberHandle ) return new Double( get_Time() );
-		else if ( get_sourceFed_handle() == datamemberHandle ) return get_sourceFed();
 		else if ( get_FedName_handle() == datamemberHandle ) return get_FedName();
-		else if ( get_originFed_handle() == datamemberHandle ) return get_originFed();
 		else if ( get_Comment_handle() == datamemberHandle ) return get_Comment();
-		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) return new Double( get_actualLogicalGenerationTime() );
-		else if ( get_federateFilter_handle() == datamemberHandle ) return get_federateFilter();
 		else return super.getParameter( datamemberHandle );
 	}
 	
@@ -768,12 +632,8 @@ public class SimLog extends C2WInteractionRoot {
 			
 		
 		if ( param_handle == get_Time_handle() ) set_Time( Double.parseDouble( val ) );
-		else if ( param_handle == get_sourceFed_handle() ) set_sourceFed( val );
 		else if ( param_handle == get_FedName_handle() ) set_FedName( val );
-		else if ( param_handle == get_originFed_handle() ) set_originFed( val );
 		else if ( param_handle == get_Comment_handle() ) set_Comment( val );
-		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
-		else if ( param_handle == get_federateFilter_handle() ) set_federateFilter( val );
 		else retval = super.setParameterAux( param_handle, val );
 		
 		return retval;
@@ -785,12 +645,8 @@ public class SimLog extends C2WInteractionRoot {
 			
 		
 		if (  "Time".equals( datamemberName )  ) set_Time( Double.parseDouble( val ) );
-		else if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( val );
 		else if (  "FedName".equals( datamemberName )  ) set_FedName( val );
-		else if (  "originFed".equals( datamemberName )  ) set_originFed( val );
-		else if (  "Comment".equals( datamemberName )  ) set_Comment( val );
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
-		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( val );	
+		else if (  "Comment".equals( datamemberName )  ) set_Comment( val );	
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -802,12 +658,8 @@ public class SimLog extends C2WInteractionRoot {
 		
 		
 		if (  "Time".equals( datamemberName )  ) set_Time( (Double)val );
-		else if (  "sourceFed".equals( datamemberName )  ) set_sourceFed( (String)val );
 		else if (  "FedName".equals( datamemberName )  ) set_FedName( (String)val );
-		else if (  "originFed".equals( datamemberName )  ) set_originFed( (String)val );
-		else if (  "Comment".equals( datamemberName )  ) set_Comment( (String)val );
-		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) set_actualLogicalGenerationTime( (Double)val );
-		else if (  "federateFilter".equals( datamemberName )  ) set_federateFilter( (String)val );		
+		else if (  "Comment".equals( datamemberName )  ) set_Comment( (String)val );		
 		else retval = super.setParameterAux( datamemberName, val );
 		
 		return retval;
@@ -821,17 +673,9 @@ public class SimLog extends C2WInteractionRoot {
 		
 			datamembers.add( get_Time_handle(), Double.toString( get_Time() ).getBytes() );
 		
-			datamembers.add( get_sourceFed_handle(), get_sourceFed().getBytes() );
-		
 			datamembers.add( get_FedName_handle(), get_FedName().getBytes() );
 		
-			datamembers.add( get_originFed_handle(), get_originFed().getBytes() );
-		
 			datamembers.add( get_Comment_handle(), get_Comment().getBytes() );
-		
-			datamembers.add( get_actualLogicalGenerationTime_handle(), Double.toString( get_actualLogicalGenerationTime() ).getBytes() );
-		
-			datamembers.add( get_federateFilter_handle(), get_federateFilter().getBytes() );
 		
 	
 		return datamembers;
@@ -845,12 +689,8 @@ public class SimLog extends C2WInteractionRoot {
 			
 			
 				_Time = data._Time;
-				_sourceFed = data._sourceFed;
 				_FedName = data._FedName;
-				_originFed = data._originFed;
 				_Comment = data._Comment;
-				_actualLogicalGenerationTime = data._actualLogicalGenerationTime;
-				_federateFilter = data._federateFilter;
 			
 		}
 	}

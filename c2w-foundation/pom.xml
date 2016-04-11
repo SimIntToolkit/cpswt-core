@@ -20,6 +20,7 @@
 		<module>federation-manager</module>
 		<module>c2w-gui</module>
 		<module>c2w-matlab</module>	
+		<module>fedmanager-exec</module>	
 	</modules>	
 
 	<build>

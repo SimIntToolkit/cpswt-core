@@ -144,411 +144,411 @@ public class ObjectRoot implements ObjectRootInterface {
 	
 	
 	
-private static boolean _isInitialized = false;
+	private static boolean _isInitialized = false;
 
-private static int _handle;
+	private static int _handle;
 
-/**
-* Returns the handle (RTI assigned) of the ObjectRoot object class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return the handle of the class pertaining to the reference,\
-* rather than the handle of the class for the instance referred to by the reference.
-* For the polymorphic version of this method, use {@link #getClassHandle()}.
-*/
-public static int get_handle() { return _handle; }
+	/**
+	* Returns the handle (RTI assigned) of the ObjectRoot object class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return the handle of the class pertaining to the reference,\
+	* rather than the handle of the class for the instance referred to by the reference.
+	* For the polymorphic version of this method, use {@link #getClassHandle()}.
+	*/
+	public static int get_handle() { return _handle; }
 
-/**
-* Returns the fully-qualified (dot-delimited) name of the ObjectRoot
-* object class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return the name of the class pertaining to the reference,\
-* rather than the name of the class for the instance referred to by the reference.
-* For the polymorphic version of this method, use {@link #getClassName()}.
-*/
-public static String get_class_name() { return "ObjectRoot"; }
+	/**
+	* Returns the fully-qualified (dot-delimited) name of the ObjectRoot
+	* object class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return the name of the class pertaining to the reference,\
+	* rather than the name of the class for the instance referred to by the reference.
+	* For the polymorphic version of this method, use {@link #getClassName()}.
+	*/
+	public static String get_class_name() { return "ObjectRoot"; }
 
-/**
-* Returns the simple name (the last name in the dot-delimited fully-qualified
-* class name) of the ObjectRoot object class.
-*/
-public static String get_simple_class_name() { return "ObjectRoot"; }
+	/**
+	* Returns the simple name (the last name in the dot-delimited fully-qualified
+	* class name) of the ObjectRoot object class.
+	*/
+	public static String get_simple_class_name() { return "ObjectRoot"; }
 
-private static Set< String > _datamemberNames = new HashSet< String >();
-private static Set< String > _allDatamemberNames = new HashSet< String >();
+	private static Set< String > _datamemberNames = new HashSet< String >();
+	private static Set< String > _allDatamemberNames = new HashSet< String >();
 
-/**
-* Returns a set containing the names of all of the non-hidden attributes in the
-* ObjectRoot object class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return a set of parameter names pertaining to the reference,\
-* rather than the parameter names of the class for the instance referred to by
-* the reference.  For the polymorphic version of this method, use
-* {@link #getAttributeNames()}.
-*/
-public static Set< String > get_attribute_names() {
-	return new HashSet< String >( _datamemberNames );
-}
-
-
-/**
-* Returns a set containing the names of all of the attributes in the
-* ObjectRoot object class.
-* Note: As this is a static method, it is NOT polymorphic, and so, if called on
-* a reference will return a set of parameter names pertaining to the reference,\
-* rather than the parameter names of the class for the instance referred to by
-* the reference.  For the polymorphic version of this method, use
-* {@link #getAttributeNames()}.
-*/
-public static Set< String > get_all_attribute_names() {
-	return new HashSet< String >( _allDatamemberNames );
-}
-
-
-
-private static AttributeHandleSet _publishedAttributeHandleSet;
-private static Set< String > _publishAttributeNameSet = new HashSet< String >();
-
-private static AttributeHandleSet _subscribedAttributeHandleSet; 
-private static Set< String > _subscribeAttributeNameSet = new HashSet< String >();
-
-
-
-static {
-	_classNameSet.add( "ObjectRoot" );
-	_classNameClassMap.put( "ObjectRoot", ObjectRoot.class );
-	
-	_datamemberClassNameSetMap.put( "ObjectRoot", _datamemberNames );
-	_allDatamemberClassNameSetMap.put( "ObjectRoot", _allDatamemberNames );
-
-	
-	
-	
-	
-	
-	
-
-
-	_classNamePublishAttributeNameMap.put( "ObjectRoot", _publishAttributeNameSet );
-	_publishedAttributeHandleSet = _factory.createAttributeHandleSet();
-	_classNamePublishedAttributeMap.put( "ObjectRoot", _publishedAttributeHandleSet );
-
-	_classNameSubscribeAttributeNameMap.put( "ObjectRoot", _subscribeAttributeNameSet );
-	_subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
-	_classNameSubscribedAttributeMap.put( "ObjectRoot", _subscribedAttributeHandleSet );
-
-
-}
-
-
-private static String initErrorMessage = "Error:  ObjectRoot:  could not initialize:  ";
-protected static void init( RTIambassador rti ) {
-	if ( _isInitialized ) return;
-	_isInitialized = true;
-	
-	
-	
-	boolean isNotInitialized = true;
-	while( isNotInitialized ) {
-		try {
-			_handle = rti.getObjectClassHandle( "ObjectRoot" );
-			isNotInitialized = false;
-		} catch ( FederateNotExecutionMember f ) {
-			System.err.println( initErrorMessage + "Federate Not Execution Member" );
-			f.printStackTrace();
-			return;				
-		} catch ( NameNotFound n ) {
-			System.err.println( initErrorMessage + "Name Not Found" );
-			n.printStackTrace();
-			return;				
-		} catch ( Exception e ) {
-			e.printStackTrace();
-			try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
-		}
-	}
-
-	_classNameHandleMap.put( "ObjectRoot", get_handle() );
-	_classHandleNameMap.put( get_handle(), "ObjectRoot" );
-	_classHandleSimpleNameMap.put( get_handle(), "ObjectRoot" );
-
-	
-}
-
-
-private static boolean _isPublished = false;
-private static String publishErrorMessage = "Error:  ObjectRoot:  could not publish:  ";
-
-/**
-* Publishes the ObjectRoot object class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void publish( RTIambassador rti ) {
-	if ( _isPublished ) return;
-	
-	init( rti );
-
-	
-	_publishedAttributeHandleSet.empty();
-	for( String attributeName : _publishAttributeNameSet ) {
-		try {
-			_publishedAttributeHandleSet.add(  _datamemberNameHandleMap.get( "ObjectRoot," + attributeName )  );
-		} catch ( Exception e ) {
-			System.err.println( publishErrorMessage + "Could not publish \"" + attributeName + "\" attribute." );
-		}
+	/**
+	* Returns a set containing the names of all of the non-hidden attributes in the
+	* ObjectRoot object class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return a set of parameter names pertaining to the reference,\
+	* rather than the parameter names of the class for the instance referred to by
+	* the reference.  For the polymorphic version of this method, use
+	* {@link #getAttributeNames()}.
+	*/
+	public static Set< String > get_attribute_names() {
+		return new HashSet< String >( _datamemberNames );
 	}
 
 
-	synchronized( rti ) {
-		boolean isNotPublished = true;
-		while( isNotPublished ) {
-			try {
-				rti.publishObjectClass( get_handle(), _publishedAttributeHandleSet );
-				isNotPublished = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( publishErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( ObjectClassNotDefined i ) {
-				System.err.println( publishErrorMessage + "Object Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isPublished = true;
-}
-
-private static String unpublishErrorMessage = "Error:  ObjectRoot:  could not unpublish:  ";
-/**
-* Unpublishes the ObjectRoot object class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void unpublish( RTIambassador rti ) {
-	if ( !_isPublished ) return;
-	
-	init( rti );
-	synchronized( rti ) {
-		boolean isNotUnpublished = true;
-		while( isNotUnpublished ) {
-			try {
-				rti.unpublishObjectClass( get_handle() );
-				isNotUnpublished = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( unpublishErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( ObjectClassNotDefined i ) {
-				System.err.println( unpublishErrorMessage + "Object Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( ObjectClassNotPublished i ) {
-				System.err.println( unpublishErrorMessage + "Object Class Not Published" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isPublished = false;
-}
-
-private static boolean _isSubscribed = false;
-private static String subscribeErrorMessage = "Error:  ObjectRoot:  could not subscribe:  ";
-/**
-* Subscribes a federate to the ObjectRoot object class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void subscribe( RTIambassador rti ) {
-	if ( _isSubscribed ) return;
-	
-	init( rti );
-	
-	_subscribedAttributeHandleSet.empty();
-	for( String attributeName : _subscribeAttributeNameSet ) {
-		try {
-			_subscribedAttributeHandleSet.add(  _datamemberNameHandleMap.get( "ObjectRoot," + attributeName )  );
-		} catch ( Exception e ) {
-			System.err.println( subscribeErrorMessage + "Could not subscribe to \"" + attributeName + "\" attribute." );
-		}
+	/**
+	* Returns a set containing the names of all of the attributes in the
+	* ObjectRoot object class.
+	* Note: As this is a static method, it is NOT polymorphic, and so, if called on
+	* a reference will return a set of parameter names pertaining to the reference,\
+	* rather than the parameter names of the class for the instance referred to by
+	* the reference.  For the polymorphic version of this method, use
+	* {@link #getAttributeNames()}.
+	*/
+	public static Set< String > get_all_attribute_names() {
+		return new HashSet< String >( _allDatamemberNames );
 	}
 
+
 	
-	synchronized( rti ) {
-		boolean isNotSubscribed = true;
-		while( isNotSubscribed ) {
-			try {
-				rti.subscribeObjectClassAttributes( get_handle(), _subscribedAttributeHandleSet );
-				isNotSubscribed = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( subscribeErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( ObjectClassNotDefined i ) {
-				System.err.println( subscribeErrorMessage + "Object Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
+	private static AttributeHandleSet _publishedAttributeHandleSet;
+	private static Set< String > _publishAttributeNameSet = new HashSet< String >();
+
+	private static AttributeHandleSet _subscribedAttributeHandleSet; 
+	private static Set< String > _subscribeAttributeNameSet = new HashSet< String >();
+
 	
-	_isSubscribed = true;
-}
 
-private static String unsubscribeErrorMessage = "Error:  ObjectRoot:  could not unsubscribe:  ";
-/**
-* Unsubscribes a federate from the ObjectRoot object class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public static void unsubscribe( RTIambassador rti ) {
-	if ( !_isSubscribed ) return;
+	static {
+		_classNameSet.add( "ObjectRoot" );
+		_classNameClassMap.put( "ObjectRoot", ObjectRoot.class );
+		
+		_datamemberClassNameSetMap.put( "ObjectRoot", _datamemberNames );
+		_allDatamemberClassNameSetMap.put( "ObjectRoot", _allDatamemberNames );
 
-	init( rti );
-	synchronized( rti ) {
-		boolean isNotUnsubscribed = true;
-		while( isNotUnsubscribed ) {
-			try {
-				rti.unsubscribeObjectClass( get_handle() );
-				isNotUnsubscribed = false;
-			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( unsubscribeErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;
-			} catch ( ObjectClassNotDefined i ) {
-				System.err.println( unsubscribeErrorMessage + "Object Class Not Defined" );
-				i.printStackTrace();
-				return;
-			} catch ( ObjectClassNotSubscribed i ) {
-				System.err.println( unsubscribeErrorMessage + "Object Class Not Subscribed" );
-				i.printStackTrace();
-				return;
-			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
-			}
-		}
-	}
-	
-	_isSubscribed = false;
-}
-
-/**
-* Return true if "handle" is equal to the handle (RTI assigned) of this class
-* (that is, the ObjectRoot object class).
-*
-* @param handle handle to compare to the value of the handle (RTI assigned) of
-* this class (the ObjectRoot object class).
-* @return "true" if "handle" matches the value of the handle of this class
-* (that is, the ObjectRoot object class).
-*/
-public static boolean match( int handle ) { return handle == get_handle(); }
-
-/**
-* Returns the handle (RTI assigned) of this instance's object class .
-* 
-* @return the handle (RTI assigned) if this instance's object class
-*/
-public int getClassHandle() { return get_handle(); }
-
-/**
-* Returns the fully-qualified (dot-delimited) name of this instance's object class.
-* 
-* @return the fully-qualified (dot-delimited) name of this instance's object class
-*/
-public String getClassName() { return get_class_name(); }
-
-/**
-* Returns the simple name (last name in its fully-qualified dot-delimited name)
-* of this instance's object class.
-* 
-* @return the simple name of this instance's object class 
-*/
-public String getSimpleClassName() { return get_simple_class_name(); }
-
-/**
-* Returns a set containing the names of all of the non-hiddenattributes of an
-* object class instance.
-*
-* @return set containing the names of all of the attributes of an
-* object class instance
-*/
-public Set< String > getAttributeNames() { return get_attribute_names(); }
-
-/**
-* Returns a set containing the names of all of the attributes of an
-* object class instance.
-*
-* @return set containing the names of all of the attributes of an
-* object class instance
-*/
-public Set< String > getAllAttributeNames() { return get_all_attribute_names(); }
-
-/**
-* Publishes the object class of this instance of the class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void publishObject( RTIambassador rti ) { publish( rti ); }
-
-/**
-* Unpublishes the object class of this instance of this class for a federate.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void unpublishObject( RTIambassador rti ) { unpublish( rti ); }
-
-/**
-* Subscribes a federate to the object class of this instance of this class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void subscribeObject( RTIambassador rti ) { subscribe( rti ); }
-
-/**
-* Unsubscribes a federate from the object class of this instance of this class.
-*
-* @param rti handle to the RTI, usu. obtained through the
-* {@link SynchronizedFederate#getRTI()} call
-*/
-public void unsubscribeObject( RTIambassador rti ) { unsubscribe( rti ); }
-
-
-/**
-* Returns a data structure containing the handles of all attributes for this object
-* class that are currently marked for subscription.  To actually subscribe to these
-* attributes, a federate must call <objectclassname>.subscribe( RTIambassador rti ).
-*
-* @return data structure containing the handles of all attributes for this object
-* class that are currently marked for subscription
-*/
-public AttributeHandleSet getSubscribedAttributeHandleSet() { return _subscribedAttributeHandleSet; }
-
-
-public String toString() {
-	return "ObjectRoot("
 		
 		
-		+ ")";
-}
+		
+		
+		
+		
+	
+
+		_classNamePublishAttributeNameMap.put( "ObjectRoot", _publishAttributeNameSet );
+		_publishedAttributeHandleSet = _factory.createAttributeHandleSet();
+		_classNamePublishedAttributeMap.put( "ObjectRoot", _publishedAttributeHandleSet );
+
+		_classNameSubscribeAttributeNameMap.put( "ObjectRoot", _subscribeAttributeNameSet );
+		_subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
+		_classNameSubscribedAttributeMap.put( "ObjectRoot", _subscribedAttributeHandleSet );
+	
+
+	}
+
+
+	private static String initErrorMessage = "Error:  ObjectRoot:  could not initialize:  ";
+	protected static void init( RTIambassador rti ) {
+		if ( _isInitialized ) return;
+		_isInitialized = true;
+		
+		
+		
+		boolean isNotInitialized = true;
+		while( isNotInitialized ) {
+			try {
+				_handle = rti.getObjectClassHandle( "ObjectRoot" );
+				isNotInitialized = false;
+			} catch ( FederateNotExecutionMember f ) {
+				System.err.println( initErrorMessage + "Federate Not Execution Member" );
+				f.printStackTrace();
+				return;				
+			} catch ( NameNotFound n ) {
+				System.err.println( initErrorMessage + "Name Not Found" );
+				n.printStackTrace();
+				return;				
+			} catch ( Exception e ) {
+				e.printStackTrace();
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+			}
+		}
+
+		_classNameHandleMap.put( "ObjectRoot", get_handle() );
+		_classHandleNameMap.put( get_handle(), "ObjectRoot" );
+		_classHandleSimpleNameMap.put( get_handle(), "ObjectRoot" );
+
+		
+	}
+
+
+	private static boolean _isPublished = false;
+	private static String publishErrorMessage = "Error:  ObjectRoot:  could not publish:  ";
+
+	/**
+	* Publishes the ObjectRoot object class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void publish( RTIambassador rti ) {
+		if ( _isPublished ) return;
+		
+		init( rti );
+
+		
+		_publishedAttributeHandleSet.empty();
+		for( String attributeName : _publishAttributeNameSet ) {
+			try {
+				_publishedAttributeHandleSet.add(  _datamemberNameHandleMap.get( "ObjectRoot," + attributeName )  );
+			} catch ( Exception e ) {
+				System.err.println( publishErrorMessage + "Could not publish \"" + attributeName + "\" attribute." );
+			}
+		}
+	
+
+		synchronized( rti ) {
+			boolean isNotPublished = true;
+			while( isNotPublished ) {
+				try {
+					rti.publishObjectClass( get_handle(), _publishedAttributeHandleSet );
+					isNotPublished = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( publishErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( ObjectClassNotDefined i ) {
+					System.err.println( publishErrorMessage + "Object Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isPublished = true;
+	}
+
+	private static String unpublishErrorMessage = "Error:  ObjectRoot:  could not unpublish:  ";
+	/**
+	* Unpublishes the ObjectRoot object class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void unpublish( RTIambassador rti ) {
+		if ( !_isPublished ) return;
+		
+		init( rti );
+		synchronized( rti ) {
+			boolean isNotUnpublished = true;
+			while( isNotUnpublished ) {
+				try {
+					rti.unpublishObjectClass( get_handle() );
+					isNotUnpublished = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( unpublishErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( ObjectClassNotDefined i ) {
+					System.err.println( unpublishErrorMessage + "Object Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( ObjectClassNotPublished i ) {
+					System.err.println( unpublishErrorMessage + "Object Class Not Published" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isPublished = false;
+	}
+
+	private static boolean _isSubscribed = false;
+	private static String subscribeErrorMessage = "Error:  ObjectRoot:  could not subscribe:  ";
+	/**
+	* Subscribes a federate to the ObjectRoot object class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void subscribe( RTIambassador rti ) {
+		if ( _isSubscribed ) return;
+		
+		init( rti );
+		
+		_subscribedAttributeHandleSet.empty();
+		for( String attributeName : _subscribeAttributeNameSet ) {
+			try {
+				_subscribedAttributeHandleSet.add(  _datamemberNameHandleMap.get( "ObjectRoot," + attributeName )  );
+			} catch ( Exception e ) {
+				System.err.println( subscribeErrorMessage + "Could not subscribe to \"" + attributeName + "\" attribute." );
+			}
+		}
+	
+		
+		synchronized( rti ) {
+			boolean isNotSubscribed = true;
+			while( isNotSubscribed ) {
+				try {
+					rti.subscribeObjectClassAttributes( get_handle(), _subscribedAttributeHandleSet );
+					isNotSubscribed = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( subscribeErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( ObjectClassNotDefined i ) {
+					System.err.println( subscribeErrorMessage + "Object Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isSubscribed = true;
+	}
+
+	private static String unsubscribeErrorMessage = "Error:  ObjectRoot:  could not unsubscribe:  ";
+	/**
+	* Unsubscribes a federate from the ObjectRoot object class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public static void unsubscribe( RTIambassador rti ) {
+		if ( !_isSubscribed ) return;
+
+		init( rti );
+		synchronized( rti ) {
+			boolean isNotUnsubscribed = true;
+			while( isNotUnsubscribed ) {
+				try {
+					rti.unsubscribeObjectClass( get_handle() );
+					isNotUnsubscribed = false;
+				} catch ( FederateNotExecutionMember f ) {
+					System.err.println( unsubscribeErrorMessage + "Federate Not Execution Member" );
+					f.printStackTrace();
+					return;
+				} catch ( ObjectClassNotDefined i ) {
+					System.err.println( unsubscribeErrorMessage + "Object Class Not Defined" );
+					i.printStackTrace();
+					return;
+				} catch ( ObjectClassNotSubscribed i ) {
+					System.err.println( unsubscribeErrorMessage + "Object Class Not Subscribed" );
+					i.printStackTrace();
+					return;
+				} catch ( Exception e ) {
+					e.printStackTrace();
+					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+				}
+			}
+		}
+		
+		_isSubscribed = false;
+	}
+
+	/**
+	* Return true if "handle" is equal to the handle (RTI assigned) of this class
+	* (that is, the ObjectRoot object class).
+	*
+	* @param handle handle to compare to the value of the handle (RTI assigned) of
+	* this class (the ObjectRoot object class).
+	* @return "true" if "handle" matches the value of the handle of this class
+	* (that is, the ObjectRoot object class).
+	*/
+	public static boolean match( int handle ) { return handle == get_handle(); }
+
+	/**
+	* Returns the handle (RTI assigned) of this instance's object class .
+	* 
+	* @return the handle (RTI assigned) if this instance's object class
+	*/
+	public int getClassHandle() { return get_handle(); }
+
+	/**
+	* Returns the fully-qualified (dot-delimited) name of this instance's object class.
+	* 
+	* @return the fully-qualified (dot-delimited) name of this instance's object class
+	*/
+	public String getClassName() { return get_class_name(); }
+
+	/**
+	* Returns the simple name (last name in its fully-qualified dot-delimited name)
+	* of this instance's object class.
+	* 
+	* @return the simple name of this instance's object class 
+	*/
+	public String getSimpleClassName() { return get_simple_class_name(); }
+
+	/**
+	* Returns a set containing the names of all of the non-hiddenattributes of an
+	* object class instance.
+	*
+	* @return set containing the names of all of the attributes of an
+	* object class instance
+	*/
+	public Set< String > getAttributeNames() { return get_attribute_names(); }
+
+	/**
+	* Returns a set containing the names of all of the attributes of an
+	* object class instance.
+	*
+	* @return set containing the names of all of the attributes of an
+	* object class instance
+	*/
+	public Set< String > getAllAttributeNames() { return get_all_attribute_names(); }
+
+	/**
+	* Publishes the object class of this instance of the class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void publishObject( RTIambassador rti ) { publish( rti ); }
+
+	/**
+	* Unpublishes the object class of this instance of this class for a federate.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void unpublishObject( RTIambassador rti ) { unpublish( rti ); }
+
+	/**
+	* Subscribes a federate to the object class of this instance of this class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void subscribeObject( RTIambassador rti ) { subscribe( rti ); }
+
+	/**
+	* Unsubscribes a federate from the object class of this instance of this class.
+	*
+	* @param rti handle to the RTI, usu. obtained through the
+	* {@link SynchronizedFederate#getRTI()} call
+	*/
+	public void unsubscribeObject( RTIambassador rti ) { unsubscribe( rti ); }
+
+	
+	/**
+	* Returns a data structure containing the handles of all attributes for this object
+	* class that are currently marked for subscription.  To actually subscribe to these
+	* attributes, a federate must call <objectclassname>.subscribe( RTIambassador rti ).
+	*
+	* @return data structure containing the handles of all attributes for this object
+	* class that are currently marked for subscription
+	*/
+	public AttributeHandleSet getSubscribedAttributeHandleSet() { return _subscribedAttributeHandleSet; }
+	
+
+	public String toString() {
+		return "ObjectRoot("
+			
+			
+			+ ")";
+	}
 	/**
 	* Returns a set of strings containing the names of all of the object
 	* classes in the current federation.
