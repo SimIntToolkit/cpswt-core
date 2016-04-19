@@ -92,7 +92,7 @@
   
   <scm>
   <connection>scm:git:https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java</connection>
-  <developerConnection>https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java</developerConnection>
+  <developerConnection>scm:git:https://git.vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java</developerConnection>
   <url>https://vulcan.isis.vanderbilt.edu/projects/c2wtng/c2wtng-java/folder/master/</url>
   </scm>
   

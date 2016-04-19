@@ -88,3 +88,7 @@ Temporary Items
 # IntelliJ
 .idea
 *.iml
+
+# Sublime project files
+*.sublime-project
+*.sublime-workspace
