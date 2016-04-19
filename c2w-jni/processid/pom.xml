@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.c2w</groupId>
     <artifactId>c2w-jni</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
   </parent>
   <artifactId>processid</artifactId>
   <packaging>nar</packaging>
@@ -55,7 +55,7 @@
 			            <argument>-classpath</argument>
 			            <!-- automatically creates the classpath using all project dependencies,
                  		also adding the project build directory -->
-			            <classpath/>
+			            <classpath />
 			            <argument>c2w.process.ProcessId</argument>
 			    </arguments>
 				</configuration>

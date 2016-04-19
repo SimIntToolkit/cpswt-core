@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.c2w</groupId>
   <artifactId>c2w-foundation</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>pom</packaging>
   <name>C2 Windtunnel Java Foundation</name>
   <description>Foundation packages and classes of C2 Windtunnel Java RTI and Federates</description>

@@ -1,13 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.c2w</groupId>
 	<artifactId>FederationManager_exec</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 
 	<properties>
-		<c2w.version>0.0.1-SNAPSHOT</c2w.version>
+		<c2w.version>0.1.0</c2w.version>
 		<nar.version>3.3.0</nar.version>
 	</properties>
 
@@ -42,7 +41,7 @@
 			            <argument>-classpath</argument>
 			            <!-- automatically creates the classpath using all project dependencies,
                  		also adding the project build directory -->
-			            <classpath/>
+			            <classpath />
 			            <argument>c2w.gui.hla.main.C2WSim</argument>
 			            <argument>--step</argument><argument>1.0</argument>
 			            <argument>--lookahead</argument><argument>0.1</argument>

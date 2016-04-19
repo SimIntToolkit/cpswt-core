@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.c2w</groupId>
     <artifactId>c2w-foundation</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
   </parent>
   <artifactId>c2w-gui</artifactId>
   
