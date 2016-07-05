@@ -88,6 +88,8 @@ import c2w.gui.coa.COASim;
 import c2w.util.FedUtil;
 import c2w.util.RandomWithFixedSeed;
 import c2w.util.WeakPropertyChangeSupport;
+import c2w.util.rtievents.IC2WFederationEventsHandler;
+import c2w.util.rtievents.C2WFederationEventsHandler;
 
 /**
  * Model class for the Federation Manager.
@@ -96,7 +98,7 @@ import c2w.util.WeakPropertyChangeSupport;
  */
 public class FedMgr extends SynchronizedFederate {
 	
-	public static final String FEDERATION_MANAGER_NAME = "manager";
+	
 
     private Set< String > _synchronizationLabels = new HashSet< String >();
 
@@ -116,6 +118,8 @@ public class FedMgr extends SynchronizedFederate {
     COAGraph _coaGraph = new COAGraph();
     COASim _coaSim = null;
     COANode _node = null;
+
+    private IC2WFederationEventsHandler _federationEventsHandler = null;
 
     // Cache class and methods for COAOutcomeFilter evaluation
     Class _outcomeFilterEvaluatorClass = null;
@@ -537,6 +541,8 @@ public class FedMgr extends SynchronizedFederate {
         
         // Update simulation mode
         realtime = mode;
+        
+        this._federationEventsHandler = new C2WFederationEventsHandler();
 
         initRTI();
         
@@ -595,20 +601,23 @@ public class FedMgr extends SynchronizedFederate {
     private void initRTI() throws Exception {
         
         log.info( "Waiting for RTI ... " );
-        createRTI();
+        createRTI(SynchronizedFederate.FEDERATION_MANAGER_NAME);
         log.info( " done.\n" );
         
         File fom_file = new File( FOM_file_name );
             
         log.info( "Attempting to create federation \"" + federation_name + "\" ... " );
         try {               
-            getRTI().createFederationExecution( federation_name, fom_file.toURI().toURL() );
+           	_federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federation_name);
+        	getRTI().createFederationExecution( federation_name, fom_file.toURI().toURL() );
+           _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federation_name);
+
         } catch ( FederationExecutionAlreadyExists feae ) {
             log.info( "already " );
         }
         log.info( "created.\n" );
         
-        joinFederation( federation_name, FEDERATION_MANAGER_NAME );
+        joinFederation( federation_name, SynchronizedFederate.FEDERATION_MANAGER_NAME );
         
         // Himanshu: Enabling Manager Logging to Database
         if( _dbName != null ) {
@@ -649,14 +658,15 @@ public class FedMgr extends SynchronizedFederate {
         log.info( "done.\n" );
 
         
-        // LOCKFILE SHOULD BE CREATED *ONLY* AFTER SYNCHRONIZATION POINTS HAVE BEEN REGISTERED
-        if ( lockFilename != null ) {
-            File lockFile = new File( lockFilename );
-            FileOutputStream lockFileStream = new FileOutputStream( lockFile );
-            lockFileStream.close();
-            log.info( "Created lockfile \"" + lockFilename + "\"\n" );
-        }
-        
+// Himanshu: Commenting out waiting for lockfiles (using while loops in federates)
+//        // LOCKFILE SHOULD BE CREATED *ONLY* AFTER SYNCHRONIZATION POINTS HAVE BEEN REGISTERED
+//        if ( lockFilename != null ) {
+//            File lockFile = new File( lockFilename );
+//            FileOutputStream lockFileStream = new FileOutputStream( lockFile );
+//            lockFileStream.close();
+//            log.info( "Created lockfile \"" + lockFilename + "\"\n" );
+//        }
+       
         
         SimEnd.publish( getRTI() );
         SimPause.publish( getRTI() );
@@ -721,7 +731,9 @@ public class FedMgr extends SynchronizedFederate {
         
         readyToRun();
         log.info( "done.\n" );
-        
+		
+        _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_READY_TO_RUN, federation_name);
+		
         // AS ALL FEDERATES ARE READY TO RUN, WAIT 3 SECS FOR BRITNEY TO INITIALIZE
         Thread.sleep( 3000 );
 
@@ -837,11 +849,12 @@ public class FedMgr extends SynchronizedFederate {
                         
                         // If we have reached federation end time (if it was configured), terminate the federation
                         if(_federationEndTime > 0 && time.getTime() > _federationEndTime) {
-                        	terminateSimulation();
+                        	_federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federation_name);
+							terminateSimulation();
                         }
 
                     }
-
+                    _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federation_name);
                     prepareForFederatesToResign();
 
                     log.info( "Waiting for \"ReadyToResign\" ... " );
@@ -978,9 +991,6 @@ public class FedMgr extends SynchronizedFederate {
         // First check for simulation termination
         if(SimEnd.match(interactionRoot.getClassHandle())) {
         	terminateSimulation();
-        	
-        	// In case some federate is still hanging around
-        	killEntireFederation();
         }
 
 
@@ -1015,8 +1025,6 @@ public class FedMgr extends SynchronizedFederate {
     	if(currentRootNodes.size() == 0 && _terminateOnCOAFinish) {
     		terminateSimulation();
     		
-    		// In case some federate is still hanging around
-    		killEntireFederation();
     	}
     	
     	
@@ -1319,6 +1327,8 @@ public class FedMgr extends SynchronizedFederate {
         try {
         	System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + _c2wtRoot);
 			Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
+			Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
+			Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
 		} catch (IOException e) {
 			System.out.println("Exception while killing the federation");
 			e.printStackTrace();
@@ -1446,6 +1456,7 @@ public class FedMgr extends SynchronizedFederate {
             } else {
                 log.info( "\"" + federateType + "\" federate has resigned the federation\n");
                 _processedFederates.remove( federateType );
+				_federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateType);
             }
             return;
         } catch( Exception e ) {
@@ -1486,8 +1497,8 @@ public class FedMgr extends SynchronizedFederate {
             boolean registeredFederate = _expectedFederates.contains( federateType );
             
             if ( !registeredFederate ) {
-                if (  federateType.equals( FEDERATION_MANAGER_NAME )  ) {
-                    log.info( "\"" + FEDERATION_MANAGER_NAME + "\" federate detected (that's me) ... ignored.\n" );
+                if (  federateType.equals( SynchronizedFederate.FEDERATION_MANAGER_NAME )  ) {
+                    log.info( "\"" + SynchronizedFederate.FEDERATION_MANAGER_NAME + "\" federate detected (that's me) ... ignored.\n" );
                     _discoveredFederates.remove( theObject );
                 } else if ( federateType.equals( "c2wt_mapper_federate" ) ) {
                 	log.info( "\"C2WT Mapper Federate\" detected (expected) ... ignored.\n" );
@@ -1498,6 +1509,7 @@ public class FedMgr extends SynchronizedFederate {
             } else {
                 log.info( "\"" + federateType + "\" federate has joined the federation\n");
                 _processedFederates.remove( federateType );
+				_federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateType);
             }
             return;
         } catch( Exception e ) {

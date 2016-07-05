@@ -112,6 +112,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	
     private RTIambassador _rti;
 
+	public static final String FEDERATION_MANAGER_NAME = "manager";
+
 	public static final String ReadyToPopulateSynch = "readyToPopulate";
 	public static final String ReadyToRunSynch      = "readyToRun";
 	public static final String ReadyToResignSynch   = "readyToResign";
@@ -142,13 +144,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	public SynchronizedFederate() {
 		// Set process group ID as the same as process ID
 		this.PGID = new ProcessId().setProcessGroupId();
-		String lockFileName = System.getenv( "EXEDIR" );
-		if (  ! "".equals( lockFileName )  ) {
-			lockFileName += "/";
-		}
-		lockFileName += "__lock__";
+		// Himanshu: Commenting out waiting for lockfiles (using while loops in federates)
+		//String lockFileName = System.getenv( "EXEDIR" );
+		//if (  ! "".equals( lockFileName )  ) {
+		//	lockFileName += "/";
+		//}
+		//lockFileName += "__lock__";
 		
-		_lockFile = new File( lockFileName );
+		//_lockFile = new File( lockFileName );
 	}
 	
 	public static enum TIME_ADVANCE_MODE {
@@ -210,6 +213,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (  !federate_id.equals( "" )  ) System.out.print( "[" + federate_id + "] federate " );
         System.out.print( "acquiring connection to RTI ... " );
+		if ( SynchronizedFederate.FEDERATION_MANAGER_NAME.compareTo( federate_id ) != 0) {
+        	// Himanshu: This is a regular federate, wait 20 seconds for federation manager to initialize first
+        	System.out.println("Regular federate waiting 20 secs for Federation Manager to initialize");
+        	try { Thread.sleep( 20000 ); } catch ( Exception e ) { e.printStackTrace(); }
+        }
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();  
 	    _rti = factory.createRtiAmbassador();
 	    System.out.println( "done." );
@@ -229,32 +237,51 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	 * the federate
 	 * @param federate_id a unique name for this federate within the federation
 	 * it is joining.  The name must be unique within a particular federation.
+	 * 
+	 * Supplies true to the argument 'ignoreLockFile'
 	 */
-	public void joinFederation( String federation_id, String federate_id ) {
+	public void joinFederation( String federation_id, String federate_id) {
+		this.joinFederation(federation_id, federate_id, true);
+	}
+	/**
+	 * Joins the federate to a particular federation.
+	 * 
+	 * @param federation_id a unique name for the federation to be joined by
+	 * the federate
+	 * @param federate_id a unique name for this federate within the federation
+	 * it is joining.  The name must be unique within a particular federation.
+	 */
+	public void joinFederation( String federation_id, String federate_id, boolean ignoreLockFile ) {
         this._federateId = federate_id;
         this._federationId = federation_id;
 		boolean federationNotPresent = true;
 		while( federationNotPresent ) {
 			try {
-				try {
-					int counter = 0;
-					while( !_lockFile.createNewFile() ) {
-						if ( ++counter >= 60 ) {
-							System.err.println( "ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": timeout after 60 seconds.  Exiting." );
+				if(!ignoreLockFile) {
+					try {
+						int counter = 0;
+						while( !_lockFile.createNewFile() ) {
+							if ( ++counter >= 60 ) {
+								System.err.println( "ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": timeout after 60 seconds.  Exiting." );
+							}
+							try { Thread.sleep( 1000 ); } catch ( Exception e ) { }
 						}
-						try { Thread.sleep( 1000 ); } catch ( Exception e ) { }
+					} catch( Exception e ) {
+						System.err.println( "ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": " + e.getMessage() + ".  Exiting." );
 					}
-				} catch( Exception e ) {
-					System.err.println( "ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": " + e.getMessage() + ".  Exiting." );
 				}
-			    System.out.print( "[" + federate_id + "] federate joining federation [" + federation_id + "] ... " );
+
+				System.out.print( "[" + federate_id + "] federate joining federation [" + federation_id + "] ... " );
 			    synchronized( _rti ) { _rti.joinFederationExecution( federate_id, federation_id, this, null ); }
 			    System.out.println( "done." );
-			    
-			    _lockFile.delete();
+
+			    if(!ignoreLockFile) {
+			    	_lockFile.delete();
+			    }
 
 				federationNotPresent = false;
 			} catch ( FederateAlreadyExecutionMember f ) {
+				System.err.println( f.getMessage() );
 				return;
 			} catch ( Exception e ) {
 			    System.err.println( e.getMessage() );
@@ -1288,6 +1315,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         if (  SimEnd.match( interactionClass )  ) {
             System.out.println( getFederateId() + ": SimEnd interaction received, exiting..." );
             createLog( interactionClass, theInteraction, theTime );
+            try {
+            	getRTI().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+            } catch (Exception e) {
+            	System.out.println("Error during resigning federate: " + getFederateId());
+            	e.printStackTrace();
+            }
+            
+            // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
+            try { Thread.sleep( 10000 ); } catch ( Exception e ) { e.printStackTrace(); }
             
             // Kill the entire process group
             String killCommand = "kill -15 -" + this.PGID;
@@ -1298,7 +1334,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 				System.out.println("Exception while killing the process group");
 				e.printStackTrace();
 			}
-            
+            // Exit
             System.exit(0);
         }
     }
