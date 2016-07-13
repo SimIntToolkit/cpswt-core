@@ -41,7 +41,6 @@ import hla.rti.SaveInProgress;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -59,7 +58,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.portico.impl.hla13.types.DoubleTime;
@@ -88,8 +86,8 @@ import c2w.gui.coa.COASim;
 import c2w.util.FedUtil;
 import c2w.util.RandomWithFixedSeed;
 import c2w.util.WeakPropertyChangeSupport;
-import c2w.util.rtievents.IC2WFederationEventsHandler;
-import c2w.util.rtievents.C2WFederationEventsHandler;
+import c2w.hla.rtievents.IC2WFederationEventsHandler;
+import c2w.hla.rtievents.C2WFederationEventsHandler;
 
 /**
  * Model class for the Federation Manager.
