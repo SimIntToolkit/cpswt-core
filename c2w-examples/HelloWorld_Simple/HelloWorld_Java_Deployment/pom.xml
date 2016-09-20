@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.nistdemo.exp2</groupId>
+	<groupId>org.c2w.Helloworld_simple_java</groupId>
 	<artifactId>HelloWorld_exec</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -9,20 +9,20 @@
 	<properties>
 		<federation.name>HelloWorld</federation.name>
 		<federation.version>0.0.1-SNAPSHOT</federation.version>
-		<c2w.version>0.2.0-SNAPSHOT</c2w.version>
+		<c2w.version>0.3.0-SNAPSHOT</c2w.version>
 		<nar.version>3.3.0</nar.version>
 	</properties>
 
 	<dependencies>
 		
 		<dependency><!-- The depenency for the generated code-->
-			<groupId>org.nistdemo.exp2</groupId>
+			<groupId>org.c2w.Helloworld_simple_java</groupId>
 			<artifactId>HelloWorld-base-java</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency><!-- The depenency for the user written code-->
-			<groupId>org.nistdemo.exp2</groupId>
+			<groupId>org.c2w.Helloworld_simple_java</groupId>
 			<artifactId>HelloWorld</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -245,7 +245,7 @@
 				<dependency>
 					<groupId>org.porticoproject</groupId>
 					<artifactId>portico</artifactId>
-					<version>2.0.2</version>
+					<version>2.1.0</version>
 				</dependency>
 			</dependencies>	
         	<build>
@@ -294,7 +294,7 @@
 				<dependency>
 					<groupId>org.porticoproject</groupId>
 					<artifactId>portico</artifactId>
-					<version>2.0.2</version>
+					<version>2.1.0</version>
 				</dependency>
 			</dependencies>	
 			<build>

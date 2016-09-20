@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.c2w</groupId>
     <artifactId>c2w-foundation</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
   </parent>
   <artifactId>federate-base</artifactId>
   

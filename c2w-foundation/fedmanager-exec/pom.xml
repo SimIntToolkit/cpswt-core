@@ -1,8 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.c2w</groupId>
+	<parent>
+		<groupId>org.c2w</groupId>
+		<artifactId>c2w-foundation</artifactId>
+		<version>0.3.0-SNAPSHOT</version>
+	</parent>
+
+	<!--<groupId>org.c2w</groupId>-->
 	<artifactId>FederationManager_exec</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<!--<version>${C2W_version}</version>-->
+	<!--<version>0.2.0-SNAPSHOT</version>-->
 	<packaging>jar</packaging>
 
 	<properties>
@@ -51,8 +59,8 @@
 			            <argument>--autoStart</argument>
 			            <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
 			            <argument>HelloWorld</argument>
-			            <argument>${env.C2WTROOT}/Demo/HelloWorld.fed</argument>
-			            <argument>${env.C2WTROOT}/scripts/script.xml</argument>
+			            <argument>${env.C2WTROOT}/HelloWorld.fed</argument>
+			            <argument>${env.C2WTROOT}/script.xml</argument>
 			            <argument>HelloWorld_main-Deployment1_100</argument>
 			            <argument>NORMAL</argument>
 			    	</arguments>
