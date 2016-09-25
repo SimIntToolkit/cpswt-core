@@ -1,10 +1,10 @@
 #!/bin/bash
 # Author: Yogesh Barve
-export RTI_HOME=/home/vagrant/c2wt-dev/dependency/portico/portico-2.1.0
+# export RTI_HOME=/home/vagrant/c2wt-dev/dependency/portico/portico-2.1.0
 
 mvn_install_deploy() {
 	echo "Maven Compiling...."
-	mvn clean install
+	mvn clean install -U
 	echo "Maven Deploying to the Archiva....."
 	mvn deploy
 	echo "Deployment Completed...."
