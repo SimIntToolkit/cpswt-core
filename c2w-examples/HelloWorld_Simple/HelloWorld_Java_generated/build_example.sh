@@ -1,7 +1,8 @@
 #!/bin/bash
 # Author: Yogesh Barve
 
-export RTI_HOME=/home/vagrant/c2wt-dev/dependency/portico/portico-2.1.0
+#export RTI_HOME=/home/vagrant/c2wt-dev/dependency/portico/portico-2.1.0
+export RTI_HOME=/usr/local/portico/portico-2.1.0
 
 mvn_install_deploy() {
 	echo "Maven Compiling...."
