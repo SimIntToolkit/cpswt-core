@@ -511,7 +511,7 @@ public class FedMgr extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    public FedMgr(FedMgrParam params) throws Exception {
+    public FedMgr(FederationManagerParameter params) throws Exception {
 
         this.federation_name = params.FederationName;
         this.FOM_file_name = params.FOMFilename;
@@ -538,7 +538,7 @@ public class FedMgr extends SynchronizedFederate {
         monitor_out = new PrintStream(new File(_c2wtRoot + "/log/monitor_" + this.federation_name + ".vec"));
 
         // Update simulation mode
-        realtime = params.Mode;
+        realtime = params.RealTimeMode;
 
         this._federationEventsHandler = new C2WFederationEventsHandler();
 

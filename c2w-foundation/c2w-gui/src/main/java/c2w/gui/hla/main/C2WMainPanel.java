@@ -24,7 +24,6 @@
 package c2w.gui.hla.main;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Toolkit;
@@ -104,14 +103,14 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
     /**
      * Creates new form C2WMainPanel
      */
-    public C2WMainPanel(FedMgrParam fedMgrParam) {
+    public C2WMainPanel(FederationManagerParameter federationManagerParameter) {
         initComponents();
         try {
             proxyStartTime = proxyStartTimeInitFormatter.parse(PROXY_START_TIME);
         } catch (Exception e) {
             proxyStartTime = new Date();
         }
-        init(fedMgrParam);
+        init(federationManagerParameter);
     }
 
     /**
@@ -180,7 +179,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
         add(modeComboBox, gridBagConstraints);
 
-        modeLabel.setText("Mode:");
+        modeLabel.setText("RealTimeMode:");
         modeLabel.setName("modeLabel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -350,7 +349,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
 
     // End of variables declaration//GEN-END:variables
 
-    private void init(final FedMgrParam fedMgrParam) {
+    private void init(final FederationManagerParameter federationManagerParameter) {
 
         // initialize labels, fields, and buttons
         startButton.setEnabled(true);
@@ -368,7 +367,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
                         FedMgr.MODE_AS_FAST_AS_POSSIBLE
                 }
         ));
-        modeComboBox.setSelectedItem(fedMgrParam.Mode ? FedMgr.MODE_REALTIME : FedMgr.MODE_AS_FAST_AS_POSSIBLE);
+        modeComboBox.setSelectedItem(federationManagerParameter.RealTimeMode ? FedMgr.MODE_REALTIME : FedMgr.MODE_AS_FAST_AS_POSSIBLE);
 
         logLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
@@ -384,10 +383,10 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         // Create Model federation manager class
         try {
             if (fedMgr == null) {
-                fedMgr = new FedMgr(fedMgrParam);
+                fedMgr = new FedMgr(federationManagerParameter);
             }
         } catch (Exception e1) {
-            MsgDisplay.displayException(this, "Error during initialization", e1, "Could not create the Federation Manager", fedMgrParam.AutoStart);
+            MsgDisplay.displayException(this, "Error during initialization", e1, "Could not create the Federation Manager", federationManagerParameter.AutoStart);
             System.exit(-1);
         }
 
@@ -406,12 +405,12 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         });
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                startSimulation(fedMgrParam.AutoStart);
+                startSimulation(federationManagerParameter.AutoStart);
             }
         });
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                pauseSimulation(fedMgrParam.AutoStart);
+                pauseSimulation(federationManagerParameter.AutoStart);
             }
         });
         terminateButton.addActionListener(new ActionListener() {
@@ -446,7 +445,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
                     try {
                         fedMgr.updateLogLevel(selected);
                     } catch (Exception e) {
-                        MsgDisplay.displayException(getParent(), "Error during initialization", e, "Could not update the log level", fedMgrParam.AutoStart);
+                        MsgDisplay.displayException(getParent(), "Error during initialization", e, "Could not update the log level", federationManagerParameter.AutoStart);
                     }
                 }
             }

@@ -23,7 +23,7 @@
 
 package c2w.gui.hla.main;
 
-import c2w.hla.FedMgrParam;
+import c2w.hla.FederationManagerParameter;
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 
@@ -59,8 +59,8 @@ public class C2WSim
 
     private C2WMainPanel mainPanel;
 
-    public C2WSim(FedMgrParam fedMgrParam) {
-        init(fedMgrParam);
+    public C2WSim(FederationManagerParameter federationManagerParameter) {
+        init(federationManagerParameter);
     }
 
     public void close() {
@@ -70,7 +70,7 @@ public class C2WSim
     /**
      * Initialize components
      */
-    private void init(FedMgrParam fedMgrParam) {
+    private void init(FederationManagerParameter federationManagerParameter) {
         setTitle("C2Windtunnel HLA-Based Simulation Tool");
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -80,7 +80,7 @@ public class C2WSim
             }
         });
 
-        initMainPanel(fedMgrParam);
+        initMainPanel(federationManagerParameter);
 
         tabbedPane = createTabbedPane();
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
@@ -89,8 +89,8 @@ public class C2WSim
         setSize(WIN_SIZEX, WIN_SIZEY);
     }
 
-    private void initMainPanel(FedMgrParam fedMgrParam) {
-        mainPanel = new C2WMainPanel(fedMgrParam);
+    private void initMainPanel(FederationManagerParameter federationManagerParameter) {
+        mainPanel = new C2WMainPanel(federationManagerParameter);
     }
 
     private JTabbedPane createTabbedPane() {
@@ -233,22 +233,22 @@ public class C2WSim
             System.exit(-1);
         }
 
-        FedMgrParam fedMgrParam = new FedMgrParam();
-        fedMgrParam.AutoStart = autoStart;
-		fedMgrParam.ScriptFilename = scriptFilename;
-        fedMgrParam.Seed4Dur = seed4DurRNG;
-        fedMgrParam.DBName = dbName;
-        fedMgrParam.FederationEndTime = federationEndTime;
-        fedMgrParam.FederationName = federationName;
-        fedMgrParam.FOMFilename = fomFilename;
-        fedMgrParam.LockFilename = lockFilename;
-        fedMgrParam.LogLevel = logLevel;
-        fedMgrParam.Lookahead = lookahead;
-        fedMgrParam.Mode = realtimeMode;
-        fedMgrParam.Step = step;
-        fedMgrParam.TerminateOnCOAFinish = terminateOnCOAFinish;
+        FederationManagerParameter federationManagerParameter = new FederationManagerParameter();
+        federationManagerParameter.AutoStart = autoStart;
+		federationManagerParameter.ScriptFilename = scriptFilename;
+        federationManagerParameter.Seed4Dur = seed4DurRNG;
+        federationManagerParameter.DBName = dbName;
+        federationManagerParameter.FederationEndTime = federationEndTime;
+        federationManagerParameter.FederationName = federationName;
+        federationManagerParameter.FOMFilename = fomFilename;
+        federationManagerParameter.LockFilename = lockFilename;
+        federationManagerParameter.LogLevel = logLevel;
+        federationManagerParameter.Lookahead = lookahead;
+        federationManagerParameter.RealTimeMode = realtimeMode;
+        federationManagerParameter.Step = step;
+        federationManagerParameter.TerminateOnCOAFinish = terminateOnCOAFinish;
 
-        C2WSim sim = new C2WSim(fedMgrParam);
+        C2WSim sim = new C2WSim(federationManagerParameter);
         if (!autoStart) {
             // Make Federation Manager GUI visible only when NOT running in batch mode
             sim.setVisible(true);
