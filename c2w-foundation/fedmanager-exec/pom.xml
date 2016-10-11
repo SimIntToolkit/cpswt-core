@@ -30,13 +30,14 @@
             <artifactId>fedmanager-host</artifactId>
             <version>0.3.0-SNAPSHOT</version>
         </dependency>
-		<dependency>
+        <dependency>
 	        <groupId>junit</groupId>
 	        <artifactId>junit</artifactId>
 	        <version>4.7</version>
 	        <scope>test</scope>
 	    </dependency>
-	</dependencies>
+
+    </dependencies>
 
 
     <profiles>
@@ -164,6 +165,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
+                                <argument>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argument>
                                 <argument>-Djava.net.preferIPv4Stack=true</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
