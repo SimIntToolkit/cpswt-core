@@ -1,5 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <properties>
+        <repositoryUrl>http://cpswtng_archiva:8080/repository</repositoryUrl>
+    </properties>
+
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.c2w</groupId>
@@ -24,6 +28,11 @@
 			<artifactId>c2w-gui</artifactId>
 			<version>${c2w.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.c2w</groupId>
+            <artifactId>fedmanager-host</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
 		<dependency>
 	        <groupId>junit</groupId>
 	        <artifactId>junit</artifactId>
@@ -31,129 +40,168 @@
 	        <scope>test</scope>
 	    </dependency>
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.4.0</version>
-				<configuration>
-					<executable>java</executable>
-					<arguments>
-						<argument>-Xmx512m</argument>
-						<!-- For debugging purposes-->
-						<!--argument>-Xdiag</argument-->
-			            <argument>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argument>
-			            <argument>-Djava.net.preferIPv4Stack=true</argument>
-			            <argument>-classpath</argument>
-			            <!-- automatically creates the classpath using all project dependencies,
-                 		also adding the project build directory -->
-			            <classpath />
-			            <argument>c2w.gui.hla.main.C2WSim</argument>
-			            <argument>--step</argument><argument>1.0</argument>
-			            <argument>--lookahead</argument><argument>0.1</argument>
-			            <argument>--realtime</argument>
-			            <argument>--federationEndTime</argument><argument>20.0</argument>
-			            <argument>--seed4DurRNG</argument><argument>0</argument>
-			            <argument>--autoStart</argument>
-			            <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
-			            <argument>HelloWorld</argument>
-			            <argument>${env.C2WTROOT}/HelloWorld.fed</argument>
-			            <argument>${env.C2WTROOT}/script.xml</argument>
-			            <argument>HelloWorld_main-Deployment1_100</argument>
-			            <argument>NORMAL</argument>
-			    	</arguments>
-				    <environmentVariables>
-	                    <EXEDIR>${env.C2WTROOT}</EXEDIR>
-	                </environmentVariables>
-				</configuration>
-			</plugin>
-			<plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-surefire-plugin</artifactId>
-		      <configuration>
-		        <forkMode>once</forkMode>
-		        <argLine>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argLine>
-		      </configuration>
-		    </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-		        <groupId>com.github.maven-nar</groupId>
-		        <artifactId>nar-maven-plugin</artifactId>
-		        <version>${nar.version}</version>
-		        <extensions>true</extensions>
-		        <executions>
-					<execution>
-						<id>nar-download</id>
-						<goals>
-							<goal>nar-download</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>nar-unpack</id>
-						<goals>
-							<goal>nar-unpack</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>nar-test-unpack</id>
-						<goals>
-							<goal>nar-test-unpack</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>nar-integration-test</id>
-						<goals>
-							<goal>nar-integration-test</goal>
-						</goals>
-					</execution>
-				</executions>
-      		</plugin>
-      		<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx512m</argument>
+                                <!-- For debugging purposes-->
+                                <!--argument>-Xdiag</argument-->
+                                <argument>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argument>
+                                <argument>-Djava.net.preferIPv4Stack=true</argument>
+                                <argument>-classpath</argument>
+                                <!-- automatically creates the classpath using all project dependencies,
+                                 also adding the project build directory -->
+                                <classpath />
+                                <argument>c2w.gui.hla.main.C2WSim</argument>
+                                <argument>--step</argument><argument>1.0</argument>
+                                <argument>--lookahead</argument><argument>0.1</argument>
+                                <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
+                                <argument>--realtime</argument>
+                                <argument>--federationEndTime</argument><argument>20.0</argument>
+                                <argument>--seed4DurRNG</argument><argument>0</argument>
+                                <argument>--autoStart</argument>
+                                <argument>--fomFilename</argument><argument>${env.C2WTROOT}/HelloWorld.fed</argument>
+                                <argument>--scriptFilename</argument><argument>${env.C2WTROOT}/script.xml</argument>
+                                <argument>--logLevel</argument><argument>NORMAL</argument>
+                                <argument>--federationName</argument><argument>HelloWorld</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <EXEDIR>${env.C2WTROOT}</EXEDIR>
+                            </environmentVariables>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <forkMode>once</forkMode>
+                            <argLine>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argLine>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.10</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.maven-nar</groupId>
+                        <artifactId>nar-maven-plugin</artifactId>
+                        <version>${nar.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>nar-download</id>
+                                <goals>
+                                    <goal>nar-download</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-unpack</id>
+                                <goals>
+                                    <goal>nar-unpack</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-test-unpack</id>
+                                <goals>
+                                    <goal>nar-test-unpack</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-integration-test</id>
+                                <goals>
+                                    <goal>nar-integration-test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.5.1</version>
+                        <configuration>
+                            <source>1.5</source>
+                            <target>1.5</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>testfedhost</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Djava.net.preferIPv4Stack=true</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+
+                                <argument>c2w.FederationManagerHost</argument>
+                                <argument>--step</argument><argument>1.0</argument>
+                                <argument>--lookahead</argument><argument>0.1</argument>
+                                <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
+                                <argument>--realtime</argument>
+                                <argument>--federationEndTime</argument><argument>20.0</argument>
+                                <argument>--seed4DurRNG</argument><argument>0</argument>
+                                <argument>--autoStart</argument>
+                                <argument>--fomFilename</argument><argument>${env.C2WTROOT}/HelloWorld.fed</argument>
+                                <argument>--scriptFilename</argument><argument>${env.C2WTROOT}/script.xml</argument>
+                                <argument>--logLevel</argument><argument>NORMAL</argument>
+                                <argument>--federationName</argument><argument>HelloWorld</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 	
 	<repositories>
 		<repository>
 			<id>archiva.internal</id>
 			<name>Internal Release Repository</name>
-			<!--<url>http://c2w-cdi.isis.vanderbilt.edu:8088/repository/internal/</url>-->
-			<url>http://cpswtng_archiva:8080/repository/internal/</url>
+			<url>${repositoryUrl}/internal/</url>
 		</repository>
 		<repository>
 			<id>archiva.snapshots</id>
 			<name>Internal Snapshot Repository</name>
-			<!--<url>http://c2w-cdi.isis.vanderbilt.edu:8088/repository/snapshots/</url>-->
-			<url>http://cpswtng_archiva:8080/repository/snapshots/</url>
+			<url>${repositoryUrl}/snapshots/</url>
 		</repository>
 	</repositories>
 
@@ -161,14 +209,12 @@
 		<repository>
 			<id>archiva.internal</id>
 			<name>Internal Release Repository</name>
-			<!--<url>http://c2w-cdi.isis.vanderbilt.edu:8088/repository/internal/</url>-->
-			<url>http://cpswtng_archiva:8080/repository/internal/</url>
+			<url>${repositoryUrl}/internal/</url>
 		</repository>
 		<snapshotRepository>
 			<id>archiva.snapshots</id>
 			<name>Internal Snapshot Repository</name>
-			<!--<url>http://c2w-cdi.isis.vanderbilt.edu:8088/repository/snapshots/</url>-->
-			<url>http://cpswtng_archiva:8080/repository/snapshots/</url>
+			<url>${repositoryUrl}/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

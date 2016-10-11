@@ -15,13 +15,16 @@ public class FederationManagerHost {
     private FedMgr federationManager;
 
     public FederationManagerHost(FederationManagerParameter federationManagerParameter) {
-
         try {
             this.federationManager = new FedMgr(federationManagerParameter);
         } catch (Exception e) {
             logger.error("Error during initializing FederationManager! Quitting...", e);
             System.exit(-1);
         }
+    }
+
+    public FederationManagerHost(String configFile) {
+
     }
 
     public void StartSimulation() throws Exception {
@@ -32,7 +35,7 @@ public class FederationManagerHost {
     public static void main(String[] args) throws Exception {
         CommandLineParser parser  = new DefaultParser();
         Options cliOptions = FederationManagerParameter.GetCLIOptions();
-        FederationManagerParameter currentParameter;
+        FederationManagerParameter currentParameter = null;
 
         try {
             CommandLine line = parser.parse(cliOptions, args);
