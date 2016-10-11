@@ -1,10 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <properties>
-        <repositoryUrl>http://cpswtng_archiva:8080/repository</repositoryUrl>
-    </properties>
-
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.c2w</groupId>
 		<artifactId>c2w-foundation</artifactId>
@@ -20,6 +16,7 @@
 	<properties>
 		<c2w.version>${project.version}</c2w.version>
 		<nar.version>3.3.0</nar.version>
+        <repositoryUrl>http://cpswtng_archiva:8080/repository</repositoryUrl>
 	</properties>
 
 	<dependencies>
