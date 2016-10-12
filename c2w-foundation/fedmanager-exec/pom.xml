@@ -185,6 +185,38 @@
                             </arguments>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>com.github.maven-nar</groupId>
+                        <artifactId>nar-maven-plugin</artifactId>
+                        <version>${nar.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>nar-download</id>
+                                <goals>
+                                    <goal>nar-download</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-unpack</id>
+                                <goals>
+                                    <goal>nar-unpack</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-test-unpack</id>
+                                <goals>
+                                    <goal>nar-test-unpack</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>nar-integration-test</id>
+                                <goals>
+                                    <goal>nar-integration-test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
