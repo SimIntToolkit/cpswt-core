@@ -3,10 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.c2w</groupId>
     <artifactId>c2w-foundation</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>${cpswt.version}</version>
     <packaging>pom</packaging>
     <name>C2 Windtunnel Java Foundation</name>
     <description>Foundation packages and classes of C2 Windtunnel Java RTI and Federates</description>
+
+    <properties>
+        <cpswt.version>0.4.0-SNAPSHOT</cpswt.version>
+        <portico.version>2.1.0</portico.version>
+        <maven.repository.url>http://cpswtng_archiva:8080/repository</maven.repository.url>
+    </properties>
 
     <modules>
         <module>hla-wrapper</module>
@@ -29,7 +35,7 @@
         <dependency>
             <groupId>org.porticoproject</groupId>
             <artifactId>portico</artifactId>
-            <version>2.1.0</version>
+            <version>${portico.version}</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

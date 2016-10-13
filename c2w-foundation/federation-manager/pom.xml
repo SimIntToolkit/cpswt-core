@@ -1,28 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.c2w</groupId>
-    <artifactId>c2w-foundation</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>federation-manager</artifactId>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.c2w</groupId>
-      <artifactId>federate-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-     <dependency>
-      <groupId>org.c2w</groupId>
-      <artifactId>c2w-coa</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.c2w</groupId>
-      <artifactId>c2w-coa-gui</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.c2w</groupId>
+        <artifactId>c2w-foundation</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>${cpswt.version}</version>
+    </parent>
+
+    <artifactId>federation-manager</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.c2w</groupId>
+            <artifactId>federate-base</artifactId>
+            <version>${cpswt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.c2w</groupId>
+            <artifactId>c2w-coa</artifactId>
+            <version>${cpswt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.c2w</groupId>
+            <artifactId>c2w-coa-gui</artifactId>
+            <version>${cpswt.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

@@ -1,48 +1,44 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.c2w</groupId>
-		<artifactId>c2w-foundation</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>org.c2w</groupId>
+        <artifactId>c2w-foundation</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>${cpswt.version}</version>
+    </parent>
 
-	<!--<groupId>org.c2w</groupId>-->
-	<artifactId>FederationManager_exec</artifactId>
-	<!--<version>${C2W_version}</version>-->
-	<!--<version>0.2.0-SNAPSHOT</version>-->
-	<packaging>jar</packaging>
+    <artifactId>fedmanager-exec</artifactId>
+    <packaging>jar</packaging>
 
-	<properties>
-		<c2w.version>${project.version}</c2w.version>
-		<nar.version>3.3.0</nar.version>
-        <repositoryUrl>http://cpswtng_archiva:8080/repository</repositoryUrl>
-	</properties>
+    <properties>
+        <nar.version>3.3.0</nar.version>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.c2w</groupId>
-			<artifactId>c2w-gui</artifactId>
-			<version>${c2w.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.c2w</groupId>
+            <artifactId>c2w-gui</artifactId>
+            <version>${cpswt.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.c2w</groupId>
             <artifactId>fedmanager-host</artifactId>
-            <version>0.3.0-SNAPSHOT</version>
+            <version>${cpswt.version}</version>
         </dependency>
         <dependency>
-	        <groupId>junit</groupId>
-	        <artifactId>junit</artifactId>
-	        <version>4.7</version>
-	        <scope>test</scope>
-	    </dependency>
-
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
     <profiles>
         <profile>
-            <id>default</id>
+            <id>OLD</id>
             <build>
                 <plugins>
                     <plugin>
@@ -55,24 +51,35 @@
                                 <argument>-Xmx512m</argument>
                                 <!-- For debugging purposes-->
                                 <!--argument>-Xdiag</argument-->
-                                <argument>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argument>
+                                <argument>
+                                    -Djava.library.path=${project.basedir}/target/nar/processid-${cpswt.version}-${nar.aol}-jni/lib/${nar.aol}/jni/
+                                </argument>
                                 <argument>-Djava.net.preferIPv4Stack=true</argument>
                                 <argument>-classpath</argument>
                                 <!-- automatically creates the classpath using all project dependencies,
                                  also adding the project build directory -->
-                                <classpath />
+                                <classpath/>
                                 <argument>c2w.gui.hla.main.C2WSim</argument>
-                                <argument>--step</argument><argument>1.0</argument>
-                                <argument>--lookahead</argument><argument>0.1</argument>
-                                <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
+                                <argument>--step</argument>
+                                <argument>1.0</argument>
+                                <argument>--lookahead</argument>
+                                <argument>0.1</argument>
+                                <argument>--lockfile</argument>
+                                <argument>${env.C2WTROOT}/__lock__</argument>
                                 <argument>--realtime</argument>
-                                <argument>--federationEndTime</argument><argument>20.0</argument>
-                                <argument>--seed4DurRNG</argument><argument>0</argument>
+                                <argument>--federationEndTime</argument>
+                                <argument>20.0</argument>
+                                <argument>--seed4DurRNG</argument>
+                                <argument>0</argument>
                                 <argument>--autoStart</argument>
-                                <argument>--fomFilename</argument><argument>${env.C2WTROOT}/HelloWorld.fed</argument>
-                                <argument>--scriptFilename</argument><argument>${env.C2WTROOT}/script.xml</argument>
-                                <argument>--logLevel</argument><argument>NORMAL</argument>
-                                <argument>--federationName</argument><argument>HelloWorld</argument>
+                                <argument>--fomFilename</argument>
+                                <argument>${env.C2WTROOT}/HelloWorld.fed</argument>
+                                <argument>--scriptFilename</argument>
+                                <argument>${env.C2WTROOT}/script.xml</argument>
+                                <argument>--logLevel</argument>
+                                <argument>NORMAL</argument>
+                                <argument>--federationName</argument>
+                                <argument>HelloWorld</argument>
                             </arguments>
                             <environmentVariables>
                                 <EXEDIR>${env.C2WTROOT}</EXEDIR>
@@ -84,7 +91,9 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <forkMode>once</forkMode>
-                            <argLine>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argLine>
+                            <argLine>
+                                -Djava.library.path=${project.basedir}/target/nar/processid-${cpswt.version}-${nar.aol}-jni/lib/${nar.aol}/jni/
+                            </argLine>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -165,23 +174,31 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Djava.library.path=${project.basedir}/target/nar/processid-${c2w.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argument>
                                 <argument>-Djava.net.preferIPv4Stack=true</argument>
                                 <argument>-classpath</argument>
-                                <classpath />
+                                <classpath/>
 
                                 <argument>c2w.FederationManagerHost</argument>
-                                <argument>--step</argument><argument>1.0</argument>
-                                <argument>--lookahead</argument><argument>0.1</argument>
-                                <argument>--lockfile</argument><argument>${env.C2WTROOT}/__lock__</argument>
+                                <argument>--step</argument>
+                                <argument>1.0</argument>
+                                <argument>--lookahead</argument>
+                                <argument>0.1</argument>
+                                <argument>--lockfile</argument>
+                                <argument>${env.C2WTROOT}/__lock__</argument>
                                 <argument>--realtime</argument>
-                                <argument>--federationEndTime</argument><argument>20.0</argument>
-                                <argument>--seed4DurRNG</argument><argument>0</argument>
+                                <argument>--federationEndTime</argument>
+                                <argument>20.0</argument>
+                                <argument>--seed4DurRNG</argument>
+                                <argument>0</argument>
                                 <argument>--autoStart</argument>
-                                <argument>--fomFilename</argument><argument>${env.C2WTROOT}/HelloWorld.fed</argument>
-                                <argument>--scriptFilename</argument><argument>${env.C2WTROOT}/script.xml</argument>
-                                <argument>--logLevel</argument><argument>NORMAL</argument>
-                                <argument>--federationName</argument><argument>HelloWorld</argument>
+                                <argument>--fomFilename</argument>
+                                <argument>${env.C2WTROOT}/HelloWorld.fed</argument>
+                                <argument>--scriptFilename</argument>
+                                <argument>${env.C2WTROOT}/script.xml</argument>
+                                <argument>--logLevel</argument>
+                                <argument>NORMAL</argument>
+                                <argument>--federationName</argument>
+                                <argument>HelloWorld</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -222,31 +239,31 @@
         </profile>
     </profiles>
 
-	
-	<repositories>
-		<repository>
-			<id>archiva.internal</id>
-			<name>Internal Release Repository</name>
-			<url>${repositoryUrl}/internal/</url>
-		</repository>
-		<repository>
-			<id>archiva.snapshots</id>
-			<name>Internal Snapshot Repository</name>
-			<url>${repositoryUrl}/snapshots/</url>
-		</repository>
-	</repositories>
 
-	<distributionManagement>
-		<repository>
-			<id>archiva.internal</id>
-			<name>Internal Release Repository</name>
-			<url>${repositoryUrl}/internal/</url>
-		</repository>
-		<snapshotRepository>
-			<id>archiva.snapshots</id>
-			<name>Internal Snapshot Repository</name>
-			<url>${repositoryUrl}/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
+    <repositories>
+        <repository>
+            <id>archiva.internal</id>
+            <name>Internal Release Repository</name>
+            <url>${maven.repository.url}/internal/</url>
+        </repository>
+        <repository>
+            <id>archiva.snapshots</id>
+            <name>Internal Snapshot Repository</name>
+            <url>${maven.repository.url}/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>archiva.internal</id>
+            <name>Internal Release Repository</name>
+            <url>${maven.repository.url}/internal/</url>
+        </repository>
+        <snapshotRepository>
+            <id>archiva.snapshots</id>
+            <name>Internal Snapshot Repository</name>
+            <url>${maven.repository.url}/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
