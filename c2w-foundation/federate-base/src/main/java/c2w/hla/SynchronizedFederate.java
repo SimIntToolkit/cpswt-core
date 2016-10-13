@@ -60,8 +60,6 @@ import java.util.concurrent.SynchronousQueue;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
 
-import c2w.process.ProcessId;
-
 /**
  * SynchronizedFederate is a class that simplifies interaction with the RTI.
  * <br/><br/>
@@ -139,19 +137,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	public void setLookahead( double lookahead ) { _lookahead = lookahead; }
     public double getLookahead() { return _lookahead; }
     
-    protected int PGID = 0;
-	
 	public SynchronizedFederate() {
 		// Set process group ID as the same as process ID
-		this.PGID = new ProcessId().setProcessGroupId();
-		// Himanshu: Commenting out waiting for lockfiles (using while loops in federates)
-		//String lockFileName = System.getenv( "EXEDIR" );
-		//if (  ! "".equals( lockFileName )  ) {
-		//	lockFileName += "/";
-		//}
-		//lockFileName += "__lock__";
-		
-		//_lockFile = new File( lockFileName );
+		//this.PGID = new ProcessId().setProcessGroupId();
 	}
 	
 	public static enum TIME_ADVANCE_MODE {
@@ -1052,7 +1040,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     /**
      * Start the {@link AdvanceTimeThread}
      * Assumes the federate is a lookahead value greater than zero. Uses
-     * {@link hla.rti.RTIambassador#timeAdvanceRequest()} for advancing
+     * {@link hla.rti.RTIambassador#timeAdvanceRequest(LogicalTime)} for advancing
      * federates time.
      */
     protected void startAdvanceTimeThread() {
@@ -1064,9 +1052,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     /**
      * Start the {@link AdvanceTimeThread}
-     * @param TIME_ADVANCE_MODE If
-     * {@link TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST_AVAILABLE} or
-     * {@link TIME_ADVANCE_MODE.NEXT_EVENT_REQUEST_AVAILABLE} is used, the
+     * @param #timeAdvanceMode If
+     * {@link TIME_ADVANCE_MODE#TIME_ADVANCE_REQUEST_AVAILABLE} or
+     * {@link TIME_ADVANCE_MODE#NEXT_EVENT_REQUEST_AVAILABLE} is used, the
      * federate's lookahead value is allowed to be zero. For other two cases,
      * federate's lookahead must be greater than zero.
      */
@@ -1324,16 +1312,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             
             // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
             try { Thread.sleep( 10000 ); } catch ( Exception e ) { e.printStackTrace(); }
-            
-            // Kill the entire process group
-            String killCommand = "kill -15 -" + this.PGID;
-            try {
-            	System.out.println("Killing Federate " + getFederateId() + " with kill command: " + killCommand);
-				Runtime.getRuntime().exec(killCommand);
-			} catch (IOException e) {
-				System.out.println("Exception while killing the process group");
-				e.printStackTrace();
-			}
+
+            // TODO: CONSIDER SETTING UP A SHUTDOWN HOOK
+            // this one will terminate the JVM not only the current process
+            Runtime.getRuntime().exit(0);
+
             // Exit
             System.exit(0);
         }
