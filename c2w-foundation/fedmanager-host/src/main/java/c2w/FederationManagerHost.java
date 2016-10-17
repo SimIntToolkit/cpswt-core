@@ -7,6 +7,7 @@ package c2w;
 import c2w.hla.FedMgr;
 import c2w.hla.FederationManagerParameter;
 import org.apache.commons.cli.*;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 public class FederationManagerHost {
@@ -33,6 +34,8 @@ public class FederationManagerHost {
 
 
     public static void main(String[] args) throws Exception {
+        BasicConfigurator.configure();
+
         CommandLineParser parser  = new DefaultParser();
         Options cliOptions = FederationManagerParameter.GetCLIOptions();
         FederationManagerParameter currentParameter = null;

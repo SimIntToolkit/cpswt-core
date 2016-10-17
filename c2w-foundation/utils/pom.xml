@@ -5,7 +5,7 @@
         <groupId>org.c2w</groupId>
         <artifactId>c2w-foundation</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>${cpswt.version}</version>
+        <version>0.4.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>utils</artifactId>
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>org.c2w</groupId>
             <artifactId>base-events</artifactId>
-            <version>${cpswt.version}</version>
+            <version>0.4.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
