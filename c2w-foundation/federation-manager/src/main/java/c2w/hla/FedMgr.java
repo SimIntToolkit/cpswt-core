@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -534,8 +535,16 @@ public class FedMgr extends SynchronizedFederate {
         }
 
         this._c2wtRoot = System.getenv("C2WTROOT");
+        if(this._c2wtRoot == null) {
+            this._c2wtRoot = System.getProperty("user.dir");
+        }
 
-        monitor_out = new PrintStream(new File(_c2wtRoot + "/log/monitor_" + this.federation_name + ".vec"));
+        File logDir = new File(this._c2wtRoot, "log");
+        if(Files.notExists(logDir.toPath())) {
+            logDir.mkdir();
+        }
+
+        monitor_out = new PrintStream(new File(logDir, "monitor_" + this.federation_name + ".vec"));
 
         // Update simulation mode
         realtime = params.RealTimeMode;
