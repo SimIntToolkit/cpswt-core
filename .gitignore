@@ -92,3 +92,6 @@ Temporary Items
 # Sublime project files
 *.sublime-project
 *.sublime-workspace
+
+# log files
+*.log

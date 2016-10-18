@@ -33,7 +33,7 @@
 
     <profiles>
         <profile>
-            <id>testfedhost</id>
+            <id>fedhost-execjava</id>
             <build>
                 <plugins>
                     <plugin>
@@ -41,16 +41,24 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.5.0</version>
                         <goals>
-                            <goal>exec</goal>
+                            <goal>java</goal>
                         </goals>
                         <configuration>
-                            <executable>java</executable>
+                            <mainClass>c2w.FederationManagerHost</mainClass>
+                            <classpathScope>runtime</classpathScope>
+
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>java.net.preferIPv4Stack</key>
+                                    <value>true</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>log4j.configuration</key>
+                                    <value>file:log4j.properties</value>
+                                </systemProperty>
+                            </systemProperties>
+
                             <arguments>
-                                <argument>-Djava.net.preferIPv4Stack=true</argument>
-                                <argument>-Dlog4j.configuration=file:log4j.properties</argument>
-                                <argument>-classpath</argument>
-                                <classpath/>
-                                <argument>c2w.FederationManagerHost</argument>
                                 <argument>--step</argument>
                                 <argument>1.0</argument>
                                 <argument>--lookahead</argument>
@@ -71,67 +79,6 @@
                                 <argument>NORMAL</argument>
                                 <argument>--federationName</argument>
                                 <argument>HelloWorld</argument>
-                            </arguments>
-                            <environmentVariables>
-                                <C2WTROOT>${project.build.directory}</C2WTROOT>
-                            </environmentVariables>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.maven-nar</groupId>
-                        <artifactId>nar-maven-plugin</artifactId>
-                        <version>${nar.version}</version>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>nar-download</id>
-                                <goals>
-                                    <goal>nar-download</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>nar-unpack</id>
-                                <goals>
-                                    <goal>nar-unpack</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>nar-test-unpack</id>
-                                <goals>
-                                    <goal>nar-test-unpack</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>nar-integration-test</id>
-                                <goals>
-                                    <goal>nar-integration-test</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>fedhost-execjava</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.5.0</version>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>c2w.FederationManagerHost</mainClass>
-                            <additionalClasspathElements>
-                                <additionalClasspathElement>log4j.configuration=file:log4j.properties</additionalClasspathElement>
-                            </additionalClasspathElements>
-
-                            <arguments>
-                                <argument>-Djava.net.preferIPv4Stack=true</argument>
                             </arguments>
                             <environmentVariables>
                                 <C2WTROOT>${project.build.directory}</C2WTROOT>
