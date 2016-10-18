@@ -7,6 +7,11 @@ package c2w.hla;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.portico.bindings.jgroups.Federation;
+
+import java.io.*;
+import java.util.Properties;
+import java.util.function.Function;
 
 public class FederationManagerParameter {
     public String FederationName;
@@ -26,23 +31,77 @@ public class FederationManagerParameter {
     public long Seed4Dur;
     public boolean AutoStart;
 
-    public static FederationManagerParameter ParseInputs(CommandLine line) {
+    @FunctionalInterface
+    interface Function2<T1, T2, R> {
+        R apply(T1 p1, T2 p2);
+    }
+
+    static FederationManagerParameter readArgs(Function<String, String> fn, Function2<String, String, String> fnWithDefaultVal) {
         FederationManagerParameter p = new FederationManagerParameter();
 
-        p.FederationName = line.getOptionValue("federationName");
-        p.FOMFilename = line.getOptionValue("fomFileName");
-        p.ScriptFilename = line.getOptionValue("scriptFileName");
+        p.FederationName = fn.apply("federationName");
+        p.FOMFilename = fn.apply("fomFilename");
+        p.ScriptFilename = fn.apply("scriptFilename");
         p.DBName = null; // not using DB anymore
-        p.LogLevel = line.getOptionValue("logLevel");
-        p.RealTimeMode = Boolean.parseBoolean(line.getOptionValue("realtime", "false"));
-        p.LockFilename = line.getOptionValue("lockfile");
-        p.Step = Double.parseDouble(line.getOptionValue("step"));
-        p.Lookahead = Double.parseDouble(line.getOptionValue("lookahead"));
-        p.TerminateOnCOAFinish = Boolean.parseBoolean(line.getOptionValue("terminateOnCOAFinish", "false"));
-        p.FederationEndTime = Double.parseDouble(line.getOptionValue("federationEndTime", "-1"));
-        p.Seed4Dur = Long.parseLong(line.getOptionValue("seed4DurRNG"));
-        p.AutoStart = Boolean.parseBoolean(line.getOptionValue("autoStart"));
+        p.LogLevel = fn.apply("logLevel");
+        p.RealTimeMode = Boolean.parseBoolean(fnWithDefaultVal.apply("realtime", "false"));
+        p.LockFilename = fn.apply("lockfile");
+        p.Step = Double.parseDouble(fn.apply("step"));
+        p.Lookahead = Double.parseDouble(fn.apply("lookahead"));
+        p.TerminateOnCOAFinish = Boolean.parseBoolean(fnWithDefaultVal.apply("terminateOnCOAFinish", "false"));
+        p.FederationEndTime = Double.parseDouble(fnWithDefaultVal.apply("federationEndTime", "-1"));
+        p.Seed4Dur = Long.parseLong(fn.apply("seed4DurRNG"));
+        p.AutoStart = Boolean.parseBoolean(fn.apply("autoStart"));
 
+        return p;
+    }
+
+    public static FederationManagerParameter ParseInputs(final CommandLine line) {
+        Function<String, String> fn = new Function<String, String>() {
+            public String apply(String s) {
+                return line.getOptionValue(s);
+            }
+        };
+        Function2<String, String, String> fnWithDefaultVal = new Function2<String, String, String>() {
+            public String apply(String opt, String defaultValue) {
+                return line.getOptionValue(opt, defaultValue);
+            }
+        };
+
+        FederationManagerParameter p = readArgs(fn, fnWithDefaultVal);
+        return p;
+    }
+
+    public static FederationManagerParameter ParsePropertiesFile(String propertiesFilePath) throws IOException {
+        InputStream inputStream = null;
+        FederationManagerParameter p = new FederationManagerParameter();
+
+        try {
+            final Properties prop = new Properties();
+            File propertiesFile = new File(propertiesFilePath);
+            inputStream = new FileInputStream(propertiesFile);
+
+            if (inputStream != null) {
+                prop.load(inputStream);
+            } else {
+                throw new FileNotFoundException("Property file '" + propertiesFilePath + "' not found!");
+            }
+
+            Function<String, String> fn = new Function<String, String>() {
+                public String apply(String s) {
+                    return prop.getProperty(s);
+                }
+            };
+            Function2<String, String, String> fnWithDefaultVal = new Function2<String, String, String>() {
+                public String apply(String opt, String defaultValue) {
+                    return prop.getProperty(opt, defaultValue);
+                }
+            };
+
+            p = readArgs(fn, fnWithDefaultVal);
+        } finally {
+            inputStream.close();
+        }
         return p;
     }
 

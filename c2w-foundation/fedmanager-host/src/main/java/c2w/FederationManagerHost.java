@@ -10,6 +10,8 @@ import org.apache.commons.cli.*;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+
 public class FederationManagerHost {
 
     static final Logger logger = Logger.getLogger(FederationManagerHost.class);
@@ -22,10 +24,6 @@ public class FederationManagerHost {
             logger.error("Error during initializing FederationManager! Quitting...", e);
             System.exit(-1);
         }
-    }
-
-    public FederationManagerHost(String configFile) {
-
     }
 
     public void StartSimulation() throws Exception {
@@ -41,11 +39,20 @@ public class FederationManagerHost {
         FederationManagerParameter currentParameter = null;
 
         try {
-            CommandLine line = parser.parse(cliOptions, args);
-            currentParameter = FederationManagerParameter.ParseInputs(line);
+            if(args.length == 1) {
+                currentParameter = FederationManagerParameter.ParsePropertiesFile(args[0]);
+            }
+            else {
+                CommandLine line = parser.parse(cliOptions, args);
+                currentParameter = FederationManagerParameter.ParseInputs(line);
+            }
         }
         catch (ParseException parseExp) {
             logger.error("Parsing CLI arguments failed. Reason: " + parseExp.getMessage(), parseExp);
+            System.exit(-1);
+        }
+        catch(IOException ioExp) {
+            logger.error("Parsing input configuration file failed. Reason: " + ioExp.getMessage(), ioExp);
             System.exit(-1);
         }
 
