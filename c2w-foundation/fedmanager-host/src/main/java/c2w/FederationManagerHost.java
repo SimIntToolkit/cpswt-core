@@ -26,10 +26,25 @@ public class FederationManagerHost {
         }
     }
 
-    public void StartSimulation() throws Exception {
+    public void StartListening() {
+        // this is where the jetty setup is done
+    }
+
+    void startSimulation() throws Exception {
         this.federationManager.startSimulation();
     }
 
+    void terminateSimulation() {
+        this.federationManager.terminateSimulation();
+    }
+
+    void pauseSimuation() throws Exception {
+        this.federationManager.pauseSimulation();
+    }
+
+    void resumeSimulation() throws Exception {
+        this.federationManager.resumeSimulation();
+    }
 
     public static void main(String[] args) throws Exception {
         BasicConfigurator.configure();
@@ -58,7 +73,7 @@ public class FederationManagerHost {
 
         try {
             FederationManagerHost host = new FederationManagerHost(currentParameter);
-            host.StartSimulation();
+            host.StartListening();
         }
         catch (Exception fedMgrExp) {
             logger.error("There was an error starting the federation manager. Reason: " + fedMgrExp.getMessage(), fedMgrExp);
