@@ -44,7 +44,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>c2w.FederationManagerHost</mainClass>
+                            <mainClass>c2w.host.FederationManagerHost</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>
@@ -106,7 +106,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>c2w.FederationManagerHost</mainClass>
+                            <mainClass>c2w.host.FederationManagerHost</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>

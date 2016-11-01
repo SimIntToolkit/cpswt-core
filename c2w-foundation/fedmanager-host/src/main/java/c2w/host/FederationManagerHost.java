@@ -2,7 +2,7 @@
  * @author Greg Varga <greg@sph3r.com>
  */
 
-package c2w;
+package c2w.host;
 
 import c2w.hla.FedMgr;
 import c2w.hla.FederationManagerParameter;

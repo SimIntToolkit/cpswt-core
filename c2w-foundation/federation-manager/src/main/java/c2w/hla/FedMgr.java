@@ -512,6 +512,11 @@ public class FedMgr extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
+    FederationManagerState _currentState;
+    public FederationManagerState getCurrentState() {
+        return _currentState;
+    }
+
     public FedMgr(FederationManagerParameter params) throws Exception {
 
         this.federation_name = params.FederationName;
@@ -586,6 +591,8 @@ public class FedMgr extends SynchronizedFederate {
         if (!params.AutoStart && coasUsed) {
             _coaSim.setVisible(true);
         }
+
+        this._currentState = FederationManagerState.INITIALIZED;
     }
 
     public void recordMainExecutionLoopStartTime() {

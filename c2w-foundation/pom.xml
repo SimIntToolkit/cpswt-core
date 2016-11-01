@@ -5,6 +5,7 @@
     <properties>
         <cpswt.version>0.4.0-SNAPSHOT</cpswt.version>
         <portico.version>2.1.0</portico.version>
+        <dropwizard.version>1.0.3</dropwizard.version>
         <maven.repository.url>http://cpswtng_archiva:8080/repository</maven.repository.url>
     </properties>
 
