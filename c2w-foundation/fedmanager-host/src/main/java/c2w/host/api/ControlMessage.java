@@ -8,9 +8,7 @@ public class ControlMessage {
     private String auth;
     private String action;
 
-    public ControlMessage() {
-
-    }
+    public ControlMessage() {}
 
     public ControlMessage(long id, String auth, String action) {
         this.id = id;
