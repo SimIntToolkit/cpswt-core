@@ -95,3 +95,4 @@ Temporary Items
 
 # log files
 *.log
+*.vec
