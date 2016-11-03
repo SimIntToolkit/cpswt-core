@@ -2,8 +2,6 @@ package c2w.hla;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public enum FederationManagerState {
     /**
@@ -12,7 +10,7 @@ public enum FederationManagerState {
     INITIALIZED(1),
 
     /**
-     * FM is running. Either "started" or "resumed"
+     * FM is running after starting up
      */
     RUNNING(2),
 
@@ -22,26 +20,32 @@ public enum FederationManagerState {
     PAUSED(4),
 
     /**
+     * FM is running again after PAUSED state
+     */
+    RESUMED(8),
+
+    /**
      * FM not running anymore from external termination signal
      */
-    TERMINATED(8),
+    TERMINATED(16),
 
     /**
      * FM not running anymore because run finished
      */
-    FINISHED(16);
+    FINISHED(32);
 
-    private short value;
-    FederationManagerState(short value) {
+    private int value;
+    FederationManagerState(int value) {
         this.value = value;
     }
 
-    static HashMap<FederationManagerState, Set<FederationManagerState>> allowedTransitions;
+    static HashMap<FederationManagerState, HashSet<FederationManagerState>> allowedTransitions;
     static {
-        allowedTransitions = new HashMap<FederationManagerState, Set<FederationManagerState>>();
+        allowedTransitions = new HashMap<FederationManagerState, HashSet<FederationManagerState>>();
 
         allowedTransitions.put(FederationManagerState.INITIALIZED, new HashSet<FederationManagerState>() {{
             add(FederationManagerState.RUNNING);
+            add(FederationManagerState.TERMINATED);
         }});
         allowedTransitions.put(FederationManagerState.RUNNING, new HashSet<FederationManagerState>() {{
             add(FederationManagerState.PAUSED);
@@ -49,8 +53,12 @@ public enum FederationManagerState {
             add(FederationManagerState.FINISHED);
         }});
         allowedTransitions.put(FederationManagerState.PAUSED, new HashSet<FederationManagerState>() {{
-            add(FederationManagerState.RUNNING);
+            add(FederationManagerState.RESUMED);
             add(FederationManagerState.TERMINATED);
+        }});
+        allowedTransitions.put(FederationManagerState.RESUMED, new HashSet<FederationManagerState>() {{
+            add(FederationManagerState.TERMINATED);
+            add(FederationManagerState.FINISHED);
         }});
         allowedTransitions.put(FederationManagerState.TERMINATED, new HashSet<FederationManagerState>());
         allowedTransitions.put(FederationManagerState.FINISHED, new HashSet<FederationManagerState>());
