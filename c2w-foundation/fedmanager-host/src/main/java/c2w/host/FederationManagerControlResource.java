@@ -34,7 +34,7 @@ public class FederationManagerControlResource {
         FederationManagerState currentState = this.federationManager.getCurrentState();
 
         if(currentState.CanTransitionTo(targetState)) {
-            // ....
+            // this.federationManager.setNewState(targetState);
         }
 
         StateMessage m = new StateMessage(targetState);
