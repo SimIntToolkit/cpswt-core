@@ -2,7 +2,10 @@ package c2w.host;
 
 import c2w.hla.FedMgr;
 import c2w.hla.FederationManagerParameter;
+import c2w.host.resources.FederationManagerControlResource;
 import io.dropwizard.Application;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -21,7 +24,13 @@ public class FederationManagerHostApplication extends Application<FederationMana
 
     @Override
     public void initialize(Bootstrap<FederationManagerHostConfiguration> bootstrap) {
-
+        // Enable variable substitution with environment variables
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(),
+                        new EnvironmentVariableSubstitutor(false)
+                )
+        );
     }
 
     @Override
@@ -36,7 +45,7 @@ public class FederationManagerHostApplication extends Application<FederationMana
             environment.jersey().register(fedMgrControlEndpoint);
 
         } catch (Exception ex) {
-            // BAZD MEG
+
         }
 
     }

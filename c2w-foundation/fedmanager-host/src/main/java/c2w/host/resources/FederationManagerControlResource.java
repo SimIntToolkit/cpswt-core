@@ -1,4 +1,4 @@
-package c2w.host;
+package c2w.host.resources;
 
 import c2w.hla.FedMgr;
 import c2w.hla.FederationManagerState;

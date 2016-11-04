@@ -26,6 +26,11 @@
             <artifactId>c2w-coa-gui</artifactId>
             <version>0.4.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-jackson</artifactId>
+            <version>1.0.3</version>
+        </dependency>
     </dependencies>
 
 </project>

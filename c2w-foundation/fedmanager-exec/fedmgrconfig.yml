@@ -38,8 +38,8 @@ logging:
       logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
 #      currentLogFilename: /tmp/application.log
 #      archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}-%i.log.gz
-      currentLogFilename: cpswtng-log.log
-      archivedLogFilenamePattern: cpswtng-log-%d{yyyy-MM-dd}-%i.log.gz
+      currentLogFilename: cpswtng-dwlog.log
+      archivedLogFilenamePattern: cpswtng-dwlog-%d{yyyy-MM-dd}-%i.log.gz
       archivedFileCount: 7
       timeZone: UTC
       maxFileSize: 10MB
