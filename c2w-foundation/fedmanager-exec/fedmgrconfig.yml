@@ -13,34 +13,25 @@ federationManagerParameter:
 
 server:
   type: simple
+  applicationContextPath: /api
   connector:
     type: http
-    port: 8080
+    port: 8082
+    bindHost: 127.0.0.1
 
-#server:
-#  applicationConnectors:
-#    - type: http
-#      port: 8080
-#  adminConnectors:
-#    - type: http
-#      port: 8081
-
-# Logging settings.
 logging:
-
-  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
   level: INFO
-
   appenders:
     - type: console
-    - type: file
-      threshold: INFO
-      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
-#      currentLogFilename: /tmp/application.log
-#      archivedLogFilenamePattern: /tmp/application-%d{yyyy-MM-dd}-%i.log.gz
-      currentLogFilename: cpswtng-dwlog.log
-      archivedLogFilenamePattern: cpswtng-dwlog-%d{yyyy-MM-dd}-%i.log.gz
-      archivedFileCount: 7
+      threshold: ALL
       timeZone: UTC
-      maxFileSize: 10MB
-
+      target: stdout
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger - %X{code} %msg %n"
+    - type: file
+      currentLogFilename: cpswtng-dwlog.log
+      threshold: ALL
+      archive: true
+      archivedLogFilenamePattern: cpswtng-dwlog-%d.log
+      archivedFileCount: 5
+      timeZone: UTC
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger - %X{code} %msg %n"

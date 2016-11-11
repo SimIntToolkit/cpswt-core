@@ -1,6 +1,7 @@
 package c2w.host.resources;
 
 import c2w.hla.FedMgr;
+import c2w.hla.FederationManagerParameter;
 import c2w.hla.FederationManagerState;
 import c2w.host.api.StateMessage;
 import com.codahale.metrics.annotation.Timed;
@@ -8,14 +9,13 @@ import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/fedmgr-control")
+@Path("/fedmgr")
 @Produces(MediaType.APPLICATION_JSON)
 public class FederationManagerControlResource {
 
     private final FedMgr federationManager;
-
-    public FederationManagerControlResource(FedMgr federationManager) {
-        this.federationManager = federationManager;
+    public FederationManagerControlResource(FedMgr fedMgr) {
+            this.federationManager = fedMgr;
     }
 
     @GET

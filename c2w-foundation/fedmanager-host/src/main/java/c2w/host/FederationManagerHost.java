@@ -12,6 +12,10 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * This is a simple host class for federation manager. This does NOT support federation manager control.
+ * For RESTful federation manager control @see FederationManagerHostApplication class.
+ */
 public class FederationManagerHost {
 
     static final Logger logger = Logger.getLogger(FederationManagerHost.class);
@@ -26,24 +30,8 @@ public class FederationManagerHost {
         }
     }
 
-    public void StartListening() {
-        // this is where the jetty setup is done
-    }
-
     void startSimulation() throws Exception {
         this.federationManager.startSimulation();
-    }
-
-    void terminateSimulation() {
-        this.federationManager.terminateSimulation();
-    }
-
-    void pauseSimuation() throws Exception {
-        this.federationManager.pauseSimulation();
-    }
-
-    void resumeSimulation() throws Exception {
-        this.federationManager.resumeSimulation();
     }
 
     public static void main(String[] args) throws Exception {
@@ -61,6 +49,8 @@ public class FederationManagerHost {
                 CommandLine line = parser.parse(cliOptions, args);
                 currentParameter = FederationManagerParameter.ParseInputs(line);
             }
+            FederationManagerHost host = new FederationManagerHost(currentParameter);
+            host.startSimulation();
         }
         catch (ParseException parseExp) {
             logger.error("Parsing CLI arguments failed. Reason: " + parseExp.getMessage(), parseExp);
@@ -69,11 +59,6 @@ public class FederationManagerHost {
         catch(IOException ioExp) {
             logger.error("Parsing input configuration file failed. Reason: " + ioExp.getMessage(), ioExp);
             System.exit(-1);
-        }
-
-        try {
-            FederationManagerHost host = new FederationManagerHost(currentParameter);
-            host.StartListening();
         }
         catch (Exception fedMgrExp) {
             logger.error("There was an error starting the federation manager. Reason: " + fedMgrExp.getMessage(), fedMgrExp);

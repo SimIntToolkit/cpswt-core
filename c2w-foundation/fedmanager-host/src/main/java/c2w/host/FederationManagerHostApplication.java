@@ -8,8 +8,12 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FederationManagerHostApplication extends Application<FederationManagerHostConfiguration> {
+
+    final Logger logger = LoggerFactory.getLogger(FederationManagerHostApplication.class);
 
     public static void main(String[] args) throws Exception {
         new FederationManagerHostApplication().run(args);
@@ -19,8 +23,6 @@ public class FederationManagerHostApplication extends Application<FederationMana
     public String getName() {
         return "FederationManagerHost";
     }
-
-    FedMgr federationManager;
 
     @Override
     public void initialize(Bootstrap<FederationManagerHostConfiguration> bootstrap) {
@@ -37,15 +39,14 @@ public class FederationManagerHostApplication extends Application<FederationMana
     public void run(FederationManagerHostConfiguration configuration, Environment environment) {
         try {
             FederationManagerParameter fedMgrParams = configuration.getFederationManagerParameter();
-            this.federationManager = new FedMgr(fedMgrParams);
-
-            final FederationManagerControlResource fedMgrControlEndpoint = new FederationManagerControlResource(this.federationManager);
+            FedMgr fedMgr = new FedMgr(fedMgrParams);
 
             // register resource (endpoint)
-            environment.jersey().register(fedMgrControlEndpoint);
+            environment.jersey().register(new FederationManagerControlResource(fedMgr));
 
         } catch (Exception ex) {
-
+            logger.error("Error initializing FederationManagerHostApplication. Reason: " + ex.getMessage());
+            System.exit(-1);
         }
 
     }

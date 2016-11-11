@@ -157,10 +157,6 @@
                                     <key>java.net.preferIPv4Stack</key>
                                     <value>true</value>
                                 </systemProperty>
-                                <systemProperty>
-                                    <key>log4j.configuration</key>
-                                    <value>file:resources/log4j.properties</value>
-                                </systemProperty>
                             </systemProperties>
 
                             <arguments>
