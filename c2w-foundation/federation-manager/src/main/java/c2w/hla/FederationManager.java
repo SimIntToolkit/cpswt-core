@@ -101,7 +101,6 @@ public class FederationManager extends SynchronizedFederate {
 
     COAGraph _coaGraph = new COAGraph();
     COASim _coaSim = null;
-    COANode _node = null;
 
     private IC2WFederationEventsHandler _federationEventsHandler = null;
 
@@ -204,16 +203,23 @@ public class FederationManager extends SynchronizedFederate {
     boolean executionTimeRecorded = false;
 
 
-    private final WeakPropertyChangeSupport support = new WeakPropertyChangeSupport(
-            this);
+    private final WeakPropertyChangeSupport support = new WeakPropertyChangeSupport(this);
 
     private PrintStream monitor_out;
 
-    //private ConfigXMLHandler scriptXmlHandler;
-
-    FederationManagerState currentState;
+    private FederationManagerState currentState;
     public FederationManagerState getCurrentState() {
         return this.currentState;
+    }
+    public boolean setCurrentState(FederationManagerState newState) {
+        if(this.currentState.CanTransitionTo(newState)) {
+            // TODO: transition to new state
+
+
+
+            return true;
+        }
+        return false;
     }
 
     public FederationManager(FederationManagerParameter params) throws Exception {
@@ -379,43 +385,9 @@ public class FederationManager extends SynchronizedFederate {
         }
         log.info("done.\n");
 
-
-// Himanshu: Commenting out waiting for lockfiles (using while loops in federates)
-//        // LOCKFILE SHOULD BE CREATED *ONLY* AFTER SYNCHRONIZATION POINTS HAVE BEEN REGISTERED
-//        if ( lockFilename != null ) {
-//            File lockFile = new File( lockFilename );
-//            FileOutputStream lockFileStream = new FileOutputStream( lockFile );
-//            lockFileStream.close();
-//            log.info( "Created lockfile \"" + lockFilename + "\"\n" );
-//        }
-
-
         SimEnd.publish(getRTI());
         SimPause.publish(getRTI());
         SimResume.publish(getRTI());
-    }
-
-    private synchronized void sleepSomeRelative2StepSize() {
-        try {
-            // Either some other federate is stuck or is running slow
-            // --> sleep this thread relative to step size
-            // Sleep 10 times (in milliseconds) of step-size (in seconds) if step-size is > 0.1 seconds
-            int numMillisecondsToSleep = (int) (step * 10.1);
-            if (numMillisecondsToSleep > 0) {
-                System.out.println("Other federates running slow, sleeping for " + numMillisecondsToSleep + " milliseconds...");
-                Thread.sleep(numMillisecondsToSleep);
-            } else {
-                // Step-size is too small
-                // Sleep 10,000 times (in nanoseconds) of step-size (in seconds) if step-size is < 0.1 seconds
-                int numNanosecondsToSleep = (int) (step * 10000);
-                if (numNanosecondsToSleep > 0) {
-                    System.out.println("Other federates running slow, sleeping for " + numNanosecondsToSleep + " nanoseconds...");
-                    Thread.sleep(0, numNanosecondsToSleep);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private synchronized void createFederation() throws Exception {
@@ -430,17 +402,6 @@ public class FederationManager extends SynchronizedFederate {
 
         log.info("Waiting for \"" + ReadyToRunSynch + "\" ... ");
 
-//        // INITIALLY MAKING SURE THAT ALL SIMULATORS ARE READY_TO_RUN AT TIME 0.0,
-//        // THEN PROCEED SIMULATION FROM FEDERATION MANAGER GUI
-//        pauseSimulation();
-//        fireSimPaused();
-//        while(paused) {
-//        	Thread.sleep(500);
-//        }
-//        
-//        readyToRun();
-//        log.info( "done.\n" );
-//        
         // IF FEDERATION MANAGER WAS NOT CONFIGURED TO AUTO-START, THEN
         // PROCEED SIMULATION ONLY WHEN USER PRESSES THE START BUTTON
         if (!_autoStart) {
@@ -513,36 +474,6 @@ public class FederationManager extends SynchronizedFederate {
                                 boolean stuckWhileWaiting = false;
                                 while (!granted && running) {
                                     getRTI().tick();
-//                                    numTicks++;
-//                                    if(numTicks > 1500 && !_killingFederation) {
-//                                    	String warningMsg = "WARNING! C2WT detected a very tight loop among federates.\n\tEither federate lookahead/step-sizes are too small,\n\tor too many messages are being generated in a very small time-period,\n\tor one of the federate had an exception and is stuck.";
-//                                    	System.out.println("WARNING! No. of RTI.tick() calls without yet getting a grant = " + numTicks);
-//                                    	System.out.println(warningMsg);
-//                                    	if(!_autoStart && !stuckWhileWaiting) {
-//                                    		// TODO: Add a dialog to not show this dialog again
-//                                    		int choice = JOptionPane.showConfirmDialog( null, warningMsg + "\n\nDo you want to terminate simulation?", "Tight-loop detected!", JOptionPane.YES_NO_OPTION );
-//                                    		if (choice == JOptionPane.YES_OPTION) {
-//                                    			// Himanshu: Here RTI is stuck, so we can't properly resign all federates
-//                                    			// Only option is to kill all federates.
-//                                    			killEntireFederation();
-//                                    		}
-//                                    		stuckWhileWaiting = true;
-//                                    	}
-//                                    }
-//
-//                                    if(numTicks > 1200) { // Stuck while waiting for others to catch, sleep some
-//                                    	sleepSomeRelative2StepSize();
-//                                    }
-//                                    
-//                                    // Sleep within each tick for step-size/1000 seconds
-//                                    // int numNanoSecs2SleepWithinEachTick = (int) ((step / 1000.0) * 1000000000.0);
-//                                    // if(numNanoSecs2SleepWithinEachTick <= 0) {
-//                                    // 	numNanoSecs2SleepWithinEachTick = 1;
-//                                    // }
-//                                    // if(numNanoSecs2SleepWithinEachTick > 999999) {
-//                                    // 	numNanoSecs2SleepWithinEachTick = 999999;
-//                                    // }
-//                                    // Thread.sleep(0, numNanoSecs2SleepWithinEachTick);
                                 }
                                 numTicks = 0;
 
@@ -733,7 +664,8 @@ public class FederationManager extends SynchronizedFederate {
         // can be executed.
         boolean nodeExecuted = false;
         for (COANode n : currentRootNodes) {
-            if (n.getNodeType() == NODE_TYPE.NODE_SYNC_PT) {
+            NODE_TYPE nodeType = n.getNodeType();
+            if (nodeType == NODE_TYPE.NODE_SYNC_PT) {
                 COASyncPt nodeSyncPt = (COASyncPt) n;
                 double timeToReachSyncPt = nodeSyncPt.getSyncTime() - getCurrentTime();
                 if (timeToReachSyncPt > 0.0) {
@@ -743,7 +675,7 @@ public class FederationManager extends SynchronizedFederate {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-            } else if (n.getNodeType() == NODE_TYPE.NODE_AWAITN) {
+            } else if (nodeType == NODE_TYPE.NODE_AWAITN) {
                 COAAwaitN nodeAwaitN = (COAAwaitN) n;
                 if (!nodeAwaitN.getIsRequiredNumOfBranchesFinished()) {
                     // AwaitN is not reached, nothing to be done
@@ -752,7 +684,8 @@ public class FederationManager extends SynchronizedFederate {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-            } else if (n.getNodeType() == NODE_TYPE.NODE_DURATION) {
+            } else if (nodeType == NODE_TYPE.NODE_DURATION) { // || nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
+                //if(nodeType == NODE_TYPE.NODE_DURATION) {
                 COADuration nodeDuration = (COADuration) n;
                 if (!nodeDuration.getIsTimerOn()) {
                     // Start executing duration element
@@ -765,7 +698,7 @@ public class FederationManager extends SynchronizedFederate {
                         nodeExecuted = true;
                     }
                 }
-            } else if (n.getNodeType() == NODE_TYPE.NODE_RANDOM_DURATION) {
+            } else if (nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
                 COARandomDuration nodeDuration = (COARandomDuration) n;
                 if (!nodeDuration.getIsTimerOn()) {
                     // Start executing duration element
@@ -778,28 +711,28 @@ public class FederationManager extends SynchronizedFederate {
                         nodeExecuted = true;
                     }
                 }
-            } else if (n.getNodeType() == NODE_TYPE.NODE_FORK) {
+            } else if (nodeType == NODE_TYPE.NODE_FORK) {
                 COAFork nodeFork = (COAFork) n;
                 boolean isDecisionPoint = nodeFork.getIsDecisionPoint(); // TODO: handle decision points
 
                 // As of now Fork is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (n.getNodeType() == NODE_TYPE.NODE_PROBABILISTIC_CHOICE) {
+            } else if (nodeType == NODE_TYPE.NODE_PROBABILISTIC_CHOICE) {
                 COAProbabilisticChoice nodeProbChoice = (COAProbabilisticChoice) n;
                 boolean isDecisionPoint = nodeProbChoice.getIsDecisionPoint(); // TODO: handle decision points
 
                 // As of now Probabilistic Choice is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (n.getNodeType() == NODE_TYPE.NODE_ACTION) {
+            } else if (nodeType == NODE_TYPE.NODE_ACTION) {
                 COAAction nodeAction = (COAAction) n;
 
                 // As of now Action is always executed as soon as it is encountered
                 executeCOAAction(nodeAction);
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (n.getNodeType() == NODE_TYPE.NODE_OUTCOME) {
+            } else if (nodeType == NODE_TYPE.NODE_OUTCOME) {
                 COAOutcome nodeOutcome = (COAOutcome) n;
                 if (!nodeOutcome.getIsTimerOn()) {
                     // Start executing Outcome element
@@ -811,7 +744,7 @@ public class FederationManager extends SynchronizedFederate {
                         nodeExecuted = true;
                     }
                 }
-            } else if (n.getNodeType() == NODE_TYPE.NODE_OUTCOME_FILTER) {
+            } else if (nodeType == NODE_TYPE.NODE_OUTCOME_FILTER) {
                 COAOutcomeFilter outcomeFilter = (COAOutcomeFilter) n;
                 COAOutcome outcomeToFilter = outcomeFilter.getOutcome();
 
