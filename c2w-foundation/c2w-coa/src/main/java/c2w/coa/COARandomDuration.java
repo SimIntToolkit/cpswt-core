@@ -18,7 +18,6 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  * 
- * @author Himanshu Neema
  */
 
 package c2w.coa;
@@ -29,30 +28,22 @@ import c2w.util.RandomSingleton;
 
 /**
  * Represents a random duration element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
-public class COARandomDuration extends COANode {
+public class COARandomDuration extends COADuration {
 
 	private double _lowerBound = 0.0;
-
 	private double _upperBound = 0.0;
-
-	private boolean _isTimerOn = false;
-
-	private double _duration = 0.0;
-
-	private double _endTime = -1.0;
-
 	private Random _rand = null;
 
 	public COARandomDuration(String nodeName, String uniqueID,
 			double lowerBound, double upperBound, Random rand) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_RANDOM_DURATION);
+		super(nodeName, uniqueID, 0.0, NODE_TYPE.NODE_RANDOM_DURATION);
+
 		if (lowerBound < 0 || upperBound < 0 || upperBound < lowerBound) {
 			throw new IllegalArgumentException(
 					"Error! Incorrect bounds on duration provided");
 		}
+
 		this._lowerBound = lowerBound;
 		this._upperBound = upperBound;
 
@@ -72,29 +63,8 @@ public class COARandomDuration extends COANode {
 
 	@Override
 	public String toString() {
-		return super.toString() + ", RandomDuration: " + _duration + "["
+		return super.toString() + ", RandomDuration: " + this._duration + "["
 				+ this._lowerBound + "," + this._upperBound + "], TimerON: "
-				+ _isTimerOn;
-	}
-
-	public double getDuration() {
-		return _duration;
-	}
-
-	public void startTimer(double currentTime) {
-		if (currentTime < 0) {
-			throw new IllegalArgumentException(
-					"Error! Negative currentTime given for: " + this);
-		}
-		this._endTime = currentTime + this._duration;
-		this._isTimerOn = true;
-	}
-
-	public double getEndTime() {
-		return _endTime;
-	}
-
-	public boolean getIsTimerOn() {
-		return _isTimerOn;
+				+ this._isTimerOn;
 	}
 }

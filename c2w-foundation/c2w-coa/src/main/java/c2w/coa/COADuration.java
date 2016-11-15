@@ -18,26 +18,25 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  * 
- * @author Himanshu Neema
  */
 
 package c2w.coa;
 
 /**
  * Represents a duration element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COADuration extends COANode {
 
-	private double _duration = 0.0;
-
-	private double _endTime = -1.0;
-
-	private boolean _isTimerOn = false;
+	protected double _duration = 0.0;
+	protected double _endTime = -1.0;
+	protected boolean _isTimerOn = false;
 
 	public COADuration(String nodeName, String uniqueID, double duration) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_DURATION);
+		this(nodeName, uniqueID, duration, NODE_TYPE.NODE_DURATION);
+	}
+
+	protected COADuration(String nodeName, String uniqueID, double duration, NODE_TYPE nodeType) {
+		super(nodeName, uniqueID, nodeType);
 		if (duration < 0) {
 			throw new IllegalArgumentException(
 					"Error! Negative duration not permitted");

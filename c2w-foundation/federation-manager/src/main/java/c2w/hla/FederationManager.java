@@ -222,8 +222,17 @@ public class FederationManager extends SynchronizedFederate {
         return false;
     }
 
+    /**
+     * Creates a @FederationManager instance.
+     * @param params The passed parameters to initialize the federation manager.
+     * @throws Exception I have no idea why we have this here. Especially pure Exception type... wtf!
+     */
     public FederationManager(FederationManagerParameter params) throws Exception {
 
+        // set current state to INITIALIZING
+        this.currentState = FederationManagerState.INITIALIZING;
+
+        // record parameters
         this.federation_name = params.FederationName;
         this.FOM_file_name = params.FOMFilename;
         this.lockFilename = params.LockFilename;
@@ -684,22 +693,15 @@ public class FederationManager extends SynchronizedFederate {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-            } else if (nodeType == NODE_TYPE.NODE_DURATION) { // || nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
-                //if(nodeType == NODE_TYPE.NODE_DURATION) {
-                COADuration nodeDuration = (COADuration) n;
-                if (!nodeDuration.getIsTimerOn()) {
-                    // Start executing duration element
-                    nodeDuration.startTimer(getCurrentTime());
-                } else {
-                    // Check if the duration node has executed
-                    if (getCurrentTime() >= nodeDuration.getEndTime()) {
-                        // Duration node finished, mark executed
-                        _coaGraph.markNodeExecuted(n, getCurrentTime());
-                        nodeExecuted = true;
-                    }
+            } else if (nodeType == NODE_TYPE.NODE_DURATION || nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
+                COADuration nodeDuration = null;
+                if(nodeType == NODE_TYPE.NODE_DURATION) {
+                    nodeDuration = (COADuration) n;
                 }
-            } else if (nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
-                COARandomDuration nodeDuration = (COARandomDuration) n;
+                else {
+                    nodeDuration = (COARandomDuration) n;
+                }
+
                 if (!nodeDuration.getIsTimerOn()) {
                     // Start executing duration element
                     nodeDuration.startTimer(getCurrentTime());
