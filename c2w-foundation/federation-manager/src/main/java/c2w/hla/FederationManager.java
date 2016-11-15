@@ -23,7 +23,6 @@
 
 package c2w.hla;
 
-import hla.rti.AttributeHandleSet;
 import hla.rti.ConcurrentAccessAttempted;
 import hla.rti.EventRetractionHandle;
 import hla.rti.FederateLoggingServiceCalls;
@@ -64,14 +63,10 @@ import javax.xml.parsers.SAXParserFactory;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
 
 import c2w.coa.COAAction;
 import c2w.coa.COAAwaitN;
 import c2w.coa.COADuration;
-import c2w.coa.COAEdge;
-import c2w.coa.COAFlowWithProbabilityEdge;
 import c2w.coa.COAFork;
 import c2w.coa.COAGraph;
 import c2w.coa.COANode;
@@ -80,11 +75,8 @@ import c2w.coa.COAOutcomeFilter;
 import c2w.coa.COAProbabilisticChoice;
 import c2w.coa.COARandomDuration;
 import c2w.coa.COASyncPt;
-import c2w.coa.COAEdge.EDGE_TYPE;
 import c2w.coa.COANode.NODE_TYPE;
 import c2w.gui.coa.COASim;
-//import c2w.gui.hla.main.C2WSim;
-import c2w.util.FedUtil;
 import c2w.util.RandomWithFixedSeed;
 import c2w.util.WeakPropertyChangeSupport;
 import c2w.hla.rtievents.IC2WFederationEventsHandler;
@@ -92,23 +84,17 @@ import c2w.hla.rtievents.C2WFederationEventsHandler;
 
 /**
  * Model class for the Federation Manager.
- *
- * @author Himanshu Neema
  */
-public class FedMgr extends SynchronizedFederate {
+public class FederationManager extends SynchronizedFederate {
 
 
     private Set<String> _synchronizationLabels = new HashSet<String>();
-
-    //private static Logger log = Logger.getLogger( C2WSim.class.getName() );
-    private static Logger log = Logger.getLogger(FedMgr.class.getName());
+    private static Logger log = Logger.getLogger(FederationManager.class.getName());
 
     Set<String> _expectedFederates = new HashSet<String>();
     Set<String> _processedFederates = new HashSet<String>();
     Map<Integer, String> _discoveredFederates = new HashMap<Integer, String>();
     Set<FederateObject> _incompleteFederates = new HashSet<FederateObject>();
-
-    AttributeHandleSet _federateAttributeHandleSet;
 
     InteractionRoot _injectedInteraction = null;
     double _injectionTime = -1;
@@ -123,311 +109,24 @@ public class FedMgr extends SynchronizedFederate {
     Class _outcomeFilterEvaluatorClass = null;
     HashMap<COAOutcomeFilter, Method> _outcomeFilter2EvalMethodMap = new HashMap<COAOutcomeFilter, Method>();
 
-    class ConfigXMLHandler extends DefaultHandler {
-
-        public void startElement(String uri, String localName, String qName, Attributes attributes) {
-
-            try {
-                if ("interaction".equals(qName)) {
-
-                    String interactionClassName = attributes.getValue("name");
-                    String simpleInteractionClassName = interactionClassName.substring(interactionClassName.lastIndexOf('.') + 1);
-
-                    String packageName = federation_name;
-                    String path = "generated/" + federation_name + "/java/" + packageName.replaceAll("\\.", "/");
-                    try {
-                        Class.forName(packageName + "." + simpleInteractionClassName);
-                    } catch (Exception e) {
-                        System.err.println("WARNING:  Could not load class \"" + simpleInteractionClassName + "\"");
-                        e.printStackTrace();
-                    }
-
-                    InteractionRoot.publish(interactionClassName, getRTI());
-                    System.out.println("publish: " + interactionClassName + "(" + InteractionRoot.get_handle(interactionClassName) + ")");
-
-                    // Himanshu: Enabling Manager Logging to Database
-                    InteractionRoot.enablePublishLog(simpleInteractionClassName, "manager", "IMPORTANT", _logLevel);
-
-                    InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClassName);
-                    interactionRoot.setParameter("sourceFed", getFederateId());
-                    interactionRoot.setParameter("originFed", getFederateId());
-
-                    int noAttributes = attributes.getLength();
-                    for (int ix = 0; ix < noAttributes; ++ix) {
-                        String name = attributes.getQName(ix);
-                        if ("name".equals(name)) continue;
-                        String val = attributes.getValue(ix);
-                        interactionRoot.setParameter(name, val);
-                    }
-
-                    _injectedInteraction = interactionRoot;
-
-                } else if ("injection_time".equals(qName)) {
-
-                    if (_injectedInteraction == null) {
-                        System.err.println("ERROR!  no interaction to inject at specified time");
-                        return;
-                    }
-
-                    String timeString = attributes.getValue("value");
-                    if (timeString == null) {
-                        System.err.println("ERROR:  interaction does not contain time of interaction.");
-                        return;
-                    }
-
-                    _injectionTime = Double.parseDouble(timeString);
-
-                } else if ("pause".equals(qName)) {
-
-                    String time = attributes.getValue("time");
-                    pause_times.add(Double.parseDouble(time));
-
-                } else if ("monitor".equals(qName)) {
-
-                    String interactionClassName = attributes.getValue("name");
-                    InteractionRoot.subscribe(interactionClassName, getRTI());
-                    int interactionClassHandle = InteractionRoot.get_handle(interactionClassName);
-                    System.out.println("subscribe: " + interactionClassName + "(" + interactionClassHandle + ")");
-
-                    // int noAttributes = attributes.getLength();
-                    // Set< Integer > parameterHandleSet = new HashSet< Integer >();
-                    // for( int ix = 0 ; ix < noAttributes ; ++ix ) {
-                    //     String name = attributes.getQName( ix );
-                    //     if (  "name".equals( name )  ) continue;
-                    //     int parameter_handle = InteractionRoot.get_parameter_handle( interactionClassName, name );
-                    //     if ( parameter_handle != -1 ) parameterHandleSet.add( parameter_handle );
-                    // }
-                    monitored_interactions.add(interactionClassHandle);
-
-                } else if ("expect".equals(qName)) {
-
-                    String federateType = null;
-                    int noAttributes = attributes.getLength();
-
-                    for (int ix = 0; ix < noAttributes; ++ix) {
-                        String attributeName = attributes.getQName(ix);
-                        String attributeValue = attributes.getValue(ix);
-                        if (attributeName.equals("federateType")) federateType = attributeValue;
-                    }
-
-                    _expectedFederates.add(federateType);
-
-                } else if ("coaNode".equals(qName)) {
-                    int noAttributes = attributes.getLength();
-                    String nodeType = null;
-                    String nodeName = null;
-                    String nodeUniqueID = null;
-                    HashMap<String, String> attrsMap = new HashMap<String, String>();
-                    for (int ix = 0; ix < noAttributes; ++ix) {
-                        String attributeName = attributes.getQName(ix);
-                        String attributeValue = attributes.getValue(ix);
-                        if (attributeName.equals("ID")) {
-                            nodeUniqueID = attributeValue;
-                        } else if (attributeName.equals("name")) {
-                            nodeName = attributeValue;
-                        } else if (attributeName.equals("nodeType")) {
-                            nodeType = attributeValue;
-                        } else {
-                            attrsMap.put(attributeName, attributeValue);
-                        }
-                    }
-                    if (NODE_TYPE.NODE_SYNC_PT.getName().equals(nodeType)) {
-                        double nodeSyncTime = Double.parseDouble(attrsMap.get("time"));
-                        int nodeNumBranchesToFinish = Integer.parseInt(attrsMap.get("minBranchesToSync"));
-                        _node = new COASyncPt(nodeName, nodeUniqueID, nodeSyncTime, nodeNumBranchesToFinish);
-                    } else if (NODE_TYPE.NODE_AWAITN.getName().equals(nodeType)) {
-                        int nodeNumBranchesToAwait = Integer.parseInt(attrsMap.get("minBranchesToAwait"));
-                        _node = new COAAwaitN(nodeName, nodeUniqueID, nodeNumBranchesToAwait);
-                    } else if (NODE_TYPE.NODE_DURATION.getName().equals(nodeType)) {
-                        double nodeDuration = Double.parseDouble(attrsMap.get("time"));
-                        _node = new COADuration(nodeName, nodeUniqueID, nodeDuration);
-                    } else if (NODE_TYPE.NODE_RANDOM_DURATION.getName().equals(nodeType)) {
-                        double lowerBound = Double.parseDouble(attrsMap.get("lowerBound"));
-                        double upperBound = Double.parseDouble(attrsMap.get("upperBound"));
-                        _node = new COARandomDuration(nodeName, nodeUniqueID, lowerBound, upperBound, _rand4Dur);
-                    } else if (NODE_TYPE.NODE_FORK.getName().equals(nodeType)) {
-                        boolean nodeIsDecisionPoint = Boolean.parseBoolean(attrsMap.get("isDecisionPoint"));
-                        _node = new COAFork(nodeName, nodeUniqueID, nodeIsDecisionPoint);
-                    } else if (NODE_TYPE.NODE_PROBABILISTIC_CHOICE.getName().equals(nodeType)) {
-                        boolean nodeIsDecisionPoint = Boolean.parseBoolean(attrsMap.get("isDecisionPoint"));
-                        _node = new COAProbabilisticChoice(nodeName, nodeUniqueID, nodeIsDecisionPoint);
-                    } else if (NODE_TYPE.NODE_ACTION.getName().equals(nodeType)) {
-                        String nodeInteractionName = attrsMap.get("interactionName");
-                        _node = new COAAction(nodeName, nodeUniqueID, nodeInteractionName);
-
-                        // Make sure the interaction corresponding to the action is published
-                        String simpleInteractionClassName = nodeInteractionName.substring(nodeInteractionName.lastIndexOf('.') + 1);
-                        String packageName = federation_name;
-                        String fullyQualifiedClassname = packageName + "." + simpleInteractionClassName;
-                        String fullyQualifiedGenericC2WTClassname = "c2w.hla." + simpleInteractionClassName;
-                        Class intrClass = FedUtil.loadClassByName(fullyQualifiedClassname);
-                        if (intrClass == null) {
-                            intrClass = FedUtil.loadClassByName(fullyQualifiedGenericC2WTClassname);
-                        }
-                        if (intrClass != null) {
-                            InteractionRoot.publish(nodeInteractionName, getRTI());
-                            int intrClassHandle = InteractionRoot.get_handle(nodeInteractionName);
-                            System.out.println("publish: " + nodeInteractionName + "(" + intrClassHandle + ")");
-
-                            // Himanshu: Enabling Manager Logging to Database
-                            enableManagerPubSubLog(intrClass, simpleInteractionClassName, true);
-                        } else {
-                            System.err.println("ERROR:  Could not load class \"" + simpleInteractionClassName + "\"... OR c2w.hla." + simpleInteractionClassName);
-                            _node = null;
-                        }
-
-                        // Set interaction's parameter values
-                        for (String paramName : attrsMap.keySet()) {
-                            if (!"interactionName".equals(paramName)) {
-                                COAAction actionNode = (COAAction) _node;
-                                actionNode.addNameValueParamPair(paramName, attrsMap.get(paramName));
-                            }
-                        }
-                    } else if (NODE_TYPE.NODE_OUTCOME.getName().equals(nodeType)) {
-                        String nodeInteractionName = attrsMap.get("interactionName");
-                        _node = new COAOutcome(nodeName, nodeUniqueID, nodeInteractionName);
-
-                        // Make sure the interaction corresponding to the action is subscribed
-                        String simpleInteractionClassName = nodeInteractionName.substring(nodeInteractionName.lastIndexOf('.') + 1);
-                        String packageName = federation_name;
-                        String fullyQualifiedClassname = packageName + "." + simpleInteractionClassName;
-                        String fullyQualifiedGenericC2WTClassname = "c2w.hla." + simpleInteractionClassName;
-                        Class intrClass = FedUtil.loadClassByName(fullyQualifiedClassname);
-                        if (intrClass == null) {
-                            intrClass = FedUtil.loadClassByName(fullyQualifiedGenericC2WTClassname);
-                        }
-                        if (intrClass != null) {
-                            InteractionRoot.subscribe(nodeInteractionName, getRTI());
-                            int intrClassHandle = InteractionRoot.get_handle(nodeInteractionName);
-                            System.out.println("subscribe: " + nodeInteractionName + "(" + intrClassHandle + ")");
-
-                            ((COAOutcome) _node).setInteractionClassHandle(intrClassHandle);
-
-                            // Himanshu: Enable Manager Logging to Database
-                            enableManagerPubSubLog(intrClass, simpleInteractionClassName, false);
-                        } else {
-                            System.err.println("ERROR:  Could not load class \"" + simpleInteractionClassName + "\"... OR c2w.hla." + simpleInteractionClassName);
-                            _node = null;
-                        }
-                    } else if (NODE_TYPE.NODE_OUTCOME_FILTER.getName().equals(nodeType)) {
-                        _node = new COAOutcomeFilter(nodeName, nodeUniqueID);
-                    } else {
-                        // Unknown node type
-                        System.out.println("WARNING! Unsupported node type in COA sequence graph: " + nodeType);
-                        _node = null;
-                    }
-
-                } else if ("coaEdge".equals(qName)) {
-                    int noAttributes = attributes.getLength();
-                    String edgeType = null;
-                    String edgeFlowID = null;
-                    String fromNodeID = null;
-                    String toNodeID = null;
-                    HashMap<String, String> attrsMap = new HashMap<String, String>();
-                    for (int ix = 0; ix < noAttributes; ++ix) {
-                        String attributeName = attributes.getQName(ix);
-                        String attributeValue = attributes.getValue(ix);
-                        if (attributeName.equals("type")) {
-                            edgeType = attributeValue;
-                        } else if (attributeName.equals("flowID")) {
-                            edgeFlowID = attributeValue;
-                        } else if (attributeName.equals("fromNode")) {
-                            fromNodeID = attributeValue;
-                        } else if (attributeName.equals("toNode")) {
-                            toNodeID = attributeValue;
-                        } else {
-                            attrsMap.put(attributeName, attributeValue);
-                        }
-                    }
-                    COANode fromNode = _coaGraph.getNode(fromNodeID);
-                    COANode toNode = _coaGraph.getNode(toNodeID);
-                    if (fromNode != null && toNode != null) {
-                        if (EDGE_TYPE.EDGE_COAFLOW.getName().equals(edgeType) || EDGE_TYPE.EDGE_OUTCOME2FILTER.getName().equals(edgeType) || EDGE_TYPE.EDGE_FILTER2COAELEMENT.getName().equals(edgeType)) {
-                            // TODO: For clarity we may actually use different classes for other edge types
-                            COAEdge coaEdge = new COAEdge(EDGE_TYPE.EDGE_COAFLOW, fromNode, toNode, edgeFlowID, null);
-                            _coaGraph.addEdge(coaEdge);
-                            System.out.println("Added COAEdge: " + coaEdge);
-                        } else if (EDGE_TYPE.EDGE_COAFLOW_WITH_PROBABILITY.getName().equals(edgeType)) {
-                            double probability = Double.parseDouble(attrsMap.get("probability"));
-                            COAFlowWithProbabilityEdge coaProbChoiceEdge = new COAFlowWithProbabilityEdge(fromNode, toNode, edgeFlowID, probability, null);
-                            _coaGraph.addEdge(coaProbChoiceEdge);
-                            System.out.println("Added COAEdge: " + coaProbChoiceEdge);
-                        } else if (EDGE_TYPE.EDGE_COAEXCEPTION.getName().equals(edgeType)) {
-                            String branchesFinishedCondition = attrsMap.get("branchesFinishedCondition");
-                            branchesFinishedCondition = branchesFinishedCondition.trim();
-                            String[] flowIDs = branchesFinishedCondition.split("\\s+");
-                            HashSet<String> flowIDsAsSet = new HashSet<String>();
-                            for (String flowID : flowIDs) {
-                                flowIDsAsSet.add(flowID);
-                            }
-                            COAEdge coaEdge = new COAEdge(EDGE_TYPE.EDGE_COAEXCEPTION, fromNode, toNode, edgeFlowID, flowIDsAsSet);
-                            _coaGraph.addEdge(coaEdge);
-                            System.out.println("Added COAEdge: " + coaEdge);
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-                System.out.println("XML parsing error");
-                e.printStackTrace();
-                parse_error = true;
-            }
-        }
-
-        public void endElement(String uri, String localName, String qName) {
-
-            try {
-                if ("interaction".equals(qName)) {
-                    if (_injectionTime < 0) {
-                        initialization_interactions.add(_injectedInteraction);
-                    } else {
-                        if (!script_interactions.containsKey(_injectionTime))
-                            script_interactions.put(_injectionTime, new ArrayList<InteractionRoot>());
-                        script_interactions.get(_injectionTime).add(_injectedInteraction);
-                    }
-                    _injectedInteraction = null;
-                    _injectionTime = -1;
-                } else if ("coaNode".equals(qName)) {
-                    _coaGraph.addNode(_node);
-                    System.out.println("Added COANode: " + _node);
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
     public static final String MODE_REALTIME = "Realtime";
-
     public static final String MODE_AS_FAST_AS_POSSIBLE = "As Fast As Possible";
 
     public static final String LOG_LEVEL_NONE = "No Logging";
-
     public static final String LOG_LEVEL_HIGH = "Only High priority";
-
     public static final String LOG_LEVEL_MEDIUM = "Up to Medium priority";
-
     public static final String LOG_LEVEL_LOW = "Up to Low priority";
-
     public static final String LOG_LEVEL_ALL = "Up to Very Low priority (All logs)";
 
     public static final String SIM_STATUS_STOPPED = "Not started";
-
     public static final String SIM_STATUS_RUNNING = "Running";
-
     public static final String SIM_STATUS_PAUSED = "Paused";
 
     public static final String PROP_LOGICAL_TIME = "propLogicalTime";
-
     public static final String PROP_LOG_HIGH_PRIO = "propLogHighPrio";
-
     public static final String PROP_LOG_MEDIUM_PRIO = "propLogMediumPrio";
-
     public static final String PROP_LOG_LOW_PRIO = "propLogLowPrio";
-
     public static final String PROP_LOG_VERY_LOW_PRIO = "propLogVeryLowPrio";
-
     public static final String PROP_EXTERNAL_SIM_PAUSED = "propExternalSimPaused";
 
     public static enum LOG_TYPE {
@@ -462,8 +161,6 @@ public class FedMgr extends SynchronizedFederate {
 
     boolean _killingFederation = false;
     String _c2wtRoot;
-
-    boolean parse_error;
 
     Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
     List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
@@ -512,12 +209,14 @@ public class FedMgr extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    FederationManagerState _currentState;
+    //private ConfigXMLHandler scriptXmlHandler;
+
+    FederationManagerState currentState;
     public FederationManagerState getCurrentState() {
-        return _currentState;
+        return this.currentState;
     }
 
-    public FedMgr(FederationManagerParameter params) throws Exception {
+    public FederationManager(FederationManagerParameter params) throws Exception {
 
         this.federation_name = params.FederationName;
         this.FOM_file_name = params.FOMFilename;
@@ -540,12 +239,12 @@ public class FedMgr extends SynchronizedFederate {
         }
 
         this._c2wtRoot = System.getenv("C2WTROOT");
-        if(this._c2wtRoot == null) {
+        if (this._c2wtRoot == null) {
             this._c2wtRoot = System.getProperty("user.dir");
         }
 
         File logDir = new File(this._c2wtRoot, "log");
-        if(Files.notExists(logDir.toPath())) {
+        if (Files.notExists(logDir.toPath())) {
             logDir.mkdir();
         }
 
@@ -560,11 +259,12 @@ public class FedMgr extends SynchronizedFederate {
 
         // read script file
         if (params.ScriptFilename != null) {
-            parse_error = false;
             File f = new File(params.ScriptFilename);
-            SAXParserFactory.newInstance().newSAXParser().parse(f,
-                    new ConfigXMLHandler());
-            if (parse_error)
+
+            ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federation_name, this.getFederateId(), this._rand4Dur, this._logLevel, this.getRTI());
+
+            SAXParserFactory.newInstance().newSAXParser().parse(f, xmlHandler);
+            if (xmlHandler.getParseFailed())
                 throw new Exception("Config file reading failed.");
 
             // Script file loaded
@@ -572,7 +272,15 @@ public class FedMgr extends SynchronizedFederate {
 
             // PREPARE FOR FEDERATES TO JOIN -- INITIALIZE _processedFederates AND ELIMINATE
             // FEDERATES NAMES FROM IT AS THEY JOIN            
-            _processedFederates.addAll(_expectedFederates);
+            _processedFederates.addAll(xmlHandler.getExpectedFederates());
+
+            _injectedInteraction = xmlHandler.getInjectedInteraction();
+            pause_times.addAll(xmlHandler.getPauseTimes());
+            monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
+            _expectedFederates.addAll(xmlHandler.getExpectedFederates());
+            _coaGraph = xmlHandler.getCoaGraph();
+            initialization_interactions.addAll(xmlHandler.getInitInteractions());
+            script_interactions = xmlHandler.getScriptInteractions();
 
             // Remember stop script file's full path
             _stopScriptFilepath = params.ScriptFilename;
@@ -592,7 +300,7 @@ public class FedMgr extends SynchronizedFederate {
             _coaSim.setVisible(true);
         }
 
-        this._currentState = FederationManagerState.INITIALIZED;
+        this.currentState = FederationManagerState.INITIALIZED;
     }
 
     public void recordMainExecutionLoopStartTime() {
@@ -936,25 +644,6 @@ public class FedMgr extends SynchronizedFederate {
             Thread.sleep(500);
         }
         log.info("All federates have resigned the federation.  Simulation terminated.\n");
-    }
-
-    // Himanshu: Enabling Manager Logging to Database
-    private void enableManagerPubSubLog(Class intrClass, String simpleIntrClassName, boolean isPublishLog) {
-        if (intrClass == null) {
-            return;
-        }
-        String method2Load = isPublishLog ? "enablePublishLog" : "enableSubscribeLog";
-        try {
-            Method method = intrClass.getMethod(method2Load, new Class[]{String.class, String.class, String.class, String.class});
-            if (method == null) {
-                System.err.println("ERROR! FedMgr: Cannot find method '" + method2Load + "' in class '" + simpleIntrClassName + "'");
-            } else {
-                method.invoke(null, simpleIntrClassName, "manager", "IMPORTANT", _logLevel);
-            }
-        } catch (Exception e) {
-            System.err.println("FedMgr: Exception caught while calling '" + method2Load + "' on interaction class '" + simpleIntrClassName + "'");
-            e.printStackTrace();
-        }
     }
 
     private void sendScriptInteractions() {
@@ -1579,9 +1268,9 @@ public class FedMgr extends SynchronizedFederate {
             InteractionRoot interactionRoot = InteractionRoot.create_interaction(handle, receivedInteraction);
 
             if (interactionRoot != null) {
-                System.out.println("FedMgr: Received interaction " + interactionRoot);
+                System.out.println("FederationManager: Received interaction " + interactionRoot);
             } else {
-                System.err.println("FedMgr: WARNING! Received interaction with handle " + handle + ".. COULD NOT CREATE PROPER INTERACTION");
+                System.err.println("FederationManager: WARNING! Received interaction with handle " + handle + ".. COULD NOT CREATE PROPER INTERACTION");
                 return;
             }
 

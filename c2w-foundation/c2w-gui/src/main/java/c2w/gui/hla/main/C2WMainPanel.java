@@ -48,7 +48,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import c2w.hla.*;
-import c2w.hla.FedMgr.LOG_TYPE;
+import c2w.hla.FederationManager.LOG_TYPE;
 import c2w.util.MsgDisplay;
 import c2w.util.XmlFileFilter;
 
@@ -61,7 +61,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
 
     private static final long serialVersionUID = 1L;
 
-    private static FedMgr fedMgr;
+    private static FederationManager federationManager;
 
     private static Logger log = Logger.getLogger(C2WSim.class.getName());
 
@@ -357,33 +357,33 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         terminateButton.setEnabled(false);
 
         updateSimTime(0);
-        updateSimStatus(FedMgr.SIM_STATUS_STOPPED);
+        updateSimStatus(FederationManager.SIM_STATUS_STOPPED);
 
         simLogText.setEditable(false);
 
         modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
-                        FedMgr.MODE_REALTIME,
-                        FedMgr.MODE_AS_FAST_AS_POSSIBLE
+                        FederationManager.MODE_REALTIME,
+                        FederationManager.MODE_AS_FAST_AS_POSSIBLE
                 }
         ));
-        modeComboBox.setSelectedItem(federationManagerParameter.RealTimeMode ? FedMgr.MODE_REALTIME : FedMgr.MODE_AS_FAST_AS_POSSIBLE);
+        modeComboBox.setSelectedItem(federationManagerParameter.RealTimeMode ? FederationManager.MODE_REALTIME : FederationManager.MODE_AS_FAST_AS_POSSIBLE);
 
         logLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
-                        FedMgr.LOG_LEVEL_NONE,
-                        FedMgr.LOG_LEVEL_HIGH,
-                        FedMgr.LOG_LEVEL_MEDIUM,
-                        FedMgr.LOG_LEVEL_LOW,
-                        FedMgr.LOG_LEVEL_ALL
+                        FederationManager.LOG_LEVEL_NONE,
+                        FederationManager.LOG_LEVEL_HIGH,
+                        FederationManager.LOG_LEVEL_MEDIUM,
+                        FederationManager.LOG_LEVEL_LOW,
+                        FederationManager.LOG_LEVEL_ALL
                 }
         ));
-        logLevelComboBox.setSelectedItem(FedMgr.LOG_LEVEL_HIGH);
+        logLevelComboBox.setSelectedItem(FederationManager.LOG_LEVEL_HIGH);
 
         // Create Model federation manager class
         try {
-            if (fedMgr == null) {
-                fedMgr = new FedMgr(federationManagerParameter);
+            if (federationManager == null) {
+                federationManager = new FederationManager(federationManagerParameter);
             }
         } catch (Exception e1) {
             MsgDisplay.displayException(this, "Error during initialization", e1, "Could not create the Federation Manager", federationManagerParameter.AutoStart);
@@ -391,12 +391,12 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         }
 
         // Add all listeners
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_LOGICAL_TIME, this);
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_LOG_HIGH_PRIO, this);
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_LOG_MEDIUM_PRIO, this);
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_LOG_LOW_PRIO, this);
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_LOG_VERY_LOW_PRIO, this);
-        fedMgr.addPropertyChangeListener(FedMgr.PROP_EXTERNAL_SIM_PAUSED, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_LOGICAL_TIME, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_LOG_HIGH_PRIO, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_LOG_MEDIUM_PRIO, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_LOG_LOW_PRIO, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_LOG_VERY_LOW_PRIO, this);
+        federationManager.addPropertyChangeListener(FederationManager.PROP_EXTERNAL_SIM_PAUSED, this);
 
         configureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -433,8 +433,8 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
                 if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                     String selected = (String) itemEvent.getItem();
                     boolean realT = selected
-                            .compareToIgnoreCase(FedMgr.MODE_REALTIME) == 0;
-                    fedMgr.setRealtime(realT);
+                            .compareToIgnoreCase(FederationManager.MODE_REALTIME) == 0;
+                    federationManager.setRealtime(realT);
                 }
             }
         });
@@ -443,7 +443,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
                 if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                     int selected = logLevelComboBox.getSelectedIndex();
                     try {
-                        fedMgr.updateLogLevel(selected);
+                        federationManager.updateLogLevel(selected);
                     } catch (Exception e) {
                         MsgDisplay.displayException(getParent(), "Error during initialization", e, "Could not update the log level", federationManagerParameter.AutoStart);
                     }
@@ -489,7 +489,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         if (selection == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             try {
-                FedMgr.configureSimulation(file);
+                FederationManager.configureSimulation(file);
             } catch (Exception e) {
                 System.out.println("Configuration of the simulation failed");
                 e.printStackTrace();
@@ -499,12 +499,12 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
 
     public void startSimulation(boolean nonGUIMode) {
         try {
-            if (fedMgr.isRunning()) {
-                fedMgr.resumeSimulation();
+            if (federationManager.isRunning()) {
+                federationManager.resumeSimulation();
             } else {
-                fedMgr.startSimulation();
+                federationManager.startSimulation();
             }
-            updateSimStatus(FedMgr.SIM_STATUS_RUNNING);
+            updateSimStatus(FederationManager.SIM_STATUS_RUNNING);
             startButton.setText("Resume");
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
@@ -516,8 +516,8 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
 
     private void pauseSimulation(boolean nonGUIMode) {
         try {
-            fedMgr.pauseSimulation();
-            updateSimStatus(FedMgr.SIM_STATUS_PAUSED);
+            federationManager.pauseSimulation();
+            updateSimStatus(FederationManager.SIM_STATUS_PAUSED);
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
             terminateButton.setEnabled(true);
@@ -528,8 +528,8 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
 
 //    public void terminateSimulation() {
 //        try {
-//            fedMgr.terminateSimulation();
-//            updateSimStatus(FedMgr.SIM_STATUS_STOPPED);
+//            federationManager.terminateSimulation();
+//            updateSimStatus(FederationManager.SIM_STATUS_STOPPED);
 //            startButton.setText("Start");
 //            startButton.setEnabled(true);
 //            pauseButton.setEnabled(false);
@@ -559,7 +559,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         if (choice == JOptionPane.YES_OPTION) {
 
             try {
-                fedMgr.terminateSimulation();
+                federationManager.terminateSimulation();
                 Thread.sleep(3000);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -568,39 +568,39 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
             log.info("C2WindTunnel Simulation tool exiting");
 
             // In case some federate is still hanging around
-            fedMgr.killEntireFederation();
+            federationManager.killEntireFederation();
         }
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        assert evt.getSource() instanceof FedMgr;
-        if (FedMgr.PROP_LOGICAL_TIME.equals(evt.getPropertyName())) {
+        assert evt.getSource() instanceof FederationManager;
+        if (FederationManager.PROP_LOGICAL_TIME.equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof Double;
             updateSimTime(((Double) evt.getNewValue()));
-        } else if (FedMgr.PROP_LOG_HIGH_PRIO.equals(evt.getPropertyName())) {
+        } else if (FederationManager.PROP_LOG_HIGH_PRIO.equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof HighPrio;
             HighPrio hp = (HighPrio) evt.getNewValue();
             addLogMessage(LOG_TYPE.LOG_TYPE_HIGH, hp.get_FedName(), hp.get_Time(),
                     hp.get_Comment());
-        } else if (FedMgr.PROP_LOG_MEDIUM_PRIO.equals(evt.getPropertyName())) {
+        } else if (FederationManager.PROP_LOG_MEDIUM_PRIO.equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof MediumPrio;
             MediumPrio mp = (MediumPrio) evt.getNewValue();
             addLogMessage(LOG_TYPE.LOG_TYPE_MEDIUM, mp.get_FedName(), mp.get_Time(),
                     mp.get_Comment());
-        } else if (FedMgr.PROP_LOG_LOW_PRIO.equals(evt.getPropertyName())) {
+        } else if (FederationManager.PROP_LOG_LOW_PRIO.equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof LowPrio;
             LowPrio lp = (LowPrio) evt.getNewValue();
             addLogMessage(LOG_TYPE.LOG_TYPE_LOW, lp.get_FedName(), lp.get_Time(),
                     lp.get_Comment());
-        } else if (FedMgr.PROP_LOG_VERY_LOW_PRIO.equals(evt.getPropertyName())) {
+        } else if (FederationManager.PROP_LOG_VERY_LOW_PRIO.equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof VeryLowPrio;
             VeryLowPrio vlp = (VeryLowPrio) evt.getNewValue();
             addLogMessage(LOG_TYPE.LOG_TYPE_VERY_LOW, vlp.get_FedName(), vlp.get_Time(),
                     vlp.get_Comment());
-        } else if (FedMgr.PROP_EXTERNAL_SIM_PAUSED
+        } else if (FederationManager.PROP_EXTERNAL_SIM_PAUSED
                 .equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof Boolean;
-            updateSimStatus(FedMgr.SIM_STATUS_PAUSED);
+            updateSimStatus(FederationManager.SIM_STATUS_PAUSED);
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
             terminateButton.setEnabled(true);

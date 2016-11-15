@@ -1,10 +1,6 @@
-/**
- * @author Greg Varga <greg@sph3r.com>
- */
-
 package c2w.host;
 
-import c2w.hla.FedMgr;
+import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
 import org.apache.commons.cli.*;
 import org.apache.log4j.BasicConfigurator;
@@ -19,11 +15,11 @@ import java.io.IOException;
 public class FederationManagerHost {
 
     static final Logger logger = Logger.getLogger(FederationManagerHost.class);
-    private FedMgr federationManager;
+    private FederationManager federationManager;
 
     public FederationManagerHost(FederationManagerParameter federationManagerParameter) {
         try {
-            this.federationManager = new FedMgr(federationManagerParameter);
+            this.federationManager = new FederationManager(federationManagerParameter);
         } catch (Exception e) {
             logger.error("Error during initializing FederationManager! Quitting...", e);
             System.exit(-1);

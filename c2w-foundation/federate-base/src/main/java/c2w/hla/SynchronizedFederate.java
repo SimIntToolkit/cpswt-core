@@ -143,7 +143,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	}
 	
 	public static enum TIME_ADVANCE_MODE {
-		TIME_ADVANCE_REQUEST("TimeAdvanceRequest"), TIME_ADVANCE_REQUEST_AVAILABLE("TimeAdvanceRequestAvailable"), NEXT_EVENT_REQUEST("NextEventRequest"), NEXT_EVENT_REQUEST_AVAILABLE("NextEventRequestAvailable"); 
+		TIME_ADVANCE_REQUEST("TimeAdvanceRequest"),
+		TIME_ADVANCE_REQUEST_AVAILABLE("TimeAdvanceRequestAvailable"),
+		NEXT_EVENT_REQUEST("NextEventRequest"),
+		NEXT_EVENT_REQUEST_AVAILABLE("NextEventRequestAvailable");
 
 		private String _name;
 

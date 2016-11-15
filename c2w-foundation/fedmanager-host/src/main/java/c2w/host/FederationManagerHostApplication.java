@@ -1,6 +1,6 @@
 package c2w.host;
 
-import c2w.hla.FedMgr;
+import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
 import c2w.host.resources.FederationManagerControlResource;
 import io.dropwizard.Application;
@@ -39,10 +39,10 @@ public class FederationManagerHostApplication extends Application<FederationMana
     public void run(FederationManagerHostConfiguration configuration, Environment environment) {
         try {
             FederationManagerParameter fedMgrParams = configuration.getFederationManagerParameter();
-            FedMgr fedMgr = new FedMgr(fedMgrParams);
+            FederationManager federationManager = new FederationManager(fedMgrParams);
 
             // register resource (endpoint)
-            environment.jersey().register(new FederationManagerControlResource(fedMgr));
+            environment.jersey().register(new FederationManagerControlResource(federationManager));
 
         } catch (Exception ex) {
             logger.error("Error initializing FederationManagerHostApplication. Reason: " + ex.getMessage());

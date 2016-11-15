@@ -269,7 +269,7 @@ public class InteractionRoot implements InteractionRootInterface {
 	* Unpublishes the InteractionRoot interaction class for a federate.
 	*
 	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* {@link @SynchronizedFederate#getRTI()} call
 	*/
 	public static void unpublish( RTIambassador rti ) {
 		if ( !_isPublished ) return;
