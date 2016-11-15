@@ -5,6 +5,11 @@ import java.util.HashSet;
 
 public enum FederationManagerState {
     /**
+     * FM is initializing
+     */
+    INITIALIZING(0),
+
+    /**
      * FM initialized, but didn't start
      */
     INITIALIZED(1),
@@ -43,6 +48,9 @@ public enum FederationManagerState {
     static {
         allowedTransitions = new HashMap<FederationManagerState, HashSet<FederationManagerState>>();
 
+        allowedTransitions.put(FederationManagerState.INITIALIZING, new HashSet<FederationManagerState>() {{
+            add(FederationManagerState.INITIALIZED);
+        }});
         allowedTransitions.put(FederationManagerState.INITIALIZED, new HashSet<FederationManagerState>() {{
             add(FederationManagerState.RUNNING);
             add(FederationManagerState.TERMINATED);
