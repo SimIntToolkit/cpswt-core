@@ -44,8 +44,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -233,11 +231,11 @@ public class FederationManager extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    private FederationManagerState currentState;
-    public FederationManagerState getCurrentState() {
+    private FederateState currentState;
+    public FederateState getCurrentState() {
         return this.currentState;
     }
-    public boolean setCurrentState(FederationManagerState newState) {
+    public boolean setCurrentState(FederateState newState) {
         if(this.currentState.CanTransitionTo(newState)) {
             // TODO: transition to new state
 
@@ -257,7 +255,7 @@ public class FederationManager extends SynchronizedFederate {
     public FederationManager(FederationManagerParameter params) throws Exception {
 
         // set current state to INITIALIZING
-        this.currentState = FederationManagerState.INITIALIZING;
+        this.currentState = FederateState.INITIALIZING;
 
         // record parameters
         this.federationName = params.FederationName;
@@ -343,7 +341,7 @@ public class FederationManager extends SynchronizedFederate {
             _coaSim.setVisible(true);
         }
 
-        this.currentState = FederationManagerState.INITIALIZED;
+        this.currentState = FederateState.INITIALIZED;
     }
 
     public void recordMainExecutionLoopStartTime() {

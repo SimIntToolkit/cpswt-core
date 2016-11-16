@@ -1,26 +1,26 @@
 package c2w.host.api;
 
-import c2w.hla.FederationManagerState;
+import c2w.hla.FederateState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StateMessage {
-    FederationManagerState state;
+    FederateState state;
     String success;
     String error;
 
     public StateMessage() {}
-    public StateMessage(FederationManagerState state) {
+    public StateMessage(FederateState state) {
         this.state = state;
     }
 
-    public StateMessage(FederationManagerState state, String success, String error) {
+    public StateMessage(FederateState state, String success, String error) {
         this.state = state;
         this.success = success;
         this.error = error;
     }
 
     @JsonProperty
-    public FederationManagerState getState() {
+    public FederateState getState() {
         return this.state;
     }
 

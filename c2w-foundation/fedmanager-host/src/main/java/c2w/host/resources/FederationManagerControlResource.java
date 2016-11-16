@@ -1,7 +1,7 @@
 package c2w.host.resources;
 
 import c2w.hla.FederationManager;
-import c2w.hla.FederationManagerState;
+import c2w.hla.FederateState;
 import c2w.host.api.StateMessage;
 import com.codahale.metrics.annotation.Timed;
 
@@ -28,9 +28,9 @@ public class FederationManagerControlResource {
     @Timed
     public StateMessage setNewState(
             @QueryParam("target_state")
-            FederationManagerState targetState
+                    FederateState targetState
     ) {
-        FederationManagerState currentState = this.federationManager.getCurrentState();
+        FederateState currentState = this.federationManager.getCurrentState();
 
         if(currentState.CanTransitionTo(targetState)) {
             // this.federationManager.setNewState(targetState);
