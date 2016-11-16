@@ -1,7 +1,7 @@
 federationManagerParameter:
   Step: 1.0
   Lookahead: 0.1
-  LockFilename: ${C2WTROOT}/__lock__
+  RootPathEnvVarKey: C2WTROOT
   RealTimeMode: 1
   FederationEndTime: 20.0
   Seed4Dur: 0

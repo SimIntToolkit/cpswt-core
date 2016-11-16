@@ -46,7 +46,7 @@ public enum FederationManagerState {
 
     static HashMap<FederationManagerState, HashSet<FederationManagerState>> allowedTransitions;
     static {
-        allowedTransitions = new HashMap<FederationManagerState, HashSet<FederationManagerState>>();
+        allowedTransitions = new HashMap<>();
 
         allowedTransitions.put(FederationManagerState.INITIALIZING, new HashSet<FederationManagerState>() {{
             add(FederationManagerState.INITIALIZED);

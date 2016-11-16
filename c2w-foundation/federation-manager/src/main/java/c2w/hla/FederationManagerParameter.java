@@ -33,7 +33,7 @@ public class FederationManagerParameter {
     public boolean RealTimeMode;
 
     @JsonProperty
-    public String LockFilename;
+    public String RootPathEnvVarKey;
 
     @JsonProperty
     public double Step;
@@ -67,7 +67,7 @@ public class FederationManagerParameter {
         p.DBName = null; // not using DB anymore
         p.LogLevel = fn.apply("logLevel");
         p.RealTimeMode = Boolean.parseBoolean(fnWithDefaultVal.apply("realtime", "false"));
-        p.LockFilename = fn.apply("lockfile");
+        p.RootPathEnvVarKey = fn.apply("rootPathEnvVarKey");
         p.Step = Double.parseDouble(fn.apply("step"));
         p.Lookahead = Double.parseDouble(fn.apply("lookahead"));
         p.TerminateOnCOAFinish = Boolean.parseBoolean(fnWithDefaultVal.apply("terminateOnCOAFinish", "false"));
@@ -150,11 +150,11 @@ public class FederationManagerParameter {
                 .build()
         );
 
-        options.addOption(Option.builder("l")
-                .longOpt("lockfile")
-                .argName("lockfile")
+        options.addOption(Option.builder()
+                .longOpt("rootPathEnvVarKey")
+                .argName("rootPathEnvVarKey")
                 .hasArg()
-                .desc("Path to the lock file")
+                .desc("Root path environment variable key")
                 .required()
                 .type(String.class)
                 .build()
