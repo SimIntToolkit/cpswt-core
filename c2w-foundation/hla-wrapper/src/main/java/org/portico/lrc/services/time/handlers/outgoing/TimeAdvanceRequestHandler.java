@@ -14,7 +14,6 @@
  */
 package org.portico.lrc.services.time.handlers.outgoing;
 
-import java.sql.Date;
 import java.util.Map;
 
 import org.portico.lrc.LRCMessageHandler;
@@ -24,84 +23,86 @@ import org.portico.lrc.services.time.msg.TimeAdvanceRequest;
 import org.portico.utils.messaging.MessageContext;
 import org.portico.utils.messaging.MessageHandler;
 
-@MessageHandler(modules="lrc-base",
-                keywords={"lrc13","lrcjava1","lrc1516"},
-                sinks="outgoing",
-                messages=TimeAdvanceRequest.class)
-public class TimeAdvanceRequestHandler extends LRCMessageHandler
-{
-	//----------------------------------------------------------
-	//                    STATIC VARIABLES
-	//----------------------------------------------------------
+/**
+ * MONKEY PATCHING:
+ * Even though there's no reference to this class in the whole project, it IS used (...)
+ * As it turns out, you need to put this in the classpath _before_ putting portico...
+ * http://imgur.com/KzCHMAx
+ */
+@MessageHandler(modules = "lrc-base",
+        keywords = {"lrc13", "lrcjava1", "lrc1516"},
+        sinks = "outgoing",
+        messages = TimeAdvanceRequest.class)
+public class TimeAdvanceRequestHandler extends LRCMessageHandler {
+    //----------------------------------------------------------
+    //                    STATIC VARIABLES
+    //----------------------------------------------------------
 
-	//----------------------------------------------------------
-	//                   INSTANCE VARIABLES
-	//----------------------------------------------------------
+    //----------------------------------------------------------
+    //                   INSTANCE VARIABLES
+    //----------------------------------------------------------
 
-	//----------------------------------------------------------
-	//                      CONSTRUCTORS
-	//----------------------------------------------------------
+    //----------------------------------------------------------
+    //                      CONSTRUCTORS
+    //----------------------------------------------------------
 
-	//----------------------------------------------------------
-	//                    INSTANCE METHODS
-	//----------------------------------------------------------
-	public void initialize( Map<String,Object> properties )
-	{
-		super.initialize( properties );
-	}
-	
-	public void process( MessageContext context ) throws Exception
-	{
-		// basic state validity checks
-		lrcState.checkJoined();          // FederateNotExecutionMemeber
-		lrcState.checkAdvancing();       // TimeAdvanceAlreadyInProgress
-		lrcState.checkTimeRegulation();  // EnableTimeRegulationPending
-		lrcState.checkTimeConstrained(); // EnableTimeConstrainedPending
-		lrcState.checkSave();            // SaveInProgress
-		lrcState.checkRestore();         // RestoreInProgress
+    //----------------------------------------------------------
+    //                    INSTANCE METHODS
+    //----------------------------------------------------------
+    public void initialize(Map<String, Object> properties) {
+        super.initialize(properties);
+    }
 
-		TimeAdvanceRequest request = context.getRequest( TimeAdvanceRequest.class, this );
-		double time = request.getTime();
-		TimeStatus ourStatus = timeStatus();
+    public void process(MessageContext context) throws Exception {
+        // basic state validity checks
+        lrcState.checkJoined();          // FederateNotExecutionMemeber
+        lrcState.checkAdvancing();       // TimeAdvanceAlreadyInProgress
+        lrcState.checkTimeRegulation();  // EnableTimeRegulationPending
+        lrcState.checkTimeConstrained(); // EnableTimeConstrainedPending
+        lrcState.checkSave();            // SaveInProgress
+        lrcState.checkRestore();         // RestoreInProgress
 
-		if( logger.isDebugEnabled() )
-			logger.debug( "REQUEST Time advance request for ["+moniker()+"] to ["+time+"]" );
+        TimeAdvanceRequest request = context.getRequest(TimeAdvanceRequest.class, this);
+        double time = request.getTime();
+        TimeStatus ourStatus = timeStatus();
 
-		// check that the time is valid
-		if(request.isTara()) {
-			// Himanshu: The fix makes sure that when exceptions aren't
-			// unintentionally thrown due to minute difference between
-			// requested and current times when NextEventRequestAvailable
-			// is used
-			if( time < ourStatus.getCurrentTime() )
-			{
-				// Reset requested time to current time
-				System.out.println("TimeAdvanceRequestAvailableHandler: Requested time to advance is less than current federate time... not aborting");
-				time = ourStatus.getCurrentTime();
-			}
-		} else {
-			if( time <= ourStatus.getCurrentTime() )
-			{
-				// requested time is less than current time, exception
-				throw new JFederationTimeAlreadyPassed( "TAR: Time " + time + " has already passed" );
-			}
-		}
+        if (logger.isDebugEnabled())
+            logger.debug("REQUEST Time advance request for [" + moniker() + "] to [" + time + "]");
 
-		// set the status
-		ourStatus.timeAdvanceRequested( time );
+        // check that the time is valid
+        if (request.isTara()) {
+            // The fix makes sure that when exceptions aren't
+            // unintentionally thrown due to minute difference between
+            // requested and current times when NextEventRequestAvailable
+            // is used
+            if (time < ourStatus.getCurrentTime()) {
+                // Reset requested time to current time
+                if (logger.isDebugEnabled()) {
+                    logger.debug("TimeAdvanceRequestAvailableHandler: Requested time to advance is less than current federate time... not aborting");
+                }
+                time = ourStatus.getCurrentTime();
+            }
+        } else {
+            if (time <= ourStatus.getCurrentTime()) {
+                // requested time is less than current time, exception
+                throw new JFederationTimeAlreadyPassed("TAR: Time " + time + " has already passed");
+            }
+        }
 
-		// notify everyone else
-		if( logger.isInfoEnabled() )
-		{
-			logger.info( "PENDING Requested time advance for ["+moniker()+"] to ["+time+
-			             "], waiting for grant..." );
-		}                             
+        // set the status
+        ourStatus.timeAdvanceRequested(time);
 
-		connection.broadcast( request );
-		context.success();
-	}
+        // notify everyone else
+        if (logger.isInfoEnabled()) {
+            logger.info("PENDING Requested time advance for [" + moniker() + "] to [" + time +
+                    "], waiting for grant...");
+        }
 
-	//----------------------------------------------------------
-	//                     STATIC METHODS
-	//----------------------------------------------------------
+        connection.broadcast(request);
+        context.success();
+    }
+
+    //----------------------------------------------------------
+    //                     STATIC METHODS
+    //----------------------------------------------------------
 }
