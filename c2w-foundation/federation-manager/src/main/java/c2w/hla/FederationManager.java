@@ -247,7 +247,7 @@ public class FederationManager extends SynchronizedFederate {
 
     /**
      * Creates a @FederationManager instance.
-     * @param params The passed parameters to initialize the federation manager.
+     * @param params The passed parameters to initialize the federation manager. See {@link FederationManagerParameter}.
      * @throws Exception I have no idea why we have this here. Especially pure Exception type... wtf!
      */
     public FederationManager(FederationManagerParameter params) throws Exception {
@@ -378,7 +378,7 @@ public class FederationManager extends SynchronizedFederate {
         log.info("created.\n");
 
         joinFederation(federationName, SynchronizedFederate.FEDERATION_MANAGER_NAME);
-        
+
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         enableTimeConstrained();
 
