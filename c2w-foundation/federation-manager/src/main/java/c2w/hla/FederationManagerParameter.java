@@ -23,9 +23,6 @@ public class FederationManagerParameter {
     @JsonProperty
     public String ScriptFilename;
 
-    @Deprecated
-    public String DBName;
-
     @JsonProperty
     public String LogLevel;
 
@@ -64,7 +61,6 @@ public class FederationManagerParameter {
         p.FederationName = fn.apply("federationName");
         p.FOMFilename = fn.apply("fomFilename");
         p.ScriptFilename = fn.apply("scriptFilename");
-        p.DBName = null; // not using DB anymore
         p.LogLevel = fn.apply("logLevel");
         p.RealTimeMode = Boolean.parseBoolean(fnWithDefaultVal.apply("realtime", "false"));
         p.RootPathEnvVarKey = fn.apply("rootPathEnvVarKey");

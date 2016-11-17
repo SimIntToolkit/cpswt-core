@@ -178,8 +178,6 @@ public class FederationManager extends SynchronizedFederate {
     Random _rand4Dur = null;
     String _stopScriptFilepath;
 
-    // Himanshu: Enabling Manage Logging to Database
-    String _dbName;
     String _logLevel;
 
     boolean _killingFederation = false;
@@ -268,7 +266,6 @@ public class FederationManager extends SynchronizedFederate {
         this._federationEndTime = params.FederationEndTime;
         this._autoStart = params.AutoStart;
 
-        this._dbName = params.DBName;
         this._logLevel = params.LogLevel;
 
         // See if fixed see must be used
@@ -381,12 +378,7 @@ public class FederationManager extends SynchronizedFederate {
         log.info("created.\n");
 
         joinFederation(federationName, SynchronizedFederate.FEDERATION_MANAGER_NAME);
-
-        // Himanshu: Enabling Manager Logging to Database
-        if (_dbName != null) {
-            C2WLogger.init(_dbName);
-        }
-
+        
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         enableTimeConstrained();
 

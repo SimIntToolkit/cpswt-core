@@ -22,6 +22,7 @@
   * _NEW_ `RootPathEnvVarKey` - the environment variable that indicates root path of the running project
   (previously `C2WTROOT`)
   * _OBSOLETE_ `LockFile` - DROPPED. Using `System.getEnv(${RootPathEnvVarKey})/__lock__` (hardcoded) instead.
+  * _OBSOLETE_ `DBName` - DROPPED. Not using remote DB to log (seriously).
 
 
 ## New inheritances
