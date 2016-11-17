@@ -45,3 +45,5 @@
 - custom logger class that logs to a remote DB and creates a Thread on every log call
 - no coding standards. field names: federation_name, FOM_file_name, _federationEndTime, ...
 - state machine with multiple boolean flags instead of states (enum) and transitions
+- runtime monkey patching: TimeAdvanceRequestHandler
+- throw new RuntimeException("Invalid parameters for arrived interaction"); -- IllegalArgumentException / NullPointerException

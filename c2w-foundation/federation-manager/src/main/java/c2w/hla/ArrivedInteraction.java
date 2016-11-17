@@ -27,28 +27,33 @@ package c2w.hla;
  * Stores last arrived interaction in the Federation Manager and is used by
  * OutcomeFilters of sequence model orchestrator to check the last arrived
  * interaction of the Outcome it filters.
- * 
+ *
  * @author Himanshu Neema
  */
 public class ArrivedInteraction {
-	private InteractionRoot _ir;
-	private Double _arrTime;
+    private InteractionRoot _ir;
+    private Double _arrTime;
 
-	public ArrivedInteraction(InteractionRoot ir, Double arrTime) {
-		if (ir == null || arrTime == null || arrTime < 0) {
-			throw new RuntimeException(
-					"Invalid parameters for arrived interaction");
-		}
+    public ArrivedInteraction(InteractionRoot ir, Double arrTime) {
+        if (ir == null) {
+            throw new NullPointerException("Passed InteractionRoot instance is null!");
+        }
+        if (arrTime == null) {
+            throw new NullPointerException("Passed 'arrivedTime' parameter is null!");
+        }
+        if (arrTime < 0) {
+            throw new IllegalArgumentException("Passed 'arrivedTime' can't be a negative number!");
+        }
 
-		this._ir = ir;
-		this._arrTime = arrTime;
-	}
+        this._ir = ir;
+        this._arrTime = arrTime;
+    }
 
-	public InteractionRoot getInteractionRoot() {
-		return _ir;
-	}
+    public InteractionRoot getInteractionRoot() {
+        return _ir;
+    }
 
-	public Double getArrivalTime() {
-		return _arrTime;
-	}
+    public Double getArrivalTime() {
+        return _arrTime;
+    }
 }
