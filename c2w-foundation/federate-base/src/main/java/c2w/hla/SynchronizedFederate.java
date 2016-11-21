@@ -24,6 +24,7 @@
 
 package c2w.hla;
 
+import c2w.hla.base.*;
 import hla.rti.ArrayIndexOutOfBounds;
 import hla.rti.AsynchronousDeliveryAlreadyEnabled;
 import hla.rti.EnableTimeConstrainedPending;
@@ -32,7 +33,6 @@ import hla.rti.EventRetractionHandle;
 import hla.rti.FederateAlreadyExecutionMember;
 import hla.rti.FederateNotExecutionMember;
 import hla.rti.FederateOwnsAttributes;
-import hla.rti.FederationTimeAlreadyPassed;
 import hla.rti.InvalidFederationTime;
 import hla.rti.InvalidLookahead;
 import hla.rti.InvalidResignAction;
@@ -50,12 +50,9 @@ import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
@@ -98,7 +95,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * <li>A means for requesting specific federation times and synchronizing with the
  * federation at these times to send interactions and attribute updates
  * ( {@link AdvanceTimeThread}, {@link AdvanceTimeRequest},
- * {@link #putAdvanceTimeRequest(c2w.hla.SynchronizedFederate.AdvanceTimeRequest)},
+ * {@link #putAdvanceTimeRequest(c2w.hla.base.AdvanceTimeRequest)},
  * {@link AdvanceTimeRequest#requestSyncStart()}, {@link AdvanceTimeRequest#requestSyncEnd()},
  * {@link #startAdvanceTimeThread()} )</li>
  * </ul>
@@ -144,28 +141,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public SynchronizedFederate() {
         // Set process group ID as the same as process ID
         //this.PGID = new ProcessId().setProcessGroupId();
-    }
-
-    public static enum TIME_ADVANCE_MODE {
-        TIME_ADVANCE_REQUEST("TimeAdvanceRequest"),
-        TIME_ADVANCE_REQUEST_AVAILABLE("TimeAdvanceRequestAvailable"),
-        NEXT_EVENT_REQUEST("NextEventRequest"),
-        NEXT_EVENT_REQUEST_AVAILABLE("NextEventRequestAvailable");
-
-        private String _name;
-
-        TIME_ADVANCE_MODE(String name) {
-            this._name = name;
-        }
-
-        public String getName() {
-            return _name;
-        }
-
-        @Override
-        public String toString() {
-            return _name;
-        }
     }
 
     /**
@@ -763,181 +738,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             return timestampWithLogicalTime;
     }
 
-    /**
-     * Synchronous Queue class that the AdvanceTimeThread uses to synchronize
-     * itself with the threads of the federate that are interacting with the RTI.
-     *
-     * @author Harmon Nine
-     */
-    public static class SyncQueue extends SynchronousQueue<Object> {
-        public final static long serialVersionUID = 1;
-    }
-
-    /**
-     * A thread in a federate uses an object of this class to request a federation
-     * time to which the AdvanceTimeThread should advance.  Once the time is
-     * reached, the federate thread uses this object to synchronize its execution
-     * with the AdvanceTimeThread.  That is, the AdvanceTimeThread is prevented
-     * from advancing the time any further until the federate thread has completed
-     * its processing for this time.
-     * See {@link AdvanceTimeThread}.
-     *
-     * @author Harmon Nine
-     */
-    public static class AdvanceTimeRequest {
-        private static Object object = new Object();
-
-        private double _requestedTime;
-        private double _currentTime = -1;
-        private SyncQueue _syncQueue;
-
-        /**
-         * Creates a new AdvanceTimeRequest with a new (and unique) SyncQueue.
-         *
-         * @param requestedTime time at which the federate wishes to perform
-         *                      processing for the simulation.
-         */
-        public AdvanceTimeRequest(double requestedTime) {
-            _requestedTime = requestedTime;
-            _syncQueue = new SyncQueue();
-        }
-
-        /**
-         * Creates a new AdvanceTimeRequest with a supplied SyncQueue.
-         *
-         * @param requestedTime time at which the federate wishes to perform
-         *                      processing for the simulation.
-         * @param syncQueue     SyncQueue
-         */
-        public AdvanceTimeRequest(double requestedTime, SyncQueue syncQueue) {
-            _requestedTime = requestedTime;
-            _syncQueue = syncQueue;
-        }
-
-        /**
-         * returns the time to which the federate thread has requested the
-         * AdvanceTimeThread advance using this AdvanceTimeRequest object.
-         *
-         * @return time to which the federate thread has requested the
-         * AdvanceTimeThread advance using this AdvanceTimeRequest object
-         */
-        public double getRequestedTime() {
-            return _requestedTime;
-        }
-
-        /**
-         * returns the time at which this AdvanceTimeRequest object is actually
-         * processed by the AdvanceTimeThread.  Usually, this is the same as the
-         * requested time (see {@link #getRequestedTime()}).  However, the current
-         * time can be greater than the requested time -- this only happens if the
-         * requested time is previous to the current federation time to begin with,
-         * and is usually the result of some kind of error in processing by the
-         * federate that created and is using this AdvanceTimeRequest.
-         *
-         * @return time at which the AdvanceTimeRequest is processed by the
-         * AdvanceTimeThread
-         */
-        public double getCurrentTime() {
-            return _currentTime;
-        }
-
-        /**
-         * Called by the AdvanceTimeThread ONLY, this method coordinates the
-         * AdvanceTimeThread with the federate thread that created and is using
-         * this AdvanceTimeRequest object.
-         * <p/>
-         * Usually, after submitting this AdvanceTimeRequest object to the
-         * AdvanceTimeThread, a federate thread calls {@link #requestSyncStart()}
-         * on this object.  This causes the federate to suspend execution until
-         * the AdvanceTimeThread advances the federate time to the requested time
-         * in the AdvanceTimeRequest object.  Once the AdvanceTimeThread does
-         * this, it calls this method (that is, threadSyncStart( double )) on
-         * the AdvanceTimeRequest object.  This causes the federate thread to
-         * resume execution and perform the processing it needs to at the requested
-         * time (see {@link AdvanceTimeThread}).
-         *
-         * @param currentTime the time at which the AdvanceTimeThread actually
-         *                    processed this AdvanceTimeRequest object.
-         */
-        public void threadSyncStart(double currentTime) {
-            _currentTime = currentTime;
-            threadSyncEnd();
-        }
-
-        /**
-         * Called by the AdvanceTimeThread ONLY, this method coordinates the
-         * AdvanceTimeThread with the federate thread that created and is using
-         * this AdvanceTimeRequest object.
-         * <p>
-         * After calling the {@link #threadSyncStart(double)} method, the
-         * {@link AdvanceTimeThread} immediately calls this method (that is, threadSyncEnd()).
-         * This causes it to suspend its execution.  It resumes its execution
-         * when the federate thread using this AdvanceTimeRequest object calls
-         * {@link #requestSyncEnd()} on this object, indicating that it has completed
-         * the processing it needed to perform at the requested time of this
-         * AdvanceTimeRequest object.
-         */
-        public void threadSyncEnd() {
-            boolean putNotExecuted = true;
-            while (putNotExecuted) {
-                try {
-                    _syncQueue.put(object);
-                    putNotExecuted = false;
-                } catch (InterruptedException i) {
-                }
-            }
-        }
-
-        /**
-         * Called by a federate thread to suspend its execution until the
-         * {@link AdvanceTimeThread} advances the federation time to the time
-         * requested in this AdvanceTimeRequest object.
-         */
-        public void requestSyncStart() {
-            boolean takeNotExecuted = true;
-            while (takeNotExecuted) {
-                try {
-                    _syncQueue.take();
-                    takeNotExecuted = false;
-                } catch (InterruptedException i) {
-                }
-            }
-        }
-
-        /**
-         * Called by a federate thread to indicate to the {@link AdvanceTimeThread}
-         * that it has completed the processing it needed to perform at the time
-         * requested in this AdvanceTimeRequest object.
-         */
-        public void requestSyncEnd() {
-            _currentTime = -1;
-            requestSyncStart();
-        }
-    }
-
-    private static class ATRComparator implements Comparator<AdvanceTimeRequest> {
-        public int compare(AdvanceTimeRequest t1, AdvanceTimeRequest t2) {
-            return (int) Math.signum(t1._requestedTime - t2._requestedTime);
-        }
-    }
-
-    public static class ATRQueue extends PriorityBlockingQueue<AdvanceTimeRequest> {
-
-        public static final long serialVersionUID = 1;
-
-        public ATRQueue(int size, ATRComparator tatComparator) {
-            super(size, tatComparator);
-        }
-    }
-
     private ATRQueue _atrQueue = new ATRQueue(100, new ATRComparator());
-
 
     /**
      * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
      * This method is used to access a queue of AdvanceTimeRequest objects.
      * AdvanceTimeRequests are placed on this queue using
-     * {@link #putAdvanceTimeRequest(c2w.hla.SynchronizedFederate.AdvanceTimeRequest)}
+     * {@link #putAdvanceTimeRequest(c2w.hla.base.AdvanceTimeRequest)}
      * and are taken off the queue in order of requested time by the
      * {@link AdvanceTimeThread}
      */
@@ -955,177 +762,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         _atrQueue.put(advanceTimeRequest);
     }
 
-
-    /**
-     * This class is run in a separate thread and is responsible for temporal
-     * coordination between the RTI and one or more threads in a given federate.
-     * The means by which the AdvanceTimeThread is able perform this coordination
-     * is via objects of the {@link AdvanceTimeRequest} class.  That is, a federate
-     * thread that has processing to perform at federation time X places this time
-     * in an AdvanceTimeRequest object and submits it to the AdvanceTimeThread.
-     * Once the AdvanceTimeThread has advanced to time X, it signals the federate
-     * thread to start processing and suspends its own execution until this
-     * processing is complete.  It then goes on to service another
-     * AdvanceTimeRequest from another thread.
-     * <p>
-     * The program statements in the main federate thread should look like this:
-     * ------
-     * // start federate threads that interact with RTI
-     * thread1.start();
-     * thread2.start();
-     * // ...
-     * // Wait for threads to suspend
-     * // ...
-     * // start AdvanceTimeThread
-     * startAdvanceTimeThread();
-     * ------
-     * <p>
-     * The program statements in one of the federate threads should look like this:
-     * ------
-     * AdvanceTimeRequest atr = null;
-     * double time = init_time; // Initial time thread needs to interact with RTI.
-     * <p>
-     * // Submit request to AdvanceTimeThread to notify this thread when
-     * // federation time "time" has been reached
-     * atr = putAdvanceTimeRequest( time );
-     * <p>
-     * while( true ) {
-     * <p>
-     * // Wait for notification from AdvanceTimeThread that federate time "time"
-     * // has been reached
-     * atr.requestSyncStart();
-     * <p>
-     * // Perform processing for time "time"
-     * // ...
-     * <p>
-     * // Compute next RTI time that processing is needed
-     * time = next_time;
-     * <p>
-     * // Submit request to AdvanceTimeThread to notify this thread when
-     * // next federation time "time" has been reached.
-     * // NOTE THAT THIS IS DONE BEFORE "requestSyncEnd()" BELOW, I.E. BEFORE
-     * // TELLING THE AdvanceTimeThread TO CONTINUE ADVANCING TIME.  IF THIS
-     * // WHERE DONE AFTER "requestSyncEnd()", IT WOULD RESULT IN A RACE
-     * // CONDITION.
-     * AdvanceTimeRequest new_atr = putAdvanceTimeRequest( time );
-     * <p>
-     * // Notify AdvanceTimeThread that processing is complete for time "time",
-     * // so that the AdvanceTimeThread may advance to other times and process
-     * // other AdvanceTimeRequest's.
-     * atr.requestSyncEnd();
-     * <p>
-     * // Reassign atr from new_atr for loop
-     * atr = new_atr;
-     * }
-     * --------
-     *
-     * @author Harmon Nine
-     */
-    public static class AdvanceTimeThread extends Thread {
-
-        // private double _atrStepSize = 0.2;
-
-        private ATRQueue _atrQueue;
-
-        private SynchronizedFederate _synchronizedFederate;
-        private RTIambassador _rti;
-        private TIME_ADVANCE_MODE _timeAdvanceMode = TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST;
-
-        public AdvanceTimeThread(SynchronizedFederate synchronizedFederate, ATRQueue atrQueue, TIME_ADVANCE_MODE timeAdvanceMode) {
-            _synchronizedFederate = synchronizedFederate;
-            _rti = _synchronizedFederate.getRTI();
-            _atrQueue = atrQueue;
-            _timeAdvanceMode = timeAdvanceMode;
-        }
-
-        public void run() {
-
-            double currentTime = _synchronizedFederate.getCurrentTime();
-            if (currentTime < 0) return;
-
-            while (true) {
-                AdvanceTimeRequest advanceTimeRequest = null;
-                advanceTimeRequest = _atrQueue.peek();
-                if (advanceTimeRequest == null) {
-                    break;
-                }
-
-
-                boolean takeNotExecuted = true;
-                while (takeNotExecuted) {
-                    try {
-                        advanceTimeRequest = _atrQueue.take();
-                        takeNotExecuted = false;
-                    } catch (InterruptedException i) {
-                    }
-                }
-
-                DoubleTime timeRequest = null;
-                // System.out.println("Current time = " + currentTime + ", and ATR's requested time = " + advanceTimeRequest.getRequestedTime());
-                if (advanceTimeRequest.getRequestedTime() > currentTime) {
-                    timeRequest = new DoubleTime(advanceTimeRequest.getRequestedTime());
-                } else {
-                    advanceTimeRequest.threadSyncStart(currentTime);
-                    advanceTimeRequest.threadSyncEnd();
-                    continue;
-                }
-
-                if (timeRequest != null) {
-                    _synchronizedFederate.setTimeAdvanceNotGranted(true);
-
-                    boolean tarNotCalled = true;
-                    while (tarNotCalled) {
-                        try {
-                            // System.out.println( "TimeAdvanceThread: Using " + _timeAdvanceMode + " to request time: " + timeRequest.getTime() );
-                            synchronized (_rti) {
-                                if (_timeAdvanceMode == TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST) {
-                                    _rti.timeAdvanceRequest(timeRequest);
-                                    // System.out.println( "TimeAdvanceThread: Called timeAdvanceRequest() to go to: " + timeRequest.getTime() );
-                                } else if (_timeAdvanceMode == TIME_ADVANCE_MODE.NEXT_EVENT_REQUEST) {
-                                    _rti.nextEventRequest(timeRequest);
-                                    // System.out.println( "TimeAdvanceThread: Using nextEventRequest() to go to: " + timeRequest.getTime() );
-                                } else if (_timeAdvanceMode == TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST_AVAILABLE) {
-                                    _rti.timeAdvanceRequestAvailable(timeRequest);
-                                    // System.out.println( "TimeAdvanceThread: Using timeAdvanceRequestAvailable() to go to: " + timeRequest.getTime() );
-                                } else if (_timeAdvanceMode == TIME_ADVANCE_MODE.NEXT_EVENT_REQUEST_AVAILABLE) {
-                                    _rti.nextEventRequestAvailable(timeRequest);
-                                    // System.out.println( "TimeAdvanceThread: Using nextEventRequestAvailable() to go to: " + timeRequest.getTime() );
-                                }
-                            }
-                            tarNotCalled = false;
-                        } catch (FederationTimeAlreadyPassed f) {
-                            System.err.println("Time already passed detected.");
-                            _synchronizedFederate.setTimeAdvanceNotGranted(false);
-                            tarNotCalled = false;
-                        } catch (Exception e) {
-                        }
-                    }
-
-                    while (_synchronizedFederate.getTimeAdvanceNotGranted()) {
-                        try {
-                            synchronized (_rti) {
-                                _rti.tick();
-                            }
-                        } catch (Exception e) {
-                        }
-                        try {
-                            Thread.sleep(10);
-                        } catch (Exception e) {
-                        }
-                    }
-
-                    currentTime = _synchronizedFederate.getCurrentTime();
-                }
-
-                if (advanceTimeRequest != null) {
-                    advanceTimeRequest.threadSyncStart(currentTime);
-                    advanceTimeRequest.threadSyncEnd();
-                }
-            }
-        }
-
-    }
-
     /**
      * Start the {@link AdvanceTimeThread}
      * Assumes the federate is a lookahead value greater than zero. Uses
@@ -1134,7 +770,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     protected void startAdvanceTimeThread() {
         if (_advanceTimeThreadNotStarted) {
-            (new AdvanceTimeThread(this, this._atrQueue, TIME_ADVANCE_MODE.TIME_ADVANCE_REQUEST)).start();
+            (new AdvanceTimeThread(this, this._atrQueue, TimeAdvanceMode.TimeAdvanceRequest)).start();
             _advanceTimeThreadNotStarted = false;
         }
     }
@@ -1143,60 +779,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * Start the {@link AdvanceTimeThread}
      *
      * @param #timeAdvanceMode If
-     *                         {@link TIME_ADVANCE_MODE#TIME_ADVANCE_REQUEST_AVAILABLE} or
-     *                         {@link TIME_ADVANCE_MODE#NEXT_EVENT_REQUEST_AVAILABLE} is used, the
+     *                         {@link TimeAdvanceMode#TimeAdvanceRequestAvailable} or
+     *                         {@link TimeAdvanceMode#NextEventRequestAvailable} is used, the
      *                         federate's lookahead value is allowed to be zero. For other two cases,
      *                         federate's lookahead must be greater than zero.
      */
-    protected void startAdvanceTimeThread(TIME_ADVANCE_MODE timeAdvanceMode) {
+    protected void startAdvanceTimeThread(TimeAdvanceMode timeAdvanceMode) {
         if (_advanceTimeThreadNotStarted) {
             (new AdvanceTimeThread(this, this._atrQueue, timeAdvanceMode)).start();
             _advanceTimeThreadNotStarted = false;
-        }
-    }
-
-    private static class InteractionRootComparator implements Comparator<InteractionRoot> {
-        public int compare(InteractionRoot interactionRoot1, InteractionRoot interactionRoot2) {
-            // System.out.println("Comparing IR1 and IR2");
-            // System.out.println("IR1 = " + interactionRoot1);
-            // System.out.println("IR2 = " + interactionRoot2);
-
-            C2WInteractionRoot c2wIR1 = (C2WInteractionRoot) interactionRoot1;
-            C2WInteractionRoot c2wIR2 = (C2WInteractionRoot) interactionRoot2;
-            double agtIR1 = c2wIR1.get_actualLogicalGenerationTime();
-            double agtIR2 = c2wIR2.get_actualLogicalGenerationTime();
-
-            // System.out.println("IR1-ID = " + interactionRoot1.getUniqueID() + ", IR2-ID = " + interactionRoot2.getUniqueID());
-            // System.out.println("IR1-Time = " + interactionRoot1.getTime() + ", IR2-Time = " + interactionRoot2.getTime());
-            // System.out.println("IR1-ActualGenerationTime = " + agtIR1 + ", IR2-ActualGenerationTime = " + agtIR2);
-
-            if (interactionRoot1.getTime() < interactionRoot2.getTime()) {
-                // System.out.println("IR1-time < IR2-time, so returning -1");
-                return -1;
-            }
-            if (interactionRoot1.getTime() > interactionRoot2.getTime()) {
-                // System.out.println("IR1-time > IR2-time, so, returning 1");
-                return 1;
-            }
-            if (agtIR1 < agtIR2) {
-                // System.out.println("IR1-actualGenerationTime < IR2-actualGenerationTime, so returning -1");
-                return -1;
-            }
-            if (agtIR1 > agtIR2) {
-                // System.out.println("IR1-actualGenerationTime > IR2-actualGenerationTime, so returning 1");
-                return 1;
-            }
-            if (interactionRoot1.getUniqueID() < interactionRoot2.getUniqueID()) {
-                // System.out.println("IR1-uniqueID < IR2-uniqueID, so returning -1");
-                return -1;
-            }
-            if (interactionRoot1.getUniqueID() > interactionRoot2.getUniqueID()) {
-                // .println("IR1-uniqueID > IR2-uniqueID, so returning 1");
-                return 1;
-            }
-
-            // System.out.println("No difference at all between IR1 and IR2, so returning 0");
-            return 0;
         }
     }
 
@@ -1414,107 +1005,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
             // Exit
             System.exit(0);
-        }
-    }
-
-    /**
-     * This class serializes reflections of the attributes of object class
-     * instances that come in from the RTI.  An object of this class contains:
-     * <p>
-     * - a reference to the object class instance for whom attribute reflections
-     * have been received
-     * - the reflected attributes and their new (reflected) values
-     * - the timestamp of the reflections
-     * <p>
-     * This class is necessary because potentially many attribute reflections
-     * can come in from the RTI before a federate thread processes them.  If the
-     * reflections were simply performed when they came in, such a federate thread
-     * could miss several reflections.
-     * <p>
-     * Instead, this class allows a federate thread to apply the reflections
-     * itself.  The thread calls either {@link SynchronizedFederate#getNextObjectReflector()}
-     * or {@link SynchronizedFederate#getNextObjectReflectorNoWait()} to get the
-     * next ObjectReflector.  It then calls {@link SynchronizedFederate.ObjectReflector#reflect()}
-     * on this ObjectReflector to apply the attribute reflections for the object
-     * class instance it contains, and then calls {@link SynchronizedFederate.ObjectReflector#getObjectRoot()}
-     * to retrieve this instance.
-     *
-     * @author Harmon Nine
-     */
-    public static class ObjectReflector {
-        private int _objectHandle;
-        private ReflectedAttributes _reflectedAttributes;
-        private double _time;
-
-        /**
-         * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
-         * The {@link SynchronizedFederate#reflectAttributeValues(int, ReflectedAttributes, byte[])}
-         * method uses this constructor to create a new "receive-order" ObjectReflector.
-         */
-        public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
-            _objectHandle = objectHandle;
-            _reflectedAttributes = reflectedAttributes;
-        }
-
-        /**
-         * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
-         * The {@link SynchronizedFederate#reflectAttributeValues(int, ReflectedAttributes, byte[], LogicalTime, EventRetractionHandle)}
-         * method uses this constructor to create a new "timestamp-order" ObjectReflector.
-         */
-        public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
-            _objectHandle = objectHandle;
-            _reflectedAttributes = reflectedAttributes;
-            DoubleTime doubleTime = new DoubleTime();
-            doubleTime.setTo(logicalTime);
-            _time = doubleTime.getTime();
-        }
-
-        /**
-         * A federate or federate thread calls this method to perform the attribute
-         * reflections contained in this ObjectReflector object to the object class
-         * instance contained by this ObjectReflector object.
-         */
-        public void reflect() {
-            if (_time < 0) ObjectRoot.reflect(_objectHandle, _reflectedAttributes);
-            else ObjectRoot.reflect(_objectHandle, _reflectedAttributes, _time);
-        }
-
-        /**
-         * A federate or federate thread calls this method to retrieve the object
-         * class instance contained by the ObjectReflector object.  Note that if
-         * this is done before {@link #reflect()} is called, the instance will not have
-         * the attribute reflections contained in this ObjectReflector object.
-         * <p>
-         * Note that the type of the reference returned by this method is always
-         * "ObjectRoot", as this is the highest super-class for all object class
-         * instances.  If a reference to the actual class of the instance is desired,
-         * then this ObjectRoot reference will have to be cast up the inheritance
-         * hierarchy.
-         *
-         * @return the object class instance contained by the ObjectReflector object.
-         */
-        public ObjectRoot getObjectRoot() {
-            return ObjectRoot.getObject(_objectHandle);
-        }
-
-        public double getTime() {
-            return _time;
-        }
-
-        public int getUniqueID() {
-            return getObjectRoot().getUniqueID();
-        }
-    }
-
-    private static class ObjectReflectorComparator implements Comparator<ObjectReflector> {
-        public int compare(ObjectReflector objectReflection1, ObjectReflector objectReflection2) {
-            if (objectReflection1.getTime() < objectReflection2.getTime()) return -1;
-            if (objectReflection1.getTime() > objectReflection2.getTime()) return 1;
-
-            if (objectReflection1.getUniqueID() < objectReflection2.getUniqueID()) return -1;
-            if (objectReflection1.getUniqueID() > objectReflection2.getUniqueID()) return 1;
-
-            return 0;
         }
     }
 

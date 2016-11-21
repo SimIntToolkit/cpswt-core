@@ -46,7 +46,7 @@ public enum FederateState {
 
     static HashMap<FederateState, HashSet<FederateState>> allowedTransitions;
     static {
-        allowedTransitions = new HashMap<>();
+        allowedTransitions = new HashMap<FederateState, HashSet<FederateState>>();
 
         allowedTransitions.put(FederateState.INITIALIZING, new HashSet<FederateState>() {{
             add(FederateState.INITIALIZED);
@@ -68,11 +68,11 @@ public enum FederateState {
             add(FederateState.TERMINATED);
             add(FederateState.FINISHED);
         }});
-        allowedTransitions.put(FederateState.TERMINATED, new HashSet<>());
-        allowedTransitions.put(FederateState.FINISHED, new HashSet<>());
+        allowedTransitions.put(FederateState.TERMINATED, new HashSet<FederateState>());
+        allowedTransitions.put(FederateState.FINISHED, new HashSet<FederateState>());
     }
 
     public boolean CanTransitionTo(FederateState toState) {
-        return allowedTransitions.get(this.value).contains(toState);
+        return allowedTransitions.get(this).contains(toState);
     }
 }
