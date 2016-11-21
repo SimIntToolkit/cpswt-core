@@ -50,4 +50,5 @@
 - throw new RuntimeException("Invalid parameters for arrived interaction"); -- IllegalArgumentException / NullPointerException
 - non-used classes in base modules (used in _some_ examples - see SubscribedInteractionFilter)
 - InteractionRootComparator - but having references to C2WInteractionRoot (WTF: you want a "baseclass"-comparator or an "inheritedclass"-comparator?? BUT NOT MIXED!!! WHERE DID YOU LEARN THE BASICS OF PROGRAMMING?????!! I CAN'T STAND THIS ANYMORE)
+- Strings for UI comboboxes defined in FederationManager!!! and these strings are not used anywhere else, just in the UI. @#$@#%#@$!@#$!@$!@$!?
 - 

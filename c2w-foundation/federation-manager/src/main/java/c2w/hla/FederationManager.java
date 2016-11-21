@@ -108,19 +108,6 @@ public class FederationManager extends SynchronizedFederate {
     Class _outcomeFilterEvaluatorClass = null;
     HashMap<COAOutcomeFilter, Method> _outcomeFilter2EvalMethodMap = new HashMap<COAOutcomeFilter, Method>();
 
-    public static final String MODE_REALTIME = "Realtime";
-    public static final String MODE_AS_FAST_AS_POSSIBLE = "As Fast As Possible";
-
-    public static final String LOG_LEVEL_NONE = "No Logging";
-    public static final String LOG_LEVEL_HIGH = "Only High priority";
-    public static final String LOG_LEVEL_MEDIUM = "Up to Medium priority";
-    public static final String LOG_LEVEL_LOW = "Up to Low priority";
-    public static final String LOG_LEVEL_ALL = "Up to Very Low priority (All logs)";
-
-    public static final String SIM_STATUS_STOPPED = "Not started";
-    public static final String SIM_STATUS_RUNNING = "Running";
-    public static final String SIM_STATUS_PAUSED = "Paused";
-
     public static final String PROP_LOGICAL_TIME = "propLogicalTime";
     public static final String PROP_LOG_HIGH_PRIO = "propLogHighPrio";
     public static final String PROP_LOG_MEDIUM_PRIO = "propLogMediumPrio";

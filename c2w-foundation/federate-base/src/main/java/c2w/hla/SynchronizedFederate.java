@@ -139,8 +139,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public SynchronizedFederate() {
-        // Set process group ID as the same as process ID
-        //this.PGID = new ProcessId().setProcessGroupId();
+
     }
 
     /**

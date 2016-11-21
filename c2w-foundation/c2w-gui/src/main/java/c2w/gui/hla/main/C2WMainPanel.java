@@ -74,6 +74,22 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
     private SimpleDateFormat proxyStartTimeInitFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     private SimpleDateFormat proxyStartTimeDisplayFormatter = new SimpleDateFormat("EEE, dd MMM yyyy  HH:mm:ss 'PDT'");
 
+    /** Strings for the UI */
+    public static final String MODE_REALTIME = "Realtime";
+    public static final String MODE_AS_FAST_AS_POSSIBLE = "As Fast As Possible";
+
+    public static final String LOG_LEVEL_NONE = "No Logging";
+    public static final String LOG_LEVEL_HIGH = "Only High priority";
+    public static final String LOG_LEVEL_MEDIUM = "Up to Medium priority";
+    public static final String LOG_LEVEL_LOW = "Up to Low priority";
+    public static final String LOG_LEVEL_ALL = "Up to Very Low priority (All logs)";
+
+    public static final String SIM_STATUS_STOPPED = "Not started";
+    public static final String SIM_STATUS_RUNNING = "Running";
+    public static final String SIM_STATUS_PAUSED = "Paused";
+    /** / */
+
+
     public class JTextAreaHandler extends Handler {
         private JTextArea _jTextArea;
 
@@ -357,28 +373,28 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         terminateButton.setEnabled(false);
 
         updateSimTime(0);
-        updateSimStatus(FederationManager.SIM_STATUS_STOPPED);
+        updateSimStatus(SIM_STATUS_STOPPED);
 
         simLogText.setEditable(false);
 
         modeComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
-                        FederationManager.MODE_REALTIME,
-                        FederationManager.MODE_AS_FAST_AS_POSSIBLE
+                        MODE_REALTIME,
+                        MODE_AS_FAST_AS_POSSIBLE
                 }
         ));
-        modeComboBox.setSelectedItem(federationManagerParameter.RealTimeMode ? FederationManager.MODE_REALTIME : FederationManager.MODE_AS_FAST_AS_POSSIBLE);
+        modeComboBox.setSelectedItem(federationManagerParameter.RealTimeMode ? MODE_REALTIME : MODE_AS_FAST_AS_POSSIBLE);
 
         logLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                 new String[]{
-                        FederationManager.LOG_LEVEL_NONE,
-                        FederationManager.LOG_LEVEL_HIGH,
-                        FederationManager.LOG_LEVEL_MEDIUM,
-                        FederationManager.LOG_LEVEL_LOW,
-                        FederationManager.LOG_LEVEL_ALL
+                        LOG_LEVEL_NONE,
+                        LOG_LEVEL_HIGH,
+                        LOG_LEVEL_MEDIUM,
+                        LOG_LEVEL_LOW,
+                        LOG_LEVEL_ALL
                 }
         ));
-        logLevelComboBox.setSelectedItem(FederationManager.LOG_LEVEL_HIGH);
+        logLevelComboBox.setSelectedItem(LOG_LEVEL_HIGH);
 
         // Create Model federation manager class
         try {
@@ -433,7 +449,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
                 if (itemEvent.getStateChange() == ItemEvent.SELECTED) {
                     String selected = (String) itemEvent.getItem();
                     boolean realT = selected
-                            .compareToIgnoreCase(FederationManager.MODE_REALTIME) == 0;
+                            .compareToIgnoreCase(MODE_REALTIME) == 0;
                     federationManager.setRealtime(realT);
                 }
             }
@@ -504,7 +520,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
             } else {
                 federationManager.startSimulation();
             }
-            updateSimStatus(FederationManager.SIM_STATUS_RUNNING);
+            updateSimStatus(SIM_STATUS_RUNNING);
             startButton.setText("Resume");
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
@@ -517,7 +533,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
     private void pauseSimulation(boolean nonGUIMode) {
         try {
             federationManager.pauseSimulation();
-            updateSimStatus(FederationManager.SIM_STATUS_PAUSED);
+            updateSimStatus(SIM_STATUS_PAUSED);
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
             terminateButton.setEnabled(true);
@@ -600,7 +616,7 @@ public class C2WMainPanel extends javax.swing.JPanel implements PropertyChangeLi
         } else if (FederationManager.PROP_EXTERNAL_SIM_PAUSED
                 .equals(evt.getPropertyName())) {
             assert evt.getNewValue() instanceof Boolean;
-            updateSimStatus(FederationManager.SIM_STATUS_PAUSED);
+            updateSimStatus(SIM_STATUS_PAUSED);
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
             terminateButton.setEnabled(true);
