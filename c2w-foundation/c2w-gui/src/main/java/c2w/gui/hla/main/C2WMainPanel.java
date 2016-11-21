@@ -48,7 +48,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import c2w.hla.*;
-import c2w.hla.FederationManager.LOG_TYPE;
 import c2w.util.MsgDisplay;
 import c2w.util.XmlFileFilter;
 
