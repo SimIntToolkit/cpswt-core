@@ -237,11 +237,11 @@ public class C2WSim
         federationManagerParameter.AutoStart = autoStart;
 		federationManagerParameter.ScriptFilename = scriptFilename;
         federationManagerParameter.Seed4Dur = seed4DurRNG;
-        federationManagerParameter.DBName = dbName;
+        //federationManagerParameter.DBName = dbName;
         federationManagerParameter.FederationEndTime = federationEndTime;
         federationManagerParameter.FederationName = federationName;
         federationManagerParameter.FOMFilename = fomFilename;
-        federationManagerParameter.LockFilename = lockFilename;
+        //federationManagerParameter.LockFilename = lockFilename;
         federationManagerParameter.LogLevel = logLevel;
         federationManagerParameter.Lookahead = lookahead;
         federationManagerParameter.RealTimeMode = realtimeMode;
