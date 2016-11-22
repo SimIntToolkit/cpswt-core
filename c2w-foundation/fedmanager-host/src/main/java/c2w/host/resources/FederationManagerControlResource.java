@@ -20,7 +20,7 @@ public class FederationManagerControlResource {
     @GET
     @Timed
     public StateMessage getCurrentState() {
-        StateMessage current = new StateMessage(this.federationManager.getCurrentState());
+        StateMessage current = new StateMessage(this.federationManager.getFederateState());
         return current;
     }
 
@@ -30,7 +30,7 @@ public class FederationManagerControlResource {
             @QueryParam("target_state")
                     FederateState targetState
     ) {
-        FederateState currentState = this.federationManager.getCurrentState();
+        FederateState currentState = this.federationManager.getFederateState();
 
         if(currentState.CanTransitionTo(targetState)) {
             // this.federationManager.setNewState(targetState);

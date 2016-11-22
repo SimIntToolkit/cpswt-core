@@ -115,8 +115,6 @@ public class FederationManager extends SynchronizedFederate {
     public static final String PROP_LOG_VERY_LOW_PRIO = "propLogVeryLowPrio";
     public static final String PROP_EXTERNAL_SIM_PAUSED = "propExternalSimPaused";
 
-
-
     /*
         ==============================================================================================================
         FederationManager fields
@@ -203,12 +201,9 @@ public class FederationManager extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    private FederateState currentState;
-    public FederateState getCurrentState() {
-        return this.currentState;
-    }
-    public boolean setCurrentState(FederateState newState) {
-        if(this.currentState.CanTransitionTo(newState)) {
+    @Override
+    public boolean setFederateState(FederateState newState) {
+        if(this.federateState.CanTransitionTo(newState)) {
             // TODO: transition to new state
 
 
@@ -222,13 +217,9 @@ public class FederationManager extends SynchronizedFederate {
     /**
      * Creates a @FederationManager instance.
      * @param params The passed parameters to initialize the federation manager. See {@link FederationManagerParameter}.
-     * @throws Exception I have no idea why we have this here. Especially pure Exception type... wtf!
+     * @throws Exception I have no idea why we have this here. Especially pure Exception type...
      */
     public FederationManager(FederationManagerParameter params) throws Exception {
-
-        // set current state to INITIALIZING
-        this.currentState = FederateState.INITIALIZING;
-
         // record parameters
         this.federationName = params.FederationName;
         this.fomFilename = params.FOMFilename;
@@ -312,7 +303,7 @@ public class FederationManager extends SynchronizedFederate {
             _coaSim.setVisible(true);
         }
 
-        this.currentState = FederateState.INITIALIZED;
+        super.setFederateState(FederateState.INITIALIZED);
     }
 
     public void recordMainExecutionLoopStartTime() {

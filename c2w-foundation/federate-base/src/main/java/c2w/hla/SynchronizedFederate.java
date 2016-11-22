@@ -138,6 +138,20 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return _lookahead;
     }
 
+    protected FederateState federateState = FederateState.INITIALIZING;
+    public FederateState getFederateState() {
+        return this.federateState;
+    }
+    public boolean setFederateState(FederateState newState) {
+        if(this.federateState.CanTransitionTo(newState)) {
+            // TODO: transition
+
+            this.federateState = newState;
+            return true;
+        }
+        return false;
+    }
+
     public SynchronizedFederate() {
 
     }
