@@ -144,8 +144,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
     public boolean setFederateState(FederateState newState) {
         if(this.federateState.CanTransitionTo(newState)) {
-            // TODO: transition
-
+            // TODO: operations needed to be done for transition
             this.federateState = newState;
             return true;
         }

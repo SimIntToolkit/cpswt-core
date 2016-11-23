@@ -51,7 +51,10 @@
 - non-used classes in base modules (used in _some_ examples - see SubscribedInteractionFilter)
 - InteractionRootComparator - but having references to C2WInteractionRoot (a "baseclass"-comparator or an "inheritedclass"-comparator? BUT NOT MIXED!)
 - Strings for UI comboboxes defined in FederationManager!!! and these strings are not used anywhere else, just in the UI.
+- FederationManager code contains UI-specific code (addPropertyChangeListener)
+- FederationManager.configureSimulation EMPTY (why?). Routed from UI call
 - 
+
 
 
 ### Questions

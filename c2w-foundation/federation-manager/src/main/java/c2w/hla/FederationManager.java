@@ -201,17 +201,17 @@ public class FederationManager extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    @Override
-    public boolean setFederateState(FederateState newState) {
-        if(this.federateState.CanTransitionTo(newState)) {
-            // TODO: transition to new state
-
-
-
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean setFederateState(FederateState newState) {
+//        if(this.federateState.CanTransitionTo(newState)) {
+//            // TODO: transition to new state
+//
+//
+//
+//            return true;
+//        }
+//        return false;
+//    }
     /* ============================================================================================================== */
 
     /**
@@ -303,7 +303,7 @@ public class FederationManager extends SynchronizedFederate {
             _coaSim.setVisible(true);
         }
 
-        super.setFederateState(FederateState.INITIALIZED);
+        this.setFederateState(FederateState.INITIALIZED);
     }
 
     public void recordMainExecutionLoopStartTime() {
@@ -879,11 +879,13 @@ public class FederationManager extends SynchronizedFederate {
             createFederation();
         }
         paused = false;
+        this.setFederateState(FederateState.RUNNING);
     }
 
     public void pauseSimulation() throws Exception {
         System.out.println("Simulation paused");
         paused = true;
+        this.setFederateState(FederateState.PAUSED);
     }
 
     private void fireSimPaused() {
@@ -894,6 +896,7 @@ public class FederationManager extends SynchronizedFederate {
         time_diff = time_in_millisec - System.currentTimeMillis();
         System.out.println("Simulation resumed");
         paused = false;
+        this.setFederateState(FederateState.RESUMED);
     }
 
     public void terminateSimulation() {
@@ -924,6 +927,7 @@ public class FederationManager extends SynchronizedFederate {
 
         running = false;
         paused = false;
+        this.setFederateState(FederateState.TERMINATED);
 
         // Wait for 10 seconds for Simulation to gracefully exit
         try {
