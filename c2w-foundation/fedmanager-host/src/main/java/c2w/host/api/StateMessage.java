@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class StateMessage {
     FederateState state;
-    String success;
     String error;
 
     public StateMessage() {}
@@ -13,9 +12,8 @@ public class StateMessage {
         this.state = state;
     }
 
-    public StateMessage(FederateState state, String success, String error) {
+    public StateMessage(FederateState state, String error) {
         this.state = state;
-        this.success = success;
         this.error = error;
     }
 
@@ -23,9 +21,6 @@ public class StateMessage {
     public FederateState getState() {
         return this.state;
     }
-
-    @JsonProperty
-    public String getSuccess() { return this.success; }
 
     @JsonProperty
     public String getError() { return this.error; }
