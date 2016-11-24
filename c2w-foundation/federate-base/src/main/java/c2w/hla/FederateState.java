@@ -14,6 +14,8 @@ public enum FederateState {
      */
     INITIALIZED(1),
 
+    STARTING(1111),
+
     /**
      * Federate is running after starting up
      */

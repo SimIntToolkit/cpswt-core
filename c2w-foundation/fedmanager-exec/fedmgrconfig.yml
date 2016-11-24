@@ -16,7 +16,7 @@ server:
   applicationContextPath: /api
   connector:
     type: http
-    port: 8082
+    port: 8083
     bindHost: 127.0.0.1
 
 logging:
