@@ -875,6 +875,7 @@ public class FederationManager extends SynchronizedFederate {
     }
 
     public void startSimulation() throws Exception {
+        this.setFederateState(FederateState.STARTING);
         if (!federationAlreadyAttempted()) {
             createFederation();
         }

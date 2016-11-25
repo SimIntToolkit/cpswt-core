@@ -27,6 +27,8 @@ var req = http.request(options, function(res) {
 req.on('error', function(e) {
   console.log('problem with request: ' + e.message);
 });
+
+
 // write data to request body
-req.write('{"targetState": "RUNNING"}');
-req.end();
+req.write('{"action": "TERMINATE"}');
+req.end(0);

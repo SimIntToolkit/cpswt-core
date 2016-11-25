@@ -7,39 +7,47 @@ public enum FederateState {
     /**
      * Federate is initializing
      */
-    INITIALIZING(0),
+    INITIALIZING(1),
 
     /**
      * Federate initialized, but didn't start
      */
-    INITIALIZED(1),
-
-    STARTING(1111),
+    INITIALIZED(2),
 
     /**
-     * Federate is running after starting up
+     * Federate is starting up.
      */
-    RUNNING(2),
+    STARTING(4),
+
+    /**
+     * Federate is running after successful startup
+     */
+    RUNNING(8),
 
     /**
      * Federate is paused, after running
      */
-    PAUSED(4),
+    PAUSED(16),
 
     /**
      * Federate is running again after PAUSED state
      */
-    RESUMED(8),
+    RESUMED(32),
 
     /**
-     * Federate not running anymore from external termination signal
+     * Federate is terminating (not running anymore) from external termination signal
      */
-    TERMINATED(16),
+    TERMINATING(64),
+
+    /**
+     * Federate finished with terminating (all cleanup code should have finished)
+     */
+    TERMINATED(128),
 
     /**
      * Federate not running anymore because run finished
      */
-    FINISHED(32);
+    FINISHED(256);
 
     private int value;
     FederateState(int value) {
@@ -54,21 +62,29 @@ public enum FederateState {
             add(FederateState.INITIALIZED);
         }});
         allowedTransitions.put(FederateState.INITIALIZED, new HashSet<FederateState>() {{
+            add(FederateState.STARTING);
+            add(FederateState.TERMINATING);
+        }});
+        allowedTransitions.put(FederateState.STARTING, new HashSet<FederateState>() {{
             add(FederateState.RUNNING);
-            add(FederateState.TERMINATED);
+            add(FederateState.TERMINATING);
         }});
         allowedTransitions.put(FederateState.RUNNING, new HashSet<FederateState>() {{
             add(FederateState.PAUSED);
-            add(FederateState.TERMINATED);
+            add(FederateState.TERMINATING);
             add(FederateState.FINISHED);
         }});
         allowedTransitions.put(FederateState.PAUSED, new HashSet<FederateState>() {{
             add(FederateState.RESUMED);
-            add(FederateState.TERMINATED);
+            add(FederateState.TERMINATING);
         }});
         allowedTransitions.put(FederateState.RESUMED, new HashSet<FederateState>() {{
-            add(FederateState.TERMINATED);
+            add(FederateState.PAUSED);
+            add(FederateState.TERMINATING);
             add(FederateState.FINISHED);
+        }});
+        allowedTransitions.put(FederateState.TERMINATING, new HashSet<FederateState>() {{
+            add(FederateState.TERMINATED);
         }});
         allowedTransitions.put(FederateState.TERMINATED, new HashSet<FederateState>());
         allowedTransitions.put(FederateState.FINISHED, new HashSet<FederateState>());
