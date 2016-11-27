@@ -467,6 +467,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 	public void resignFederationExecution( int resignAction ) {
 
 	    boolean federationNotResigned = true;
+		int Counter=10;
 	    while( federationNotResigned ) {
 	        try {
 	            getRTI().resignFederationExecution( resignAction );
@@ -484,6 +485,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 System.err.println( "WARNING:  problem encountered while resigning federation execution:  retry" );
                 e.printStackTrace();
                 try { Thread.sleep( 500 ); } catch ( Exception e1 ) { }	            
+				if( Counter-- < 1){
+					System.err.println( "Resigned Failed. Exiting from the Federation" );
+					federationNotResigned = false;
+				}
 	        }
 	    }
 	}
