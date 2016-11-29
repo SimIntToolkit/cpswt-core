@@ -3,17 +3,19 @@ package c2w.host;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
 import c2w.host.resources.FederationManagerControlResource;
+import c2w.host.resources.FederationManagerControlWSResource;
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.websockets.WebsocketBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FederationManagerHostApplication extends Application<FederationManagerHostConfiguration> {
 
-    final Logger logger = LoggerFactory.getLogger(FederationManagerHostApplication.class);
+    private final Logger logger = LoggerFactory.getLogger(FederationManagerHostApplication.class);
 
     public static void main(String[] args) throws Exception {
         new FederationManagerHostApplication().run(args);
@@ -33,6 +35,8 @@ public class FederationManagerHostApplication extends Application<FederationMana
                         new EnvironmentVariableSubstitutor(false)
                 )
         );
+
+        bootstrap.addBundle(new WebsocketBundle(FederationManagerControlWSResource.class));
     }
 
     @Override

@@ -23,6 +23,16 @@
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.liveperson</groupId>
+            <artifactId>dropwizard-websockets</artifactId>
+            <version>1.0.0-1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+        </dependency>
     </dependencies>
 
 
