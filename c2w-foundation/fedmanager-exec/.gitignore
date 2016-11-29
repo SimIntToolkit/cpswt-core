@@ -1,2 +1,3 @@
 *.fed
 script.xml
+node_modules/
