@@ -6,6 +6,8 @@ import c2w.host.api.ControlAction;
 import c2w.host.api.FederationManagerControlRequest;
 import c2w.host.api.StateChangeResponse;
 import c2w.host.api.StateResponse;
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.glassfish.jersey.server.ManagedAsync;
@@ -16,6 +18,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
+@Metered
+@Timed
+@ExceptionMetered
 @Path("/fedmgr")
 public class FederationManagerControlResource {
 
@@ -27,14 +32,12 @@ public class FederationManagerControlResource {
     }
 
     @GET
-    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public StateResponse getCurrentState() {
         return new StateResponse(this.federationManager.getFederateState());
     }
 
     @POST
-    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ManagedAsync
@@ -43,7 +46,7 @@ public class FederationManagerControlResource {
     ) {
         FederateState currentState = this.federationManager.getFederateState();
         ControlAction action = controlRequest.action;
-        FederateState targetState = controlRequest.getTargetState();
+        FederateState targetState = action.getTargetState();
 
         final ChunkedOutput<StateChangeResponse> output = new ChunkedOutput<StateChangeResponse>(StateChangeResponse.class);
 
