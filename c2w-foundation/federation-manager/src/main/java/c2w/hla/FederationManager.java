@@ -201,6 +201,8 @@ public class FederationManager extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
+    private List<FederateStateChangeListener> eventListeners = new ArrayList<>();
+
 //    @Override
 //    public boolean setFederateState(FederateState newState) {
 //        if(this.federateState.CanTransitionTo(newState)) {
@@ -1282,5 +1284,21 @@ public class FederationManager extends SynchronizedFederate {
         intrArrivalTimeList.add(arrivedIntr);
         // System.out.println("Adding interaction to arrived list: " + receivedIntr);
     }
+
+    public void addChangeListener(FederateStateChangeListener listener) {
+        if(!this.eventListeners.contains(listener)) {
+            this.eventListeners.add(listener);
+        }
+    }
+    public void removeChangeListener(FederateStateChangeListener listener) {
+        this.eventListeners.remove(listener);
+    }
+    private void fireStateChanged(FederateState prevState, FederateState newState) {
+        FederateStateChangeEvent e = new FederateStateChangeEvent(this, prevState, newState);
+        for(FederateStateChangeListener listener: this.eventListeners) {
+            listener.federateStateChanged(e);
+        }
+    }
+
 
 }

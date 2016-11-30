@@ -1,11 +1,10 @@
 package c2w.host.resources;
 
 import c2w.hla.FederateState;
+import c2w.hla.FederateStateChangeEvent;
+import c2w.hla.FederateStateChangeListener;
 import c2w.hla.FederationManager;
-import c2w.host.api.ControlAction;
-import c2w.host.api.FederationManagerControlRequest;
-import c2w.host.api.JsonEncoder;
-import c2w.host.api.StateResponse;
+import c2w.host.api.*;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
@@ -15,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Timed
 @ExceptionMetered
 @ServerEndpoint(value = "/fedmgr-ws", encoders = {JsonEncoder.class})
-public class FederationManagerControlWSResource {
+public class FederationManagerControlWSResource implements FederateStateChangeListener {
 
     private final FederationManager federationManager;
     private static Logger logger = LoggerFactory.getLogger(FederationManagerControlWSResource.class);
@@ -33,6 +33,7 @@ public class FederationManagerControlWSResource {
     public FederationManagerControlWSResource(FederationManager federationManager) {
         this.federationManager = federationManager;
         this.clients = new ConcurrentHashMap<String, Session>();
+        this.federationManager.addChangeListener(this);
     }
 
     @OnOpen
@@ -82,6 +83,14 @@ public class FederationManagerControlWSResource {
         String id = session.getId();
         if (this.clients.containsKey(id)) {
             this.clients.remove(id);
+        }
+    }
+
+    @Override
+    public void federateStateChanged(FederateStateChangeEvent e) {
+        StateChangeResponse response = new StateChangeResponse(e.getPrevState(), e.getNewState());
+        for (Map.Entry<String, Session> client: this.clients.entrySet()) {
+            client.getValue().getAsyncRemote().sendObject(response);
         }
     }
 }
