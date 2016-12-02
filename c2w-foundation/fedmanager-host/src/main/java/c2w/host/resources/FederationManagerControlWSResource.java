@@ -23,21 +23,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Metered
 @Timed
 @ExceptionMetered
-@ServerEndpoint(value = "/fedmgr-ws", encoders = {JsonEncoder.class})
+@ServerEndpoint(value = "/fedmgr-ws") // , encoders = {JsonEncoder.class}
 public class FederationManagerControlWSResource implements FederateStateChangeListener {
-
     private final FederationManager federationManager;
     private static Logger logger = LoggerFactory.getLogger(FederationManagerControlWSResource.class);
     private ConcurrentHashMap<String, Session> clients;
 
     public FederationManagerControlWSResource(FederationManager federationManager) {
         this.federationManager = federationManager;
-        this.clients = new ConcurrentHashMap<String, Session>();
-        this.federationManager.addChangeListener(this);
+        this.clients = new ConcurrentHashMap<>();
+        this.federationManager.addFederateStateChangeListener(this);
     }
 
     @OnOpen
-    public void OnOpen(final Session session) throws IOException {
+    public void open(final Session session) throws IOException {
         String id = session.getId();
 
         if (!this.clients.containsKey(id)) {
@@ -49,8 +48,9 @@ public class FederationManagerControlWSResource implements FederateStateChangeLi
     }
 
     @OnMessage
-    public void OnMessage(final Session session, String message) {
+    public void handleMessage(final Session session, String message) {
         String id = session.getId();
+        //session.getUserProperties("federationManager")
 
         logger.debug("Message received from " + id + ": " + message);
         ControlAction action = ControlAction.valueOf(message.toUpperCase());
@@ -79,7 +79,7 @@ public class FederationManagerControlWSResource implements FederateStateChangeLi
     }
 
     @OnClose
-    public void OnClose(final Session session, CloseReason closeReason) {
+    public void close(final Session session, CloseReason closeReason) {
         String id = session.getId();
         if (this.clients.containsKey(id)) {
             this.clients.remove(id);

@@ -50,7 +50,9 @@ import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -143,13 +145,25 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return this.federateState;
     }
     public boolean setFederateState(FederateState newState) {
+
+        // TODO: add Mutex
+
         if(this.federateState.CanTransitionTo(newState)) {
-            // TODO: operations needed to be done for transition
+            FederateState prevState = this.federateState;
             this.federateState = newState;
+
+            // fire FederateStateChanged event - notify listeners
+            this.fireFederateStateChanged(prevState, newState);
+
             return true;
         }
         return false;
     }
+
+    /**
+     * Event listeners for FederateStateChange events
+     */
+    private List<FederateStateChangeListener> federateChangeEventListeners = new ArrayList<>();
 
     public SynchronizedFederate() {
 
@@ -1255,4 +1269,27 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         });
         t.start();
     }
+
+    /**
+     * Adds a FederateChangeListener to the federateChangeEventListeners collection.
+     * @param listener The object that implements the FederateChangeListener interface.
+     */
+    public void addFederateStateChangeListener(FederateStateChangeListener listener) {
+        if (!this.federateChangeEventListeners.contains(listener)) {
+            this.federateChangeEventListeners.add(listener);
+        }
+    }
+
+    public void removeFederateStateChangeListener(FederateStateChangeListener listener) {
+        this.federateChangeEventListeners.remove(listener);
+    }
+
+    protected void fireFederateStateChanged(FederateState prevState, FederateState newState) {
+        FederateStateChangeEvent e = new FederateStateChangeEvent(this, prevState, newState);
+        for (FederateStateChangeListener listener : this.federateChangeEventListeners) {
+            listener.federateStateChanged(e);
+        }
+    }
+
+
 }

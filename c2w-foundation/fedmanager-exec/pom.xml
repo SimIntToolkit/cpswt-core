@@ -44,7 +44,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>c2w.host.FederationManagerHost</mainClass>
+                            <mainClass>c2w.host.FederationManagerConsoleHost</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>
@@ -106,7 +106,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>c2w.host.FederationManagerHost</mainClass>
+                            <mainClass>c2w.host.FederationManagerConsoleHost</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>
@@ -162,6 +162,46 @@
                             <arguments>
                                 <argument>server</argument>
                                 <argument>fedmgrconfig.yml</argument>
+                            </arguments>
+
+                            <!--
+                           this doesn't work in the exec:java case
+                           <environmentVariables>
+                               <C2WTROOT>${project.build.directory}</C2WTROOT>
+                           </environmentVariables>
+                           -->
+
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <profile>
+            <id>spark</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.5.0</version>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>c2w.host.FederationManagerSparkApplication</mainClass>
+                            <classpathScope>runtime</classpathScope>
+
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>java.net.preferIPv4Stack</key>
+                                    <value>true</value>
+                                </systemProperty>
+                            </systemProperties>
+
+                            <arguments>
+                                <argument>fedmgrconfig-spark.yml</argument>
                             </arguments>
 
                             <!--

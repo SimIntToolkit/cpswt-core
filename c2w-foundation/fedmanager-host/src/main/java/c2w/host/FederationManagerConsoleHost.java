@@ -12,12 +12,12 @@ import java.io.IOException;
  * This is a simple host class for federation manager. This does NOT support federation manager control.
  * For RESTful federation manager control @see FederationManagerHostApplication class.
  */
-public class FederationManagerHost {
+public class FederationManagerConsoleHost {
 
-    static final Logger logger = Logger.getLogger(FederationManagerHost.class);
+    static final Logger logger = Logger.getLogger(FederationManagerConsoleHost.class);
     private FederationManager federationManager;
 
-    public FederationManagerHost(FederationManagerParameter federationManagerParameter) {
+    public FederationManagerConsoleHost(FederationManagerParameter federationManagerParameter) {
         try {
             this.federationManager = new FederationManager(federationManagerParameter);
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class FederationManagerHost {
                 CommandLine line = parser.parse(cliOptions, args);
                 currentParameter = FederationManagerParameter.ParseInputs(line);
             }
-            FederationManagerHost host = new FederationManagerHost(currentParameter);
+            FederationManagerConsoleHost host = new FederationManagerConsoleHost(currentParameter);
             host.startSimulation();
         }
         catch (ParseException parseExp) {

@@ -8,3 +8,7 @@ ws.on('open', function open() {
 ws.on('message', function(data, flags) {
     console.log(data);
 });
+
+ws.on('error', function(msg) {
+    console.log('error: ' + msg);
+});

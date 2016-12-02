@@ -201,8 +201,6 @@ public class FederationManager extends SynchronizedFederate {
 
     private PrintStream monitor_out;
 
-    private List<FederateStateChangeListener> eventListeners = new ArrayList<>();
-
 //    @Override
 //    public boolean setFederateState(FederateState newState) {
 //        if(this.federateState.CanTransitionTo(newState)) {
@@ -218,6 +216,7 @@ public class FederationManager extends SynchronizedFederate {
 
     /**
      * Creates a @FederationManager instance.
+     *
      * @param params The passed parameters to initialize the federation manager. See {@link FederationManagerParameter}.
      * @throws Exception I have no idea why we have this here. Especially pure Exception type...
      */
@@ -680,10 +679,9 @@ public class FederationManager extends SynchronizedFederate {
                 }
             } else if (nodeType == NODE_TYPE.NODE_DURATION || nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
                 COADuration nodeDuration = null;
-                if(nodeType == NODE_TYPE.NODE_DURATION) {
+                if (nodeType == NODE_TYPE.NODE_DURATION) {
                     nodeDuration = (COADuration) n;
-                }
-                else {
+                } else {
                     nodeDuration = (COARandomDuration) n;
                 }
 
@@ -1284,21 +1282,4 @@ public class FederationManager extends SynchronizedFederate {
         intrArrivalTimeList.add(arrivedIntr);
         // System.out.println("Adding interaction to arrived list: " + receivedIntr);
     }
-
-    public void addChangeListener(FederateStateChangeListener listener) {
-        if(!this.eventListeners.contains(listener)) {
-            this.eventListeners.add(listener);
-        }
-    }
-    public void removeChangeListener(FederateStateChangeListener listener) {
-        this.eventListeners.remove(listener);
-    }
-    private void fireStateChanged(FederateState prevState, FederateState newState) {
-        FederateStateChangeEvent e = new FederateStateChangeEvent(this, prevState, newState);
-        for(FederateStateChangeListener listener: this.eventListeners) {
-            listener.federateStateChanged(e);
-        }
-    }
-
-
 }
