@@ -4,7 +4,6 @@
 
 package c2w.hla;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -14,40 +13,28 @@ import java.util.Properties;
 import java.util.function.Function;
 
 public class FederationManagerParameter {
-    @JsonProperty
     public String FederationName;
 
-    @JsonProperty
     public String FOMFilename;
 
-    @JsonProperty
     public String ScriptFilename;
 
-    @JsonProperty
     public String LogLevel;
 
-    @JsonProperty
     public boolean RealTimeMode;
 
-    @JsonProperty
     public String RootPathEnvVarKey;
 
-    @JsonProperty
     public double Step;
 
-    @JsonProperty
     public double Lookahead;
 
-    @JsonProperty
     public boolean TerminateOnCOAFinish;
 
-    @JsonProperty
     public double FederationEndTime;
 
-    @JsonProperty
     public long Seed4Dur;
 
-    @JsonProperty
     public boolean AutoStart;
 
     @FunctionalInterface

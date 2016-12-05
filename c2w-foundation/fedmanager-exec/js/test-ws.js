@@ -1,5 +1,5 @@
 var WebSocket = require('ws');
-var ws = new WebSocket('ws://localhost:8083/fedmgr-ws');
+var ws = new WebSocket('ws://localhost:8083/api/fedmgr-ws');
 
 var args = process.argv;
 var CMD = "GET_STATUS";
