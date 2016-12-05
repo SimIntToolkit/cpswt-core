@@ -1,8 +1,15 @@
 var WebSocket = require('ws');
-var ws = new WebSocket('ws://localhost:8083/api/fedmgr-ws');
+var ws = new WebSocket('ws://localhost:8083/fedmgr-ws');
+
+var args = process.argv;
+var CMD = "GET_STATUS";
+
+if(args && args.length) {
+    CMD = args[0];
+}
 
 ws.on('open', function open() {
-    ws.send('test');
+    ws.send(CMD);
 });
 
 ws.on('message', function(data, flags) {

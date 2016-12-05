@@ -5,6 +5,7 @@ import c2w.hla.FederateStateChangeEvent;
 import c2w.hla.FederateStateChangeListener;
 import c2w.hla.FederationManager;
 import c2w.host.api.*;
+import c2w.host.core.FederationManagerContainer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
@@ -29,8 +30,8 @@ public class FederationManagerControlWSResource implements FederateStateChangeLi
     private static Logger logger = LoggerFactory.getLogger(FederationManagerControlWSResource.class);
     private ConcurrentHashMap<String, Session> clients;
 
-    public FederationManagerControlWSResource(FederationManager federationManager) {
-        this.federationManager = federationManager;
+    public FederationManagerControlWSResource() {
+        this.federationManager = FederationManagerContainer.getInstance();
         this.clients = new ConcurrentHashMap<>();
         this.federationManager.addFederateStateChangeListener(this);
     }
@@ -54,6 +55,12 @@ public class FederationManagerControlWSResource implements FederateStateChangeLi
 
         logger.debug("Message received from " + id + ": " + message);
         ControlAction action = ControlAction.valueOf(message.toUpperCase());
+
+        if(action == ControlAction.GET_STATUS) {
+            session.getAsyncRemote().sendObject(new StateResponse(this.federationManager.getFederateState()));
+            return;
+        }
+
         FederateState currentState = this.federationManager.getFederateState();
         FederateState targetState = action.getTargetState();
 

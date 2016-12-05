@@ -9,7 +9,8 @@ public enum ControlAction {
     START(1),
     PAUSE(2),
     RESUME(4),
-    TERMINATE(8);
+    TERMINATE(8),
+    GET_STATUS(16);
 
     int value;
     ControlAction(int value) { this.value = value; }

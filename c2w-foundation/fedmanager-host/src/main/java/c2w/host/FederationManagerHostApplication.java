@@ -2,6 +2,7 @@ package c2w.host;
 
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
+import c2w.host.core.FederationManagerContainer;
 import c2w.host.resources.FederationManagerControlResource;
 import c2w.host.resources.FederationManagerControlWSResource;
 import io.dropwizard.Application;
@@ -50,14 +51,14 @@ public class FederationManagerHostApplication extends Application<FederationMana
     public void run(FederationManagerHostConfiguration configuration, Environment environment) {
         try {
             FederationManagerParameter fedMgrParams = configuration.getFederationManagerParameter();
-            FederationManager federationManager = new FederationManager(fedMgrParams);
+            FederationManagerContainer.init(fedMgrParams);
 
             // register resource (endpoint)
-            environment.jersey().register(new FederationManagerControlResource(federationManager));
+            environment.jersey().register(new FederationManagerControlResource());
 
-            ServerEndpointConfig config = ServerEndpointConfig.Builder.create(FederationManagerControlWSResource.class, "/fedmgr-ws").build();
-            config.getUserProperties().put("federationManager", federationManager);
-            websocketBundle.addEndpoint(config);
+            //ServerEndpointConfig config = ServerEndpointConfig.Builder.create(FederationManagerControlWSResource.class, "/fedmgr-ws").build();
+            //config.getUserProperties().put("federationManager", federationManager);
+            //websocketBundle.addEndpoint(config);
 
         } catch (Exception ex) {
             logger.error("Error initializing FederationManagerHostApplication. Reason: " + ex.getMessage());

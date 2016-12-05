@@ -6,6 +6,7 @@ import c2w.host.api.ControlAction;
 import c2w.host.api.FederationManagerControlRequest;
 import c2w.host.api.StateChangeResponse;
 import c2w.host.api.StateResponse;
+import c2w.host.core.FederationManagerContainer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
@@ -27,8 +28,8 @@ public class FederationManagerControlResource {
     private final FederationManager federationManager;
     private Logger logger = LoggerFactory.getLogger(FederationManagerControlResource.class);
 
-    public FederationManagerControlResource(FederationManager federationManager) {
-        this.federationManager = federationManager;
+    public FederationManagerControlResource() {
+        this.federationManager = FederationManagerContainer.getInstance();
     }
 
     @GET

@@ -6,7 +6,6 @@ import c2w.host.util.Config;
 import c2w.host.util.Filters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,19 +70,20 @@ public class FederationManagerSparkApplication {
                 enableDebugScreen();
             }
 
-            before("*", Filters.addTrailingSlashes);
-
             // create federation manager
             // TODO: REMOVE INIT CODE FROM CTOR TO SPEED UP OBJECT CREATION
             this.federationManager = new FederationManager(this.config.federationManagerParameter);
+            FederationManagerController federationManagerController = new FederationManagerController(federationManager);
 
-            // rest controller
-            FederationManagerController restController = new FederationManagerController(federationManager);
-            get(this.config.server.restfulEndpoint, restController.getFederateState);
-            post(this.config.server.restfulEndpoint, restController.changeFederateState);
+            // ws controller setup
+            webSocket(this.config.server.websocketEndpoint, federationManagerController);
 
-            // ws controller
-            // TODO: add WS controller implementation
+            // rest controller setup
+            before("*", Filters.addTrailingSlashes);
+            get(this.config.server.restfulEndpoint, federationManagerController.getFederateState);
+            post(this.config.server.restfulEndpoint, federationManagerController.changeFederateState);
+
+            spark.Spark.init();
 
         } catch (Exception ex) {
             logger.error("Error initializing FederationManagerHost application. Reason: " + ex.getMessage());
@@ -94,7 +94,6 @@ public class FederationManagerSparkApplication {
     private String replaceEnvVars(String str) {
         StrSubstitutor sub = new StrSubstitutor(System.getenv());
         String resolvedString = sub.replace(str);
-
         return resolvedString;
     }
 }
