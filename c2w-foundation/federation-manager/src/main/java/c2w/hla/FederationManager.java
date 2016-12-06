@@ -242,12 +242,12 @@ public class FederationManager extends SynchronizedFederate {
             this._rand4Dur = new Random();
         }
 
-        this._c2wtRoot = System.getenv("C2WTROOT");
+        this._c2wtRoot = System.getenv(params.RootPathEnvVarKey);
         if (this._c2wtRoot == null) {
             this._c2wtRoot = System.getProperty("user.dir");
         }
 
-        File logDir = new File(this._c2wtRoot, "log");
+        File logDir = new File(params.LogDir);
         if (Files.notExists(logDir.toPath())) {
             logDir.mkdir();
         }

@@ -9,6 +9,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.function.Function;
 
@@ -20,6 +21,8 @@ public class FederationManagerParameter {
     public String ScriptFilename;
 
     public String LogLevel;
+
+    public String LogDir;
 
     public boolean RealTimeMode;
 
@@ -51,6 +54,7 @@ public class FederationManagerParameter {
         p.LogLevel = fn.apply("logLevel");
         p.RealTimeMode = Boolean.parseBoolean(fnWithDefaultVal.apply("realtime", "false"));
         p.RootPathEnvVarKey = fn.apply("rootPathEnvVarKey");
+        p.LogDir = fnWithDefaultVal.apply("logDir", Paths.get(System.getenv(p.RootPathEnvVarKey), "log").toString());
         p.Step = Double.parseDouble(fn.apply("step"));
         p.Lookahead = Double.parseDouble(fn.apply("lookahead"));
         p.TerminateOnCOAFinish = Boolean.parseBoolean(fnWithDefaultVal.apply("terminateOnCOAFinish", "false"));
@@ -224,6 +228,15 @@ public class FederationManagerParameter {
                 .hasArg()
                 .desc("Log level")
                 .required()
+                .type(String.class)
+                .build()
+        );
+
+        options.addOption(Option.builder()
+                .longOpt("logDir")
+                .argName("logDir")
+                .hasArg()
+                .desc("Log directory")
                 .type(String.class)
                 .build()
         );

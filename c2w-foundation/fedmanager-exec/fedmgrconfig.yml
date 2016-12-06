@@ -8,6 +8,7 @@ federationManagerParameter:
   AutoStart: 1
   FOMFilename: ${C2WTROOT}/HelloWorld.fed
   ScriptFilename: ${C2WTROOT}/script.xml
+  LogDir: ${C2WTROOT}/log
   LogLevel: NORMAL
   FederationName: HelloWorld
 
@@ -28,10 +29,10 @@ logging:
       target: stdout
       logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger - %X{code} %msg %n"
     - type: file
-      currentLogFilename: cpswtng-dwlog.log
+      currentLogFilename: log/cpswtng-dwlog.log
       threshold: ALL
       archive: true
-      archivedLogFilenamePattern: cpswtng-dwlog-%d.log
+      archivedLogFilenamePattern: log/cpswtng-dwlog-%d.log
       archivedFileCount: 5
       timeZone: UTC
       logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger - %X{code} %msg %n"

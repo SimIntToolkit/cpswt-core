@@ -9,14 +9,12 @@ import c2w.host.core.FederationManagerContainer;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import org.eclipse.jetty.websocket.api.WebSocketException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,6 +97,8 @@ public class FederationManagerControlWSResource implements FederateStateChangeLi
         if (this.clients.containsKey(id)) {
             this.clients.remove(id);
         }
+
+        LOG.debug("Client "+id+" disconnected. Reason: " + (closeReason == null ? "none" : closeReason.toString()));
     }
 
     @Override
