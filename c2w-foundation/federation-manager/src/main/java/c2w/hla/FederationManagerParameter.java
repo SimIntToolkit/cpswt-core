@@ -40,6 +40,8 @@ public class FederationManagerParameter {
 
     public boolean AutoStart;
 
+    public String StopScriptPath;
+
     @FunctionalInterface
     interface Function2<T1, T2, R> {
         R apply(T1 p1, T2 p2);
@@ -54,13 +56,17 @@ public class FederationManagerParameter {
         p.LogLevel = fn.apply("logLevel");
         p.RealTimeMode = Boolean.parseBoolean(fnWithDefaultVal.apply("realtime", "false"));
         p.RootPathEnvVarKey = fn.apply("rootPathEnvVarKey");
-        p.LogDir = fnWithDefaultVal.apply("logDir", Paths.get(System.getenv(p.RootPathEnvVarKey), "log").toString());
         p.Step = Double.parseDouble(fn.apply("step"));
         p.Lookahead = Double.parseDouble(fn.apply("lookahead"));
         p.TerminateOnCOAFinish = Boolean.parseBoolean(fnWithDefaultVal.apply("terminateOnCOAFinish", "false"));
         p.FederationEndTime = Double.parseDouble(fnWithDefaultVal.apply("federationEndTime", "-1"));
         p.Seed4Dur = Long.parseLong(fn.apply("seed4DurRNG"));
         p.AutoStart = Boolean.parseBoolean(fn.apply("autoStart"));
+
+        p.LogDir = fnWithDefaultVal.apply("logDir", Paths.get(System.getenv(p.RootPathEnvVarKey), "log").toString());
+
+        // default value from previous versions ...
+        p.StopScriptPath = fnWithDefaultVal.apply("stopScriptPath", Paths.get(System.getenv(p.RootPathEnvVarKey), "Main", "stop.sh").toString());
 
         return p;
     }
@@ -237,6 +243,15 @@ public class FederationManagerParameter {
                 .argName("logDir")
                 .hasArg()
                 .desc("Log directory")
+                .type(String.class)
+                .build()
+        );
+
+        options.addOption(Option.builder()
+                .longOpt("stopScriptPath")
+                .argName("stopScriptPath")
+                .hasArg()
+                .desc("Path to the stop script")
                 .type(String.class)
                 .build()
         );

@@ -287,11 +287,7 @@ public class FederationManager extends SynchronizedFederate {
             script_interactions = xmlHandler.getScriptInteractions();
 
             // Remember stop script file's full path
-            _stopScriptFilepath = params.ScriptFilename;
-            int dotPos = _stopScriptFilepath.lastIndexOf('/');
-            if ((dotPos > 0) && (dotPos < (_stopScriptFilepath.length() - 1))) {
-                _stopScriptFilepath = _stopScriptFilepath.substring(0, dotPos) + "/Main/stop.sh";
-            }
+            _stopScriptFilepath = params.StopScriptPath;
         }
 
         // Before beginning simulation, initialize COA sequence graph

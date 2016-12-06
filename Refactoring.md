@@ -21,6 +21,7 @@
   
   * _NEW_ `RootPathEnvVarKey` - the environment variable that indicates root path of the running project
   * _NEW_ `LogDir` - path to log dir - it was created in the code (hardcoded)
+  * _NEW_ `StopScriptPath` - path to stop script - it was created in the code (hardcoded)
   (previously `C2WTROOT`)
   * _OBSOLETE_ `LockFile` - DROPPED. Using `System.getEnv(${RootPathEnvVarKey})/__lock__` (hardcoded) instead.
   * _OBSOLETE_ `DBName` - DROPPED. Not using remote DB to log (seriously).
@@ -54,7 +55,8 @@
 - Strings for UI comboboxes defined in FederationManager!!! and these strings are not used anywhere else, just in the UI.
 - FederationManager code contains UI-specific code (addPropertyChangeListener)
 - FederationManager.configureSimulation EMPTY (why?). Routed from UI call
-- FederationManager ctor creates log dir with hardcoded path  
+- FederationManager ctor creates log dir with hardcoded path
+- FederationManager ctor creates stop script path with hardcoded path
 
 
 

@@ -11,6 +11,7 @@ federationManagerParameter:
   LogDir: ${C2WTROOT}/log
   LogLevel: NORMAL
   FederationName: HelloWorld
+  StopScriptPath: ${C2WTROOT}/Main/stop.sh
 
 server:
   type: simple
