@@ -22,6 +22,7 @@
 package HelloWorld;
 
 import c2w.hla.InteractionRoot;
+import c2w.hla.base.AdvanceTimeRequest;
 
 public class Sink3 extends Sink3Base {
 

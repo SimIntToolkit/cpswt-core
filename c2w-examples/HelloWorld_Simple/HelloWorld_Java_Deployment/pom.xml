@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.c2w.Helloworld_simple_java</groupId>
 	<artifactId>HelloWorld_exec</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<properties>
 		<federation.name>HelloWorld</federation.name>
-		<federation.version>0.0.1-SNAPSHOT</federation.version>
+		<federation.version>0.0.2-SNAPSHOT</federation.version>
 		<c2w.version>0.4.0-SNAPSHOT</c2w.version>
 		<nar.version>3.3.0</nar.version>
 	</properties>
@@ -18,13 +18,13 @@
 		<dependency><!-- The depenency for the generated code-->
 			<groupId>org.c2w.Helloworld_simple_java</groupId>
 			<artifactId>HelloWorld-base-java</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency><!-- The depenency for the user written code-->
 			<groupId>org.c2w.Helloworld_simple_java</groupId>
 			<artifactId>HelloWorld</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		
 		

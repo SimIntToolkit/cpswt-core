@@ -6,7 +6,8 @@ export RTI_HOME=/usr/local/portico/portico-2.1.0
 
 mvn_install_deploy() {
 	echo "Maven Compiling...."
-	mvn clean install
+	mvn clean compile
+	mvn  install
 	echo "Maven Deploying to the Archiva....."
 	mvn deploy
 	echo "Deployment Completed...."

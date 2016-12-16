@@ -21,6 +21,8 @@
 
 package HelloWorld;
 //import c2w.hla.InteractionRoot;
+import c2w.hla.SynchronizedFederate;
+import c2w.hla.base.AdvanceTimeRequest;
 
 public class Source3 extends Source3Base {
 

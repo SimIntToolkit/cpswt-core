@@ -8,19 +8,20 @@
   <!--</parent>-->
   <groupId>org.c2w.Helloworld_simple_java</groupId>
   <artifactId>HelloWorld</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <dependencies>
     <dependency>
       <groupId>org.c2w.Helloworld_simple_java</groupId>
       <artifactId>HelloWorld-base-java</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2-SNAPSHOT</version>
 
     </dependency>
     <dependency>
     	<groupId>org.porticoproject</groupId>
     	<artifactId>portico</artifactId>
-    	<version>2.1.0</version>
-    	<!--<scope>provided</scope>-->
+    	<!--<version>2.1.0</version>-->
+      <version>2.1.0-LOG4J</version>
+      <!--<scope>provided</scope>-->
     </dependency>
   </dependencies>
 

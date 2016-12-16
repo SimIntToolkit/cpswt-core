@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.c2w.Helloworld_simple_java</groupId>
     <artifactId>HelloWorld-java</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>HelloWorld-base-java</artifactId>
   <packaging>jar</packaging>
@@ -12,7 +12,7 @@
     <dependency>
       <groupId>org.c2w.Helloworld_simple_java</groupId>
       <artifactId>HelloWorld-rti-java</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.c2w</groupId>
