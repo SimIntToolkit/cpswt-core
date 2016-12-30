@@ -81,7 +81,7 @@ public class FederationManagerControlResource {
         }
         else {
             try {
-                output.write(new StateChangeResponse(currentState, currentState, "FederationManager can transition from " + currentState + " state to " + targetState));
+                output.write(new StateChangeResponse(currentState, currentState, "FederationManager cannot transition from " + currentState + " state to " + targetState));
                 output.close();
             }
             catch(IOException ioEx) {
