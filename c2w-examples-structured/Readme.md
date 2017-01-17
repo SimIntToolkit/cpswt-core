@@ -4,7 +4,7 @@ This subproject is the example of a "simple Helloworld" workflow.
 
 To perform these steps, you need access to `cpswtng-meta` repo and the `HelloWorld.webgmex` seed.
 
-## HelloWorld_Java_Tutorial_1_FederatesExporter
+## HelloWorld\_Java\_Tutorial\_1\_FederatesExporter
 
 This folder is the result of the `Federates Exporter` with the following variables:
 
@@ -17,11 +17,11 @@ This folder is the result of the `Federates Exporter` with the following variabl
 
 Needed steps: maven clean -> compile -> deploy
 
-## HelloWorld_Java_Tutorial_2_Implementation
+## HelloWorld\_Java\_Tutorial\_2\_Implementation
 
 This folder is the implementation of the interfaces generated above.
 
-## HelloWorld_Java_Tutorial_3_DeploymentExporter
+## HelloWorld\_Java\_Tutorial\_3\_DeploymentExporter
 
 This folder is the result of the `Deployment Exporter` with the following variables:
 
