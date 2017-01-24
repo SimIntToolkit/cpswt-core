@@ -7,7 +7,7 @@
 
   <parent>
     <groupId>org.c2wt.example</groupId>
-    <artifactId>HelloWorld_Java_Tutorial</artifactId>
+    <artifactId>HelloWorld_Java_Tutorial_Implementation</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
