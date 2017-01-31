@@ -147,7 +147,6 @@
         </plugins>
     </build>
 
-
     <repositories>
         <repository>
             <id>archiva.internal</id>
@@ -308,6 +307,31 @@
             </dependencies>
             <build>
                 <plugins>
+                    <!--
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.0.2</version>
+                        <executions>
+                            <execution>
+                                <id>copy-resources</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.basedir}/target/conf/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}/src/conf</directory>
+                                            <include>fedmgrconfig.yml</include>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -328,7 +352,7 @@
 
                             <arguments>
                                 <argument>server</argument>
-                                <argument>fedmgrconfig.yml</argument>
+                                <argument>${project.basedir}/src/conf/fedmgrconfig.yml</argument>
                             </arguments>
                         </configuration>
                     </plugin>
