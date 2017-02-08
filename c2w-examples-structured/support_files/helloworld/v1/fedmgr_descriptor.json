@@ -5,7 +5,7 @@
 		"files": [
 			"script.xml",
 			"Helloworld_Java_Tutorial.fed",
-			"helloworld__custom_startup.sh"
+			"helloworld__custom_startup.sh",
             "fedmgrconfig.yml"
 		]
 	},
