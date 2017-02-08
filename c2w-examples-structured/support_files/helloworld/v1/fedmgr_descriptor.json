@@ -1,7 +1,7 @@
 {
 	"federation_name": "c2w_tutorials_helloworld_v1",
 	"download": {
-		"base_url": "https://vulcan.isis.vanderbilt.edu/rest/projects/cpswtngdemo/downloads/content/experiments/c2w-tutorials/helloworld/v1.0/",
+		"base_url": "https://vulcan.isis.vanderbilt.edu/rest/projects/cpswtngdemo/downloads/content/experiments/c2w-tutorials/helloworld/v1.0",
 		"files": [
 			"script.xml",
 			"Helloworld_Java_Tutorial.fed",

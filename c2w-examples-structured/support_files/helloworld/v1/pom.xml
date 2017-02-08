@@ -354,7 +354,7 @@
 
                             <arguments>
                                 <argument>server</argument>
-                                <argument>${project.basedir}/fedmgrconfig.yml</argument>
+                                <argument>${project.basedir}/input/fedmgrconfig.yml</argument>
                             </arguments>
                         </configuration>
                     </plugin>
