@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -82,7 +84,6 @@ import c2w.hla.rtievents.IC2WFederationEventsHandler;
 import c2w.hla.rtievents.C2WFederationEventsHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 /**
  * Model class for the Federation Manager.
@@ -155,7 +156,7 @@ public class FederationManager extends SynchronizedFederate {
     String _logLevel;
 
     boolean _killingFederation = false;
-    String _c2wtRoot;
+    String _rootDir;
 
     Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
     List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
@@ -225,8 +226,14 @@ public class FederationManager extends SynchronizedFederate {
     public FederationManager(FederationManagerParameter params) throws Exception {
         // record parameters
         this.federationName = params.FederationName;
-        this.fomFilename = params.FOMFilename;
         this.rootPathEnvVarKey = params.RootPathEnvVarKey;
+
+        this._rootDir = System.getenv(params.RootPathEnvVarKey);
+        if (this._rootDir == null) {
+            this._rootDir = System.getProperty("user.dir");
+        }
+
+        this.fomFilename = Paths.get(this._rootDir, params.FOMFilename).toString();
         this.step = params.Step;
         this.lookahead = params.Lookahead;
 
@@ -244,13 +251,10 @@ public class FederationManager extends SynchronizedFederate {
             this._rand4Dur = new Random();
         }
 
-        this._c2wtRoot = System.getenv(params.RootPathEnvVarKey);
-        if (this._c2wtRoot == null) {
-            this._c2wtRoot = System.getProperty("user.dir");
-        }
 
-        File logDir = new File(params.LogDir);
-        if (Files.notExists(logDir.toPath())) {
+        Path logDirPath = Paths.get(this._rootDir, params.LogDir);
+        File logDir = logDirPath.toFile();
+        if (Files.notExists(logDirPath)) {
             logDir.mkdir();
         }
 
@@ -265,7 +269,7 @@ public class FederationManager extends SynchronizedFederate {
 
         // read script file
         if (params.ScriptFilename != null) {
-            File f = new File(params.ScriptFilename);
+            File f = Paths.get(this._rootDir, params.ScriptFilename).toFile();
 
             ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationName, this.getFederateId(), this._rand4Dur, this._logLevel, this.getRTI());
 
@@ -289,7 +293,7 @@ public class FederationManager extends SynchronizedFederate {
             script_interactions = xmlHandler.getScriptInteractions();
 
             // Remember stop script file's full path
-            _stopScriptFilepath = params.StopScriptPath;
+            _stopScriptFilepath = Paths.get(this._rootDir, params.StopScriptPath).toString();
         }
 
         // Before beginning simulation, initialize COA sequence graph
@@ -947,10 +951,10 @@ public class FederationManager extends SynchronizedFederate {
         // Kill the entire federation
         String killCommand = "bash -x " + _stopScriptFilepath;
         try {
-            System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + _c2wtRoot);
-            Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
-            Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
-            Runtime.getRuntime().exec(killCommand, null, new File(_c2wtRoot));
+            System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + _rootDir);
+            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
+            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
+            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
         } catch (IOException e) {
             System.out.println("Exception while killing the federation");
             e.printStackTrace();

@@ -1,17 +1,17 @@
 federationManagerParameter:
   Step: 1.0
   Lookahead: 0.1
-  RootPathEnvVarKey: C2WTROOT
+  RootPathEnvVarKey: CPSWT_ROOT
   RealTimeMode: 1
   FederationEndTime: 20.0
   Seed4Dur: 0
   AutoStart: 1
-  FOMFilename: ${C2WTROOT}/HelloWorld.fed
-  ScriptFilename: ${C2WTROOT}/script.xml
-  LogDir: ${C2WTROOT}/log
+  FOMFilename: HelloWorld_Java_Tutorial.fed
+  ScriptFilename: script.xml
+  LogDir: log
   LogLevel: NORMAL
   FederationName: HelloWorld
-  StopScriptPath: ${C2WTROOT}/Main/stop.sh
+  StopScriptPath: Main/stop.sh
 
 server:
   type: simple

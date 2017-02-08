@@ -308,6 +308,8 @@
             <build>
                 <plugins>
                     <!--
+                    To run this part: `mvn process-resources -U -X -P FedManager`
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
