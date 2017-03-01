@@ -1,10 +1,13 @@
 {
 	"federation_name": "c2w_tutorials_helloworld_v1",
+	"environment_variables": {
+		"FEDERATION_MANAGER": 1
+	},
 	"download": {
 		"base_url": "https://vulcan.isis.vanderbilt.edu/rest/projects/cpswtngdemo/downloads/content/experiments/c2w-tutorials/helloworld/v1.0",
 		"files": [
 			"script.xml",
-			"Helloworld_Java_Tutorial.fed",
+			"HelloWorld_Java_Tutorial.fed",
 			"helloworld__custom_startup.sh",
             "fedmgrconfig.yml"
 		]
