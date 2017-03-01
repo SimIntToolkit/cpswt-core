@@ -77,7 +77,6 @@ import c2w.coa.COAProbabilisticChoice;
 import c2w.coa.COARandomDuration;
 import c2w.coa.COASyncPt;
 import c2w.coa.COANode.NODE_TYPE;
-import c2w.gui.coa.COASim;
 import c2w.util.RandomWithFixedSeed;
 import c2w.util.WeakPropertyChangeSupport;
 import c2w.hla.rtievents.IC2WFederationEventsHandler;
@@ -103,7 +102,6 @@ public class FederationManager extends SynchronizedFederate {
     double _injectionTime = -1;
 
     COAGraph _coaGraph = new COAGraph();
-    COASim _coaSim = null;
 
     private IC2WFederationEventsHandler _federationEventsHandler = null;
 
@@ -298,14 +296,6 @@ public class FederationManager extends SynchronizedFederate {
 
         // Before beginning simulation, initialize COA sequence graph
         _coaGraph.initialize();
-        _coaSim = new COASim(_coaGraph);
-        boolean coasUsed = _coaGraph.getAllCOANodes().size() > 0;
-        // No GUIs are to be shown in batch mode execution
-        // Also, No COA Display, if there are no COAs to begin with
-        if (!params.AutoStart && coasUsed) {
-            _coaSim.setVisible(true);
-        }
-
         this.setFederateState(FederateState.INITIALIZED);
     }
 
