@@ -1,7 +1,3 @@
-/**
- * * @author Greg Varga <greg@sph3r.com>
- */
-
 package c2w.hla;
 
 import org.apache.commons.cli.CommandLine;

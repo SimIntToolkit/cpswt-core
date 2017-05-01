@@ -50,11 +50,14 @@ public class FederationManagerHostApplication extends Application<FederationMana
     @Override
     public void run(FederationManagerHostConfiguration configuration, Environment environment) {
         try {
+            FederationManagerControlResource resource = new FederationManagerControlResource();
+            // register resource (endpoint)
+            environment.jersey().register(resource);
+
             FederationManagerParameter fedMgrParams = configuration.getFederationManagerParameter();
             FederationManagerContainer.init(fedMgrParams);
 
-            // register resource (endpoint)
-            environment.jersey().register(new FederationManagerControlResource());
+            resource.initFederationManager();
 
             //ServerEndpointConfig config = ServerEndpointConfig.Builder.create(FederationManagerControlWSResource.class, "/fedmgr-ws").build();
             //config.getUserProperties().put("federationManager", federationManager);

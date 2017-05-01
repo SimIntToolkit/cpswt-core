@@ -25,11 +25,23 @@ import java.io.IOException;
 @Path("/fedmgr")
 public class FederationManagerControlResource {
 
-    private final FederationManager federationManager;
+    private FederationManager federationManager;
     private Logger logger = LoggerFactory.getLogger(FederationManagerControlResource.class);
 
-    public FederationManagerControlResource() {
+    public FederationManagerControlResource() {}
+
+    public void initFederationManager() {
         this.federationManager = FederationManagerContainer.getInstance();
+        /*
+        if(this.federationManager.getAutoStart()) {
+            try {
+                this.federationManager.startSimulation();
+            }
+            catch(Exception e) {
+                logger.error("There was an error auto starting federation manager", e);
+            }
+        }
+        */
     }
 
     @GET

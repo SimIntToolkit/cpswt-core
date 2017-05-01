@@ -197,6 +197,11 @@ public class FederationManager extends SynchronizedFederate {
     double tMainLoopEndTime = 0.0;
     boolean executionTimeRecorded = false;
 
+    // expose autostart
+    public boolean getAutoStart() {
+        return this._autoStart;
+    }
+
 
     private final WeakPropertyChangeSupport support = new WeakPropertyChangeSupport(this);
 
@@ -297,6 +302,7 @@ public class FederationManager extends SynchronizedFederate {
         // Before beginning simulation, initialize COA sequence graph
         _coaGraph.initialize();
         this.setFederateState(FederateState.INITIALIZED);
+
     }
 
     public void recordMainExecutionLoopStartTime() {

@@ -10,7 +10,7 @@ federationManagerParameter:
   ScriptFilename: script.xml
   LogDir: log
   LogLevel: NORMAL
-  FederationName: HelloWorld
+  FederationName: HelloWorld_Java_Tutorial
   StopScriptPath: Main/stop.sh
 
 server:
