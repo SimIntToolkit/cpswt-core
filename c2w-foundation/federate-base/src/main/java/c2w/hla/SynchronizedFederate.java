@@ -132,6 +132,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private double _lookahead = 0.0;
 
+    protected int federateRTIInitWaitTime = 200;
+
     public void setLookahead(double lookahead) {
         _lookahead = lookahead;
     }
@@ -216,9 +218,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         System.out.print("acquiring connection to RTI ... ");
         if (SynchronizedFederate.FEDERATION_MANAGER_NAME.compareTo(federate_id) != 0) {
             // Himanshu: This is a regular federate, wait 20 seconds for federation manager to initialize first
-            System.out.println("Regular federate waiting 20 secs for Federation Manager to initialize");
+            System.out.println("Regular federate waiting "+this.federateRTIInitWaitTime+" ms for Federation Manager to initialize");
             try {
-                Thread.sleep(20000);
+                Thread.sleep(this.federateRTIInitWaitTime);
             } catch (Exception e) {
                 e.printStackTrace();
             }

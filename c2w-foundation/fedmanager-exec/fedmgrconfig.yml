@@ -12,6 +12,7 @@ federationManagerParameter:
   LogLevel: NORMAL
   FederationName: HelloWorld_Java_Tutorial
   StopScriptPath: Main/stop.sh
+  FederateRTIInitWaitTime: 1000
 
 server:
   type: simple

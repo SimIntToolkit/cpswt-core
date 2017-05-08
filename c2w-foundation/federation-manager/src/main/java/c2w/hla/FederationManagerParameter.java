@@ -38,6 +38,8 @@ public class FederationManagerParameter {
 
     public String StopScriptPath;
 
+    public int FederateRTIInitWaitTime;
+
     @FunctionalInterface
     interface Function2<T1, T2, R> {
         R apply(T1 p1, T2 p2);
@@ -63,6 +65,8 @@ public class FederationManagerParameter {
 
         // default value from previous versions ...
         p.StopScriptPath = fnWithDefaultVal.apply("stopScriptPath", Paths.get(System.getenv(p.RootPathEnvVarKey), "Main", "stop.sh").toString());
+
+        p.FederateRTIInitWaitTime = Integer.parseInt(fnWithDefaultVal.apply("federateRTIInitWaitTime", "20000"));
 
         return p;
     }
@@ -249,6 +253,15 @@ public class FederationManagerParameter {
                 .hasArg()
                 .desc("Path to the stop script")
                 .type(String.class)
+                .build()
+        );
+
+        options.addOption(Option.builder()
+                .longOpt("federateRTIInitWaitTime")
+                .argName("federateRTIInitWaitTime")
+                .hasArg()
+                .desc("Federate RTI first initialization wait time")
+                .type(Integer.class)
                 .build()
         );
 
