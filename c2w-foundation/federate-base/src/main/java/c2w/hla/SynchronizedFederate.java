@@ -1292,6 +1292,4 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             listener.federateStateChanged(e);
         }
     }
-
-
 }
