@@ -160,7 +160,7 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <pofiles>
+    <profiles>
         <profile>
             <id>Sink</id>
             <properties>
@@ -266,6 +266,6 @@
             </build>
         </profile>
 
-    </pofiles>
+    </profiles>
 
 </project>
