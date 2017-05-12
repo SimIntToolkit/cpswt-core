@@ -110,9 +110,9 @@ public class FederationManagerControlResource {
             public void run() {
                 try {
                     output.write(new StateChangeResponse(federationManager.getFederateState(), FederateState.STARTING));
-                    federationManager.startSimulation();
-                    output.write(new StateChangeResponse(FederateState.STARTING, federationManager.getFederateState()));
                     output.close();
+                    federationManager.startSimulation();
+                    //output.write(new StateChangeResponse(FederateState.STARTING, federationManager.getFederateState()));
                 }
                 catch(Exception ex) {
                     logger.error("There was an error while starting the simulation", ex);

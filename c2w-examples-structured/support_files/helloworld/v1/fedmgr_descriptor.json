@@ -1,5 +1,5 @@
 {
-	"federation_name": "c2w_tutorials_helloworld_v1",
+	"federation_name": "HelloWorld_Java_Tutorial",
 	"environment_variables": {
 		"FEDERATION_MANAGER": 1
 	},
@@ -15,11 +15,11 @@
 	"scripts": [
 		"helloworld_custom_startup.sh"
 	],
-	"rti": {
-		"portico.jgroups.timeout": "10000"
-	},
+	"rti": [
+		"portico.jgroups.timeout=10000"
+	],
 	"pom": {
-		"url": "https://vulcan.isis.vanderbilt.edu/rest/projects/cpswtngdemo/downloads/content/experiments/c2w-tutorials/helloworld/v1.0/pom.xml",
+		"url": "https://vulcan.isis.vanderbilt.edu/rest/projects/cpswtngdemo/downloads/content/experiments/c2w-tutorials/helloworld/v1.0/pom-fedmgr.xml",
 		"profile": "FedManager"
 	}
 }

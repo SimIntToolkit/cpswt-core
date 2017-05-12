@@ -138,7 +138,7 @@
         </profile>
 
         <profile>
-            <id>RESTfulFedMgr</id>
+            <id>FederationManagerExecJava</id>
             <build>
                 <plugins>
                     <plugin>
@@ -163,13 +163,6 @@
                                 <argument>server</argument>
                                 <argument>fedmgrconfig.yml</argument>
                             </arguments>
-
-                            <!--
-                           this doesn't work in the exec:java case
-                           <environmentVariables>
-                               <C2WTROOT>${project.build.directory}</C2WTROOT>
-                           </environmentVariables>
-                           -->
 
                         </configuration>
                     </plugin>
