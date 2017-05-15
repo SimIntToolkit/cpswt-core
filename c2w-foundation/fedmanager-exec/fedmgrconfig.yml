@@ -6,7 +6,7 @@ federationManagerParameter:
   FederationEndTime: 20.0
   Seed4Dur: 0
   AutoStart: 1
-  FOMFilename: HelloWorld.fed
+  FOMFilename: HelloWorld-test.fed
   ScriptFilename: script.xml
   LogDir: log
   LogLevel: NORMAL

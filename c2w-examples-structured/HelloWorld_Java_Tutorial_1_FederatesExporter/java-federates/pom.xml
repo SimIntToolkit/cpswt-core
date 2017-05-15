@@ -16,7 +16,7 @@
     <dependency>
       <groupId>org.porticoproject</groupId>
       <artifactId>portico</artifactId>
-      <version>2.1.0-LOG4J</version>
+      <version>2.1.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
