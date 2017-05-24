@@ -20,7 +20,7 @@ server:
   connector:
     type: http
     port: 8083
-    bindHost: 127.0.0.1
+    bindHost: 0.0.0.0
 
 logging:
   level: INFO
