@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<script>
-  <expect federateType="Sink2"/>
-  <expect federateType="Sink1"/>
-  <expect federateType="Sink3"/>
-  <expect federateType="Source3"/>
-  <expect federateType="Source2"/>
-  <expect federateType="Source1"/>
-</script>
