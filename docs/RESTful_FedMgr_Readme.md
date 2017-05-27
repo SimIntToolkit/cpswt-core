@@ -4,7 +4,7 @@ This document explains the differences between the legacy and the "new" RESTful 
 
 ## Introduction
 
-The foundation code that supports the RESTful Federation manager is now labeled as version 0.4.0-SNAPSHOT.
+The foundation code that supports the RESTful Federation manager is now labeled as version 0.5.0-SNAPSHOT.
 
 
 ## Running FederationManager
