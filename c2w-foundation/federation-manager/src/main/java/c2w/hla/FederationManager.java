@@ -43,9 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -205,7 +203,7 @@ public class FederationManager extends SynchronizedFederate {
 
     private final WeakPropertyChangeSupport support = new WeakPropertyChangeSupport(this);
 
-    private PrintStream monitor_out;
+    //private PrintStream monitor_out;
 
 //    @Override
 //    public boolean setFederateState(FederateState newState) {
@@ -261,7 +259,7 @@ public class FederationManager extends SynchronizedFederate {
             logDir.mkdir();
         }
 
-        monitor_out = new PrintStream(new File(logDir, "monitor_" + this.federationName + ".vec"));
+        // monitor_out = new PrintStream(new File(logDir, "monitor_" + this.federationName + ".vec"));
 
         // Update simulation mode
         realtime = params.RealTimeMode;
@@ -328,7 +326,9 @@ public class FederationManager extends SynchronizedFederate {
         createRTI(SynchronizedFederate.FEDERATION_MANAGER_NAME);
         LOG.info(" done.\n");
 
-        File fom_file = new File(fomFilename);
+        Path fomFilePath = FileSystems.getDefault().getPath(fomFilename);
+        fomFilePath.normalize();
+        File fom_file = fomFilePath.toAbsolutePath().toFile();
 
         LOG.info("Attempting to create federation \"" + federationName + "\" ... ");
         try {
@@ -1250,7 +1250,7 @@ public class FederationManager extends SynchronizedFederate {
                     intrBuf.append("\t" + InteractionRoot.get_parameter_name(parameterHandle) + " = " + val.toString() + "\n");
                 }
             }
-            monitor_out.print(intrBuf.toString());
+            // monitor_out.print(intrBuf.toString());
             LOG.info(intrBuf.toString());
         } catch (Exception e) {
             System.out.println("Exception while dumping interaction with handle: " + handle);
