@@ -2,12 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.c2w.example</groupId>
+    <groupId>org.c2w.examples</groupId>
     <artifactId>EchoExample-java</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
+
+  <groupId>org.c2wt.examples</groupId>
   <artifactId>EchoExample-rti-java</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
+
   <dependencies>
     <dependency>
       <groupId>org.c2w</groupId>
