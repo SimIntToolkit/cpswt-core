@@ -12,8 +12,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>EchoExample-base-java</module>
     <module>EchoExample-rti-java</module>
+    <module>EchoExample-base-java</module>
   </modules>
 
   <dependencies>
