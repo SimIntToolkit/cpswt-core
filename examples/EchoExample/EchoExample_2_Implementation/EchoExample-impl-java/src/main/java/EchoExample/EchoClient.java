@@ -2,6 +2,9 @@ package EchoExample;
 
 import c2w.hla.base.AdvanceTimeRequest;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class EchoClient extends EchoClientBase {
 
     public EchoClient(String[] federationInfo) throws Exception {
@@ -9,6 +12,8 @@ public class EchoClient extends EchoClientBase {
     }
 
     private final int echoMessageCount = 500;
+    int sequenceNumber = 0;
+    Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
 
     private void execute() throws Exception {
 
@@ -25,12 +30,19 @@ public class EchoClient extends EchoClientBase {
         int ix = 0;
         while( true ) {
             ClientMessage message = create_ClientMessage();
+
+            this.sequenceNumber++;
+
+            message.set_sequenceNumber(this.sequenceNumber);
             currentTime += 1;
 
             atr.requestSyncStart();
 
             System.out.println( this.getFederateId() + ": Sending echo message interaction #" + ix );
             message.sendInteraction( getRTI(), currentTime );
+
+            // store sent sequenceNumber
+            sentSequenceNumbers.add(this.sequenceNumber);
 
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );

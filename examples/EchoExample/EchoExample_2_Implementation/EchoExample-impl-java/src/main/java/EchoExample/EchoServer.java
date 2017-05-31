@@ -24,16 +24,22 @@ public class EchoServer extends EchoServerBase {
         InteractionRoot interactionRoot;
 
         while( true ) {
-            double timeOrderOffset = 0;
             currentTime += 1;
 
             atr.requestSyncStart();
 
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
+                if(!(interactionRoot instanceof ClientMessage)) {
+                    continue;
+                }
+
                 ClientMessage message = (ClientMessage) interactionRoot;
-                System.out.println( this.getFederateId() + ": Received ClientMessage interaction from " + message.get_sourceFed() );
+                System.out.println( this.getFederateId() + ": Received ClientMessage interaction from " + message.get_originFed() );
 
                 ServerReply reply = create_ServerReply();
+                reply.set_sequenceNumber(message.get_sequenceNumber());
+                reply.set_targetFed(message.get_originFed());
+
                 reply.sendInteraction(getRTI(), currentTime);
 
                 AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
