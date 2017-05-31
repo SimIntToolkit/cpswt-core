@@ -25,7 +25,16 @@ public class ClientMessage extends C2WInteractionRoot {
 
 	
 	
+	private static int _sequenceNumber_handle;
 	
+	
+	/**
+	* Returns the handle (RTI assigned) of the "sequenceNumber" parameter of
+	* its containing interaction class.
+	*
+	* @return the handle (RTI assigned) of the "sequenceNumber" parameter
+	*/
+	public static int get_sequenceNumber_handle() { return _sequenceNumber_handle; }
 	
 	
 	
@@ -103,15 +112,18 @@ public class ClientMessage extends C2WInteractionRoot {
 		
 		
 		
+		_datamemberNames.add( "sequenceNumber" );
 		
 		
 		
 		_allDatamemberNames.add( "actualLogicalGenerationTime" );
 		_allDatamemberNames.add( "federateFilter" );
 		_allDatamemberNames.add( "originFed" );
+		_allDatamemberNames.add( "sequenceNumber" );
 		_allDatamemberNames.add( "sourceFed" );
 		
 		
+		_datamemberTypeMap.put( "sequenceNumber", "int" );
 	
 	
 
@@ -148,6 +160,36 @@ public class ClientMessage extends C2WInteractionRoot {
 		_classHandleNameMap.put( get_handle(), "InteractionRoot.C2WInteractionRoot.ClientMessage" );
 		_classHandleSimpleNameMap.put( get_handle(), "ClientMessage" );
 
+		
+		isNotInitialized = true;
+		while( isNotInitialized ) {
+			try {
+							
+				_sequenceNumber_handle = rti.getParameterHandle( "sequenceNumber", get_handle() );
+				isNotInitialized = false;
+			} catch ( FederateNotExecutionMember f ) {
+				System.err.println( initErrorMessage + "Federate Not Execution Member" );
+				f.printStackTrace();
+				return;				
+			} catch ( InteractionClassNotDefined i ) {
+				System.err.println( initErrorMessage + "Interaction Class Not Defined" );
+				i.printStackTrace();
+				return;				
+			} catch ( NameNotFound n ) {
+				System.err.println( initErrorMessage + "Name Not Found" );
+				n.printStackTrace();
+				return;				
+			} catch ( Exception e ) {
+				e.printStackTrace();
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+			}
+		}
+			
+			
+		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot.ClientMessage,sequenceNumber", get_sequenceNumber_handle() );
+			
+			
+		_datamemberHandleNameMap.put( get_sequenceNumber_handle(), "sequenceNumber" );
 		
 	}
 
@@ -397,6 +439,7 @@ public class ClientMessage extends C2WInteractionRoot {
 		return "ClientMessage("
 			
 			
+			+ "sequenceNumber:" + get_sequenceNumber()
 			+ ")";
 	}
 	
@@ -404,7 +447,24 @@ public class ClientMessage extends C2WInteractionRoot {
 
 
 	
+	
+	private int _sequenceNumber = 0;
 
+	
+	
+	/**
+	* Set the value of the "sequenceNumber" parameter to "value" for this parameter.
+	*
+	* @param value the new value for the "sequenceNumber" parameter
+	*/
+	public void set_sequenceNumber( int value ) { _sequenceNumber = value; }
+	
+	/**
+	* Returns the value of the "sequenceNumber" parameter of this interaction.
+	*
+	* @return the value of the "sequenceNumber" parameter
+	*/
+	public int get_sequenceNumber() { return _sequenceNumber; }
 	
 
 
@@ -458,8 +518,88 @@ public class ClientMessage extends C2WInteractionRoot {
 		super( ClientMessage_var );
 		
 		
+		set_sequenceNumber( ClientMessage_var.get_sequenceNumber() );
 	}
 
+
+	/**
+	* Returns the value of the parameter whose name is "datamemberName"
+	* for this interaction.
+	*
+	* @param datamemberName name of parameter whose value is to be
+	* returned
+	* @return value of the parameter whose name is "datamemberName"
+	* for this interaction
+	*/
+	public Object getParameter( String datamemberName ) {
+		
+		
+		
+		if (  "sequenceNumber".equals( datamemberName )  ) return new Integer( get_sequenceNumber() );
+		else return super.getParameter( datamemberName );
+	}
+	
+	/**
+	* Returns the value of the parameter whose handle (RTI assigned)
+	* is "datamemberHandle" for this interaction.
+	*
+	* @param datamemberHandle handle (RTI assigned) of parameter whose
+	* value is to be returned
+	* @return value of the parameter whose handle (RTI assigned) is
+	* "datamemberHandle" for this interaction
+	*/
+	public Object getParameter( int datamemberHandle ) {
+		
+				
+		
+		if ( get_sequenceNumber_handle() == datamemberHandle ) return new Integer( get_sequenceNumber() );
+		else return super.getParameter( datamemberHandle );
+	}
+	
+	protected boolean setParameterAux( int param_handle, String val ) {
+		boolean retval = true;		
+		
+			
+		
+		if ( param_handle == get_sequenceNumber_handle() ) set_sequenceNumber( Integer.parseInt( val ) );
+		else retval = super.setParameterAux( param_handle, val );
+		
+		return retval;
+	}
+	
+	protected boolean setParameterAux( String datamemberName, String val ) {
+		boolean retval = true;
+		
+			
+		
+		if (  "sequenceNumber".equals( datamemberName )  ) set_sequenceNumber( Integer.parseInt( val ) );	
+		else retval = super.setParameterAux( datamemberName, val );
+		
+		return retval;
+	}
+	
+	protected boolean setParameterAux( String datamemberName, Object val ) {
+		boolean retval = true;
+		
+		
+		
+		if (  "sequenceNumber".equals( datamemberName )  ) set_sequenceNumber( (Integer)val );		
+		else retval = super.setParameterAux( datamemberName, val );
+		
+		return retval;
+	}
+
+	protected SuppliedParameters createSuppliedDatamembers() {
+		SuppliedParameters datamembers = super.createSuppliedDatamembers();
+
+	
+		
+		
+			datamembers.add( get_sequenceNumber_handle(), Integer.toString( get_sequenceNumber() ).getBytes() );
+		
+	
+		return datamembers;
+	}
 
 	
 	public void copyFrom( Object object ) {
@@ -468,6 +608,7 @@ public class ClientMessage extends C2WInteractionRoot {
 			ClientMessage data = (ClientMessage)object;
 			
 			
+				_sequenceNumber = data._sequenceNumber;
 			
 		}
 	}
