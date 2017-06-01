@@ -27,9 +27,9 @@ public class EchoClientBase extends SynchronizedFederate {
 		createRTI();
 		joinFederation( federation_id, federate_id );
 
-		enableTimeConstrained();
+		// enableTimeConstrained();
 
-		enableTimeRegulation( getLookahead() );
+		// enableTimeRegulation( getLookahead() );
 		enableAsynchronousDelivery();
         // interaction pubsub
         

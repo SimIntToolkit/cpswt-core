@@ -7,6 +7,12 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <federation.name>EchoExample</federation.name>
+        <federation.version>1.0.0-SNAPSHOT</federation.version>
+        <c2w.version>0.5.0-SNAPSHOT</c2w.version>
+        <maven.repository.url>http://cpswtng_archiva:8080/repository</maven.repository.url>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -15,10 +21,9 @@
             <version>0.5.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>org.c2w.examples</groupId>
+            <artifactId>EchoExample-impl-java</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -60,17 +65,13 @@
         <profile>
             <id>EchoClient</id>
             <properties>
-                <federation.name>EchoExample</federation.name>
                 <federate.name>EchoClient</federate.name>
-                <federate.loglevel>NORMAL</federate.loglevel>
             </properties>
         </profile>
         <profile>
             <id>EchoServer</id>
             <properties>
-                <federation.name>EchoExample</federation.name>
                 <federate.name>EchoServer</federate.name>
-                <federate.loglevel>NORMAL</federate.loglevel>
             </properties>
         </profile>
 
@@ -104,7 +105,7 @@
                             </systemProperties>
 
                             <classpathScope>runtime</classpathScope>
-                            <mainClass>${federation.name}.${federate.name}</mainClass>
+                            <mainClass>${federate.name}</mainClass>
 
                             <arguments>
                                 <argument>${federation.name}</argument>

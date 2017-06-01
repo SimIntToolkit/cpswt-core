@@ -1,5 +1,6 @@
 package EchoExample;
 
+import c2w.hla.InteractionRoot;
 import c2w.hla.base.AdvanceTimeRequest;
 
 import java.util.HashSet;
@@ -11,9 +12,10 @@ public class EchoClient extends EchoClientBase {
         super(federationInfo);
     }
 
-    private final int echoMessageCount = 500;
+    private final int sendMessageCount = 500;
     int sequenceNumber = 0;
     Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
+    long waitToSendNextMessage = 10000;
 
     private void execute() throws Exception {
 
@@ -27,36 +29,61 @@ public class EchoClient extends EchoClientBase {
 
         startAdvanceTimeThread();
 
-        int ix = 0;
+        InteractionRoot interactionRoot;
+
         while( true ) {
-            ClientMessage message = create_ClientMessage();
-
-            this.sequenceNumber++;
-
-            message.set_sequenceNumber(this.sequenceNumber);
             currentTime += 1;
 
             atr.requestSyncStart();
 
-            System.out.println( this.getFederateId() + ": Sending echo message interaction #" + ix );
-            message.sendInteraction( getRTI(), currentTime );
+            // Send interactions to RTI
+            this.sendClientMessage(currentTime + this.getLookahead());
 
-            // store sent sequenceNumber
-            sentSequenceNumbers.add(this.sequenceNumber);
-
+            // Request RTI to advance time
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );
 
             atr.requestSyncEnd();
             atr = newATR;
 
-            ++ix;
+            // Waiting for incoming interactions
+            while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
+                if (!(interactionRoot instanceof ServerReply)) {
+                    continue;
+                }
 
-            if(ix > this.echoMessageCount) {
+                ServerReply reply = (ServerReply) interactionRoot;
+                if(reply.get_targetFed().equals(this.getFederateId())) {
+                    int replySeqNum = reply.get_sequenceNumber();
+                    if(this.sentSequenceNumbers.contains(replySeqNum)) {
+                        this.sentSequenceNumbers.remove(replySeqNum);
+                        System.out.println(this.getFederateId() + ": Got a server reply back with sequence number: " + replySeqNum);
+                    }
+                    else {
+                        System.out.println(this.getFederateId() + ": Server reply with sequence number unknown: " + replySeqNum);
+                    }
+                }
+            }
+
+            if(this.sequenceNumber > this.sendMessageCount) {
                 break;
             }
-        }
 
+            // wait until next message to send
+            Thread.sleep(this.waitToSendNextMessage);
+        }
+    }
+
+    void sendClientMessage(double currentTime) throws Exception {
+        ClientMessage message = create_ClientMessage();
+        this.sequenceNumber++;
+        message.set_sequenceNumber(this.sequenceNumber);
+
+        System.out.println( this.getFederateId() + ": Sending echo message interaction #" + this.sequenceNumber );
+        message.sendInteraction( getRTI(), currentTime );
+
+        // store sent sequenceNumber
+        sentSequenceNumbers.add(this.sequenceNumber);
     }
 
     public static void main( String[] args ) {

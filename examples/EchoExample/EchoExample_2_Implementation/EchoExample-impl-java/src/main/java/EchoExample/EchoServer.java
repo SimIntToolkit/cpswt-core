@@ -40,7 +40,7 @@ public class EchoServer extends EchoServerBase {
                 reply.set_sequenceNumber(message.get_sequenceNumber());
                 reply.set_targetFed(message.get_originFed());
 
-                reply.sendInteraction(getRTI(), currentTime);
+                reply.sendInteraction(getRTI(), currentTime + this.getLookahead());
 
                 AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
                 putAdvanceTimeRequest( newATR );
