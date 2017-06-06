@@ -82,8 +82,8 @@ public class C2WLogger {
 			String userName = "root";
 			String password = "c2wt";
 			db_url = "jdbc:mysql://localhost:3306/"+dbName; //normally url="jdbc:mysql://localhost:3306/+dbname
-			Class.forName ("com.mysql.jdbc.Driver").newInstance();;
-			conn = DriverManager.getConnection (db_url, userName, password);	
+			// Class.forName ("com.mysql.jdbc.Driver").newInstance();;
+			// conn = DriverManager.getConnection (db_url, userName, password);
 		}
 		catch (Exception e)
 		{
