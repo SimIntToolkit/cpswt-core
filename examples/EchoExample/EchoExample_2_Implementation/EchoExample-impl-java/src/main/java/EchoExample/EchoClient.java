@@ -2,11 +2,15 @@ package EchoExample;
 
 import c2w.hla.InteractionRoot;
 import c2w.hla.base.AdvanceTimeRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class EchoClient extends EchoClientBase {
+
+    static final Logger logger = LogManager.getLogger(EchoClient.class);
 
     public EchoClient(String[] federationInfo) throws Exception {
         super(federationInfo);
