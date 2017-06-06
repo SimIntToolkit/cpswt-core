@@ -20,10 +20,11 @@ public class EchoClient extends EchoClientBase {
     int sequenceNumber = 0;
     Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
     long waitToSendNextMessage = 10000;
+    double stepSize = 1.0;
 
     private void execute() throws Exception {
 
-        double currentTime = 0;
+        double currentTime = 1.0;
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );
@@ -36,19 +37,9 @@ public class EchoClient extends EchoClientBase {
         InteractionRoot interactionRoot;
 
         while( true ) {
-            currentTime += 1;
-
+            // Wait for time to be granted by the RTI
+            logger.debug("{}: requesting RTI to go to time: {}", this.getFederateId(), currentTime);
             atr.requestSyncStart();
-
-            // Send interactions to RTI
-            this.sendClientMessage(currentTime + this.getLookahead());
-
-            // Request RTI to advance time
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
-            putAdvanceTimeRequest( newATR );
-
-            atr.requestSyncEnd();
-            atr = newATR;
 
             // Waiting for incoming interactions
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
@@ -61,10 +52,10 @@ public class EchoClient extends EchoClientBase {
                     int replySeqNum = reply.get_sequenceNumber();
                     if(this.sentSequenceNumbers.contains(replySeqNum)) {
                         this.sentSequenceNumbers.remove(replySeqNum);
-                        System.out.println(this.getFederateId() + ": Got a server reply back with sequence number: " + replySeqNum);
+                        logger.debug("{}: Got a server reply back with sequence number: {}", this.getFederateId(), replySeqNum);
                     }
                     else {
-                        System.out.println(this.getFederateId() + ": Server reply with sequence number unknown: " + replySeqNum);
+                        logger.debug("{}: Server reply with sequence number unknown: {}", this.getFederateId(), replySeqNum);
                     }
                 }
             }
@@ -73,8 +64,20 @@ public class EchoClient extends EchoClientBase {
                 break;
             }
 
+            // Send interactions to RTI
+            this.sendClientMessage(currentTime + this.getLookahead());
+
+            // Request RTI to advance time
+            atr.requestSyncEnd();
+            currentTime += stepSize;
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
+            putAdvanceTimeRequest( newATR );
+
+            atr.requestSyncEnd();
+            atr = newATR;
+
             // wait until next message to send
-            Thread.sleep(this.waitToSendNextMessage);
+            // Thread.sleep(this.waitToSendNextMessage);
         }
     }
 

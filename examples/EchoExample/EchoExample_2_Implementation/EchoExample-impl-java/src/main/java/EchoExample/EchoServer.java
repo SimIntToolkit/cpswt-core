@@ -2,16 +2,27 @@ package EchoExample;
 
 import c2w.hla.InteractionRoot;
 import c2w.hla.base.AdvanceTimeRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EchoServer extends EchoServerBase {
+
+    static final Logger logger = LogManager.getLogger(EchoServer.class);
 
     public EchoServer(String[] federationInfo) throws Exception {
         super(federationInfo);
     }
 
+    double stepSize = 1.0;
+    List<ServerReply> replies = new ArrayList<ServerReply>();
+
     private void execute() throws Exception {
 
-        double currentTime = 0.0;
+        // Add time advance request to RTI to go to 1.0 from the start
+        double currentTime = 1.0;
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );
@@ -24,35 +35,39 @@ public class EchoServer extends EchoServerBase {
         InteractionRoot interactionRoot;
 
         while( true ) {
-            currentTime += 1;
-
+            // Wait for time to be granted by the RTI
+            logger.debug("{}: requesting RTI to go to time: {}", this.getFederateId(), currentTime);
             atr.requestSyncStart();
 
+            // Process any incoming interactions in the queue
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
                 if(!(interactionRoot instanceof ClientMessage)) {
                     continue;
                 }
 
+                // handle incoming message
                 ClientMessage message = (ClientMessage) interactionRoot;
-                System.out.println( this.getFederateId() + ": Received ClientMessage interaction from " + message.get_originFed() );
+                logger.debug("{}: Received ClientMessage interaction | from: {}\t seq#: {}", this.getFederateId(), message.get_originFed(), message.get_sequenceNumber());
 
+                // assemble reply to that message
                 ServerReply reply = create_ServerReply();
                 reply.set_sequenceNumber(message.get_sequenceNumber());
                 reply.set_targetFed(message.get_originFed());
 
-                reply.sendInteraction(getRTI(), currentTime + this.getLookahead());
-
-                AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
-                putAdvanceTimeRequest( newATR );
-
-                atr.requestSyncEnd();
-                atr = newATR;
+                replies.add(reply);
             }
 
+            // send replies
+            for(ServerReply reply : replies) {
+                reply.sendInteraction(getRTI(), currentTime + this.getLookahead());
+            }
+            replies.clear();
+
+            // Prepare to request RTI to advance time to next step
+            atr.requestSyncEnd();
+            currentTime += this.stepSize;
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );
-
-            atr.requestSyncEnd();
             atr = newATR;
         }
 
