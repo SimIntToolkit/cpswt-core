@@ -352,25 +352,25 @@ public class FederationManager extends SynchronizedFederate {
 
         LOG.info("Registering synchronization points ... ");
         // REGISTER "ReadyToPopulate" SYNCHRONIZATION POINT
-        getRTI().registerFederationSynchronizationPoint(ReadyToPopulateSynch, null);
+        getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
         getRTI().tick();
-        while (!_synchronizationLabels.contains(ReadyToPopulateSynch)) {
+        while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToPopulate)) {
             Thread.sleep(500);
             getRTI().tick();
         }
 
         // REGISTER "ReadyToRun" SYNCHRONIZATION POINT
-        getRTI().registerFederationSynchronizationPoint(ReadyToRunSynch, null);
+        getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
         getRTI().tick();
-        while (!_synchronizationLabels.contains(ReadyToRunSynch)) {
+        while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToRun)) {
             Thread.sleep(500);
             getRTI().tick();
         }
 
         // REGISTER "ReadyToResign" SYNCHRONIZATION POINT
-        getRTI().registerFederationSynchronizationPoint(ReadyToResignSynch, null);
+        getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
         getRTI().tick();
-        while (!_synchronizationLabels.contains(ReadyToResignSynch)) {
+        while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToResign)) {
             Thread.sleep(500);
             getRTI().tick();
         }
@@ -387,11 +387,11 @@ public class FederationManager extends SynchronizedFederate {
 
         waitForFederatesToJoin();
 
-        LOG.info("Waiting for \"" + ReadyToPopulateSynch + "\" ... ");
+        LOG.info("Waiting for \"" + SynchronizationPoints.ReadyToPopulate + "\" ... ");
         readyToPopulate();
         LOG.info("done.\n");
 
-        LOG.info("Waiting for \"" + ReadyToRunSynch + "\" ... ");
+        LOG.info("Waiting for \"" + SynchronizationPoints.ReadyToRun + "\" ... ");
 
         // IF FEDERATION MANAGER WAS NOT CONFIGURED TO AUTO-START, THEN
         // PROCEED SIMULATION ONLY WHEN USER PRESSES THE START BUTTON

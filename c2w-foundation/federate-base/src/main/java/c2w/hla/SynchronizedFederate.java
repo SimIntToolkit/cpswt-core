@@ -49,7 +49,6 @@ import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -110,10 +109,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public static final String FEDERATION_MANAGER_NAME = "manager";
 
-    public static final String ReadyToPopulateSynch = "readyToPopulate";
-    public static final String ReadyToRunSynch = "readyToRun";
-    public static final String ReadyToResignSynch = "readyToResign";
-
     public static int logId = 0;
 
     private Set<String> _achievedSynchronizationPoints = new HashSet<String>();
@@ -121,25 +116,20 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _timeConstrainedNotEnabled = true;
     private boolean _timeRegulationNotEnabled = true;
     private boolean _simEndNotSubscribed = true;
-
     private boolean _timeAdvanceNotGranted = true;
-
     private boolean _advanceTimeThreadNotStarted = true;
 
-    private String _federateId = "";
-    private String _federationId = "";
-    private File _lockFile;
-
-    private double _lookahead = 0.0;
+    private String federateId;
+    private String federationId;
+    private double lookahead = 0.0;
 
     protected int federateRTIInitWaitTime = 200;
 
     public void setLookahead(double lookahead) {
-        _lookahead = lookahead;
+        this.lookahead = lookahead;
     }
-
     public double getLookahead() {
-        return _lookahead;
+        return lookahead;
     }
 
     protected FederateState federateState = FederateState.INITIALIZING;
@@ -246,53 +236,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                      the federate
      * @param federate_id   a unique name for this federate within the federation
      *                      it is joining.  The name must be unique within a particular federation.
-     *                      <p>
-     *                      Supplies true to the argument 'ignoreLockFile'
      */
     public void joinFederation(String federation_id, String federate_id) {
-        this.joinFederation(federation_id, federate_id, true);
-    }
-
-    /**
-     * Joins the federate to a particular federation.
-     *
-     * @param federation_id a unique name for the federation to be joined by
-     *                      the federate
-     * @param federate_id   a unique name for this federate within the federation
-     *                      it is joining.  The name must be unique within a particular federation.
-     */
-    public void joinFederation(String federation_id, String federate_id, boolean ignoreLockFile) {
-        this._federateId = federate_id;
-        this._federationId = federation_id;
+        this.federateId = federate_id;
+        this.federationId = federation_id;
         boolean federationNotPresent = true;
         while (federationNotPresent) {
             try {
-                if (!ignoreLockFile) {
-                    try {
-                        int counter = 0;
-                        while (!_lockFile.createNewFile()) {
-                            if (++counter >= 60) {
-                                System.err.println("ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": timeout after 60 seconds.  Exiting.");
-                            }
-                            try {
-                                Thread.sleep(1000);
-                            } catch (Exception e) {
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("ERROR: [" + federate_id + "] federate:  could not open lock file \"" + _lockFile + "\": " + e.getMessage() + ".  Exiting.");
-                    }
-                }
-
                 System.out.print("[" + federate_id + "] federate joining federation [" + federation_id + "] ... ");
                 synchronized (_rti) {
                     _rti.joinFederationExecution(federate_id, federation_id, this, null);
                 }
                 System.out.println("done.");
-
-                if (!ignoreLockFile) {
-                    _lockFile.delete();
-                }
 
                 federationNotPresent = false;
             } catch (FederateAlreadyExecutionMember f) {
@@ -306,20 +261,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
             }
         }
-
-//		try {
-//		    File lockFile = new File( federation_id + "_" + federate_id + ".lck" );
-//		    FileOutputStream lockFileStream = new FileOutputStream( lockFile );
-//		    lockFileStream.close();
-//		} catch( Exception e ) { }
-
     }
 
     /**
      * Returns the id (name) of the federation in which this federate is running.
      */
     public String getFederationId() {
-        return _federationId;
+        return federationId;
     }
 
     /**
@@ -327,7 +275,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * in which it is running.
      */
     public String getFederateId() {
-        return _federateId;
+        return federateId;
     }
 
     /**
@@ -579,7 +527,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void readyToPopulate() throws FederateNotExecutionMember, RTIinternalError {
         ensureSimEndSubscription();
 
-        achieveSynchronizationPoint(ReadyToPopulateSynch);
+        achieveSynchronizationPoint(SynchronizationPoints.ReadyToPopulate);
     }
 
     /**
@@ -592,7 +540,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @throws RTIinternalError
      */
     public void readyToRun() throws FederateNotExecutionMember, RTIinternalError {
-        achieveSynchronizationPoint(ReadyToRunSynch);
+        achieveSynchronizationPoint(SynchronizationPoints.ReadyToRun);
     }
 
     /**
@@ -605,7 +553,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @throws RTIinternalError
      */
     public void readyToResign() throws FederateNotExecutionMember, RTIinternalError {
-        achieveSynchronizationPoint(ReadyToResignSynch);
+        achieveSynchronizationPoint(SynchronizationPoints.ReadyToResign);
     }
 
     private void achieveSynchronizationPoint(String label) throws FederateNotExecutionMember, RTIinternalError {
@@ -1226,7 +1174,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                         String parameter = InteractionRoot.get_parameter_name(theInteraction.getParameterHandle(i));
                         String value = new String(theInteraction.getValue(i));
                         String type = new String(InteractionRoot._datamemberTypeMap.get(parameter));
-                        C2WLogger.addLog(interactionName + "_sub_" + _federateId, time, parameter, value, type, InteractionRoot.subLogLevel, logIdLocal);
+                        C2WLogger.addLog(interactionName + "_sub_" + federateId, time, parameter, value, type, InteractionRoot.subLogLevel, logIdLocal);
                     }
                 } catch (ArrayIndexOutOfBounds e) {
                     e.printStackTrace();
@@ -1262,7 +1210,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                         String value = new String(reflectedAttributes.getValue(i));
                         String type = new String(ObjectRoot._datamemberTypeMap.get(attribute));
                         String loglevel = ObjectRoot._subAttributeLogMap.get(attribute);
-                        C2WLogger.addLog(objectName + "_" + attribute + "_sub_" + _federateId, time, attribute, value, type, loglevel, logIdLocal);
+                        C2WLogger.addLog(objectName + "_" + attribute + "_sub_" + federateId, time, attribute, value, type, loglevel, logIdLocal);
                     }
                 } catch (ArrayIndexOutOfBounds e) {
                     e.printStackTrace();
