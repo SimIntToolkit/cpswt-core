@@ -73,7 +73,6 @@ public class EchoClient extends EchoClientBase {
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );
 
-            atr.requestSyncEnd();
             atr = newATR;
 
             // wait until next message to send
@@ -86,7 +85,7 @@ public class EchoClient extends EchoClientBase {
         this.sequenceNumber++;
         message.set_sequenceNumber(this.sequenceNumber);
 
-        System.out.println( this.getFederateId() + ": Sending echo message interaction #" + this.sequenceNumber );
+        logger.debug("{}: Sending echo message interaction #{}", this.getFederateId(), this.sequenceNumber);
         message.sendInteraction( getRTI(), currentTime );
 
         // store sent sequenceNumber

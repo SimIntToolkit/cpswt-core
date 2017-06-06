@@ -230,6 +230,14 @@
 									<key>java.net.preferIPv4Stack</key>
 									<value>true</value>
 								</systemProperty>
+								<systemProperty>
+									<key>org.apache.logging.log4j.simplelog.StatusLogger.level</key>
+									<value>TRACE</value>
+								</systemProperty>
+								<systemProperty>
+									<key>log4j.configurationFile</key>
+									<value>./log4j2.xml</value>
+								</systemProperty>
 							</systemProperties>
 
 							<classpathScope>runtime</classpathScope>
