@@ -25,6 +25,7 @@
 package c2w.hla;
 
 import c2w.hla.base.*;
+import c2w.utils.FederateIdGenerator;
 import hla.rti.ArrayIndexOutOfBounds;
 import hla.rti.AsynchronousDeliveryAlreadyEnabled;
 import hla.rti.EnableTimeConstrainedPending;
@@ -77,7 +78,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * <ul>
  * <li>RTI creation/destruction ( {@link #createRTI()}, {@link #destroyRTI()} )</li>
  * <li>A means of acquiring a handle to the RTI ( {@link #getRTI()} )</li>
- * <li>Joining a federation ( {@link #joinFederation(String, String)} )</li>
+ * <li>Joining a federation ( {@link #joinFederation()} )</li>
  * <li>Time-constrained enable ( {@link #enableTimeConstrained()} )</li>
  * <li>Time-regulating enable ( {@link #enableTimeRegulation(double)}, {@link #enableTimeRegulation(double, double)} )</li>
  * <li>Asynchronous delivery enable ( {@link #enableAsynchronousDelivery()} )</li>
@@ -119,18 +120,44 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
 
-    private String federateId;
-    private String federationId;
+    /**
+     * General federate parameters
+     */
+    private final String federateId;
+    private final String federationId;
+
+    private final String federateType;
+    public String getFederateType() { return this.federateType; }
+
+    protected final int federateRTIInitWaitTime;
+
     private double lookahead = 0.0;
-
-    protected int federateRTIInitWaitTime = 200;
-
-    public void setLookahead(double lookahead) {
-        this.lookahead = lookahead;
-    }
     public double getLookahead() {
         return lookahead;
     }
+    public void setLookahead(double lookahead) {
+        this.lookahead = lookahead;
+    }
+
+    private final boolean isLateJoiner;
+    public boolean isLateJoiner() { return this.isLateJoiner; }
+
+    private double stepSize;
+    public double getStepSize() { return this.stepSize; }
+    private void setStepSize(double stepSize) { this.stepSize = stepSize; }
+
+    public SynchronizedFederate(FederateParameter federateParameter) {
+        this.federateRTIInitWaitTime = federateParameter.federateRTIInitWaitTimeMs;
+        this.federateType = federateParameter.federateType;
+        this.federationId = federateParameter.federationId;
+        this.isLateJoiner = federateParameter.isLateJoiner;
+        this.lookahead = federateParameter.lookAhead;
+        this.stepSize = federateParameter.stepSize;
+
+        this.federateId = FederateIdGenerator.generateID(this.federateType);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     protected FederateState federateState = FederateState.INITIALIZING;
     public FederateState getFederateState() {
@@ -156,10 +183,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * Event listeners for FederateStateChange events
      */
     private List<FederateStateChangeListener> federateChangeEventListeners = new ArrayList<>();
-
-    public SynchronizedFederate() {
-
-    }
 
     /**
      * Get a handle to the RTI.
@@ -231,21 +254,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     /**
      * Joins the federate to a particular federation.
-     *
-     * @param federation_id a unique name for the federation to be joined by
-     *                      the federate
-     * @param federate_id   a unique name for this federate within the federation
-     *                      it is joining.  The name must be unique within a particular federation.
      */
-    public void joinFederation(String federation_id, String federate_id) {
-        this.federateId = federate_id;
-        this.federationId = federation_id;
+    public void joinFederation() {
         boolean federationNotPresent = true;
         while (federationNotPresent) {
             try {
-                System.out.print("[" + federate_id + "] federate joining federation [" + federation_id + "] ... ");
+                System.out.print("[" + this.federateId + "] federate joining federation [" + this.federationId + "] ... ");
                 synchronized (_rti) {
-                    _rti.joinFederationExecution(federate_id, federation_id, this, null);
+                    _rti.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
                 System.out.println("done.");
 

@@ -1,10 +1,8 @@
 {
-  "federateName": "DefaultFederateName",
   "federateRTIInitWaitTimeMs": 200,
-  "federationEndTime": 40.0,
-  "federationName": "DefaultFederationName",
-  "lateJoiner": false,
+  "federateType": "DefaultFederateType",
+  "federationId": "DefaultFederationId",
+  "isLateJoiner": false,
   "lookAhead": 0.1,
-  "realTime": true,
   "stepSize": 1.0
 }

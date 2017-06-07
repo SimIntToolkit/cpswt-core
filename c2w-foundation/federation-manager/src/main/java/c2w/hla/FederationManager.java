@@ -225,6 +225,13 @@ public class FederationManager extends SynchronizedFederate {
      * @throws Exception I have no idea why we have this here. Especially pure Exception type...
      */
     public FederationManager(FederationManagerParameter params) throws Exception {
+        super(new FederateParameter(
+                "FederationManager",
+                params.FederationName,
+                false,
+                params.Lookahead,
+                params.Step));
+
         // record parameters
         this.federationName = params.FederationName;
         this.rootPathEnvVarKey = params.RootPathEnvVarKey;
@@ -341,7 +348,7 @@ public class FederationManager extends SynchronizedFederate {
         }
         LOG.info("created.\n");
 
-        joinFederation(federationName, SynchronizedFederate.FEDERATION_MANAGER_NAME);
+        super.joinFederation();
 
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         enableTimeConstrained();
