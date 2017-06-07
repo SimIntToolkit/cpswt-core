@@ -25,7 +25,6 @@
         <module>base-events</module>
         <module>utils</module>
         <module>federate-base</module>
-        <module>simple-federates</module>
         <module>c2w-coa</module>
         <module>c2w-coa-gui</module>
         <module>federation-manager</module>
