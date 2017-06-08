@@ -41,7 +41,6 @@ import hla.rti.SaveInProgress;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -59,6 +58,8 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
@@ -79,8 +80,6 @@ import c2w.util.RandomWithFixedSeed;
 import c2w.util.WeakPropertyChangeSupport;
 import c2w.hla.rtievents.IC2WFederationEventsHandler;
 import c2w.hla.rtievents.C2WFederationEventsHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Model class for the Federation Manager.
@@ -89,7 +88,7 @@ public class FederationManager extends SynchronizedFederate {
 
 
     private Set<String> _synchronizationLabels = new HashSet<String>();
-    private static Logger LOG = LoggerFactory.getLogger(FederationManager.class);
+    private static Logger LOG = LogManager.getLogger(FederationManager.class);
 
     Set<String> _expectedFederates = new HashSet<String>();
     Set<String> _processedFederates = new HashSet<String>();
