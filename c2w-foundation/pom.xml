@@ -28,7 +28,6 @@
         <module>c2w-coa</module>
         <module>c2w-coa-gui</module>
         <module>federation-manager</module>
-        <module>c2w-gui</module>
         <module>fedmanager-exec</module>
         <module>fedmanager-host</module>
     </modules>
