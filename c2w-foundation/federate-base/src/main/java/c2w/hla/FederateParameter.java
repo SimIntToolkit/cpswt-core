@@ -75,7 +75,7 @@ public class FederateParameter {
      */
     public static FederateParameter parseArgs(final String[] args) {
         CommandLineParser parser  = new DefaultParser();
-        Options cliOptions = FederateParameter.getCLIOptions();
+        Options cliOptions = FederateParameter.getDefaultCLIOptions();
 
         FederateParameter currentParameter;
 
@@ -101,7 +101,7 @@ public class FederateParameter {
      * Helper to determine what command line arguments we support.
      * @return The command line argument options.
      */
-    static Options getCLIOptions() {
+    public static Options getDefaultCLIOptions() {
         Options options = new Options();
 
         options.addOption(Option.builder("c")
