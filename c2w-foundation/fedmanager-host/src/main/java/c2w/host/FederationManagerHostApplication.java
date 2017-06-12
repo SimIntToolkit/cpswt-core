@@ -1,8 +1,8 @@
 package c2w.host;
 
-import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
 import c2w.host.core.FederationManagerContainer;
+import c2w.host.health.FederationManagerHealthCheck;
 import c2w.host.resources.FederationManagerControlResource;
 import c2w.host.resources.FederationManagerControlWSResource;
 import io.dropwizard.Application;
@@ -11,13 +11,10 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.websockets.WebsocketBundle;
-import org.eclipse.jetty.websocket.common.scopes.WebSocketContainerScope;
-import org.eclipse.jetty.websocket.jsr356.server.AnnotatedServerEndpointConfig;
-import org.eclipse.jetty.websocket.jsr356.server.BasicServerEndpointConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.server.ServerEndpointConfig;
+// import javax.websocket.server.ServerEndpointConfig;
 
 public class FederationManagerHostApplication extends Application<FederationManagerHostConfiguration> {
 
@@ -62,6 +59,8 @@ public class FederationManagerHostApplication extends Application<FederationMana
             //ServerEndpointConfig config = ServerEndpointConfig.Builder.create(FederationManagerControlWSResource.class, "/fedmgr-ws").build();
             //config.getUserProperties().put("federationManager", federationManager);
             //websocketBundle.addEndpoint(config);
+
+            environment.healthChecks().register("federationManager", new FederationManagerHealthCheck(FederationManagerContainer.getInstance()));
 
         } catch (Exception ex) {
             logger.error("Error initializing FederationManagerHostApplication. Reason: " + ex.getMessage());
