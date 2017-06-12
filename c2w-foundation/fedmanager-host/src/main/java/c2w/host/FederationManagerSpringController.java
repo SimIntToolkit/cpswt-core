@@ -8,6 +8,7 @@ import c2w.host.api.StateChangeResponse;
 import c2w.host.api.StateResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -29,14 +30,13 @@ public class FederationManagerSpringController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public StateChangeResponse setNewState(@RequestBody FederationManagerControlRequest controlRequest) {
+    public ChunkedOutput<StateChangeResponse> setNewState(@RequestBody FederationManagerControlRequest controlRequest) {
         FederateState currentState = this.federationManager.getFederateState();
         ControlAction action = controlRequest.action;
         FederateState targetState = action.getTargetState();
 
-        StateChangeResponse output = new StateChangeResponse();
+        final ChunkedOutput<StateChangeResponse> output = new ChunkedOutput<StateChangeResponse>(StateChangeResponse.class);
 
-        /*
         if (currentState.CanTransitionTo(targetState)) {
             try {
                 switch (action) {
@@ -73,9 +73,42 @@ public class FederationManagerSpringController {
             catch(IOException ioEx) {
                 logger.error("ChunkedOutput problem.", ioEx);
             }
-        }*/
+        }
 
         return output;
     }
 
+    private void startSimulationAsync(final ChunkedOutput<StateChangeResponse> output) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    output.write(new StateChangeResponse(federationManager.getFederateState(), FederateState.STARTING));
+                    output.close();
+                    federationManager.startSimulation();
+                    //output.write(new StateChangeResponse(FederateState.STARTING, federationManager.getFederateState()));
+                }
+                catch(Exception ex) {
+                    logger.error("There was an error while starting the simulation", ex);
+                }
+            }
+        }.start();
+    }
+
+    private void terminateSimulationAsync(final ChunkedOutput<StateChangeResponse> output) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    output.write(new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING));
+                    federationManager.terminateSimulation();
+                    output.write(new StateChangeResponse(FederateState.TERMINATING, federationManager.getFederateState()));
+                    output.close();
+                }
+                catch(Exception ex) {
+                    logger.error("There was an error while terminating the simulation", ex);
+                }
+            }
+        }.start();
+    }
 }
