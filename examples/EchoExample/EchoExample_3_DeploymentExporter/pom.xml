@@ -192,14 +192,14 @@
             <id>EchoClient</id>
             <properties>
                 <federate.name>EchoClient</federate.name>
-                <federate.loglevel>NORMAL</federate.loglevel>
+                <federate.configFile>echoclient.json</federate.configFile>
             </properties>
         </profile>
         <profile>
             <id>EchoServer</id>
             <properties>
                 <federate.name>EchoServer</federate.name>
-                <federate.loglevel>NORMAL</federate.loglevel>
+				<federate.configFile>echoserver.json</federate.configFile>
             </properties>
         </profile>
 
@@ -244,9 +244,11 @@
 							<mainClass>${federation.name}.${federate.name}</mainClass>
 
 							<arguments>
-								<argument>${federation.name}</argument>
-								<argument>${federate.name}</argument>
-								<argument>${federate.loglevel}</argument>
+								<argument>--configFile</argument>
+								<argument>${federate.configFile}</argument>
+								<!--<argument>${federation.name}</argument>-->
+								<!--<argument>${federate.name}</argument>-->
+								<!--<argument>${federate.loglevel}</argument>-->
 							</arguments>
 						</configuration>
 					</plugin>

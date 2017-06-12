@@ -20,48 +20,19 @@ public class EchoClientBase extends SynchronizedFederate {
 
 	private SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
 	
-	// constructor
-	public EchoClientBase( String federation_id, String federate_id ) throws Exception {
-	
-		setLookahead( 0.2 );
-		createRTI();
-		joinFederation( federation_id, federate_id );
-
-		// enableTimeConstrained();
-
-		// enableTimeRegulation( getLookahead() );
-		enableAsynchronousDelivery();
-        // interaction pubsub
-        
-        ClientMessage.publish( getRTI() );
-        
-        ServerReply.subscribe( getRTI() );
-        _subscribedInteractionFilter.setFedFilters( 
-			ServerReply.get_handle(), 
-			SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED, 
-			SubscribedInteractionFilter.SourceFedFilter.SOURCE_FILTER_DISABLED 
-		);		
-		// object pubsub
-                        }
-        
-       // constructor
-	public EchoClientBase(  String[] federationInfo ) throws Exception {
+    // constructor
+	public EchoClientBase(FederateParameter params) throws Exception {
+		super(params);
 
 		setLookahead( 0.2 );
 		createRTI();
-		joinFederation( federationInfo[ 0 ], federationInfo[ 1 ] );
+		joinFederation();
 
-		String loglevel = null;
-		if(federationInfo.length == 3)
-			C2WLogger.init( federationInfo[ 2 ] );
-		else if(federationInfo.length > 3)
-			C2WLogger.init( federationInfo[ 2 ], federationInfo[ 3 ] );		
-		
-		if(federationInfo.length == 5)
-			loglevel = federationInfo[ 4 ];
+		if(!params.isLateJoiner) {
+			enableTimeConstrained();
+			enableTimeRegulation(getLookahead());
+		}
 
-		enableTimeConstrained();
-		enableTimeRegulation( getLookahead() );
 		enableAsynchronousDelivery();
 
         // interaction pubsub
@@ -74,24 +45,6 @@ public class EchoClientBase extends SynchronizedFederate {
 			SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED, 
 			SubscribedInteractionFilter.SourceFedFilter.SOURCE_FILTER_DISABLED 
 		);		// object pubsub
-                		// enable pubsub log
-		if(federationInfo.length  > 2) {
-			
-			ClientMessage.enablePublishLog(
-				"ClientMessage",
-				"EchoClient",
-				"NORMAL",
-				loglevel);
-			
-			ServerReply.enableSubscribeLog(
-				"ServerReply",
-				"EchoClient", 
-				"NORMAL", 
-				loglevel);	
-			
-			
-		}
-		
 	}
 	
 	public ClientMessage create_ClientMessage() {
