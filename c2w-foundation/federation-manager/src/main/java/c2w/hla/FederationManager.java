@@ -23,28 +23,13 @@
 
 package c2w.hla;
 
-import hla.rti.ConcurrentAccessAttempted;
-import hla.rti.EventRetractionHandle;
-import hla.rti.FederateLoggingServiceCalls;
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.FederationExecutionAlreadyExists;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotSubscribed;
-import hla.rti.LogicalTime;
-import hla.rti.RTIinternalError;
-import hla.rti.ReceivedInteraction;
-import hla.rti.ReflectedAttributes;
-import hla.rti.ResignAction;
-import hla.rti.RestoreInProgress;
-import hla.rti.SaveInProgress;
+import c2w.utils.FederateIdUtility;
+import hla.rti.*;
 
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,8 +43,6 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
@@ -79,16 +62,17 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         public void info(String msg) {
             System.out.println(msg);
         }
+        public void error(String msg, Object... params) { System.out.println(msg); }
     }
 
     private Set<String> _synchronizationLabels = new HashSet<String>();
     // private static Logger LOG = LogManager.getLogger(FederationManager.class);
     private LOGGER LOG = new LOGGER();
 
-    Set<String> _expectedFederates = new HashSet<String>();
+    Set<String> expectedFederateTypes = new HashSet<String>();
     Set<String> _processedFederates = new HashSet<String>();
     Map<Integer, String> _discoveredFederates = new HashMap<Integer, String>();
-    Set<FederateObject> _incompleteFederates = new HashSet<FederateObject>();
+    Set<FederateObject> rtiDiscoveredFederateObjects = new HashSet<FederateObject>();
 
     InteractionRoot _injectedInteraction = null;
     double _injectionTime = -1;
@@ -214,7 +198,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
      */
     public FederationManager(FederationManagerParameter params) throws Exception {
         super(new FederateParameter(
-                "FederationManager",
+                SynchronizedFederate.FEDERATION_MANAGER_NAME,
                 params.FederationName,
                 false,
                 params.Lookahead,
@@ -283,7 +267,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             _injectedInteraction = xmlHandler.getInjectedInteraction();
             pause_times.addAll(xmlHandler.getPauseTimes());
             monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
-            _expectedFederates.addAll(xmlHandler.getExpectedFederates());
+            expectedFederateTypes.addAll(xmlHandler.getExpectedFederates());
 
             this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), this.lookahead, this._terminateOnCOAFinish, getRTI());
             this.coaExecutor.setCoaExecutorEventListener(this);
@@ -530,7 +514,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         FederateObject.subscribe_FederateHost();
         FederateObject.subscribe(getRTI());
 
-        for (String federateType : _expectedFederates) {
+        for (String federateType : expectedFederateTypes) {
             LOG.info(
                     "Waiting for \"" + federateType + "\" federate to join ...\n"
             );
@@ -538,7 +522,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         while (_processedFederates.size() != 0) {
             getRTI().tick();
-            for (FederateObject federateObject : _incompleteFederates) {
+            for (FederateObject federateObject : this.rtiDiscoveredFederateObjects) {
                 federateObject.requestUpdate(getRTI());
             }
             Thread.sleep(500);
@@ -547,12 +531,12 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         // PREPARE FOR FEDERATES TO RESIGN NOW -- INITIALIZE _processedFederates AND ELIMINATE
         // FEDERATES NAMES FROM IT AS THEY RESIGN (WHICH COULD BE AT ANY TIME).            
-        _processedFederates.addAll(_expectedFederates);
+        _processedFederates.addAll(expectedFederateTypes);
     }
 
     private void prepareForFederatesToResign() throws Exception {
 
-        for (String federateType : _expectedFederates) {
+        for (String federateType : expectedFederateTypes) {
             LOG.info(
                     "Waiting for \"" + federateType + "\" federate to resign ...\n"
             );
@@ -800,11 +784,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
     }
 
-    public synchronized void addPropertyChangeListener(String propertyName,
-                                                       PropertyChangeListener li) {
-        support.addPropertyChangeListener(propertyName, li);
-    }
-
     private void fireTimeUpdate(LogicalTime t) {
         DoubleTime newTime = new DoubleTime(0);
         newTime.setTo(t);
@@ -815,8 +794,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         DoubleTime prevTime = new DoubleTime(0);
         prevTime.setTime(time.getTime());
         time.setTime(t);
-        support.firePropertyChange(PROP_LOGICAL_TIME, Double.valueOf(prevTime
-                .getTime()), Double.valueOf(time.getTime()));
     }
 
     @Override
@@ -828,14 +805,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     @Override
     public void discoverObjectInstance(int objectHandle, int objectClassHandle, String objectName) {
         ObjectRoot objectRoot = ObjectRoot.discover(objectClassHandle, objectHandle);
-        if (FederateObject.match(objectClassHandle)) _incompleteFederates.add((FederateObject) objectRoot);
+        if (FederateObject.match(objectClassHandle)) {
+            this.rtiDiscoveredFederateObjects.add((FederateObject) objectRoot);
+        }
     }
 
     @Override
     public void removeObjectInstance(int theObject, byte[] tag) {
         try {
             String federateType = _discoveredFederates.get(theObject);
-            boolean registeredFederate = _expectedFederates.contains(federateType);
+            boolean registeredFederate = expectedFederateTypes.contains(federateType);
 
             if (!registeredFederate) {
                 LOG.info("Unregistered \"" + federateType + "\" federate has resigned the federation.\n");
@@ -853,54 +832,66 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     /**
      * reflectAttributeValues handles federates that join the federation
-     * @param theObject       handle (RTI assigned) of the object class instance to which
+     * @param objectHandle       handle (RTI assigned) of the object class instance to which
      *                        the attribute reflections are to be applied
-     * @param theAttributes   data structure containing attribute reflections for
+     * @param reflectedAttributes   data structure containing attribute reflections for
      *                        the object class instance, i.e. new values for the instance's attributes.
      * @param theTag
      */
     @Override
-    public void reflectAttributeValues(int theObject, ReflectedAttributes theAttributes, byte[] theTag) {
+    public void reflectAttributeValues(int objectHandle, ReflectedAttributes reflectedAttributes, byte[] theTag) {
 
+        // check if current objectHandle has been already discovered by the RTI
+        if (!this.rtiDiscoveredFederateObjects.contains(ObjectRoot.getObject(objectHandle)))
+            return;
+
+        // transform attributes
         UpdateAttributes updateAttributes = new UpdateAttributes();
-        for (int ix = 0; ix < theAttributes.size(); ++ix) {
-            byte[] currentValue = null;
-            try {
-                currentValue = theAttributes.getValue(ix);
-            } catch (Exception e) {
-            }
-            byte[] newValue = new byte[currentValue.length - 1];
-            for (int jx = 0; jx < newValue.length; ++jx) newValue[jx] = currentValue[jx];
-            try {
-                updateAttributes.addFilteredAttribute(theAttributes.getAttributeHandle(ix), newValue, null);
-            } catch (Exception e) {
+        try {
+            for (int ix = 0; ix < reflectedAttributes.size(); ++ix) {
+                byte[] currentValue = reflectedAttributes.getValue(ix);
+
+                byte[] newValue = new byte[currentValue.length - 1];
+                for (int jx = 0; jx < newValue.length; ++jx) {
+                    newValue[jx] = currentValue[jx];
+                }
+
+                updateAttributes.addFilteredAttribute(reflectedAttributes.getAttributeHandle(ix), newValue, null);
             }
         }
-        theAttributes = new HLA13ReflectedAttributes(updateAttributes.getFilteredAttributes());
+        catch(ArrayIndexOutOfBounds aioob) {
+            LOG.error("Error while processing reflectedAttributes. {}", aioob);
+        }
 
-        if (!_incompleteFederates.contains(ObjectRoot.getObject(theObject))) return;
+        reflectedAttributes = new HLA13ReflectedAttributes(updateAttributes.getFilteredAttributes());
+
+
         try {
-            FederateObject federateObject = (FederateObject) ObjectRoot.reflect(theObject, theAttributes);
+            FederateObject federateObject = (FederateObject) ObjectRoot.reflect(objectHandle, reflectedAttributes);
 
-            if (
-                    federateObject.get_FederateHandle() == 0 ||
-                            "".equals(federateObject.get_FederateType()) ||
-                            "".equals(federateObject.get_FederateHost())
-                    ) return;
-            _incompleteFederates.remove(federateObject);
+            // if any attribute of the federateObject is empty
+            if (federateObject.get_FederateHandle() == 0 ||
+                "".equals(federateObject.get_FederateId()) ||
+                "".equals(federateObject.get_FederateHost())
+                ) return;
 
-            String federateType = federateObject.get_FederateType();
-            _discoveredFederates.put(theObject, federateType);
+            //
+            this.rtiDiscoveredFederateObjects.remove(federateObject);
 
-            boolean registeredFederate = _expectedFederates.contains(federateType);
+            String federateId = federateObject.get_FederateId();
+            String federateType = FederateIdUtility.getFederateType(federateId);
+
+            _discoveredFederates.put(objectHandle, federateType);
+
+            boolean registeredFederate = this.expectedFederateTypes.contains(federateType);
 
             if (!registeredFederate) {
                 if (federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
                     LOG.info("\"" + SynchronizedFederate.FEDERATION_MANAGER_NAME + "\" federate detected (that's me) ... ignored.\n");
-                    _discoveredFederates.remove(theObject);
+                    _discoveredFederates.remove(objectHandle);
                 } else if (federateType.equals("c2wt_mapper_federate")) {
                     LOG.info("\"C2WT Mapper Federate\" detected (expected) ... ignored.\n");
-                    _discoveredFederates.remove(theObject);
+                    _discoveredFederates.remove(objectHandle);
                 } else {
                     LOG.info("Unexpected \"" + federateType + "\" federate has joined the federation.\n");
                 }

@@ -34,7 +34,7 @@ public class FederateIdUtility {
         if(useUUID) {
             Matcher m = uuidPattern.matcher(federateId);
             if(m.find()) {
-                return m.group(0);
+                return m.group(1);
             }
             else {
                 return federateId;

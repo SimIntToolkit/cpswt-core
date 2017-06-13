@@ -108,7 +108,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private RTIambassador _rti;
 
-    public static final String FEDERATION_MANAGER_NAME = "manager";
+    public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
     public static int logId = 0;
 
