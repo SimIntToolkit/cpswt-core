@@ -824,10 +824,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         _synchronizationLabels.add(label);
     }
 
+
     @Override
-    public void discoverObjectInstance(int theObject, int theObjectClass, String objectName) {
-        ObjectRoot objectRoot = ObjectRoot.discover(theObjectClass, theObject);
-        if (FederateObject.match(theObjectClass)) _incompleteFederates.add((FederateObject) objectRoot);
+    public void discoverObjectInstance(int objectHandle, int objectClassHandle, String objectName) {
+        ObjectRoot objectRoot = ObjectRoot.discover(objectClassHandle, objectHandle);
+        if (FederateObject.match(objectClassHandle)) _incompleteFederates.add((FederateObject) objectRoot);
     }
 
     @Override
@@ -850,6 +851,14 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
     }
 
+    /**
+     * reflectAttributeValues handles federates that join the federation
+     * @param theObject       handle (RTI assigned) of the object class instance to which
+     *                        the attribute reflections are to be applied
+     * @param theAttributes   data structure containing attribute reflections for
+     *                        the object class instance, i.e. new values for the instance's attributes.
+     * @param theTag
+     */
     @Override
     public void reflectAttributeValues(int theObject, ReflectedAttributes theAttributes, byte[] theTag) {
 

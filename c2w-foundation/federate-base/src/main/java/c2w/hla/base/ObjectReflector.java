@@ -32,9 +32,9 @@ import org.portico.impl.hla13.types.DoubleTime;
  * @author Harmon Nine
  */
 public class ObjectReflector {
-    private int _objectHandle;
-    private ReflectedAttributes _reflectedAttributes;
-    private double _time;
+    private int objectHandle;
+    private ReflectedAttributes reflectedAttributes;
+    private double time;
 
     /**
      * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
@@ -42,8 +42,8 @@ public class ObjectReflector {
      * method uses this constructor to create a new "receive-order" ObjectReflector.
      */
     public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
-        _objectHandle = objectHandle;
-        _reflectedAttributes = reflectedAttributes;
+        this.objectHandle = objectHandle;
+        this.reflectedAttributes = reflectedAttributes;
     }
 
     /**
@@ -52,11 +52,11 @@ public class ObjectReflector {
      * method uses this constructor to create a new "timestamp-order" ObjectReflector.
      */
     public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
-        _objectHandle = objectHandle;
-        _reflectedAttributes = reflectedAttributes;
+        this.objectHandle = objectHandle;
+        this.reflectedAttributes = reflectedAttributes;
         DoubleTime doubleTime = new DoubleTime();
         doubleTime.setTo(logicalTime);
-        _time = doubleTime.getTime();
+        this.time = doubleTime.getTime();
     }
 
     /**
@@ -65,8 +65,12 @@ public class ObjectReflector {
      * instance contained by this ObjectReflector object.
      */
     public void reflect() {
-        if (_time < 0) ObjectRoot.reflect(_objectHandle, _reflectedAttributes);
-        else ObjectRoot.reflect(_objectHandle, _reflectedAttributes, _time);
+        if (this.time < 0) {
+            ObjectRoot.reflect(this.objectHandle, this.reflectedAttributes);
+        }
+        else {
+            ObjectRoot.reflect(this.objectHandle, this.reflectedAttributes, this.time);
+        }
     }
 
     /**
@@ -84,11 +88,11 @@ public class ObjectReflector {
      * @return the object class instance contained by the ObjectReflector object.
      */
     public ObjectRoot getObjectRoot() {
-        return ObjectRoot.getObject(_objectHandle);
+        return ObjectRoot.getObject(this.objectHandle);
     }
 
     public double getTime() {
-        return _time;
+        return this.time;
     }
 
     public int getUniqueID() {

@@ -25,7 +25,7 @@
 package c2w.hla;
 
 import c2w.hla.base.*;
-import c2w.utils.FederateIdGenerator;
+import c2w.utils.FederateIdUtility;
 import hla.rti.ArrayIndexOutOfBounds;
 import hla.rti.AsynchronousDeliveryAlreadyEnabled;
 import hla.rti.EnableTimeConstrainedPending;
@@ -154,7 +154,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.lookahead = federateParameter.lookAhead;
         this.stepSize = federateParameter.stepSize;
 
-        this.federateId = FederateIdGenerator.generateID(this.federateType);
+        this.federateId = FederateIdUtility.generateID(this.federateType);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -1081,16 +1081,16 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * place it in a table local to the ObjectRoot class.  This table is indexed
      * by the handles (RTI assigned) of the instances.
      *
-     * @param theObject      handle (RTI assigned) of a new object class instance that
+     * @param objectHandle      handle (RTI assigned) of a new object class instance that
      *                       has been created by another federate in the federation and accounced on
      *                       the RTI.
-     * @param theObjectClass handle (RTI assigned) of the object class to which the
+     * @param objectClassHandle handle (RTI assigned) of the object class to which the
      *                       new instance belongs.
      * @param objectName     name of the new object class instance (currently ignored).
      */
     @Override
-    public void discoverObjectInstance(int theObject, int theObjectClass, String objectName) {
-        ObjectRoot.discover(theObjectClass, theObject);
+    public void discoverObjectInstance(int objectHandle, int objectClassHandle, String objectName) {
+        ObjectRoot.discover(objectClassHandle, objectHandle);
     }
 
     /**
