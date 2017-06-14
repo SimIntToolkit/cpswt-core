@@ -1,0 +1,24 @@
+{
+  "federateRTIInitWaitTimeMs": 200,
+  "federateType": "FederationManager",
+  "federationId": "DefaultFederationId",
+  "isLateJoiner": false,
+  "lookAhead": 0.1,
+  "stepSize": 1.0,
+
+  "hosting": {
+    "bindHost": "0.0.0.0",
+    "port": 8083,
+    "controlEndpoint": "/fedmgr",
+    "federatesEndpoint": "/federates"
+  },
+
+  "autoStart": true,
+  "federationEndTime": 20.0,
+  "realTimeMode": true,
+  "rootPathEnvVarKey": "CPSWT_ROOT",
+  "fedFile": "EchoExample.fed",
+  "federationConfig": "script.xml"
+
+
+}

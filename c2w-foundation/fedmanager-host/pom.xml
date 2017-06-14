@@ -31,22 +31,16 @@
 
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-            <version>1.5.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>1.5.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>4.3.9.RELEASE</version>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play_2.11</artifactId>
+            <version>2.5.15</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-http_2.11</artifactId>
+            <version>10.0.7</version>
+        </dependency>
 
 
 
