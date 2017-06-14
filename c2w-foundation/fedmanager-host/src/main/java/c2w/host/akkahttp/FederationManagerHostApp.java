@@ -1,13 +1,20 @@
 package c2w.host.akkahttp;
 
+import akka.NotUsed;
 import akka.actor.ActorSystem;
+import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
+import akka.http.javadsl.ServerBinding;
+import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
+import akka.stream.javadsl.Flow;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerParameter;
 import c2w.host.FederationManagerConsoleHost;
+import c2w.host.api.StateResponse;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
@@ -15,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletionStage;
 
 /**
  * Federation Manager hosting through Akka-HTTP
@@ -24,15 +32,13 @@ public class FederationManagerHostApp extends AllDirectives {
     static final Logger logger = Logger.getLogger(FederationManagerConsoleHost.class);
     private FederationManager federationManager;
 
-    public static void main(String[] args) {
-
-        ActorSystem actorSystem = ActorSystem.create("routes");
-
-        final Http http = Http.get(actorSystem);
-        final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
-
-        FederationManagerHostApp app = new FederationManagerHostApp();
-
+    String bindingAddress;
+    public String getBindingAddress() {
+        return bindingAddress;
+    }
+    int port;
+    public int getPort() {
+        return port;
     }
 
     FederationManagerParameter getFederationManagerParameter(String[] args) {
@@ -75,10 +81,35 @@ public class FederationManagerHostApp extends AllDirectives {
 
     Route createRoute() {
         return route(
-                //get(
-                //        () ->
-                //)
+                get(() ->
+//                        path("fedmgr", () ->
+//                            completeOK(new StateResponse(federationManager.getFederateState(), Jackson.marshaller()))
+//                        )
+                ),
+
+                post(() ->
+                    path("fedmgr", () -> {
+
+                    })
+                )
         );
     }
 
+
+
+
+    public static void main(String[] args) {
+
+        ActorSystem actorSystem = ActorSystem.create("routes");
+
+        final Http http = Http.get(actorSystem);
+        final ActorMaterializer materializer = ActorMaterializer.create(actorSystem);
+
+        FederationManagerHostApp app = new FederationManagerHostApp();
+
+        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(actorSystem, materializer);
+        final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
+                ConnectHttp.toHost(app.getBindingAddress(), app.getPort()), materializer);
+
+    }
 }
