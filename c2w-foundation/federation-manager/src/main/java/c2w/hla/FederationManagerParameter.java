@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.function.Function;
 
-public class FederationManagerParameter {
+public class FederationManagerParameter extends FederateParameter {
     public String FederationName;
 
     public String FOMFilename;

@@ -1,6 +1,8 @@
 package c2w.templates;
 
+import c2w.hla.DefaultFederateParameterParser;
 import c2w.hla.FederateParameter;
+import c2w.hla.FederateParameterParser;
 import c2w.hla.SynchronizedFederate;
 import org.apache.log4j.Logger;
 
@@ -21,9 +23,10 @@ public class CustomFederate extends SynchronizedFederate {
 
     public static void main(String[] args) throws Exception {
         FederateParameter currentParameter;
+        FederateParameterParser federateParameterParser = new FederateParameterParser(FederateParameter.getDefaultCLIOptions());
 
         try {
-            currentParameter = FederateParameter.parseArgs(args);
+            currentParameter = federateParameterParser.parseArgs(args, FederateParameter.class);
 
             CustomFederate customFederate = new CustomFederate(currentParameter);
             customFederate.start();

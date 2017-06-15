@@ -1,5 +1,6 @@
 package c2w.hla;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
@@ -15,6 +16,8 @@ import java.net.URL;
  * Represents the parameter object for a federate.
  */
 public class FederateParameter {
+
+    @JsonIgnore
     static final Logger logger = LogManager.getLogger(FederateParameter.class);
 
     /**
@@ -120,7 +123,7 @@ public class FederateParameter {
                 .desc("Time to wait for RTI in milliseconds")
                 .hasArg()
                 .required(false)
-                .type(int.class)
+                .type(Integer.class)
                 .build()
         );
 
@@ -150,7 +153,7 @@ public class FederateParameter {
                 .desc("Indicates if the federate is a late joiner")
                 .hasArg()
                 .required(false)
-                .type(boolean.class)
+                .type(Boolean.class)
                 .build()
         );
 
@@ -160,7 +163,7 @@ public class FederateParameter {
                 .desc("The lookahead value")
                 .hasArg()
                 .required(false)
-                .type(double.class)
+                .type(Double.class)
                 .build()
         );
 
@@ -170,7 +173,7 @@ public class FederateParameter {
                 .desc("The step size value")
                 .hasArg()
                 .required(false)
-                .type(double.class)
+                .type(Double.class)
                 .build()
         );
 
