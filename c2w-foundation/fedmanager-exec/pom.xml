@@ -190,7 +190,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>c2w.host.akkahttp.FederationManagerHostApp</mainClass>
+                            <mainClass>c2w.host.FederationManagerHostApp</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>
