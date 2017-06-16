@@ -1,6 +1,5 @@
 package c2w.templates;
 
-import c2w.hla.DefaultFederateParameterParser;
 import c2w.hla.FederateParameter;
 import c2w.hla.FederateParameterParser;
 import c2w.hla.SynchronizedFederate;

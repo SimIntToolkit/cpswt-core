@@ -15,7 +15,7 @@
     <version>0.5.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
-    <name>C2 Windtunnel Java Foundation</name>
+    <name>C2WT Java Foundation</name>
     <description>Foundation packages and classes of C2 Windtunnel Java RTI and Federates</description>
 
     <modules>

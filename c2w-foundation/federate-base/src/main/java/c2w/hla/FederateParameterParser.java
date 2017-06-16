@@ -1,5 +1,6 @@
 package c2w.hla;
 
+import c2w.utils.CpswtDefaults;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -20,7 +21,7 @@ import java.util.Set;
  * Parser for Federate parameters
  */
 public class FederateParameterParser {
-    static final Logger logger = LogManager.getLogger(FederateParameter.class);
+    static final Logger logger = LogManager.getLogger(FederateParameterParser.class);
 
     Options cliOptions;
 
@@ -49,22 +50,37 @@ public class FederateParameterParser {
         }
     }
 
-    static final Set<Class<?>> supportedTypes = new HashSet();
-    static {
-        supportedTypes.add(Double.class);
-        supportedTypes.add(Integer.class);
-        supportedTypes.add(Boolean.class);
-        supportedTypes.add(Long.class);
+    /**
+     * Add more CLI option to the existing ones.
+     * @param option
+     */
+    public void addCLIOption(Option option) {
+        this.cliOptions.addOption(option);
     }
 
-    public <T extends FederateParameter> T parseArgs(final String[] args, final Class<T> clazz) {
+    static final Set<Class<?>> supportedCLIArgTypes = new HashSet();
+    static {
+        supportedCLIArgTypes.add(Double.class);
+        supportedCLIArgTypes.add(Integer.class);
+        supportedCLIArgTypes.add(Boolean.class);
+        supportedCLIArgTypes.add(Long.class);
+    }
+
+    /**
+     * Parse the command line arguments provided to the main function.
+     * @param args Command line arguments provided to 'main'
+     * @param clazz The class that represents the federate parameter.
+     * @param <TParam> The generic type of the federate parameter.
+     * @return An instance of the class that represents the federate parameter.
+     */
+    public <TParam extends FederateParameter> TParam parseArgs(final String[] args, final Class<TParam> clazz) {
 
         CommandLineParser parser  = new DefaultParser();
 
         try {
 
             CommandLine commandLine = parser.parse(this.cliOptions, args);
-            T currentParameter = this.parseCommandLine(commandLine, clazz);
+            TParam currentParameter = this.parseCommandLine(commandLine, clazz);
 
             return currentParameter;
         }
@@ -77,31 +93,41 @@ public class FederateParameterParser {
 
     }
 
-    <T extends FederateParameter> T parseCommandLine(CommandLine commandLine, final Class<T> clazz) {
+    <TParam extends FederateParameter> TParam parseCommandLine(CommandLine commandLine, final Class<TParam> clazz) {
         try {
-
             File configFile = null;
             ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 
+            // get the "configFile" parameter from the command line
             String mConfigFilePath = commandLine.getOptionValue("configFile");
 
-            T federateParameter = null;
+            TParam federateParameter = null;
 
             // fallback to default config from resources
             if (mConfigFilePath == null) {
+                logger.trace("configFile CLI parameter not provided");
+                logger.trace("Trying to load {} as a resource of {} class.", CpswtDefaults.FederateConfigDefaultResource, clazz.getName());
+
                 ClassLoader classLoader = clazz.getClassLoader();
-                URL resource = classLoader.getResource("federateConfig.default.json");
+                URL resource = classLoader.getResource(CpswtDefaults.FederateConfigDefaultResource);
+
+                // fallback to environment variable definition
                 if (resource == null) {
-                    String configFileFromEnv = System.getenv("CPSWTNG_FEDERATE_CONFIG");
+                    logger.trace("No resource found for class {}", clazz.getName());
+                    logger.trace("Trying to load configFile set in {} environment variable.", CpswtDefaults.FederateConfigEnvironmentVariable);
+                    String configFileFromEnv = System.getenv(CpswtDefaults.FederateConfigEnvironmentVariable);
                     if (configFileFromEnv != null) {
+                        logger.trace("{} environment variable set, loading config file {}", CpswtDefaults.FederateConfigEnvironmentVariable, configFileFromEnv);
                         configFile = new File(configFileFromEnv);
                     }
                 } else {
+                    logger.trace("Resource found. Loading {}.", resource.getPath());
                     configFile = new File(resource.getFile());
                 }
             }
             // load passed config file
             else {
+                logger.trace("Trying to load config file {}.", mConfigFilePath);
                 configFile = new File(mConfigFilePath);
             }
 
@@ -111,6 +137,7 @@ public class FederateParameterParser {
 
             // if default config file was not found
             if (federateParameter == null) {
+                logger.trace("No configFile could be loaded. Instantiating empty {} parameter class.", clazz.getName());
                 federateParameter = clazz.newInstance();
             }
 
@@ -128,7 +155,7 @@ public class FederateParameterParser {
                     if(optType == String.class) {
                         optField.set(federateParameter, optType.cast(optVal));
                     }
-                    else if(supportedTypes.contains(optType)) {
+                    else if(supportedCLIArgTypes.contains(optType)) {
                         Object castedValue = optType.cast(optType.getDeclaredMethod("valueOf", String.class).invoke(null, optVal));
                         optField.set(federateParameter, castedValue);
                     }
@@ -142,6 +169,7 @@ public class FederateParameterParser {
 
             return federateParameter;
 
+            // TODO: logger.error -->
         } catch (InstantiationException instEx) {
             instEx.printStackTrace();
         } catch (JsonParseException jsonParseEx) {
