@@ -209,7 +209,8 @@
                             </systemProperties>
 
                             <arguments>
-                                <argument>fedmgrconfig.yml</argument>
+                                <argument>-configFile</argument>
+                                <argument>fedmgrconfig.json</argument>
                             </arguments>
 
                         </configuration>

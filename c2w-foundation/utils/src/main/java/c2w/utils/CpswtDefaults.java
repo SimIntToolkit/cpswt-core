@@ -8,4 +8,5 @@ public class CpswtDefaults {
     public static final String FederateConfigEnvironmentVariable = "CPSWTNG_FEDERATE_CONFIG";
 
     public static final String RootPathEnvVarKey = "CPSWTNG_ROOT";
+    public static final String ConfigFileOptionName = "configFile";
 }

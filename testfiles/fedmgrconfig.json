@@ -1,7 +1,7 @@
 {
   "federateRTIInitWaitTimeMs": 200,
   "federateType": "FederationManager",
-  "federationId": "DefaultFederationId",
+  "federationId": "EchoExample",
   "isLateJoiner": false,
   "lookAhead": 0.1,
   "stepSize": 1.0,
@@ -16,6 +16,6 @@
   "realTimeMode": true,
   "terminateOnCOAFinish": false,
   "fedFile": "EchoExample.fed",
-  "federationConfig": "script.xml"
+  "experimentConfig": "script.xml"
 
 }

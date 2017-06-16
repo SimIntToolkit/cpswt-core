@@ -1,4 +1,4 @@
-package c2w.host.akkahttp;
+package c2w.host;
 
 import akka.NotUsed;
 import akka.actor.ActorSystem;
@@ -17,14 +17,11 @@ import c2w.hla.FederateState;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerConfig;
 import c2w.host.api.ControlAction;
+import c2w.host.api.FederationManagerControlRequest;
 import c2w.host.api.StateChangeResponse;
 import c2w.host.api.StateResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
@@ -44,11 +41,18 @@ public class FederationManagerHostApp extends AllDirectives {
     public int getPort() {
         return port;
     }
+    FederationManagerConfig federationManagerConfig;
 
-    void initFederationManager(String[] args) {
-        FederationManagerConfig parameter = this.getFederationManagerParameter(args);
+    void parseConfig(String[] args) {
+        this.federationManagerConfig = this.getFederationManagerParameter(args);
+        this.bindingAddress = this.federationManagerConfig.bindHost;
+        this.port = this.federationManagerConfig.port;
+
+    }
+
+    void initFederationManager() {
         try {
-            this.federationManager = new FederationManager(parameter);
+            this.federationManager = new FederationManager(this.federationManagerConfig);
         }
         catch(Exception e) {
             System.err.println("Error while initializing FederationManager!" + e.getMessage());
@@ -81,8 +85,10 @@ public class FederationManagerHostApp extends AllDirectives {
                 ),
                 post(() ->
                     path("fedmgr", () ->
-                        parameter("action", actionStr -> {
-                            ControlAction action = ControlAction.valueOf(actionStr);
+                                    entity(Jackson.unmarshaller(FederationManagerControlRequest.class), controlRequest -> {
+                        //parameter("action", actionStr -> {
+
+                            ControlAction action = controlRequest.action; // ControlAction.valueOf(actionStr);
                             FederateState currentState = federationManager.getFederateState();
                             FederateState targetState = action.getTargetState();
 
@@ -164,11 +170,13 @@ public class FederationManagerHostApp extends AllDirectives {
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
         FederationManagerHostApp app = new FederationManagerHostApp();
-        app.initFederationManager(args);
+        app.parseConfig(args);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost(app.getBindingAddress(), app.getPort()), materializer);
+
+        app.initFederationManager();
 
         System.out.println("Server online at " + app.getBindingAddress() + ":" + app.getPort() + "...");
         System.in.read();
