@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,15 +21,15 @@ import java.util.Set;
 /**
  * Parser for Federate parameters
  */
-public class FederateParameterParser {
-    static final Logger logger = LogManager.getLogger(FederateParameterParser.class);
+public class FederateConfigParser {
+    static final Logger logger = LogManager.getLogger(FederateConfigParser.class);
 
     Options cliOptions;
 
     /**
      * Default constructor
      */
-    public FederateParameterParser() {
+    public FederateConfigParser() {
         this.cliOptions = new Options();
     }
 
@@ -36,7 +37,7 @@ public class FederateParameterParser {
      * Instantiate a parser with pre-defined CLI options.
      * @param cliOptions
      */
-    public FederateParameterParser(Options cliOptions) {
+    public FederateConfigParser(Options cliOptions) {
         this.cliOptions = cliOptions;
     }
 
@@ -73,13 +74,13 @@ public class FederateParameterParser {
      * @param <TParam> The generic type of the federate parameter.
      * @return An instance of the class that represents the federate parameter.
      */
-    public <TParam extends FederateParameter> TParam parseArgs(final String[] args, final Class<TParam> clazz) {
+    public <TParam extends FederateConfig> TParam parseArgs(final String[] args, final Class<TParam> clazz) {
 
         CommandLineParser parser  = new DefaultParser();
 
         try {
-
-            CommandLine commandLine = parser.parse(this.cliOptions, args);
+            Options opts = this.getCLIOptions(clazz);
+            CommandLine commandLine = parser.parse(opts, args);
             TParam currentParameter = this.parseCommandLine(commandLine, clazz);
 
             return currentParameter;
@@ -93,7 +94,7 @@ public class FederateParameterParser {
 
     }
 
-    <TParam extends FederateParameter> TParam parseCommandLine(CommandLine commandLine, final Class<TParam> clazz) {
+    <TParam extends FederateConfig> TParam parseCommandLine(CommandLine commandLine, final Class<TParam> clazz) {
         try {
             File configFile = null;
             ObjectMapper mapper = new ObjectMapper(new JsonFactory());
@@ -190,5 +191,37 @@ public class FederateParameterParser {
         }
 
         return null;
+    }
+
+    /**
+     * Helper to determine what command line arguments we support for federate parameters.
+     * @return The command line argument options.
+     */
+    public Options getCLIOptions(Class<? extends FederateConfig> configClass) {
+        Options options = new Options();
+
+        Field[] fields = configClass.getFields();
+
+        for(Field field : fields) {
+            if(field.getAnnotation(FederateParameter.class) != null) {
+                String fieldName = field.getName();
+                Class<?> fieldType = field.getType();
+
+                if(fieldType.isPrimitive()) {
+                    fieldType = ClassUtils.primitiveToWrapper(fieldType);
+                }
+
+                options.addOption(Option.builder()
+                        .longOpt(fieldName)
+                        .argName(fieldName)
+                        .hasArg()
+                        .required(false)
+                        .type(fieldType)
+                        .build()
+                );
+            }
+        }
+
+        return options;
     }
 }

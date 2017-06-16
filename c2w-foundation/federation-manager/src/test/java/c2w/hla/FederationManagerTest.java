@@ -2,7 +2,6 @@ package c2w.hla;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
@@ -14,8 +13,8 @@ public class FederationManagerTest {
     static FederationManager federationManager;
     static String rootPathEnvVarKey = "CPSWTNG_ROOT";
 
-    private static FederationManagerParameter defaultFederationManagerParameter() {
-        FederationManagerParameter p = new FederationManagerParameter();
+    private static FederationManagerConfig defaultFederationManagerParameter() {
+        FederationManagerConfig p = new FederationManagerConfig();
 
         p.AutoStart = true;
         p.FederateRTIInitWaitTime = 20;

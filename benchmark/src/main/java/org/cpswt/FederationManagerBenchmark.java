@@ -1,7 +1,7 @@
 package org.cpswt;
 
 import c2w.hla.FederationManager;
-import c2w.hla.FederationManagerParameter;
+import c2w.hla.FederationManagerConfig;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -31,7 +31,7 @@ public class FederationManagerBenchmark {
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
     public void testFederationManagerCtor() {
 
-        FederationManagerParameter fmp = getDefaultParam();
+        FederationManagerConfig fmp = getDefaultParam();
 
         try {
             FederationManager federationManager = new FederationManager(fmp);
@@ -41,8 +41,8 @@ public class FederationManagerBenchmark {
         }
     }
     
-    FederationManagerParameter getDefaultParam() {
-        FederationManagerParameter fmp = new FederationManagerParameter();
+    FederationManagerConfig getDefaultParam() {
+        FederationManagerConfig fmp = new FederationManagerConfig();
         fmp.Step = 1.0;
         fmp.Lookahead = 0.1;
         fmp.RootPathEnvVarKey = "CPSWT_ROOT";

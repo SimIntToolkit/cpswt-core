@@ -8,7 +8,6 @@ import hla.rti.LogicalTime;
 import hla.rti.ReceivedInteraction;
 
 import c2w.hla.C2WInteractionRoot;
-import c2w.hla.C2WLogger;
 import c2w.hla.InteractionRoot;
 import c2w.hla.SubscribedInteractionFilter;
 import c2w.hla.SynchronizedFederate;
@@ -21,7 +20,7 @@ public class EchoServerBase extends SynchronizedFederate {
 	private SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
 	
 	// constructor
-	public EchoServerBase(FederateParameter params) throws Exception {
+	public EchoServerBase(FederateConfig params) throws Exception {
 		super(params);
 
 		setLookahead( 0.2 );

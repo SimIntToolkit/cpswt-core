@@ -1,6 +1,6 @@
 package EchoExample;
 
-import c2w.hla.FederateParameter;
+import c2w.hla.FederateConfig;
 import c2w.hla.InteractionRoot;
 import c2w.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +13,7 @@ public class EchoServer extends EchoServerBase {
 
     static final Logger logger = LogManager.getLogger(EchoServer.class);
 
-    public EchoServer(FederateParameter params) throws Exception {
+    public EchoServer(FederateConfig params) throws Exception {
         super(params);
     }
 
@@ -76,7 +76,7 @@ public class EchoServer extends EchoServerBase {
 
     public static void main( String[] args ) {
         try {
-            FederateParameter params = FederateParameter.parseArgs(args);
+            FederateConfig params = FederateConfig.parseArgs(args);
             EchoServer echoServer = new EchoServer(params);
             echoServer.execute();
         } catch ( Exception e ) {

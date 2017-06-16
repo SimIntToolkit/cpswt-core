@@ -146,13 +146,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public double getStepSize() { return this.stepSize; }
     private void setStepSize(double stepSize) { this.stepSize = stepSize; }
 
-    public SynchronizedFederate(FederateParameter federateParameter) {
-        this.federateRTIInitWaitTime = federateParameter.federateRTIInitWaitTimeMs;
-        this.federateType = federateParameter.federateType;
-        this.federationId = federateParameter.federationId;
-        this.isLateJoiner = federateParameter.isLateJoiner;
-        this.lookahead = federateParameter.lookAhead;
-        this.stepSize = federateParameter.stepSize;
+    public SynchronizedFederate(FederateConfig federateConfig) {
+        this.federateRTIInitWaitTime = federateConfig.federateRTIInitWaitTimeMs;
+        this.federateType = federateConfig.federateType;
+        this.federationId = federateConfig.federationId;
+        this.isLateJoiner = federateConfig.isLateJoiner;
+        this.lookahead = federateConfig.lookAhead;
+        this.stepSize = federateConfig.stepSize;
 
         this.federateId = FederateIdUtility.generateID(this.federateType);
     }

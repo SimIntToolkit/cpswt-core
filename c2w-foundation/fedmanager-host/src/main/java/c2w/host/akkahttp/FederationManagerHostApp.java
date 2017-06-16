@@ -12,14 +12,13 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import c2w.hla.FederateConfigParser;
 import c2w.hla.FederateState;
 import c2w.hla.FederationManager;
-import c2w.hla.FederationManagerParameter;
-import c2w.host.FederationManagerConsoleHost;
+import c2w.hla.FederationManagerConfig;
 import c2w.host.api.ControlAction;
 import c2w.host.api.StateChangeResponse;
 import c2w.host.api.StateResponse;
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.cli.*;
@@ -34,7 +33,7 @@ import java.util.concurrent.CompletionStage;
  */
 public class FederationManagerHostApp extends AllDirectives {
 
-    static final Logger logger = Logger.getLogger(FederationManagerConsoleHost.class);
+    static final Logger logger = Logger.getLogger(FederationManagerHostApp.class);
     private FederationManager federationManager;
 
     String bindingAddress;
@@ -47,7 +46,7 @@ public class FederationManagerHostApp extends AllDirectives {
     }
 
     void initFederationManager(String[] args) {
-        FederationManagerParameter parameter = this.getFederationManagerParameter(args);
+        FederationManagerConfig parameter = this.getFederationManagerParameter(args);
         try {
             this.federationManager = new FederationManager(parameter);
         }
@@ -57,35 +56,13 @@ public class FederationManagerHostApp extends AllDirectives {
         }
     }
 
-    FederationManagerParameter getFederationManagerParameter(String[] args) {
-        CommandLineParser parser  = new DefaultParser();
-        Options cliOptions = FederationManagerParameter.GetCLIOptions();
-        FederationManagerParameter currentParameter = null;
-
+    FederationManagerConfig getFederationManagerParameter(String[] args) {
         try {
-            CommandLine commandLine = parser.parse(cliOptions, args);
-            String mConfigFilePath;
+            FederationManagerConfig federationManagerConfig;
+            FederateConfigParser federateConfigParser = new FederateConfigParser();
 
-            if(args.length == 1) {
-                mConfigFilePath = args[0];
-            }
-            else {
-                mConfigFilePath = commandLine.getOptionValue("configFile");
-            }
-
-            File configFile = new File(mConfigFilePath);
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-            FederationManagerParameter federationManagerParameter = mapper.readValue(configFile, FederationManagerParameter.class);
-
-            return federationManagerParameter;
-        }
-        catch (ParseException parseExp) {
-            logger.error("Parsing CLI arguments failed. Reason: " + parseExp.getMessage(), parseExp);
-            System.exit(-1);
-        }
-        catch(IOException ioExp) {
-            logger.error("Parsing input configuration file failed. Reason: " + ioExp.getMessage(), ioExp);
-            System.exit(-1);
+            federationManagerConfig = federateConfigParser.parseArgs(args, FederationManagerConfig.class);
+            return federationManagerConfig;
         }
         catch (Exception fedMgrExp) {
             logger.error("There was an error starting the federation manager. Reason: " + fedMgrExp.getMessage(), fedMgrExp);

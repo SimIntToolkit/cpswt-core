@@ -1,15 +1,15 @@
 package c2w.host;
 
-import c2w.hla.FederationManagerParameter;
+import c2w.hla.FederationManagerConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 
 public class FederationManagerHostConfiguration extends Configuration {
     @JsonProperty
-    FederationManagerParameter federationManagerParameter;
+    FederationManagerConfig federationManagerParameter;
 
     @JsonProperty
-    public FederationManagerParameter getFederationManagerParameter() {
+    public FederationManagerConfig getFederationManagerParameter() {
         return this.federationManagerParameter;
     }
 }

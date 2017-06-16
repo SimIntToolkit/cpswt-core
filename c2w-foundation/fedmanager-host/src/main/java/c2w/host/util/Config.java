@@ -1,6 +1,6 @@
 package c2w.host.util;
 
-import c2w.hla.FederationManagerParameter;
+import c2w.hla.FederationManagerConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Config {
 
     @JsonProperty
-    public FederationManagerParameter federationManagerParameter;
+    public FederationManagerConfig federationManagerParameter;
 
     @JsonProperty
     public Server server;

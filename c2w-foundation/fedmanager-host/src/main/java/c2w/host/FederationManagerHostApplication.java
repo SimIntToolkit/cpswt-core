@@ -1,6 +1,6 @@
 package c2w.host;
 
-import c2w.hla.FederationManagerParameter;
+import c2w.hla.FederationManagerConfig;
 import c2w.host.core.FederationManagerContainer;
 import c2w.host.health.FederationManagerHealthCheck;
 import c2w.host.resources.FederationManagerControlResource;
@@ -51,7 +51,7 @@ public class FederationManagerHostApplication extends Application<FederationMana
             // register resource (endpoint)
             environment.jersey().register(resource);
 
-            FederationManagerParameter fedMgrParams = configuration.getFederationManagerParameter();
+            FederationManagerConfig fedMgrParams = configuration.getFederationManagerParameter();
             FederationManagerContainer.init(fedMgrParams);
 
             resource.initFederationManager();

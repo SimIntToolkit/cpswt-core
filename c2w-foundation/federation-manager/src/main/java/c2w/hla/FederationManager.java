@@ -23,6 +23,7 @@
 
 package c2w.hla;
 
+import c2w.utils.CpswtDefaults;
 import c2w.utils.FederateIdUtility;
 import hla.rti.*;
 
@@ -193,46 +194,49 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * Creates a @FederationManager instance.
      *
-     * @param params The passed parameters to initialize the federation manager. See {@link FederationManagerParameter}.
+     * @param params The passed parameters to initialize the federation manager. See {@link FederationManagerConfig}.
      * @throws Exception I have no idea why we have this here. Especially pure Exception type...
      */
-    public FederationManager(FederationManagerParameter params) throws Exception {
-        super(new FederateParameter(
+    public FederationManager(FederationManagerConfig params) throws Exception {
+        super(new FederateConfig(
                 SynchronizedFederate.FEDERATION_MANAGER_NAME,
-                params.FederationName,
+                params.federationId,
                 false,
-                params.Lookahead,
-                params.Step));
+                params.lookAhead,
+                params.stepSize));
 
         // record parameters
-        this.federationName = params.FederationName;
-        this.rootPathEnvVarKey = params.RootPathEnvVarKey;
+        this.federationName = params.federationId;
 
-        this._rootDir = System.getenv(params.RootPathEnvVarKey);
+        this._rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
         if (this._rootDir == null) {
             this._rootDir = System.getProperty("user.dir");
         }
 
-        this.fomFilename = Paths.get(this._rootDir, params.FOMFilename).toString();
-        this.step = params.Step;
-        this.lookahead = params.Lookahead;
+        this.fomFilename = Paths.get(this._rootDir, params.fedFile).toString();
+        this.step = params.stepSize;
+        this.lookahead = params.lookAhead;
 
-        this._terminateOnCOAFinish = params.TerminateOnCOAFinish;
-        this._federationEndTime = params.FederationEndTime;
-        this._autoStart = params.AutoStart;
+        this._terminateOnCOAFinish = params.terminateOnCOAFinish;
+        this._federationEndTime = params.federationEndTime;
+        this._autoStart = params.autoStart;
 
-        this._logLevel = params.LogLevel;
+        // TODO: eliminate loglevels @see #18
+        this._logLevel = "NORMAL";
 
         // See if fixed see must be used
-        if (params.Seed4Dur > 0) {
-            RandomWithFixedSeed.init(params.Seed4Dur);
+        // TODO: WHAT IS THIS SHIT
+        int seed4Dur = 0;
+        if (seed4Dur > 0) {
+            RandomWithFixedSeed.init(seed4Dur);
             this._rand4Dur = RandomWithFixedSeed.instance();
         } else {
             this._rand4Dur = new Random();
         }
 
 
-        Path logDirPath = Paths.get(this._rootDir, params.LogDir);
+        // TODO: #18 , #13, #7
+        Path logDirPath = Paths.get(this._rootDir, "log" ); // params.LogDir);
         File logDir = logDirPath.toFile();
         if (Files.notExists(logDirPath)) {
             logDir.mkdir();
@@ -241,15 +245,15 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // monitor_out = new PrintStream(new File(logDir, "monitor_" + this.federationName + ".vec"));
 
         // Update simulation mode
-        realtime = params.RealTimeMode;
+        realtime = params.realTimeMode;
 
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
         initRTI();
 
         // read script file
-        if (params.ScriptFilename != null) {
-            File f = Paths.get(this._rootDir, params.ScriptFilename).toFile();
+        if (params.experimentConfig != null) {
+            File f = Paths.get(this._rootDir, params.experimentConfig).toFile();
 
             ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationName, this.getFederateId(), this._rand4Dur, this._logLevel, this.getRTI());
 
@@ -277,7 +281,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             script_interactions = xmlHandler.getScriptInteractions();
 
             // Remember stop script file's full path
-            _stopScriptFilepath = Paths.get(this._rootDir, params.StopScriptPath).toString();
+            // TODO: stop script remove, @see #25
+            _stopScriptFilepath = Paths.get(this._rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
         }
 
         // Before beginning simulation, initialize COA sequence graph

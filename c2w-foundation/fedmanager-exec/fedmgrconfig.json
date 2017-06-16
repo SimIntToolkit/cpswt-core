@@ -6,19 +6,16 @@
   "lookAhead": 0.1,
   "stepSize": 1.0,
 
-  "hosting": {
-    "bindHost": "0.0.0.0",
-    "port": 8083,
-    "controlEndpoint": "/fedmgr",
-    "federatesEndpoint": "/federates"
-  },
+  "bindHost": "0.0.0.0",
+  "port": 8083,
+  "controlEndpoint": "/fedmgr",
+  "federatesEndpoint": "/federates",
 
   "autoStart": true,
   "federationEndTime": 20.0,
   "realTimeMode": true,
-  "rootPathEnvVarKey": "CPSWT_ROOT",
+  "terminateOnCOAFinish": false,
   "fedFile": "EchoExample.fed",
   "federationConfig": "script.xml"
-
 
 }
