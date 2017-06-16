@@ -396,10 +396,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_READY_TO_RUN, federationName);
 
-        // AS ALL FEDERATES ARE READY TO RUN, WAIT 3 SECS FOR BRITNEY TO INITIALIZE
-        Thread.sleep(3000);
-
-
         // SEND OUT "INITIALIZATION INTERACTIONS," WHICH ARE SUPPOSED TO BE "RECEIVE" ORDERED.
         for (InteractionRoot interactionRoot : initialization_interactions) {
             System.out.println("Sending \"" + interactionRoot.getSimpleClassName() + "\" interaction.");
