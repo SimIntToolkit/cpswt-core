@@ -25,6 +25,8 @@ package c2w.hla;
 
 import c2w.utils.CpswtDefaults;
 import c2w.utils.FederateIdUtility;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hla.rti.*;
 
 import java.io.File;
@@ -61,18 +63,8 @@ import c2w.hla.rtievents.C2WFederationEventsHandler;
  */
 public class FederationManager extends SynchronizedFederate implements COAExecutorEventListener {
 
-    /*
-    class LOGGER {
-        public void info(String msg) {
-            System.out.println(msg);
-        }
-        public void error(String msg, Object... params) { System.out.println(msg); }
-    }
-    */
-
     private Set<String> _synchronizationLabels = new HashSet<String>();
     private static Logger LOG = LogManager.getLogger(FederationManager.class);
-    //private LOGGER LOG = new LOGGER();
 
     Set<String> expectedFederateTypes = new HashSet<String>();
     Set<String> _processedFederates = new HashSet<String>();
@@ -99,7 +91,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * The name of the Federation
      */
-    String federationName;
+    String federationId;
 
     /**
      * The name of the FOM file
@@ -112,15 +104,21 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     String rootPathEnvVarKey;
 
     /**
-     * Simulation step.
+     * Indicates if real time mode is on.
      */
-    double step;
+    boolean realTimeMode = true;
 
     /**
-     * The lookahead
+     * Indicates if federation manager terminates when COA finishes.
      */
-    double lookahead;
-    boolean _terminateOnCOAFinish;
+    boolean terminateOnCOAFinish;
+
+    /**
+     * Project root directory
+     */
+    String rootDir;
+
+
     boolean _autoStart;
     double _federationEndTime = 0.0;
     Random _rand4Dur = null;
@@ -129,7 +127,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     String _logLevel;
 
     boolean _killingFederation = false;
-    String _rootDir;
+
 
     Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
     List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
@@ -156,8 +154,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     long time_diff;
 
-    // Default to run simulation in realtime
-    boolean realtime = true;
+
 
     // Default to No logging
     private int logLevel = 0;
@@ -209,21 +206,22 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 params.lookAhead,
                 params.stepSize));
 
-        // record parameters
-        this.federationName = params.federationId;
+        // record config parameters
+        this.federationId = params.federationId;
+        // this.federateRTIInitWaitTime = params.federateRTIInitWaitTimeMs;
+        this._autoStart = params.autoStart;
+        this._federationEndTime = params.federationEndTime;
+        this.realTimeMode = params.realTimeMode;
+        this.terminateOnCOAFinish = params.terminateOnCOAFinish;
 
-        this._rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
-        if (this._rootDir == null) {
-            this._rootDir = System.getProperty("user.dir");
+        // set project's root directory
+        this.rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
+        if (this.rootDir == null) {
+            this.rootDir = System.getProperty("user.dir");
         }
 
-        this.fomFilename = Paths.get(this._rootDir, params.fedFile).toString();
-        this.step = params.stepSize;
-        this.lookahead = params.lookAhead;
-
-        this._terminateOnCOAFinish = params.terminateOnCOAFinish;
-        this._federationEndTime = params.federationEndTime;
-        this._autoStart = params.autoStart;
+        // TODO: if(!fedFile.isAbsolutePath) ....
+        this.fomFilename = Paths.get(this.rootDir, params.fedFile).toString();
 
         // TODO: eliminate loglevels @see #18
         this._logLevel = "NORMAL";
@@ -238,28 +236,35 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this._rand4Dur = new Random();
         }
 
-
-        // TODO: #18 , #13, #7
-        Path logDirPath = Paths.get(this._rootDir, "log" ); // params.LogDir);
+        // TODO: logging #18 , #13, #7
+        Path logDirPath = Paths.get(this.rootDir, "log" ); // params.LogDir);
         File logDir = logDirPath.toFile();
         if (Files.notExists(logDirPath)) {
             logDir.mkdir();
         }
 
-        // monitor_out = new PrintStream(new File(logDir, "monitor_" + this.federationName + ".vec"));
-
-        // Update simulation mode
-        realtime = params.realTimeMode;
-
+        // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
         initRTI();
 
+        // TODO: rootDir // isAbsolutePath ...
+        File experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+        ExperimentConfig experimentConfig = mapper.readValue(experimentConfigFile, ExperimentConfig.class);
+
+        for(ExperimentConfig.ExpectedFederateInfo expectedFederateInfo : experimentConfig.expectedFederates) {
+            this.expectedFederateTypes.add(expectedFederateInfo.federateType);
+            this._processedFederates.add(expectedFederateInfo.federateType);
+        }
+
+
+        /*
         // read script file
         if (params.experimentConfig != null) {
-            File f = Paths.get(this._rootDir, params.experimentConfig).toFile();
+            File f = Paths.get(this.rootDir, params.experimentConfig).toFile();
 
-            ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationName, this.getFederateId(), this._rand4Dur, this._logLevel, this.getRTI());
+            ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationId, this.getFederateId(), this._rand4Dur, this._logLevel, this.getRTI());
 
             SAXParserFactory.newInstance().newSAXParser().parse(f, xmlHandler);
             if (xmlHandler.getParseFailed())
@@ -277,7 +282,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
             expectedFederateTypes.addAll(xmlHandler.getExpectedFederates());
 
-            this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), this.lookahead, this._terminateOnCOAFinish, getRTI());
+            this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getRTI());
             this.coaExecutor.setCoaExecutorEventListener(this);
             coaExecutor.setCOAGraph(xmlHandler.getCoaGraph());
 
@@ -286,11 +291,12 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
             // Remember stop script file's full path
             // TODO: stop script remove, @see #25
-            _stopScriptFilepath = Paths.get(this._rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
+            _stopScriptFilepath = Paths.get(this.rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
         }
+        */
 
         // Before beginning simulation, initialize COA sequence graph
-        coaExecutor.initializeCOAGraph();
+        // coaExecutor.initializeCOAGraph();
         this.setFederateState(FederateState.INITIALIZED);
 
     }
@@ -322,11 +328,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         fomFilePath.normalize();
         File fom_file = fomFilePath.toAbsolutePath().toFile();
 
-        LOG.info("Attempting to create federation \"" + federationName + "\" ... ");
+        LOG.info("Attempting to create federation \"" + federationId + "\" ... ");
         try {
-            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationName);
-            getRTI().createFederationExecution(federationName, fom_file.toURI().toURL());
-            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationName);
+            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationId);
+            getRTI().createFederationExecution(federationId, fom_file.toURI().toURL());
+            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationId);
 
         } catch (FederationExecutionAlreadyExists feae) {
             LOG.info("already ");
@@ -338,7 +344,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         enableTimeConstrained();
 
-        enableTimeRegulation(time.getTime(), lookahead);
+        enableTimeRegulation(time.getTime(), super.getLookAhead());
 
         enableAsynchronousDelivery();
 
@@ -398,7 +404,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         readyToRun();
         LOG.info("done.\n");
 
-        _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_READY_TO_RUN, federationName);
+        _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_READY_TO_RUN, federationId);
 
         // SEND OUT "INITIALIZATION INTERACTIONS," WHICH ARE SUPPOSED TO BE "RECEIVE" ORDERED.
         for (InteractionRoot interactionRoot : initialization_interactions) {
@@ -414,6 +420,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         fireTimeUpdate(getRTI().queryFederateTime());
         resetTimeOffset();
 
+        double step = super.getStepSize();
+
         // run rti on a spearate thread
         Thread t = new Thread() {
             public void run() {
@@ -423,9 +431,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                     int numStepsExecuted = 0;
                     while (running) {
-                        if (realtime) {
+                        if (realTimeMode) {
                             long sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
-                            while (sleep_time > 0 && realtime) {
+                            while (sleep_time > 0 && realTimeMode) {
                                 long local_sleep_time = sleep_time;
                                 if (local_sleep_time > 1000) local_sleep_time = 1000;
                                 Thread.sleep(local_sleep_time);
@@ -443,7 +451,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                                 DoubleTime next_time = new DoubleTime(time.getTime() + step);
                                 System.out.println("Current_time = " + time.getTime() + " and step = " + step + " and requested_time = " + next_time.getTime());
                                 getRTI().timeAdvanceRequest(next_time);
-                                if (realtime) {
+                                if (realTimeMode) {
                                     time_diff = time_in_millisec - System.currentTimeMillis();
                                 }
 
@@ -481,12 +489,12 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                         // If we have reached federation end time (if it was configured), terminate the federation
                         if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
-                            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationName);
+                            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
                             terminateSimulation();
                         }
 
                     }
-                    _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationName);
+                    _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
                     prepareForFederatesToResign();
 
                     LOG.info("Waiting for \"ReadyToResign\" ... ");
@@ -497,7 +505,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                     // destroy federation
                     getRTI().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-                    getRTI().destroyFederationExecution(federationName);
+                    getRTI().destroyFederationExecution(federationId);
                     destroyRTI();
                     logLevel = 0;
 
@@ -557,7 +565,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     private void sendScriptInteractions() {
-        double tmin = time.getTime() + lookahead + (lookahead / 10000.0);
+        double tmin = time.getTime() + super.getLookAhead() + (super.getLookAhead()/ 10000.0);
 
         for (double intrtime : script_interactions.keySet()) {
 //            System.out.println("Interaction time = " + intrtime);
@@ -576,7 +584,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 System.out.println(
                         "error: simulation passed scheduled interaction time: " + intrtime + "," + interactionClassList
                 );
-            } else if (intrtime >= tmin && intrtime < tmin + this.step) {
+            } else if (intrtime >= tmin && intrtime < tmin + super.getStepSize()) {
 
                 List<InteractionRoot> interactionsSent = new ArrayList<InteractionRoot>();
                 for (InteractionRoot interactionRoot : interactionRootList) {
@@ -660,7 +668,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 SimEnd e = new SimEnd();
                 e.set_originFed(getFederateId());
                 e.set_sourceFed(getFederateId());
-                double tmin = time.getTime() + lookahead;
+                double tmin = time.getTime() + super.getLookAhead();
                 e.sendInteraction(getRTI(), tmin);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -699,10 +707,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // Kill the entire federation
         String killCommand = "bash -x " + _stopScriptFilepath;
         try {
-            System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + _rootDir);
-            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
-            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
-            Runtime.getRuntime().exec(killCommand, null, new File(_rootDir));
+            System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + rootDir);
+            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
+            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
+            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
         } catch (IOException e) {
             System.out.println("Exception while killing the federation");
             e.printStackTrace();
@@ -710,11 +718,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         System.exit(0);
     }
 
-    public void setRealtime(boolean b) {
-        System.out.println("Setting simulation to run in realtime as: " + b);
-        realtime = b;
-        if (realtime)
-            resetTimeOffset();
+    public void setRealTimeMode(boolean newRealTimeMode) {
+        LOG.debug("Setting simulation to run in realTimeMode as: {}", newRealTimeMode);
+        this.realTimeMode = newRealTimeMode;
+        if (this.realTimeMode)
+            this.resetTimeOffset();
     }
 
     /**

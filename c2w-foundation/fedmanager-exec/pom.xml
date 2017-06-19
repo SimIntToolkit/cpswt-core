@@ -61,7 +61,7 @@
                             <arguments>
                                 <argument>--step</argument>
                                 <argument>1.0</argument>
-                                <argument>--lookahead</argument>
+                                <argument>--lookAhead</argument>
                                 <argument>0.1</argument>
                                 <argument>--lockfile</argument>
                                 <argument>${env.C2WTROOT}/__lock__</argument>

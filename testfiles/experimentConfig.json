@@ -1,0 +1,24 @@
+{
+  "federateTypesAllowed": [
+    "EchoServer",
+    "EchoClient"
+  ],
+
+  "expectedFederates": [
+    {
+      "federateType": "EchoServer",
+      "count": 1
+    }
+    , {
+      "federateType": "EchoClient",
+      "count": 1
+    }
+  ],
+
+  "lateJoinerFederates": [
+    {
+      "federateType": "EchoClient",
+      "maxCount": 10
+    }
+  ]
+}

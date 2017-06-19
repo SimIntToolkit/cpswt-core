@@ -61,7 +61,7 @@ public class EchoServer extends EchoServerBase {
 
             // send replies
             for(ServerReply reply : replies) {
-                reply.sendInteraction(getRTI(), currentTime + this.getLookahead());
+                reply.sendInteraction(getRTI(), currentTime + this.getLookAhead());
             }
             replies.clear();
 

@@ -67,7 +67,7 @@ public class EchoClient extends EchoClientBase {
             }
 
             // Send interactions to RTI
-            this.sendClientMessage(currentTime + this.getLookahead());
+            this.sendClientMessage(currentTime + this.getLookAhead());
 
             // Request RTI to advance time
             atr.requestSyncEnd();

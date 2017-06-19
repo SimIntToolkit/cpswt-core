@@ -23,13 +23,13 @@ public class EchoServerBase extends SynchronizedFederate {
 	public EchoServerBase(FederateConfig params) throws Exception {
 		super(params);
 
-		setLookahead( 0.2 );
+		setLookAhead( 0.2 );
 		createRTI();
 		joinFederation();
 
 		if(params.isLateJoiner) {
 			enableTimeConstrained();
-			enableTimeRegulation(getLookahead());
+			enableTimeRegulation(getLookAhead());
 		}
 		enableAsynchronousDelivery();
 

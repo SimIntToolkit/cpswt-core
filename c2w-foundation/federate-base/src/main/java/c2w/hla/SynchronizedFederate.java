@@ -131,12 +131,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     protected final int federateRTIInitWaitTime;
 
-    private double lookahead = 0.0;
-    public double getLookahead() {
-        return lookahead;
+    private double lookAhead = 0.0;
+    public double getLookAhead() {
+        return lookAhead;
     }
-    public void setLookahead(double lookahead) {
-        this.lookahead = lookahead;
+    public void setLookAhead(double lookAhead) {
+        this.lookAhead = lookAhead;
     }
 
     private final boolean isLateJoiner;
@@ -151,7 +151,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.federateType = federateConfig.federateType;
         this.federationId = federateConfig.federationId;
         this.isLateJoiner = federateConfig.isLateJoiner;
-        this.lookahead = federateConfig.lookAhead;
+        this.lookAhead = federateConfig.lookAhead;
         this.stepSize = federateConfig.stepSize;
 
         this.federateId = FederateIdUtility.generateID(this.federateType);
@@ -722,7 +722,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         dtLogicalTime.setTo(logicalTime);
         double dblLogicalTime = dtLogicalTime.getTime();
 
-        double timestampWithLogicalTime = dblLogicalTime + getLookahead();
+        double timestampWithLogicalTime = dblLogicalTime + getLookAhead();
 
         if (dblLBTSTime > timestampWithLogicalTime)
             return dblLBTSTime;
@@ -756,7 +756,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     /**
      * Start the {@link AdvanceTimeThread}
-     * Assumes the federate is a lookahead value greater than zero. Uses
+     * Assumes the federate is a lookAhead value greater than zero. Uses
      * {@link hla.rti.RTIambassador#timeAdvanceRequest(LogicalTime)} for advancing
      * federates time.
      */
@@ -773,8 +773,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @param #timeAdvanceMode If
      *                         {@link TimeAdvanceMode#TimeAdvanceRequestAvailable} or
      *                         {@link TimeAdvanceMode#NextEventRequestAvailable} is used, the
-     *                         federate's lookahead value is allowed to be zero. For other two cases,
-     *                         federate's lookahead must be greater than zero.
+     *                         federate's lookAhead value is allowed to be zero. For other two cases,
+     *                         federate's lookAhead must be greater than zero.
      */
     protected void startAdvanceTimeThread(TimeAdvanceMode timeAdvanceMode) {
         if (_advanceTimeThreadNotStarted) {
