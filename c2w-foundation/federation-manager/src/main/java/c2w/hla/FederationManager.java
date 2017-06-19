@@ -44,6 +44,8 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
@@ -59,16 +61,18 @@ import c2w.hla.rtievents.C2WFederationEventsHandler;
  */
 public class FederationManager extends SynchronizedFederate implements COAExecutorEventListener {
 
+    /*
     class LOGGER {
         public void info(String msg) {
             System.out.println(msg);
         }
         public void error(String msg, Object... params) { System.out.println(msg); }
     }
+    */
 
     private Set<String> _synchronizationLabels = new HashSet<String>();
-    // private static Logger LOG = LogManager.getLogger(FederationManager.class);
-    private LOGGER LOG = new LOGGER();
+    private static Logger LOG = LogManager.getLogger(FederationManager.class);
+    //private LOGGER LOG = new LOGGER();
 
     Set<String> expectedFederateTypes = new HashSet<String>();
     Set<String> _processedFederates = new HashSet<String>();

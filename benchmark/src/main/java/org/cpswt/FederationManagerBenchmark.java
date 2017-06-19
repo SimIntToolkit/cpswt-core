@@ -1,5 +1,6 @@
 package org.cpswt;
 
+import c2w.hla.FederateConfigParser;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerConfig;
 import org.openjdk.jmh.annotations.Mode;
@@ -42,22 +43,8 @@ public class FederationManagerBenchmark {
     }
     
     FederationManagerConfig getDefaultParam() {
-        FederationManagerConfig fmp = new FederationManagerConfig();
-        fmp.Step = 1.0;
-        fmp.Lookahead = 0.1;
-        fmp.RootPathEnvVarKey = "CPSWT_ROOT";
-        fmp.RealTimeMode = true;
-        fmp.FederationEndTime = 100.0;
-        fmp.Seed4Dur = 0;
-        fmp.AutoStart = true;
-        fmp.FOMFilename = "fedtest.fed";
-        fmp.ScriptFilename = "script.xml";
-        fmp.LogDir = "log";
-        fmp.LogLevel = "NORMAL";
-        fmp.FederationName = "HelloWorld_Java_Tutorial";
-        fmp.StopScriptPath = "Main/stop.sh";
-        fmp.FederateRTIInitWaitTime = 1000;
-
+        FederateConfigParser parser = new FederateConfigParser();
+        FederationManagerConfig fmp = parser.parseArgs(new String[] { "-configFile", "fedmgrconfig.json" }, FederationManagerConfig.class);
         return fmp;
     }
 
