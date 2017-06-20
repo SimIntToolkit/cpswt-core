@@ -31,6 +31,7 @@ import hla.rti.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,11 +95,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
      * The name of the Federation
      */
     String federationId;
-
-    /**
-     * The name of the FOM file
-     */
-    String fomFilename;
 
     /**
      * The environment variable key to the root path (previously "C2WTROOT")
@@ -222,8 +218,15 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this.rootDir = System.getProperty("user.dir");
         }
 
-        // TODO: if(!fedFile.isAbsolutePath) ....
-        this.fomFilename = Paths.get(this.rootDir, params.fedFile).toString();
+        // build fed file URL
+        Path fedFilePath = Paths.get(params.fedFile);
+        URL fedFileURL;
+        if(fedFilePath.isAbsolute()) {
+            fedFileURL = fedFilePath.toUri().toURL();
+        }
+        else {
+            fedFileURL = Paths.get(this.rootDir, params.fedFile).toUri().toURL();
+        }
 
         // TODO: eliminate loglevels @see #18
         this._logLevel = "NORMAL";
@@ -257,9 +260,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this._processedFederates.add(expectedFederateInfo.federateType);
         }
 
-        initRTI();
+        initRTI(fedFileURL);
 
         /*
+
         // read script file
         if (params.experimentConfig != null) {
             File f = Paths.get(this.rootDir, params.experimentConfig).toFile();
@@ -293,6 +297,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // TODO: stop script remove, @see #25
             _stopScriptFilepath = Paths.get(this.rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
         }
+
         */
 
         // Before beginning simulation, initialize COA sequence graph
@@ -318,20 +323,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
     }
 
-    private void initRTI() throws Exception {
+    private void initRTI(URL fedFileURL) throws Exception {
 
         LOG.info("Waiting for RTI ... ");
         createRTI(SynchronizedFederate.FEDERATION_MANAGER_NAME);
         LOG.info(" done.\n");
 
-        Path fomFilePath = FileSystems.getDefault().getPath(fomFilename);
-        fomFilePath.normalize();
-        File fom_file = fomFilePath.toAbsolutePath().toFile();
-
         LOG.info("Attempting to create federation \"" + federationId + "\" ... ");
         try {
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationId);
-            getRTI().createFederationExecution(federationId, fom_file.toURI().toURL());
+            getRTI().createFederationExecution(federationId, fedFileURL);
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationId);
 
         } catch (FederationExecutionAlreadyExists feae) {
