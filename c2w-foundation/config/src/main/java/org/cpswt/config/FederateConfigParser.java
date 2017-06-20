@@ -1,8 +1,6 @@
 package org.cpswt.config;
 
 import c2w.utils.CpswtDefaults;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.LogManager;
@@ -118,7 +116,6 @@ public class FederateConfigParser {
 
     <TParam extends FederateConfig> TParam parseCommandLine(CommandLine commandLine, final Class<TParam> clazz) {
         File configFile = null;
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
 
         // get the "configFile" parameter from the command line
         String mConfigFilePath = commandLine.getOptionValue(CpswtDefaults.ConfigFileOptionName);
@@ -157,7 +154,7 @@ public class FederateConfigParser {
         if (configFile != null && configFile.exists()) {
 
             try {
-                federateParameter = mapper.readValue(configFile, clazz);
+                federateParameter = ConfigParser.parseConfig(configFile, clazz);
             } catch (IOException ioExp) {
                 logger.error("Parsing input configuration file failed.");
                 logger.error(ioExp);

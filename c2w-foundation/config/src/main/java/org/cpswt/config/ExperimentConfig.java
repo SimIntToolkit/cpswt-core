@@ -9,4 +9,6 @@ public class ExperimentConfig {
     public List<String> federateTypesAllowed;
     public List<ExpectedFederateInfo> expectedFederates;
     public List<LateJoinerFederateInfo> lateJoinerFederates;
+
+
 }

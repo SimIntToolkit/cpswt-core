@@ -46,6 +46,7 @@ import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.config.ConfigParser;
 import org.cpswt.config.ExpectedFederateInfo;
 import org.cpswt.config.ExperimentConfig;
 import org.cpswt.config.FederateConfig;
@@ -249,8 +250,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         // TODO: rootDir // isAbsolutePath ...
         File experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
-        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-        ExperimentConfig experimentConfig = mapper.readValue(experimentConfigFile, ExperimentConfig.class);
+        ExperimentConfig experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
 
         for(ExpectedFederateInfo expectedFederateInfo : experimentConfig.expectedFederates) {
             this.expectedFederateTypes.add(expectedFederateInfo.federateType);
