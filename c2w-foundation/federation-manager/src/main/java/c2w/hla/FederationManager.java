@@ -44,10 +44,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.xml.parsers.SAXParserFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.config.ExpectedFederateInfo;
+import org.cpswt.config.ExperimentConfig;
+import org.cpswt.config.FederateConfig;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
@@ -246,18 +247,17 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
-        initRTI();
-
         // TODO: rootDir // isAbsolutePath ...
         File experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
         ObjectMapper mapper = new ObjectMapper(new JsonFactory());
         ExperimentConfig experimentConfig = mapper.readValue(experimentConfigFile, ExperimentConfig.class);
 
-        for(ExperimentConfig.ExpectedFederateInfo expectedFederateInfo : experimentConfig.expectedFederates) {
+        for(ExpectedFederateInfo expectedFederateInfo : experimentConfig.expectedFederates) {
             this.expectedFederateTypes.add(expectedFederateInfo.federateType);
             this._processedFederates.add(expectedFederateInfo.federateType);
         }
 
+        initRTI();
 
         /*
         // read script file

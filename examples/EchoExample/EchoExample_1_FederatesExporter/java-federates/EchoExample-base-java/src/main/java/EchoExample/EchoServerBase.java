@@ -13,7 +13,7 @@ import c2w.hla.SubscribedInteractionFilter;
 import c2w.hla.SynchronizedFederate;
 
 
-import c2w.hla.*;
+import org.cpswt.config.FederateConfig;
 
 public class EchoServerBase extends SynchronizedFederate {
 

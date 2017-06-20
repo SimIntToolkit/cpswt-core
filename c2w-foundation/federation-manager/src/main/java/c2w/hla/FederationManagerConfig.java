@@ -1,5 +1,8 @@
 package c2w.hla;
 
+import org.cpswt.config.FederateConfig;
+import org.cpswt.config.FederateParameter;
+
 public class FederationManagerConfig extends FederateConfig {
     /**
      * The host to bind the RESTful API.

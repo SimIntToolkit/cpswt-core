@@ -1,4 +1,4 @@
-package c2w.hla;
+package org.cpswt.config;
 
 import java.lang.annotation.*;
 

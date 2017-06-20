@@ -1,7 +1,7 @@
 package c2w.templates;
 
-import c2w.hla.FederateConfig;
-import c2w.hla.FederateConfigParser;
+import org.cpswt.config.FederateConfig;
+import org.cpswt.config.FederateConfigParser;
 import c2w.hla.SynchronizedFederate;
 import org.apache.log4j.Logger;
 

@@ -1,6 +1,6 @@
 package org.cpswt;
 
-import c2w.hla.FederateConfigParser;
+import org.cpswt.config.FederateConfigParser;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerConfig;
 import org.openjdk.jmh.annotations.Mode;

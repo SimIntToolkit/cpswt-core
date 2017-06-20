@@ -1,4 +1,4 @@
-package c2w.hla;
+package org.cpswt.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.cli.*;
@@ -6,8 +6,6 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.lang.reflect.Field;
 
 /**
  * Represents the parameter object for a federate.

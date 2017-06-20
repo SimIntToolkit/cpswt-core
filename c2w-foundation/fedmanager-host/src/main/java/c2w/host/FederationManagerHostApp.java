@@ -12,7 +12,7 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
-import c2w.hla.FederateConfigParser;
+import org.cpswt.config.FederateConfigParser;
 import c2w.hla.FederateState;
 import c2w.hla.FederationManager;
 import c2w.hla.FederationManagerConfig;

@@ -1,4 +1,4 @@
-package c2w.hla;
+package org.cpswt.config;
 
 import c2w.utils.CpswtDefaults;
 import com.fasterxml.jackson.core.JsonFactory;

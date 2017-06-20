@@ -1,7 +1,7 @@
 package EchoExample;
 
-import c2w.hla.FederateConfig;
-import c2w.hla.FederateConfigParser;
+import org.cpswt.config.FederateConfig;
+import org.cpswt.config.FederateConfigParser;
 import c2w.hla.InteractionRoot;
 import c2w.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;

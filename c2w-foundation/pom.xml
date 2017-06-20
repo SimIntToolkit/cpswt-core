@@ -22,6 +22,7 @@
         <module>hla-wrapper</module>
         <module>c2w-logging</module>
         <module>root</module>
+        <module>config</module>
         <module>base-events</module>
         <module>utils</module>
         <module>federate-base</module>
