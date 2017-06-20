@@ -251,10 +251,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
-        // TODO: rootDir // isAbsolutePath ...
-        File experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
-        ExperimentConfig experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
+        Path experimentConfigFilePath = Paths.get(params.experimentConfig);
+        File experimentConfigFile;
+        if(experimentConfigFilePath.isAbsolute()) {
+            experimentConfigFile = experimentConfigFilePath.toFile();
+        }
+        else {
+            experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
+        }
 
+        ExperimentConfig experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
         for(ExpectedFederateInfo expectedFederateInfo : experimentConfig.expectedFederates) {
             this.expectedFederateTypes.add(expectedFederateInfo.federateType);
             this._processedFederates.add(expectedFederateInfo.federateType);
