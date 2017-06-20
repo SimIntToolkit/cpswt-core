@@ -97,11 +97,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     String federationId;
 
     /**
-     * The environment variable key to the root path (previously "C2WTROOT")
-     */
-    String rootPathEnvVarKey;
-
-    /**
      * Indicates if real time mode is on.
      */
     boolean realTimeMode = true;
@@ -331,31 +326,31 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private void initRTI(URL fedFileURL) throws Exception {
 
-        LOG.info("Waiting for RTI ... ");
+        LOG.trace("Creating RTI ... ");
         createRTI(SynchronizedFederate.FEDERATION_MANAGER_NAME);
-        LOG.info(" done.\n");
+        LOG.debug("RTI created successfully.");
 
-        LOG.info("Attempting to create federation \"" + federationId + "\" ... ");
+        LOG.trace("Attempting to create federation \"{}\"...", federationId);
         try {
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationId);
             getRTI().createFederationExecution(federationId, fedFileURL);
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationId);
 
         } catch (FederationExecutionAlreadyExists feae) {
-            LOG.info("already ");
+            LOG.error("Federation with the name of \"{}\" already exists.", federationId);
         }
-        LOG.info("created.\n");
+        LOG.debug("Federation \"{}\" created successfully.", this.federationId);
 
         super.joinFederation();
 
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
-        enableTimeConstrained();
+        super.enableTimeConstrained();
 
-        enableTimeRegulation(time.getTime(), super.getLookAhead());
+        super.enableTimeRegulation(time.getTime(), super.getLookAhead());
 
-        enableAsynchronousDelivery();
+        super.enableAsynchronousDelivery();
 
-        LOG.info("Registering synchronization points ... ");
+        LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
         // REGISTER "ReadyToPopulate" SYNCHRONIZATION POINT
         getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
         getRTI().tick();
@@ -363,24 +358,27 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             Thread.sleep(500);
             getRTI().tick();
         }
+        LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToPopulate);
 
-        // REGISTER "ReadyToRun" SYNCHRONIZATION POINT
+        LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToRun);
         getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
         getRTI().tick();
         while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToRun)) {
             Thread.sleep(500);
             getRTI().tick();
         }
+        LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToRun);
 
-        // REGISTER "ReadyToResign" SYNCHRONIZATION POINT
+        LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToResign);
         getRTI().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
         getRTI().tick();
         while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToResign)) {
             Thread.sleep(500);
             getRTI().tick();
         }
-        LOG.info("done.\n");
+        LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToResign);
 
+        // TODO: overview this later
         SimEnd.publish(getRTI());
         SimPause.publish(getRTI());
         SimResume.publish(getRTI());

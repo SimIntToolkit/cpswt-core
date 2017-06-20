@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.config.FederateConfig;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
@@ -106,6 +108,8 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * @author Harmon Nine
  */
 public class SynchronizedFederate extends NullFederateAmbassador {
+
+    private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
 
     private RTIambassador _rti;
 
@@ -228,20 +232,20 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public void createRTI(String federate_id) throws RTIinternalError {
 
-        if (!federate_id.equals("")) System.out.print("[" + federate_id + "] federate ");
-        System.out.print("acquiring connection to RTI ... ");
-        if (SynchronizedFederate.FEDERATION_MANAGER_NAME.compareTo(federate_id) != 0) {
-            // Himanshu: This is a regular federate, wait 20 seconds for federation manager to initialize first
-            System.out.println("Regular federate waiting "+this.federateRTIInitWaitTime+" ms for Federation Manager to initialize");
+        LOG.debug("[{}] Acquiring connection to RTI ...", this.federateId);
+        if(!this.federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
+            LOG.debug("[{}] Regular federate waiting {}ms for Federation Manager to initialize", this.federateType, this.federateRTIInitWaitTime);
+
             try {
                 Thread.sleep(this.federateRTIInitWaitTime);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();
         _rti = factory.createRtiAmbassador();
-        System.out.println("done.");
+        LOG.debug("[{}] CreateRTI successful.", this.federateId);
     }
 
     /**
@@ -260,22 +264,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean federationNotPresent = true;
         while (federationNotPresent) {
             try {
-                System.out.print("[" + this.federateId + "] federate joining federation [" + this.federationId + "] ... ");
+                LOG.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
                 synchronized (_rti) {
                     _rti.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
-                System.out.println("done.");
-
                 federationNotPresent = false;
+                LOG.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
             } catch (FederateAlreadyExecutionMember f) {
-                System.err.println(f.getMessage());
+                LOG.error("Federate already execution member: {}", f);
                 return;
             } catch (Exception e) {
-                System.err.println(e.getMessage());
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e2) {
-                }
+                LOG.error("General error while trying to join federation. {}", e);
             }
         }
     }
