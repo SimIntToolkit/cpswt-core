@@ -21,6 +21,7 @@ public class FederateObject extends ObjectRoot {
     private static int _FederateHandle_handle;
     private static int _FederateType_handle;
     private static int _FederateHost_handle;
+    private static int _FederateIsLateJoiner_handle;
 
 
     /**
@@ -53,6 +54,7 @@ public class FederateObject extends ObjectRoot {
         return _FederateHost_handle;
     }
 
+    public static int get_FederateIsLateJoiner_handle() { return _FederateIsLateJoiner_handle; }
 
     private static boolean _isInitialized = false;
 
@@ -138,16 +140,19 @@ public class FederateObject extends ObjectRoot {
         _datamemberNames.add("FederateHandle");
         _datamemberNames.add("FederateType");
         _datamemberNames.add("FederateHost");
+        _datamemberNames.add("FederateIsLateJoiner");
 
 
         _allDatamemberNames.add("FederateHandle");
         _allDatamemberNames.add("FederateType");
         _allDatamemberNames.add("FederateHost");
+        _allDatamemberNames.add("FederateIsLateJoiner");
 
 
         _datamemberTypeMap.put("FederateHandle", "int");
         _datamemberTypeMap.put("FederateType", "String");
         _datamemberTypeMap.put("FederateHost", "String");
+        _datamemberTypeMap.put("FederateIsLateJoiner", "boolean");
 
 
         _classNamePublishAttributeNameMap.put("ObjectRoot.Manager.Federate", _publishAttributeNameSet);
@@ -204,6 +209,7 @@ public class FederateObject extends ObjectRoot {
                 _FederateHandle_handle = rti.getAttributeHandle("FederateHandle", get_handle());
                 _FederateType_handle = rti.getAttributeHandle("FederateType", get_handle());
                 _FederateHost_handle = rti.getAttributeHandle("FederateHost", get_handle());
+                _FederateIsLateJoiner_handle = rti.getAttributeHandle("FederateIsLateJoiner", get_handle());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
                 System.err.println(initErrorMessage + "Federate Not Execution Member");
@@ -230,11 +236,13 @@ public class FederateObject extends ObjectRoot {
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateHandle", get_FederateHandle_handle());
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateType", get_FederateType_handle());
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateHost", get_FederateHost_handle());
+        _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateIsLateJoiner", get_FederateIsLateJoiner_handle());
 
 
         _datamemberHandleNameMap.put(get_FederateHandle_handle(), "FederateHandle");
         _datamemberHandleNameMap.put(get_FederateType_handle(), "FederateType");
         _datamemberHandleNameMap.put(get_FederateHost_handle(), "FederateHost");
+        _datamemberHandleNameMap.put(get_FederateIsLateJoiner_handle(), "FederateIsLateJoiner");
 
     }
 
@@ -544,6 +552,7 @@ public class FederateObject extends ObjectRoot {
                 + "FederateHandle:" + get_FederateHandle()
                 + "," + "FederateType:" + get_FederateId()
                 + "," + "FederateHost:" + get_FederateHost()
+                + "," + "FederateIsLateJoiner:" + get_FederateIsLateJoiner()
                 + ")";
     }
 
@@ -694,6 +703,10 @@ public class FederateObject extends ObjectRoot {
         _subscribeAttributeNameSet.remove("FederateHost");
     }
 
+    public static void publish_FederateIsLateJoiner() { _publishAttributeNameSet.add("FederateIsLateJoiner"); }
+    public static void unpublish_FederateIsLateJoiner() { _publishAttributeNameSet.remove("FederateIsLateJoiner"); }
+    public static void subscribe_FederateIsLateJoiner() { _subscribeAttributeNameSet.add("FederateIsLateJoiner"); }
+    public static void unsubscribe_FederateIsLateJoiner() { _subscribeAttributeNameSet.remove("FederateIsLateJoiner"); }
 
     private Attribute<Integer> _FederateHandle =
             new Attribute<Integer>(new Integer(0));
@@ -728,7 +741,7 @@ public class FederateObject extends ObjectRoot {
 
 
     private Attribute<String> _FederateId =
-            new Attribute<String>(new String(""));
+            new Attribute<String>("");
 
     /**
      * Set the value of the "FederateType" attribute to "value" for this object.
@@ -760,7 +773,7 @@ public class FederateObject extends ObjectRoot {
 
 
     private Attribute<String> _FederateHost =
-            new Attribute<String>(new String(""));
+            new Attribute<String>("");
 
     /**
      * Set the value of the "FederateHost" attribute to "value" for this object.
@@ -790,6 +803,15 @@ public class FederateObject extends ObjectRoot {
         return _FederateHost.getTime();
     }
 
+    private Attribute<Boolean> _FederateIsLateJoiner = new Attribute<>(false);
+
+    public void set_FederateIsLateJoiner(boolean value) {
+        _FederateIsLateJoiner.setValue(value);
+        _FederateIsLateJoiner.setTime(getTime());
+    }
+    public boolean get_FederateIsLateJoiner() {
+        return _FederateIsLateJoiner.getValue();
+    }
 
     protected FederateObject(ReflectedAttributes datamemberMap, boolean initFlag) {
         super(datamemberMap, false);
@@ -844,6 +866,7 @@ public class FederateObject extends ObjectRoot {
         set_FederateHandle(FederateObject_var.get_FederateHandle());
         set_FederateId(FederateObject_var.get_FederateId());
         set_FederateHost(FederateObject_var.get_FederateHost());
+        set_FederateIsLateJoiner(FederateObject_var.get_FederateIsLateJoiner());
     }
 
 
@@ -859,9 +882,10 @@ public class FederateObject extends ObjectRoot {
     public Object getAttribute(String datamemberName) {
 
 
-        if ("FederateHandle".equals(datamemberName)) return new Integer(get_FederateHandle());
+        if ("FederateHandle".equals(datamemberName)) return get_FederateHandle();
         else if ("FederateType".equals(datamemberName)) return get_FederateId();
         else if ("FederateHost".equals(datamemberName)) return get_FederateHost();
+        else if("FederateIsLateJoiner".equals(datamemberName)) return get_FederateIsLateJoiner();
         else return super.getAttribute(datamemberName);
     }
 
@@ -877,9 +901,10 @@ public class FederateObject extends ObjectRoot {
     public Object getAttribute(int datamemberHandle) {
 
 
-        if (get_FederateHandle_handle() == datamemberHandle) return new Integer(get_FederateHandle());
+        if (get_FederateHandle_handle() == datamemberHandle) return get_FederateHandle();
         else if (get_FederateType_handle() == datamemberHandle) return get_FederateId();
         else if (get_FederateHost_handle() == datamemberHandle) return get_FederateHost();
+        else if (get_FederateIsLateJoiner_handle() == datamemberHandle) return get_FederateIsLateJoiner();
         else return super.getAttribute(datamemberHandle);
     }
 
@@ -890,6 +915,7 @@ public class FederateObject extends ObjectRoot {
         if (param_handle == get_FederateHandle_handle()) set_FederateHandle(Integer.parseInt(val));
         else if (param_handle == get_FederateType_handle()) set_FederateId(val);
         else if (param_handle == get_FederateHost_handle()) set_FederateHost(val);
+        else if (param_handle == get_FederateIsLateJoiner_handle()) set_FederateIsLateJoiner(Boolean.parseBoolean(val));
         else retval = super.setAttributeAux(param_handle, val);
 
         return retval;
@@ -902,6 +928,7 @@ public class FederateObject extends ObjectRoot {
         if ("FederateHandle".equals(datamemberName)) set_FederateHandle(Integer.parseInt(val));
         else if ("FederateType".equals(datamemberName)) set_FederateId(val);
         else if ("FederateHost".equals(datamemberName)) set_FederateHost(val);
+        else if ("FederateIsLateJoiner".equals(datamemberName)) set_FederateIsLateJoiner(Boolean.parseBoolean(val));
         else retval = super.setAttributeAux(datamemberName, val);
 
         return retval;
@@ -914,6 +941,7 @@ public class FederateObject extends ObjectRoot {
         if ("FederateHandle".equals(datamemberName)) set_FederateHandle((Integer) val);
         else if ("FederateType".equals(datamemberName)) set_FederateId((String) val);
         else if ("FederateHost".equals(datamemberName)) set_FederateHost((String) val);
+        else if("FederateIsLateJoiner".equals(datamemberName)) set_FederateIsLateJoiner((Boolean) val);
         else retval = super.setAttributeAux(datamemberName, val);
 
         return retval;
@@ -956,7 +984,16 @@ public class FederateObject extends ObjectRoot {
             datamembers.add(get_FederateHost_handle(), get_FederateHost().getBytes());
             _FederateHost.setHasBeenUpdated();
         }
-
+        try {
+            isPublished = _publishedAttributeHandleSet.isMember(get_FederateIsLateJoiner_handle());
+        } catch (Exception e) {
+            System.err.println("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateIsLateJoiner is published.");
+            isPublished = false;
+        }
+        if (isPublished && _FederateIsLateJoiner.shouldBeUpdated(force)) {
+            datamembers.add(get_FederateIsLateJoiner_handle(), Boolean.toString(get_FederateIsLateJoiner()).getBytes());
+            _FederateIsLateJoiner.setHasBeenUpdated();
+        }
         return datamembers;
     }
 
@@ -970,6 +1007,7 @@ public class FederateObject extends ObjectRoot {
             _FederateHandle = data._FederateHandle;
             _FederateId = data._FederateId;
             _FederateHost = data._FederateHost;
+            _FederateIsLateJoiner = data._FederateIsLateJoiner;
 
         }
     }
