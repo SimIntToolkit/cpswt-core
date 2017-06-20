@@ -110,6 +110,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
 public class SynchronizedFederate extends NullFederateAmbassador {
 
     private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
+    public static final int internalThreadWaitTimeMs = 50;
 
     private RTIambassador _rti;
 
@@ -325,7 +326,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 throw f;
             } catch (Exception e) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e2) {
                 }
             }
@@ -339,7 +340,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
         while (_timeConstrainedNotEnabled) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             } catch (Exception e) {
             }
             try {
@@ -392,7 +393,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 throw i;
             } catch (Exception e) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e2) {
                 }
             }
@@ -406,7 +407,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
         while (_timeRegulationNotEnabled) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             } catch (Exception e) {
             }
             try {
@@ -461,7 +462,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 System.err.println("WARNING:  problem encountered enabling asynchronous delivery:  retry");
                 e.printStackTrace();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e1) {
                 }
             }
@@ -504,7 +505,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 System.err.println("WARNING:  problem encountered while resigning federation execution:  retry");
                 e.printStackTrace();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e1) {
                 }
             }
@@ -580,7 +581,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                     _rti.synchronizationPointAchieved(label);
                 }
                 while (!_achievedSynchronizationPoints.contains(label)) {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                     synchronized (_rti) {
                         _rti.tick();
                     }
@@ -599,7 +600,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                             throw r;
                         } catch (Exception e) {
                             try {
-                                Thread.sleep(500);
+                                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                             } catch (Exception e2) {
                             }
                         }
@@ -607,7 +608,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
             } catch (Exception e) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e2) {
                 }
             }

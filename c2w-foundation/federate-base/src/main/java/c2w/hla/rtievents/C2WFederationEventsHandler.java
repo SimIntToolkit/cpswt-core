@@ -23,6 +23,9 @@
 
 package c2w.hla.rtievents;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Basic handler for federation events.
  * Does nothing with the received events.
@@ -31,6 +34,8 @@ package c2w.hla.rtievents;
  * @author Himanshu Neema
  */
 public class C2WFederationEventsHandler implements IC2WFederationEventsHandler {
+    private static final Logger logger = LogManager.getLogger(C2WFederationEventsHandler.class);
+
     /**
      * Basic federation level event handler method.
      * 
@@ -38,7 +43,6 @@ public class C2WFederationEventsHandler implements IC2WFederationEventsHandler {
      * @param message [Filled with detailed event message, if any]
      */
     public void handleEvent( C2W_FEDERATION_EVENTS federationEvent, String message ) {
-    	// Himanshu: this will be commented out after testing period
-    	System.out.println("Received federation event: " + federationEvent + " with message: " + message);
+        logger.trace("Received federation event: {} with message: ", federationEvent, message);
     }
 }
