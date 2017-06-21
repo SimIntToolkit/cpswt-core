@@ -1,0 +1,33 @@
+@startuml
+
+title "Federation execution"
+
+actor User
+participant "RESTful API" as REST
+participant "FederationManager" as FM
+participant "Local RTI Component" as LRC
+participant "RTIExec Process" as RTI
+participant "CustomFederate" as Fed
+
+== Start up the federation ==
+
+User --> REST : Start
+activate REST
+REST -> REST : Startup
+REST -> FM : Initialize
+activate FM #81EEC5
+FM -> FM : initializeLRC()
+FM -> LRC : createRtiAmbassador()
+activate LRC
+LRC -> RTI : createFederationExecution()
+LRC -> RTI : joinFederationExecution()
+
+User --> REST : curl START
+REST -> FM: startSimulation()
+
+
+deactivate LRC
+deactivate FM
+deactivate REST
+
+@enduml
