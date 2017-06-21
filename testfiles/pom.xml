@@ -95,9 +95,9 @@
                                 <argument>-configFile</argument>
                                 <argument>fedmgrconfig.json</argument>
                                 <argument>-stepSize</argument>
-                                <argument>2.0</argument>
+                                <argument>1.0</argument>
                                 <argument>-federationEndTime</argument>
-                                <argument>10.0</argument>
+                                <argument>0</argument>
                             </arguments>
 
                         </configuration>

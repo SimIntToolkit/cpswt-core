@@ -31,8 +31,10 @@ public class EchoClient extends EchoClientBase {
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );
 
-        readyToPopulate();
-        readyToRun();
+        if(!this.isLateJoiner()) {
+            readyToPopulate();
+            readyToRun();
+        }
 
         startAdvanceTimeThread();
 

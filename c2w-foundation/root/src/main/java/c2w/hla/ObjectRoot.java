@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
@@ -38,6 +40,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     private static final String FACTORY_CLASS_NAME = "org.portico.dlc.HLA13RTIFactory";
     private static final String OBJECTROOT_CLASS_NAME = "ObjectRoot";
+
+    private static final Logger LOG = LogManager.getLogger(ObjectRoot.class);
 
     private static int logId = 0;
     private static int _globalUniqueID = 0;
@@ -362,12 +366,12 @@ public class ObjectRoot implements ObjectRootInterface {
     /**
      * Subscribes a federate to the ObjectRoot object class.
      *
-     * @param rti handle to the RTI
+     * @param lrc handle to the RTI
      */
-    public static void subscribe(RTIambassador rti) {
+    public static void subscribe(RTIambassador lrc) {
         if (_isSubscribed) return;
 
-        init(rti);
+        init(lrc);
 
         _subscribedAttributeHandleSet.empty();
         for (String attributeName : _subscribeAttributeNameSet) {
@@ -379,11 +383,11 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
 
-        synchronized (rti) {
+        synchronized (lrc) {
             boolean isNotSubscribed = true;
             while (isNotSubscribed) {
                 try {
-                    rti.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
+                    lrc.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
                     System.err.println(subscribeErrorMessage + "Federate Not Execution Member");
@@ -1143,6 +1147,7 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean requestNotSubmitted = true;
         while (requestNotSubmitted) {
             try {
+                // TODO: LOG HERE
                 rti.requestObjectAttributeValueUpdate(getObjectHandle(), getSubscribedAttributeHandleSet());
                 requestNotSubmitted = false;
             } catch (FederateNotExecutionMember f) {

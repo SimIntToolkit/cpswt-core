@@ -195,6 +195,13 @@
                 <federate.configFile>echoclient.json</federate.configFile>
             </properties>
         </profile>
+		<profile>
+			<id>EchoClient-LateJoiner</id>
+			<properties>
+				<federate.name>EchoClient</federate.name>
+				<federate.configFile>echoclient-latejoin.json</federate.configFile>
+			</properties>
+		</profile>
         <profile>
             <id>EchoServer</id>
             <properties>

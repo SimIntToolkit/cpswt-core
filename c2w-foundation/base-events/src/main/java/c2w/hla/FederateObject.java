@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hla.rti.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The FederateObject class implements the FederateObject object in the
@@ -12,6 +14,7 @@ import hla.rti.*;
 public class FederateObject extends ObjectRoot {
 
     private static final String OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME = "ObjectRoot.Manager.Federate";
+    private static final Logger LOG = LogManager.getLogger(ObjectRoot.class);
 
     /**
      * Default constructor -- creates an instance of the FederateObject object
@@ -183,19 +186,15 @@ public class FederateObject extends ObjectRoot {
                 _handle = rti.getObjectClassHandle(OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME);
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println(initErrorMessage + "Federate Not Execution Member");
-                f.printStackTrace();
+                LOG.error("{} Federate Not Execution Member", initErrorMessage);
+                LOG.error(f);
                 return;
             } catch (NameNotFound n) {
-                System.err.println(initErrorMessage + "Name Not Found");
-                n.printStackTrace();
+                LOG.error("{} Name Not Found", initErrorMessage);
+                LOG.error(n);
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
             }
         }
 
@@ -214,23 +213,19 @@ public class FederateObject extends ObjectRoot {
 //                _FederateIsLateJoiner_handle = rti.getAttributeHandle("FederateIsLateJoiner", get_handle());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println(initErrorMessage + "Federate Not Execution Member");
-                f.printStackTrace();
+                LOG.error("{} Federate Not Execution Member", initErrorMessage);
+                LOG.error(f);
                 return;
             } catch (ObjectClassNotDefined i) {
-                System.err.println(initErrorMessage + "Object Class Not Defined");
-                i.printStackTrace();
+                LOG.error("{} Object Class Not Defined", initErrorMessage);
+                LOG.error(i);
                 return;
             } catch (NameNotFound n) {
-                System.err.println(initErrorMessage + "Name Not Found");
-                n.printStackTrace();
+                LOG.error("{} Name Not Found", initErrorMessage);
+                LOG.error(n);
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
             }
         }
 
