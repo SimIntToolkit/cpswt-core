@@ -36,9 +36,9 @@ public class EchoClientBase extends SynchronizedFederate {
 
         // interaction pubsub
 
-        ClientMessage.publish( getRTI() );
+        ClientMessage.publish( getLRC() );
 
-        ServerReply.subscribe( getRTI() );
+        ServerReply.subscribe( getLRC() );
         _subscribedInteractionFilter.setFedFilters( 
 			ServerReply.get_handle(), 
 			SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED, 

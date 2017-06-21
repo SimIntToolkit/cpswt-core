@@ -80,7 +80,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * writing of a federate:
  * <ul>
  * <li>RTI creation/destruction ( {@link #createRTI()}, {@link #destroyRTI()} )</li>
- * <li>A means of acquiring a handle to the RTI ( {@link #getRTI()} )</li>
+ * <li>A means of acquiring a handle to the RTI ( {@link #getLRC()} )</li>
  * <li>Joining a federation ( {@link #joinFederation()} )</li>
  * <li>Time-constrained enable ( {@link #enableTimeConstrained()} )</li>
  * <li>Time-regulating enable ( {@link #enableTimeRegulation(double)}, {@link #enableTimeRegulation(double, double)} )</li>
@@ -112,7 +112,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 50;
 
-    private RTIambassador _rti;
+    /**
+     * Local RTI component. This is where you submit the "requests"
+     * to the RTIExec process that manages the whole federation.
+     */
+    private RTIambassador lrc;
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
@@ -197,8 +201,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * an argument to {@link InteractionRoot#sendInteraction(RTIambassador)} or
      * {@link ObjectRoot#updateAttributeValues(RTIambassador)} calls, for instance.
      */
-    public RTIambassador getRTI() {
-        return _rti;
+    public RTIambassador getLRC() {
+        return this.lrc;
     }
 
     /**
@@ -225,7 +229,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     /**
      * Create the RTI, or, more specifically, acquire a handle to the RTI that
-     * can be accessed via the {@link #getRTI()} call.
+     * can be accessed via the {@link #getLRC()} call.
      */
     public void createRTI() throws RTIinternalError {
         createRTI("");
@@ -245,17 +249,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();
-        _rti = factory.createRtiAmbassador();
+        lrc = factory.createRtiAmbassador();
         LOG.debug("[{}] CreateRTI successful.", this.federateId);
     }
 
     /**
      * Dissociate from the RTI.  This sets the handle to the RTI acquired via
-     * {@link #createRTI} to null.  Thus, {@link #getRTI()} returns null after
+     * {@link #createRTI} to null.  Thus, {@link #getLRC()} returns null after
      * this call.
      */
     public void destroyRTI() {
-        _rti = null;
+        lrc = null;
     }
 
     /**
@@ -266,8 +270,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         while (federationNotPresent) {
             try {
                 LOG.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
-                synchronized (_rti) {
-                    _rti.joinFederationExecution(this.federateId, this.federationId, this, null);
+                synchronized (lrc) {
+                    lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
                 federationNotPresent = false;
                 LOG.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
@@ -314,8 +318,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean timeConstrainedEnabledNotCalled = true;
         while (timeConstrainedEnabledNotCalled) {
             try {
-                synchronized (_rti) {
-                    _rti.enableTimeConstrained();
+                synchronized (lrc) {
+                    lrc.enableTimeConstrained();
                 }
                 timeConstrainedEnabledNotCalled = false;
             } catch (TimeConstrainedAlreadyEnabled t) {
@@ -333,8 +337,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         try {
-            synchronized (_rti) {
-                _rti.tick();
+            synchronized (lrc) {
+                lrc.tick();
             }
         } catch (Exception e) {
         }
@@ -344,8 +348,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (Exception e) {
             }
             try {
-                synchronized (_rti) {
-                    _rti.tick();
+                synchronized (lrc) {
+                    lrc.tick();
                 }
             } catch (Exception e) {
             }
@@ -377,8 +381,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean timeRegulationEnabledNotCalled = true;
         while (timeRegulationEnabledNotCalled) {
             try {
-                synchronized (_rti) {
-                    _rti.enableTimeRegulation(new DoubleTime(time), new DoubleTimeInterval(lookahead));
+                synchronized (lrc) {
+                    lrc.enableTimeRegulation(new DoubleTime(time), new DoubleTimeInterval(lookahead));
                 }
                 timeRegulationEnabledNotCalled = false;
             } catch (TimeRegulationAlreadyEnabled t) {
@@ -400,8 +404,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         try {
-            synchronized (_rti) {
-                _rti.tick();
+            synchronized (lrc) {
+                lrc.tick();
             }
         } catch (Exception e) {
         }
@@ -411,8 +415,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (Exception e) {
             }
             try {
-                synchronized (_rti) {
-                    _rti.tick();
+                synchronized (lrc) {
+                    lrc.tick();
                 }
             } catch (Exception e) {
             }
@@ -426,7 +430,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (_simEndNotSubscribed) {
             // Auto-subscribing also ensures that there is no filter set for SimEnd
-            SimEnd.subscribe(getRTI());
+            SimEnd.subscribe(getLRC());
             _simEndNotSubscribed = false;
         }
     }
@@ -450,7 +454,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean asynchronousDeliveryNotEnabled = true;
         while (asynchronousDeliveryNotEnabled) {
             try {
-                getRTI().enableAsynchronousDelivery();
+                getLRC().enableAsynchronousDelivery();
                 asynchronousDeliveryNotEnabled = false;
             } catch (FederateNotExecutionMember f) {
                 System.err.println("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");
@@ -490,7 +494,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean federationNotResigned = true;
         while (federationNotResigned) {
             try {
-                getRTI().resignFederationExecution(resignAction);
+                getLRC().resignFederationExecution(resignAction);
                 federationNotResigned = false;
             } catch (InvalidResignAction i) {
                 System.err.println("WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.");
@@ -577,13 +581,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean synchronizationPointNotAccepted = true;
         while (synchronizationPointNotAccepted) {
             try {
-                synchronized (_rti) {
-                    _rti.synchronizationPointAchieved(label);
+                synchronized (lrc) {
+                    lrc.synchronizationPointAchieved(label);
                 }
                 while (!_achievedSynchronizationPoints.contains(label)) {
                     Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                    synchronized (_rti) {
-                        _rti.tick();
+                    synchronized (lrc) {
+                        lrc.tick();
                     }
                 }
                 synchronizationPointNotAccepted = false;
@@ -593,9 +597,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 if (_achievedSynchronizationPoints.contains(label)) {
                     synchronizationPointNotAccepted = false;
                 } else {
-                    synchronized (_rti) {
+                    synchronized (lrc) {
                         try {
-                            _rti.tick();
+                            lrc.tick();
                         } catch (RTIinternalError r) {
                             throw r;
                         } catch (Exception e) {
@@ -635,8 +639,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean timeNotAcquired = true;
         while (timeNotAcquired) {
             try {
-                synchronized (getRTI()) {
-                    logicalTime = getRTI().queryFederateTime();
+                synchronized (getLRC()) {
+                    logicalTime = getLRC().queryFederateTime();
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
@@ -665,8 +669,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean timeNotAcquired = true;
         while (timeNotAcquired) {
             try {
-                synchronized (getRTI()) {
-                    lbtsTime = getRTI().queryLBTS();
+                synchronized (getLRC()) {
+                    lbtsTime = getLRC().queryLBTS();
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
@@ -699,9 +703,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean timeNotAcquired = true;
         while (timeNotAcquired) {
             try {
-                synchronized (getRTI()) {
-                    lbtsTime = getRTI().queryLBTS();
-                    logicalTime = getRTI().queryFederateTime();
+                synchronized (getLRC()) {
+                    lbtsTime = getLRC().queryLBTS();
+                    logicalTime = getLRC().queryFederateTime();
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
@@ -979,7 +983,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             System.out.println(getFederateId() + ": SimEnd interaction received, exiting...");
             createLog(interactionClass, theInteraction, theTime);
             try {
-                getRTI().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+                getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
             } catch (Exception e) {
                 System.out.println("Error during resigning federate: " + getFederateId());
                 e.printStackTrace();

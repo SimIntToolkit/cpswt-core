@@ -88,7 +88,7 @@ public class EchoClient extends EchoClientBase {
         message.set_sequenceNumber(this.sequenceNumber);
 
         logger.debug("{}: Sending echo message interaction #{}", this.getFederateId(), this.sequenceNumber);
-        message.sendInteraction( getRTI(), currentTime );
+        message.sendInteraction( getLRC(), currentTime );
 
         // store sent sequenceNumber
         sentSequenceNumbers.add(this.sequenceNumber);

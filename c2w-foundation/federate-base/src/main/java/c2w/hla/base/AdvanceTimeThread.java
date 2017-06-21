@@ -82,7 +82,7 @@ public class AdvanceTimeThread extends Thread {
 
     public AdvanceTimeThread(SynchronizedFederate synchronizedFederate, ATRQueue atrQueue, TimeAdvanceMode timeAdvanceMode) {
         _synchronizedFederate = synchronizedFederate;
-        _rti = _synchronizedFederate.getRTI();
+        _rti = _synchronizedFederate.getLRC();
         _atrQueue = atrQueue;
         _timeAdvanceMode = timeAdvanceMode;
     }
