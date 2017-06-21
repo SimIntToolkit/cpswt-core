@@ -543,7 +543,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 //        FederateObject.subscribe_FederateIsLateJoiner();
         FederateObject.subscribe(getLRC());
 
-        for(ExpectedFederateInfo federateInfo : this.experimentConfig.expectedFederates) {
+        for(FederateJoinInfo federateInfo : this.experimentConfig.expectedFederates) {
             LOG.trace("Waiting for {} federate{} of type \"{}\" to join", federateInfo.count, federateInfo.count == 1 ? "":"s", federateInfo.federateType);
         }
 
@@ -900,8 +900,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // if any attribute of the federateObject is empty
             if (federateObject.get_FederateHandle() == 0 ||
                 "".equals(federateObject.get_FederateId()) ||
-                "".equals(federateObject.get_FederateHost()) ||
-                "".equals(federateObject.get_FederateIsLateJoiner())
+                "".equals(federateObject.get_FederateHost())
                 ) return;
 
             //
@@ -938,16 +937,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     _processedFederates.remove(federateType);
                     _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateType);
 
-                    boolean isLateJoiner = federateObject.get_FederateIsLateJoiner();
+                    boolean isLateJoiner = false; // federateObject.get_FederateIsLateJoiner();
                     if(isLateJoiner) {
-                        for(LateJoinerFederateInfo fed : this.workingExperimentConfig.lateJoinerFederates) {
+                        for(FederateJoinInfo fed : this.workingExperimentConfig.lateJoinerFederates) {
                             if(fed.federateType.equals(federateType)) {
-                                fed.maxCount--;
+                                fed.count--;
                             }
                         }
                     }
                     else {
-                        for(ExpectedFederateInfo fed : this.workingExperimentConfig.expectedFederates) {
+                        for(FederateJoinInfo fed : this.workingExperimentConfig.expectedFederates) {
                             if(fed.federateType.equals(federateType)) {
                                 fed.count--;
                             }

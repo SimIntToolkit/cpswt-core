@@ -1,9 +1,9 @@
 package org.cpswt.config;
 
 /**
- * ExpectedFederateInfo
+ * FederateJoinInfo
  */
-public class ExpectedFederateInfo {
+public class FederateJoinInfo {
     public String federateType;
     public int count;
 }

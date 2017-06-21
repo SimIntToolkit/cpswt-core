@@ -7,14 +7,14 @@ import java.util.List;
  */
 public class ExperimentConfig {
     public List<String> federateTypesAllowed;
-    public List<ExpectedFederateInfo> expectedFederates;
-    public List<LateJoinerFederateInfo> lateJoinerFederates;
+    public List<FederateJoinInfo> expectedFederates;
+    public List<FederateJoinInfo> lateJoinerFederates;
 
     public int expectedFederateItemsCount() {
-        int cnt = 0;
-        for(ExpectedFederateInfo e : expectedFederates) {
-            cnt += e.count;
-        }
+        int cnt = this.expectedFederates
+                .stream()
+                .mapToInt(o -> o.count)
+                .sum();
         return cnt;
     }
 }
