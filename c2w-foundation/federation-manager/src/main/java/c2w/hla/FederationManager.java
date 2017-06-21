@@ -334,7 +334,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private void initializeLRC(URL fedFileURL) throws Exception {
 
         LOG.trace("Creating RTI ... ");
-        createLRC();
+        super.createLRC();
         LOG.debug("RTI created successfully.");
 
         LOG.trace("Attempting to create federation \"{}\"...", federationId);
@@ -348,6 +348,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
         LOG.debug("Federation \"{}\" created successfully.", this.federationId);
 
+        // join the federation
         super.joinFederation();
 
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
@@ -358,6 +359,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         super.enableAsynchronousDelivery();
 
         LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
+
+
         // REGISTER "ReadyToPopulate" SYNCHRONIZATION POINT
         super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
         super.lrc.tick();

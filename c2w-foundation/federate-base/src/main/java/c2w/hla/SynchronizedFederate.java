@@ -446,7 +446,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean asynchronousDeliveryNotEnabled = true;
         while (asynchronousDeliveryNotEnabled) {
             try {
-                getLRC().enableAsynchronousDelivery();
+                this.lrc.enableAsynchronousDelivery();
                 asynchronousDeliveryNotEnabled = false;
             } catch (FederateNotExecutionMember f) {
                 System.err.println("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");

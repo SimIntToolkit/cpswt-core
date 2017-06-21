@@ -9,7 +9,7 @@ participant "Local RTI Component" as LRC
 participant "RTIExec Process" as RTI
 participant "CustomFederate" as Fed
 
-== Start up the federation ==
+== Federation initialization ==
 
 User --> REST : Start
 activate REST
@@ -21,10 +21,19 @@ FM -> LRC : createRtiAmbassador()
 activate LRC
 LRC -> RTI : createFederationExecution()
 LRC -> RTI : joinFederationExecution()
+LRC -> RTI : enableTimeConstrained()
+LRC -> RTI : enableTimeRegulation()
+LRC -> RTI : enableAsynchronousDelivery()
+|||
+LRC -> RTI : registerFederationSynchronizationPoint()
+RTI -> LRC : synchronizationPointRegistrationSucceeded()
+
+== Start federation execution ==
 
 User --> REST : curl START
 REST -> FM: startSimulation()
-
+FM -> FM : startFederationRun()
+LRC -> RTI : requestUpdate()
 
 deactivate LRC
 deactivate FM
