@@ -36,6 +36,9 @@ import org.portico.impl.hla13.types.DoubleTime;
  */
 public class ObjectRoot implements ObjectRootInterface {
 
+    private static final String FACTORY_CLASS_NAME = "org.portico.dlc.HLA13RTIFactory";
+    private static final String OBJECTROOT_CLASS_NAME = "ObjectRoot";
+
     private static int logId = 0;
     private static int _globalUniqueID = 0;
 
@@ -55,7 +58,7 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean factoryNotAcquired = true;
         while (factoryNotAcquired) {
             try {
-                _factory = RtiFactoryFactory.getRtiFactory("org.portico.dlc.HLA13RTIFactory");
+                _factory = RtiFactoryFactory.getRtiFactory(FACTORY_CLASS_NAME);
                 factoryNotAcquired = false;
             } catch (Exception e) {
                 System.err.println("ERROR: acquiring factory");
@@ -156,7 +159,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * For the polymorphic version of this method, use {@link #getClassName()}.
      */
     public static String get_class_name() {
-        return "ObjectRoot";
+        return OBJECTROOT_CLASS_NAME;
     }
 
     /**
@@ -164,7 +167,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * class name) of the ObjectRoot object class.
      */
     public static String get_simple_class_name() {
-        return "ObjectRoot";
+        return OBJECTROOT_CLASS_NAME;
     }
 
     private static Set<String> _datamemberNames = new HashSet<String>();
@@ -206,20 +209,20 @@ public class ObjectRoot implements ObjectRootInterface {
 
 
     static {
-        _classNameSet.add("ObjectRoot");
-        _classNameClassMap.put("ObjectRoot", ObjectRoot.class);
+        _classNameSet.add(OBJECTROOT_CLASS_NAME);
+        _classNameClassMap.put(OBJECTROOT_CLASS_NAME, ObjectRoot.class);
 
-        _datamemberClassNameSetMap.put("ObjectRoot", _datamemberNames);
-        _allDatamemberClassNameSetMap.put("ObjectRoot", _allDatamemberNames);
+        _datamemberClassNameSetMap.put(OBJECTROOT_CLASS_NAME, _datamemberNames);
+        _allDatamemberClassNameSetMap.put(OBJECTROOT_CLASS_NAME, _allDatamemberNames);
 
 
-        _classNamePublishAttributeNameMap.put("ObjectRoot", _publishAttributeNameSet);
+        _classNamePublishAttributeNameMap.put(OBJECTROOT_CLASS_NAME, _publishAttributeNameSet);
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNamePublishedAttributeMap.put("ObjectRoot", _publishedAttributeHandleSet);
+        _classNamePublishedAttributeMap.put(OBJECTROOT_CLASS_NAME, _publishedAttributeHandleSet);
 
-        _classNameSubscribeAttributeNameMap.put("ObjectRoot", _subscribeAttributeNameSet);
+        _classNameSubscribeAttributeNameMap.put(OBJECTROOT_CLASS_NAME, _subscribeAttributeNameSet);
         _subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNameSubscribedAttributeMap.put("ObjectRoot", _subscribedAttributeHandleSet);
+        _classNameSubscribedAttributeMap.put(OBJECTROOT_CLASS_NAME, _subscribedAttributeHandleSet);
     }
 
 
@@ -233,7 +236,7 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean isNotInitialized = true;
         while (isNotInitialized) {
             try {
-                _handle = rti.getObjectClassHandle("ObjectRoot");
+                _handle = rti.getObjectClassHandle(OBJECTROOT_CLASS_NAME);
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
                 System.err.println(initErrorMessage + "Federate Not Execution Member");
@@ -252,9 +255,9 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _classNameHandleMap.put("ObjectRoot", get_handle());
-        _classHandleNameMap.put(get_handle(), "ObjectRoot");
-        _classHandleSimpleNameMap.put(get_handle(), "ObjectRoot");
+        _classNameHandleMap.put(OBJECTROOT_CLASS_NAME, get_handle());
+        _classHandleNameMap.put(get_handle(), OBJECTROOT_CLASS_NAME);
+        _classHandleSimpleNameMap.put(get_handle(), OBJECTROOT_CLASS_NAME);
 
 
     }

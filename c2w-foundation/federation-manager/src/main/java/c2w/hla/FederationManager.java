@@ -69,10 +69,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private final Map<String, MutableInt> onlineLateJoinerFederates;
 
 
-    Set<String> expectedFederateTypes = new HashSet<String>();
-    Set<String> _processedFederates = new HashSet<String>();
-    Map<Integer, String> _discoveredFederates = new HashMap<Integer, String>();
-    Set<FederateObject> rtiDiscoveredFederateObjects = new HashSet<FederateObject>();
+    private Set<String> expectedFederateTypes = new HashSet<String>();
+    private Set<String> _processedFederates = new HashSet<String>();
+    private Map<Integer, String> _discoveredFederates = new HashMap<Integer, String>();
+    private Set<FederateObject> rtiDiscoveredFederateObjects = new HashSet<FederateObject>();
 
     InteractionRoot _injectedInteraction = null;
     double _injectionTime = -1;
@@ -94,65 +94,65 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * The name of the Federation
      */
-    String federationId;
+    private String federationId;
 
     /**
      * Indicates if real time mode is on.
      */
-    boolean realTimeMode = true;
+    private boolean realTimeMode = true;
 
     /**
      * Indicates if federation manager terminates when COA finishes.
      */
-    boolean terminateOnCOAFinish;
+    private boolean terminateOnCOAFinish;
 
     /**
      * Project root directory
      */
-    String rootDir;
+    private String rootDir;
 
     /**
      * Experiment config
      */
-    ExperimentConfig experimentConfig;
+    private ExperimentConfig experimentConfig;
 
-    ExperimentConfig workingExperimentConfig;
-
-
-    boolean _autoStart;
-    double _federationEndTime = 0.0;
-    Random _rand4Dur = null;
-    String _stopScriptFilepath;
-
-    String _logLevel;
-
-    boolean _killingFederation = false;
+    private ExperimentConfig workingExperimentConfig;
 
 
-    Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
-    List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
+    private boolean _autoStart;
+    private double _federationEndTime = 0.0;
+    private Random _rand4Dur = null;
+    private String _stopScriptFilepath;
 
-    Set<Double> pause_times = new TreeSet<Double>();
+    private String _logLevel;
 
-    List<Integer> monitored_interactions = new ArrayList<Integer>();
+    private boolean _killingFederation = false;
 
-    boolean running = false;
 
-    boolean paused = false;
+    private Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
+    private List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
 
-    boolean federationAttempted = false;
+    private Set<Double> pause_times = new TreeSet<Double>();
+
+    private List<Integer> monitored_interactions = new ArrayList<Integer>();
+
+    private boolean running = false;
+
+    private boolean paused = false;
+
+    private boolean federationAttempted = false;
 
     boolean timeRegulationEnabled = false;
 
     boolean timeConstrainedEnabled = false;
 
-    boolean granted = false;
+    private boolean granted = false;
 
-    DoubleTime time = new DoubleTime(0);
+    private DoubleTime time = new DoubleTime(0);
 
-    long time_in_millisec = 0;
+    private long time_in_millisec = 0;
 
-    long time_diff;
+    private long time_diff;
 
 
 
@@ -163,16 +163,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private int logLevelToSet = 1;
 
     // Start and end time markers for the main execution loop
-    double tMainLoopStartTime = 0.0;
-    double tMainLoopEndTime = 0.0;
-    boolean executionTimeRecorded = false;
+    private double tMainLoopStartTime = 0.0;
+    private double tMainLoopEndTime = 0.0;
+    private boolean executionTimeRecorded = false;
 
     // expose autostart
     public boolean getAutoStart() {
         return this._autoStart;
     }
 
-    COAExecutor coaExecutor;
+    private COAExecutor coaExecutor;
 
     //private PrintStream monitor_out;
 
@@ -540,8 +540,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         FederateObject.subscribe_FederateHandle();
         FederateObject.subscribe_FederateType();
         FederateObject.subscribe_FederateHost();
-        FederateObject.subscribe_FederateIsLateJoiner();
-        FederateObject.subscribe(getRTI());
+//        FederateObject.subscribe_FederateIsLateJoiner();
+        FederateObject.subscribe(getLRC());
 
         for(ExpectedFederateInfo federateInfo : this.experimentConfig.expectedFederates) {
             LOG.trace("Waiting for {} federate{} of type \"{}\" to join", federateInfo.count, federateInfo.count == 1 ? "":"s", federateInfo.federateType);
