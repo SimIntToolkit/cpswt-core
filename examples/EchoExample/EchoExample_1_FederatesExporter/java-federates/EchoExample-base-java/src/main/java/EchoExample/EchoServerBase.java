@@ -24,7 +24,7 @@ public class EchoServerBase extends SynchronizedFederate {
 		super(params);
 
 		setLookAhead( 0.2 );
-		createRTI();
+		createLRC();
 		joinFederation();
 
 		if(params.isLateJoiner) {

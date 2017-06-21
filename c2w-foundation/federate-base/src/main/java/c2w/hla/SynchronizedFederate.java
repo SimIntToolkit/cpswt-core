@@ -79,7 +79,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * The SynchonizedFederate provides the following facilities which simplify the
  * writing of a federate:
  * <ul>
- * <li>RTI creation/destruction ( {@link #createRTI()}, {@link #destroyRTI()} )</li>
+ * <li>RTI creation/destruction ( {@link #createLRC()}, {@link #destroyRTI()} )</li>
  * <li>A means of acquiring a handle to the RTI ( {@link #getLRC()} )</li>
  * <li>Joining a federation ( {@link #joinFederation()} )</li>
  * <li>Time-constrained enable ( {@link #enableTimeConstrained()} )</li>
@@ -116,7 +116,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * Local RTI component. This is where you submit the "requests"
      * to the RTIExec process that manages the whole federation.
      */
-    private RTIambassador lrc;
+    protected RTIambassador lrc;
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
@@ -227,15 +227,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         _timeAdvanceNotGranted = timeAdvanceNotGranted;
     }
 
-    /**
-     * Create the RTI, or, more specifically, acquire a handle to the RTI that
-     * can be accessed via the {@link #getLRC()} call.
-     */
-    public void createRTI() throws RTIinternalError {
-        createRTI("");
-    }
-
-    public void createRTI(String federate_id) throws RTIinternalError {
+    public void createLRC() throws RTIinternalError {
 
         LOG.debug("[{}] Acquiring connection to RTI ...", this.federateId);
         if(!this.federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
@@ -249,13 +241,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();
-        lrc = factory.createRtiAmbassador();
+        this.lrc = factory.createRtiAmbassador();
         LOG.debug("[{}] CreateRTI successful.", this.federateId);
     }
 
     /**
      * Dissociate from the RTI.  This sets the handle to the RTI acquired via
-     * {@link #createRTI} to null.  Thus, {@link #getLRC()} returns null after
+     * {@link #createLRC} to null.  Thus, {@link #getLRC()} returns null after
      * this call.
      */
     public void destroyRTI() {

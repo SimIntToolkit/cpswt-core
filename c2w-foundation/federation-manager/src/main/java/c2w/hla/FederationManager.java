@@ -268,7 +268,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.workingExperimentConfig.expectedFederates = new ArrayList<>(this.experimentConfig.expectedFederates);
         this.workingExperimentConfig.lateJoinerFederates = new ArrayList<>(this.experimentConfig.lateJoinerFederates);
 
-        initRTI(fedFileURL);
+        this.initializeLRC(fedFileURL);
 
         /*
 
@@ -331,16 +331,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
     }
 
-    private void initRTI(URL fedFileURL) throws Exception {
+    private void initializeLRC(URL fedFileURL) throws Exception {
 
         LOG.trace("Creating RTI ... ");
-        createRTI(SynchronizedFederate.FEDERATION_MANAGER_NAME);
+        createLRC();
         LOG.debug("RTI created successfully.");
 
         LOG.trace("Attempting to create federation \"{}\"...", federationId);
         try {
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationId);
-            super.getLRC().createFederationExecution(federationId, fedFileURL);
+            super.lrc.createFederationExecution(this.federationId, fedFileURL);
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationId);
 
         } catch (FederationExecutionAlreadyExists feae) {
@@ -359,26 +359,26 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
         // REGISTER "ReadyToPopulate" SYNCHRONIZATION POINT
-        getLRC().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
-        getLRC().tick();
+        super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
+        super.lrc.tick();
         while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToPopulate)) {
             Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            getLRC().tick();
+            super.lrc.tick();
         }
         LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToPopulate);
 
         LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToRun);
-        getLRC().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
-        getLRC().tick();
+        super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
+        super.lrc.tick();
         while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToRun)) {
             Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            getLRC().tick();
+            super.lrc.tick();
         }
         LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToRun);
 
         LOG.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToResign);
-        getLRC().registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
-        getLRC().tick();
+        super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
+        super.lrc.tick();
         while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToResign)) {
             Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             getLRC().tick();
@@ -392,7 +392,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     /**
-     * Start the federation run - federation that has been created already in the initRTI() -- TEMP comment, needs to be refactored
+     * Start the federation run - federation that has been created already in the initializeLRC() -- TEMP comment, needs to be refactored
      * @throws Exception
      */
     private synchronized void startFederationRun() throws Exception {
