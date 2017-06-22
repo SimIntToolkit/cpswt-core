@@ -73,7 +73,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private Set<String> expectedFederateTypes = new HashSet<String>();
     private Set<String> _processedFederates = new HashSet<String>();
     private Map<Integer, String> _discoveredFederates = new HashMap<Integer, String>();
-    private Set<FederateObject> rtiDiscoveredFederateObjects = new HashSet<FederateObject>();
+
+
+    private Set<ObjectRoot> rtiDiscoveredFederateObjects = new HashSet<>();
+    private Set<ObjectRoot> rtiDiscoveredCpswtFederateInfoObjects = new HashSet<>();
 
     InteractionRoot _injectedInteraction = null;
     double _injectionTime = -1;
@@ -390,6 +393,13 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
         LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToResign);
 
+
+        // ---------- subscribe for CpswtFederateInfo
+        CpswtFederateInfoObject.subscribe_FederateId();
+        CpswtFederateInfoObject.subscribe_FederateType();
+        CpswtFederateInfoObject.subscribe_IsLateJoiner();
+        CpswtFederateInfoObject.subscribe(super.lrc);
+
         // TODO: overview this later
         SimEnd.publish(getLRC());
         SimPause.publish(getLRC());
@@ -401,7 +411,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
      * @throws Exception
      */
     private synchronized void startFederationRun() throws Exception {
-
         federationAttempted = true;
 
         this.waitExpectedFederatesToJoin();
@@ -544,7 +553,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         FederateObject.subscribe_FederateHandle();
         FederateObject.subscribe_FederateType();
         FederateObject.subscribe_FederateHost();
-//        FederateObject.subscribe_FederateIsLateJoiner();
         FederateObject.subscribe(getLRC());
 
         for(FederateJoinInfo federateInfo : this.experimentConfig.expectedFederates) {
@@ -558,9 +566,15 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: mutex or some sort of synchronization
         while (numOfFedsToWaitFor > 0) {
             super.lrc.tick();
-            for (FederateObject federateObject : this.rtiDiscoveredFederateObjects) {
-                federateObject.requestUpdate(this.lrc);
+
+            for (ObjectRoot objectRoot : this.rtiDiscoveredFederateObjects) {
+                objectRoot.requestUpdate(this.lrc);
             }
+            for( ObjectRoot objectRoot : this.rtiDiscoveredCpswtFederateInfoObjects) {
+                objectRoot.requestUpdate(this.lrc);
+            }
+
+
             Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             numOfFedsToWaitFor = this.workingExperimentConfig.expectedFederateItemsCount();
         }
@@ -840,8 +854,13 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         ObjectRoot objectRoot = ObjectRoot.discover(objectClassHandle, objectHandle);
         if (FederateObject.match(objectClassHandle)) {
             FederateObject federateObject = (FederateObject) objectRoot;
-            LOG.debug("New object discovered: {}", federateObject.get_FederateId());
+            LOG.debug("New federateObject discovered");
             this.rtiDiscoveredFederateObjects.add(federateObject);
+        }
+        else if(CpswtFederateInfoObject.match(objectClassHandle)) {
+            CpswtFederateInfoObject infoObject = (CpswtFederateInfoObject) objectRoot;
+            LOG.debug("New CpswtFederateInfoObject discovered");
+            this.rtiDiscoveredCpswtFederateInfoObjects.add(infoObject);
         }
     }
 
@@ -901,80 +920,91 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         reflectedAttributes = new HLA13ReflectedAttributes(updateAttributes.getFilteredAttributes());
 
         try {
-            FederateObject federateObject = (FederateObject) ObjectRoot.reflect(objectHandle, reflectedAttributes);
+            ObjectRoot objRootInstance = ObjectRoot.reflect(objectHandle, reflectedAttributes);
 
-            // if any attribute of the federateObject is empty, ignore
-            if (federateObject.get_FederateHandle() == 0 ||
-                "".equals(federateObject.get_FederateId()) ||
-                "".equals(federateObject.get_FederateHost())
-                ) return;
+            // Federate info type object
+            if(CpswtFederateInfoObject.match(objectHandle)) {
+                LOG.trace("Handling CpswtFederateInfoObject");
+                CpswtFederateInfoObject federateInfoObject = (CpswtFederateInfoObject) objRootInstance;
 
-            //
-            this.rtiDiscoveredFederateObjects.remove(federateObject);
+                this.rtiDiscoveredCpswtFederateInfoObjects.remove(federateInfoObject);
 
-            String federateId = federateObject.get_FederateId();
-            String federateType = FederateIdUtility.getFederateType(federateId);
+                if(federateInfoObject.get_FederateId().isEmpty() ||
+                        federateInfoObject.get_FederateType().isEmpty()) {
+                    LOG.error("THIS SHOULDN'T HAPPEN RIGHT??");
+                    return;
+                }
 
-            _discoveredFederates.put(objectHandle, federateType);
+                String federateId = federateInfoObject.get_FederateId();
+                String federateType = federateInfoObject.get_FederateType();
+                boolean isLateJoiner = federateInfoObject.get_IsLateJoiner();
 
-            // federationManager case
-            if(federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
-                LOG.info("{} federate joined the federation", SynchronizedFederate.FEDERATION_MANAGER_NAME);
-                _discoveredFederates.remove(objectHandle);
+                // this?
                 _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateId);
-                return;
-            }
 
-            if(!this.experimentConfig.federateTypesAllowed.contains(federateType)) {
-                LOG.warn("{} federate type is not allowed to join this federation. Ignoring...", federateType);
-                return;
-            }
-            // everything else
-            else {
-            // expected
-                if(this.workingExperimentConfig.isExpectedFederateType(federateType)) {
-                    MutableInt v = this.onlineExpectedFederateTypes.get(federateType);
-                    if(v == null) {
-                        v = new MutableInt(1);
-                        this.onlineExpectedFederateTypes.put(federateType, v);
-                    }
-                    else {
-                        v.increment();
-                    }
+                // federationManager case
+                if(federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
+                    LOG.info("{} federate joined the federation", SynchronizedFederate.FEDERATION_MANAGER_NAME);
+                    _discoveredFederates.remove(objectHandle);
+                    //_federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateId);
+                    return;
+                }
 
-                    LOG.info("{} #{} expected federate joined the federation with ID {}", federateType, v.getValue(), federateId);
+                if(!this.experimentConfig.federateTypesAllowed.contains(federateType)) {
+                    LOG.warn("{} federate type is not allowed to join this federation. Ignoring...", federateType);
+                    return;
+                }
+                // everything else
+                else {
+                    // expected
+                    if (this.workingExperimentConfig.isExpectedFederateType(federateType)) {
+                        MutableInt v = this.onlineExpectedFederateTypes.get(federateType);
+                        if (v == null) {
+                            v = new MutableInt(1);
+                            this.onlineExpectedFederateTypes.put(federateType, v);
+                        } else {
+                            v.increment();
+                        }
 
-                    // decrease the counter for the expected federate
-                    for(FederateJoinInfo fed : this.workingExperimentConfig.expectedFederates) {
-                        if(fed.federateType.equals(federateType)) {
-                            fed.count--;
+                        LOG.info("{} #{} expected federate joined the federation with ID {}", federateType, v.getValue(), federateId);
+
+                        // decrease the counter for the expected federate
+                        for (FederateJoinInfo fed : this.workingExperimentConfig.expectedFederates) {
+                            if (fed.federateType.equals(federateType)) {
+                                fed.count--;
+                            }
                         }
                     }
-                }
-            // late joiner
-                else if(this.workingExperimentConfig.isLateJoinerFederateType(federateType)) {
-                    MutableInt v = this.onlineLateJoinerFederateTypes.get(federateType);
-                    if(v == null) {
-                        v = new MutableInt(1);
-                        this.onlineLateJoinerFederateTypes.put(federateType, v);
+                    // late joiner
+                    else if (this.workingExperimentConfig.isLateJoinerFederateType(federateType)) {
+                        MutableInt v = this.onlineLateJoinerFederateTypes.get(federateType);
+                        if (v == null) {
+                            v = new MutableInt(1);
+                            this.onlineLateJoinerFederateTypes.put(federateType, v);
+                        } else {
+                            v.increment();
+                        }
+
+                        LOG.info("{} #{} late joiner federate joined the federation with ID {}", federateType, v.getValue(), federateId);
                     }
+                    // unknown
                     else {
-                        v.increment();
+                        LOG.warn("FederateType \"{}\" is neither expected nor late joiner. Ignoring...", federateType);
                     }
-
-                    LOG.info("{} #{} late joiner federate joined the federation with ID {}", federateType, v.getValue(), federateId);
                 }
-            // unknown
-                else {
-                    LOG.warn("FederateType \"{}\" is neither expected nor late joiner. Ignoring...", federateType);
-                }
+            }
+            else {
+                FederateObject federateObject = (FederateObject) ObjectRoot.reflect(objectHandle, reflectedAttributes);
+                LOG.trace("Handling FederateObject ({})", federateObject.get_FederateId());
 
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateId);
+                // if any attribute of the federateObject is empty, ignore
+                if (federateObject.get_FederateHandle() == 0 ||
+                        "".equals(federateObject.get_FederateId()) ||
+                        "".equals(federateObject.get_FederateHost())
+                        ) return;
 
-                {
-                    _processedFederates.remove(federateType);
-                }
-                return;
+                //
+                this.rtiDiscoveredFederateObjects.remove(federateObject);
             }
         } catch (Exception e) {
             System.out.println("Error while parsing the Federate object: " + e.getMessage());

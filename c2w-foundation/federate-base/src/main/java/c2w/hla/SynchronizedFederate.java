@@ -110,7 +110,7 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
 public class SynchronizedFederate extends NullFederateAmbassador {
 
     private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
-    public static final int internalThreadWaitTimeMs = 50;
+    public static final int internalThreadWaitTimeMs = 500;
 
     /**
      * Local RTI component. This is where you submit the "requests"
@@ -263,7 +263,19 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             try {
                 LOG.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
                 synchronized (lrc) {
-                    lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
+                    this.lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
+
+                    CpswtFederateInfoObject.publish_FederateId();
+                    CpswtFederateInfoObject.publish_FederateType();
+                    CpswtFederateInfoObject.publish_IsLateJoiner();
+                    CpswtFederateInfoObject.publish(this.lrc);
+
+                    CpswtFederateInfoObject federateInfo = new CpswtFederateInfoObject();
+                    federateInfo.set_FederateId(this.federateId);
+                    federateInfo.set_FederateType(this.federateType);
+                    federateInfo.set_IsLateJoiner(this.isLateJoiner);
+                    federateInfo.registerObject(this.lrc);
+                    federateInfo.updateAttributeValues(this.lrc);
                 }
                 federationNotPresent = false;
                 LOG.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);

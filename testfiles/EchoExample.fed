@@ -45,12 +45,18 @@
           (attribute ObjectsReflected reliable receive)
         )
       )
-
-(class FederateObject
-  (attribute FederateHandle reliable timestamp)
-  (attribute FederateHost reliable timestamp)
-  (attribute FederateType reliable timestamp)
-  (attribute FederateIsLateJoiner reliable timestamp) )   )
+      (class FederateObject
+        (attribute FederateHandle reliable timestamp)
+        (attribute FederateHost reliable timestamp)
+        (attribute FederateType reliable timestamp)
+        (attribute FederateIsLateJoiner reliable timestamp)
+      )
+      (class CpswtFederateInfoObject
+        (attribute FederateId reliable timestamp)
+        (attribute FederateType reliable timestamp)
+        (attribute IsLateJoiner reliable timestamp)
+      )
+    )
   )
   (interactions
     (class InteractionRoot reliable timestamp
