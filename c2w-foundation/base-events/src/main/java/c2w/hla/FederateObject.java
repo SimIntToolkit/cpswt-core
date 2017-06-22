@@ -26,8 +26,6 @@ public class FederateObject extends ObjectRoot {
     private static int _FederateHandle_handle;
     private static int _FederateType_handle;
     private static int _FederateHost_handle;
-//    private static int _FederateIsLateJoiner_handle;
-
 
     /**
      * Returns the handle (RTI assigned) of the "FederateHandle" attribute of
@@ -58,8 +56,6 @@ public class FederateObject extends ObjectRoot {
     public static int get_FederateHost_handle() {
         return _FederateHost_handle;
     }
-
-//    public static int get_FederateIsLateJoiner_handle() { return _FederateIsLateJoiner_handle; }
 
     private static boolean _isInitialized = false;
 
@@ -145,20 +141,14 @@ public class FederateObject extends ObjectRoot {
         _datamemberNames.add("FederateHandle");
         _datamemberNames.add("FederateType");
         _datamemberNames.add("FederateHost");
-//        _datamemberNames.add("FederateIsLateJoiner");
-
 
         _allDatamemberNames.add("FederateHandle");
         _allDatamemberNames.add("FederateType");
         _allDatamemberNames.add("FederateHost");
-//        _allDatamemberNames.add("FederateIsLateJoiner");
-
 
         _datamemberTypeMap.put("FederateHandle", "int");
         _datamemberTypeMap.put("FederateType", "String");
         _datamemberTypeMap.put("FederateHost", "String");
-//        _datamemberTypeMap.put("FederateIsLateJoiner", "boolean");
-
 
         _classNamePublishAttributeNameMap.put(OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME, _publishAttributeNameSet);
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
@@ -202,7 +192,6 @@ public class FederateObject extends ObjectRoot {
         _classHandleNameMap.put(get_handle(), OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME);
         _classHandleSimpleNameMap.put(get_handle(), "FederateObject");
 
-
         isNotInitialized = true;
         while (isNotInitialized) {
             try {
@@ -210,7 +199,6 @@ public class FederateObject extends ObjectRoot {
                 _FederateHandle_handle = rti.getAttributeHandle("FederateHandle", get_handle());
                 _FederateType_handle = rti.getAttributeHandle("FederateType", get_handle());
                 _FederateHost_handle = rti.getAttributeHandle("FederateHost", get_handle());
-//                _FederateIsLateJoiner_handle = rti.getAttributeHandle("FederateIsLateJoiner", get_handle());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
                 LOG.error("{} Federate Not Execution Member", initErrorMessage);
@@ -229,20 +217,14 @@ public class FederateObject extends ObjectRoot {
             }
         }
 
-
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateHandle", get_FederateHandle_handle());
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateType", get_FederateType_handle());
         _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateHost", get_FederateHost_handle());
-//        _datamemberNameHandleMap.put("ObjectRoot.Manager.Federate,FederateIsLateJoiner", get_FederateIsLateJoiner_handle());
-
 
         _datamemberHandleNameMap.put(get_FederateHandle_handle(), "FederateHandle");
         _datamemberHandleNameMap.put(get_FederateType_handle(), "FederateType");
         _datamemberHandleNameMap.put(get_FederateHost_handle(), "FederateHost");
-//        _datamemberHandleNameMap.put(get_FederateIsLateJoiner_handle(), "FederateIsLateJoiner");
-
     }
-
 
     private static boolean _isPublished = false;
     private static String publishErrorMessage = "Error:  ObjectRoot.Manager.Federate:  could not publish:  ";
@@ -275,19 +257,15 @@ public class FederateObject extends ObjectRoot {
                     rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(publishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    LOG.error("{} Federate Not Execution Member", publishErrorMessage);
+                    LOG.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(publishErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Defined", publishErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
                 }
             }
         }
@@ -313,16 +291,16 @@ public class FederateObject extends ObjectRoot {
                     rti.unpublishObjectClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unpublishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    LOG.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    LOG.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(unpublishErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Defined", unpublishErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (ObjectClassNotPublished i) {
-                    System.err.println(unpublishErrorMessage + "Object Class Not Published");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Published", unpublishErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -367,19 +345,15 @@ public class FederateObject extends ObjectRoot {
                     rti.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(subscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    LOG.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    LOG.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(subscribeErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Defined", subscribeErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
                 }
             }
         }
@@ -405,23 +379,19 @@ public class FederateObject extends ObjectRoot {
                     rti.unsubscribeObjectClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unsubscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    LOG.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    LOG.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(unsubscribeErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Defined", unsubscribeErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (ObjectClassNotSubscribed i) {
-                    System.err.println(unsubscribeErrorMessage + "Object Class Not Subscribed");
-                    i.printStackTrace();
+                    LOG.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
+                    LOG.error(i);
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
                 }
             }
         }
@@ -549,7 +519,6 @@ public class FederateObject extends ObjectRoot {
                 + "FederateHandle:" + get_FederateHandle()
                 + "," + "FederateType:" + get_FederateId()
                 + "," + "FederateHost:" + get_FederateHost()
-//                + "," + "FederateIsLateJoiner:" + get_FederateIsLateJoiner()
                 + ")";
     }
 
@@ -700,11 +669,6 @@ public class FederateObject extends ObjectRoot {
         _subscribeAttributeNameSet.remove("FederateHost");
     }
 
-//    public static void publish_FederateIsLateJoiner() { _publishAttributeNameSet.add("FederateIsLateJoiner"); }
-//    public static void unpublish_FederateIsLateJoiner() { _publishAttributeNameSet.remove("FederateIsLateJoiner"); }
-//    public static void subscribe_FederateIsLateJoiner() { _subscribeAttributeNameSet.add("FederateIsLateJoiner"); }
-//    public static void unsubscribe_FederateIsLateJoiner() { _subscribeAttributeNameSet.remove("FederateIsLateJoiner"); }
-
     private Attribute<Integer> _FederateHandle =
             new Attribute<Integer>(new Integer(0));
 
@@ -800,16 +764,6 @@ public class FederateObject extends ObjectRoot {
         return _FederateHost.getTime();
     }
 
-//    private Attribute<Boolean> _FederateIsLateJoiner = new Attribute<>(false);
-//
-//    public void set_FederateIsLateJoiner(boolean value) {
-//        _FederateIsLateJoiner.setValue(value);
-//        _FederateIsLateJoiner.setTime(getTime());
-//    }
-//    public boolean get_FederateIsLateJoiner() {
-//        return _FederateIsLateJoiner.getValue();
-//    }
-
     protected FederateObject(ReflectedAttributes datamemberMap, boolean initFlag) {
         super(datamemberMap, false);
         if (initFlag) setAttributes(datamemberMap);
@@ -819,7 +773,6 @@ public class FederateObject extends ObjectRoot {
         super(datamemberMap, logicalTime, false);
         if (initFlag) setAttributes(datamemberMap);
     }
-
 
     /**
      * Creates an instance of the FederateObject object class, using
@@ -859,11 +812,9 @@ public class FederateObject extends ObjectRoot {
     public FederateObject(FederateObject FederateObject_var) {
         super(FederateObject_var);
 
-
         set_FederateHandle(FederateObject_var.get_FederateHandle());
         set_FederateId(FederateObject_var.get_FederateId());
         set_FederateHost(FederateObject_var.get_FederateHost());
-//        set_FederateIsLateJoiner(FederateObject_var.get_FederateIsLateJoiner());
     }
 
 
@@ -877,12 +828,9 @@ public class FederateObject extends ObjectRoot {
      * for this object
      */
     public Object getAttribute(String datamemberName) {
-
-
         if ("FederateHandle".equals(datamemberName)) return get_FederateHandle();
         else if ("FederateType".equals(datamemberName)) return get_FederateId();
         else if ("FederateHost".equals(datamemberName)) return get_FederateHost();
-//        else if("FederateIsLateJoiner".equals(datamemberName)) return get_FederateIsLateJoiner();
         else return super.getAttribute(datamemberName);
     }
 
@@ -896,23 +844,18 @@ public class FederateObject extends ObjectRoot {
      * "datamemberHandle" for this object
      */
     public Object getAttribute(int datamemberHandle) {
-
-
         if (get_FederateHandle_handle() == datamemberHandle) return get_FederateHandle();
         else if (get_FederateType_handle() == datamemberHandle) return get_FederateId();
         else if (get_FederateHost_handle() == datamemberHandle) return get_FederateHost();
-//        else if (get_FederateIsLateJoiner_handle() == datamemberHandle) return get_FederateIsLateJoiner();
         else return super.getAttribute(datamemberHandle);
     }
 
     protected boolean setAttributeAux(int param_handle, String val) {
         boolean retval = true;
 
-
         if (param_handle == get_FederateHandle_handle()) set_FederateHandle(Integer.parseInt(val));
         else if (param_handle == get_FederateType_handle()) set_FederateId(val);
         else if (param_handle == get_FederateHost_handle()) set_FederateHost(val);
-//        else if (param_handle == get_FederateIsLateJoiner_handle()) set_FederateIsLateJoiner(Boolean.parseBoolean(val));
         else retval = super.setAttributeAux(param_handle, val);
 
         return retval;
@@ -921,11 +864,9 @@ public class FederateObject extends ObjectRoot {
     protected boolean setAttributeAux(String datamemberName, String val) {
         boolean retval = true;
 
-
         if ("FederateHandle".equals(datamemberName)) set_FederateHandle(Integer.parseInt(val));
         else if ("FederateType".equals(datamemberName)) set_FederateId(val);
         else if ("FederateHost".equals(datamemberName)) set_FederateHost(val);
-//        else if ("FederateIsLateJoiner".equals(datamemberName)) set_FederateIsLateJoiner(Boolean.parseBoolean(val));
         else retval = super.setAttributeAux(datamemberName, val);
 
         return retval;
@@ -934,11 +875,9 @@ public class FederateObject extends ObjectRoot {
     protected boolean setAttributeAux(String datamemberName, Object val) {
         boolean retval = true;
 
-
         if ("FederateHandle".equals(datamemberName)) set_FederateHandle((Integer) val);
         else if ("FederateType".equals(datamemberName)) set_FederateId((String) val);
         else if ("FederateHost".equals(datamemberName)) set_FederateHost((String) val);
-//        else if("FederateIsLateJoiner".equals(datamemberName)) set_FederateIsLateJoiner((Boolean) val);
         else retval = super.setAttributeAux(datamemberName, val);
 
         return retval;
@@ -947,14 +886,12 @@ public class FederateObject extends ObjectRoot {
     protected SuppliedAttributes createSuppliedDatamembers(boolean force) {
         SuppliedAttributes datamembers = super.createSuppliedDatamembers(force);
 
-
         boolean isPublished = false;
-
 
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateHandle_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHandle is published.");
+            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHandle is published.");
             isPublished = false;
         }
         if (isPublished && _FederateHandle.shouldBeUpdated(force)) {
@@ -964,7 +901,7 @@ public class FederateObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateType_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateType is published.");
+            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateType is published.");
             isPublished = false;
         }
         if (isPublished && _FederateId.shouldBeUpdated(force)) {
@@ -974,23 +911,13 @@ public class FederateObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateHost_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHost is published.");
+            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHost is published.");
             isPublished = false;
         }
         if (isPublished && _FederateHost.shouldBeUpdated(force)) {
             datamembers.add(get_FederateHost_handle(), get_FederateHost().getBytes());
             _FederateHost.setHasBeenUpdated();
         }
-//        try {
-//            isPublished = _publishedAttributeHandleSet.isMember(get_FederateIsLateJoiner_handle());
-//        } catch (Exception e) {
-//            System.err.println("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateIsLateJoiner is published.");
-//            isPublished = false;
-//        }
-//        if (isPublished && _FederateIsLateJoiner.shouldBeUpdated(force)) {
-//            datamembers.add(get_FederateIsLateJoiner_handle(), Boolean.toString(get_FederateIsLateJoiner()).getBytes());
-//            _FederateIsLateJoiner.setHasBeenUpdated();
-//        }
         return datamembers;
     }
 
@@ -1000,12 +927,9 @@ public class FederateObject extends ObjectRoot {
         if (object instanceof FederateObject) {
             FederateObject data = (FederateObject) object;
 
-
             _FederateHandle = data._FederateHandle;
             _FederateId = data._FederateId;
             _FederateHost = data._FederateHost;
-//            _FederateIsLateJoiner = data._FederateIsLateJoiner;
-
         }
     }
 }

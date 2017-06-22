@@ -921,6 +921,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             if(federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
                 LOG.info("{} federate joined the federation", SynchronizedFederate.FEDERATION_MANAGER_NAME);
                 _discoveredFederates.remove(objectHandle);
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateId);
+                return;
             }
 
             if(!this.experimentConfig.federateTypesAllowed.contains(federateType)) {
