@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<script>
+	<expect federateType="OmnetFederate"/>
+	<expect federateType="ComplexMapper"/>
+	<expect federateType="DataConversionMapper"/>
+	<expect federateType="BasicMapper"/>
+	<expect federateType="DirectMapper"/>
+	<expect federateType="ICICIBank"/>
+	<expect federateType="SocieteGenerale"/>
+	<expect federateType="BankOfAmerica"/>
+	<expect federateType="Moodys"/>
+	
+	<pause time="100.0"/>
+	<pause time="200.5"/>
+	<pause time="353.8"/>
+
+	<coaNode ID="id-0067-00000064" name="Action-SendFedRescueInteractionForBAC" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.FedRescue" receiver="BankOfAmerica" dollarsInBillionUSDs="35"/>
+	<coaNode ID="id-0067-00000065" name="Action-SendEUMoneyGramInteraction" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.EUMoneyGram" id="MoneyGramXYZ" euros="100000" sender="BankOfAmerica" receiver="SocieteGenerale"/>
+	<coaNode ID="id-0067-00000066" name="Action-SendFrenchTransferReceiptInteraction" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.FrenchTransferReceipt" id="Receipt1"/>
+	<coaNode ID="id-0067-00000067" name="Action-SendMoodysAnalysisInteraction" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.MoodysAnalysis" bank="SocieteGenerale" debtRating="200"/>
+	<coaNode ID="id-0067-00000070" name="Action-SendNamasteInteraction" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.Namaste" />
+	<coaNode ID="id-0067-00000071" name="Action-SendFedRescueInteraction" nodeType="Action" interactionName="InteractionRoot.C2WInteractionRoot.FedRescue" receiver="BankOfAmerica" dollarsInBillionUSDs="50"/>
+	<coaNode ID="id-0066-00000098" name="Fork-Fork1" nodeType="Fork" isDecisionPoint="false"/>
+	<coaNode ID="id-0066-0000009b" name="ProbabilisticChoice-ProbabilisticallySend-FTR-w-p65-OR-MA-w-p35-Interactions" nodeType="ProbabilisticChoice" isDecisionPoint="false"/>
+	<coaNode ID="id-0066-0000009f" name="SyncPoint-WaitForOneInteractionSentToFinishByTime400Secs" nodeType="SyncPoint" time="400.0" minBranchesToSync="1"/>
+	<coaNode ID="id-0066-00000096" name="SyncPoint-StartingCOAExecutionAt20Seconds" nodeType="SyncPoint" time="0.0" minBranchesToSync="-1"/>
+	<coaNode ID="id-0066-000000a0" name="Dur-Wait100Secs" nodeType="Dur" time="100.0"/>
+	<coaNode ID="id-0066-00000095" name="Dur-Wait50SecondsDuration" nodeType="Dur" time="50.0"/>
+	<coaNode ID="id-0066-00000097" name="RandomDur-WaitFor0to100SecondsRandomly" nodeType="RandomDur" lowerBound="0.0" upperBound="0.0"/>
+	<coaNode ID="id-0066-0000009d" name="AwaitN-WaitForOneInteractionSentToFinish" nodeType="AwaitN" minBranchesToAwait="1"/>
+	<coaNode ID="id-0066-00000099" name="AwaitN-WaitForBothInteractionsSendToFinish" nodeType="AwaitN" minBranchesToAwait="-1"/>
+	<coaNode ID="id-0067-0000006f" name="Outcome-CurrentAssetsInBillionUSDsBySocieteGenerale" nodeType="Outcome" interactionName="InteractionRoot.C2WInteractionRoot.CurrentAssetsInBillionUSDs"/>
+	<coaNode ID="id-0067-0000006e" name="Outcome-CurrentAssetsInBillionUSDsByBAC" nodeType="Outcome" interactionName="InteractionRoot.C2WInteractionRoot.CurrentAssetsInBillionUSDs"/>
+	<coaNode ID="id-0067-00000069" name="Outcome-StandardAndPoorsAnalysis" nodeType="Outcome" interactionName="InteractionRoot.C2WInteractionRoot.StandardAndPoorsAnalysis"/>
+	<coaNode ID="id-0066-0000009c" name="OutcomeFilter-Filter2CheckDebtRating" nodeType="OutcomeFilter" />
+	<coaNode ID="id-0069-0000007z" name="TerminateCOA-TerminateTheExecutionOfThisCOAOnAnException" nodeType="TerminateCOA" />
+	
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000097" toNode="id-0066-00000098" />
+	<coaEdge type="COAFlow" flowID="Flow2MA" fromNode="id-0067-00000067" toNode="id-0066-0000009d" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-000000a0" toNode="id-0067-00000070" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0067-0000006e" toNode="id-0066-0000009f" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-0000009f" toNode="id-0067-00000071" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-0000009d" toNode="id-0067-0000006f" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0067-00000065" toNode="id-0066-00000099" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000098" toNode="id-0067-00000065" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000095" toNode="id-0067-00000069" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-0000009d" toNode="id-0067-0000006e" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0067-00000064" toNode="id-0066-00000099" />
+	<coaEdge type="COAFlow" flowID="Flow2FTR" fromNode="id-0067-00000066" toNode="id-0066-0000009d" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0067-0000006f" toNode="id-0066-0000009f" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000098" toNode="id-0067-00000064" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000099" toNode="id-0066-00000095" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0066-00000096" toNode="id-0066-00000097" />
+	<coaEdge type="COAFlow" flowID="" fromNode="id-0067-00000071" toNode="id-0066-000000a0" />
+	<coaEdge type="COAFlowWithProbability" flowID="Flow2MA" fromNode="id-0066-0000009b" toNode="id-0067-00000067" probability="0.65"/>
+	<coaEdge type="COAFlowWithProbability" flowID="Flow2FTR" fromNode="id-0066-0000009b" toNode="id-0067-00000066" probability="0.35"/>
+	<coaEdge type="Outcome2Filter" flowID="" fromNode="id-0067-00000069" toNode="id-0066-0000009c" />
+	<coaEdge type="Filter2COAElement" flowID="" fromNode="id-0066-0000009c" toNode="id-0066-0000009b" />
+	<coaEdge type="COAException" flowID="" fromNode="id-0066-0000009f" toNode="id-0069-0000007z" />
+</script>
