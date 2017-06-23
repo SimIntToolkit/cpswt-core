@@ -1,5 +1,6 @@
 package EchoExample;
 
+import c2w.hla.CpswtFederateInfoObject;
 import org.cpswt.config.FederateConfig;
 import org.cpswt.config.FederateConfigParser;
 import c2w.hla.InteractionRoot;
@@ -18,7 +19,7 @@ public class EchoClient extends EchoClientBase {
         super(params);
     }
 
-    private final int sendMessageCount = 500;
+    private final int sendMessageCount = 10;
     int sequenceNumber = 0;
     Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
     long waitToSendNextMessage = 10000;
@@ -27,6 +28,8 @@ public class EchoClient extends EchoClientBase {
     private void execute() throws Exception {
 
         double currentTime = 1.0;
+
+        this.federateInfo.updateAttributeValues(getLRC());
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );

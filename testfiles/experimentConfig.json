@@ -7,7 +7,7 @@
   "expectedFederates": [
     {
       "federateType": "EchoServer",
-      "count": 1
+      "count": 0
     }
   ],
 

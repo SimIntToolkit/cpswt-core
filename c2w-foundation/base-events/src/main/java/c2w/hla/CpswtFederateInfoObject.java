@@ -16,7 +16,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
     }
 
     private static final String OBJECT_CLASS_NAME = "ObjectRoot.CpswtFederateInfoObject";
-    private static final Logger LOG = LogManager.getLogger(ObjectRoot.class);
+    private static final Logger LOG = LogManager.getLogger(CpswtFederateInfoObject.class);
 
     private static int _FederateId_handle;
     private static int _FederateType_handle;
@@ -109,6 +109,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
             try {
                 _handle = rti.getObjectClassHandle(OBJECT_CLASS_NAME);
                 isNotInitialized = false;
+                LOG.trace("CpswtFederateInfoObject initialized");
             } catch (FederateNotExecutionMember f) {
                 LOG.error("{} Federate Not Execution Member", initErrorMessage);
                 LOG.error(f);
@@ -190,6 +191,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                 try {
                     rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
+                    LOG.trace("CpswtFederateInfoObject published");
                 } catch (FederateNotExecutionMember f) {
                     LOG.error("{} Federate Not Execution Member", publishErrorMessage);
                     LOG.error(f);
@@ -274,6 +276,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                 try {
                     rti.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
+                    LOG.trace("CpswtFederateInfoObject subscribed");
                 } catch (FederateNotExecutionMember f) {
                     LOG.error("{} Federate Not Execution Member", subscribeErrorMessage);
                     LOG.error(f);
@@ -651,12 +654,19 @@ public class CpswtFederateInfoObject extends ObjectRoot {
     }
 
     private Attribute<Boolean> _IsLateJoiner = new Attribute<Boolean>(false);
+
     public void set_IsLateJoiner(boolean value) {
         _IsLateJoiner.setValue(value);
         _IsLateJoiner.setTime(getTime());
     }
-    public boolean get_IsLateJoiner() { return _IsLateJoiner.getValue(); }
-    public double get_IsLateJoiner_time() { return _IsLateJoiner.getTime(); }
+
+    public boolean get_IsLateJoiner() {
+        return _IsLateJoiner.getValue();
+    }
+
+    public double get_IsLateJoiner_time() {
+        return _IsLateJoiner.getTime();
+    }
 
     protected CpswtFederateInfoObject(ReflectedAttributes datamemberMap, boolean initFlag) {
         super(datamemberMap, false);
@@ -682,8 +692,8 @@ public class CpswtFederateInfoObject extends ObjectRoot {
      * of the instance referred to by CpswtFederateInfoObject_var.
      *
      * @param CpswtFederateInfo_var CpswtFederateInfoObject object class instance of which
-     *                      this newly created CpswtFederateInfoObject object class instance will be a
-     *                      duplicate
+     *                              this newly created CpswtFederateInfoObject object class instance will be a
+     *                              duplicate
      */
     public CpswtFederateInfoObject(CpswtFederateInfoObject CpswtFederateInfo_var) {
         super(CpswtFederateInfo_var);
@@ -707,7 +717,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
     public Object getAttribute(String datamemberName) {
         if ("FederateId".equals(datamemberName)) return new Integer(get_FederateId());
         else if ("FederateType".equals(datamemberName)) return get_FederateType();
-        else if("IsLateJoiner".equals(datamemberName)) return get_IsLateJoiner();
+        else if ("IsLateJoiner".equals(datamemberName)) return get_IsLateJoiner();
         else return super.getAttribute(datamemberName);
     }
 

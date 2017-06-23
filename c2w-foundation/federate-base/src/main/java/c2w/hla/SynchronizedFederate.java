@@ -109,6 +109,8 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  */
 public class SynchronizedFederate extends NullFederateAmbassador {
 
+    public CpswtFederateInfoObject federateInfo;
+
     private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 500;
 
@@ -264,18 +266,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 LOG.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
                 synchronized (lrc) {
                     this.lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
-
-                    CpswtFederateInfoObject.publish_FederateId();
-                    CpswtFederateInfoObject.publish_FederateType();
-                    CpswtFederateInfoObject.publish_IsLateJoiner();
-                    CpswtFederateInfoObject.publish(this.lrc);
-
-                    CpswtFederateInfoObject federateInfo = new CpswtFederateInfoObject();
-                    federateInfo.set_FederateId(this.federateId);
-                    federateInfo.set_FederateType(this.federateType);
-                    federateInfo.set_IsLateJoiner(this.isLateJoiner);
-                    federateInfo.registerObject(this.lrc);
-                    federateInfo.updateAttributeValues(this.lrc);
                 }
                 federationNotPresent = false;
                 LOG.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
@@ -285,6 +275,21 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (Exception e) {
                 LOG.error("General error while trying to join federation. {}", e);
             }
+        }
+    }
+
+    public void publishFederateInfoObject() {
+        synchronized (this.lrc) {
+            CpswtFederateInfoObject.publish_FederateId();
+            CpswtFederateInfoObject.publish_FederateType();
+            CpswtFederateInfoObject.publish_IsLateJoiner();
+            CpswtFederateInfoObject.publish(this.lrc);
+
+            this.federateInfo = new CpswtFederateInfoObject();
+            federateInfo.set_FederateId(this.federateId);
+            federateInfo.set_FederateType(this.federateType);
+            federateInfo.set_IsLateJoiner(this.isLateJoiner);
+            federateInfo.registerObject(this.lrc);
         }
     }
 
