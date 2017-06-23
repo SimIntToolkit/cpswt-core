@@ -26,6 +26,8 @@ public class EchoServer extends EchoServerBase {
         // Add time advance request to RTI to go to 1.0 from the start
         double currentTime = 1.0;
 
+        this.federateInfo.updateAttributeValues(getLRC());
+
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );
 

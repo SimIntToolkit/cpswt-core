@@ -30,9 +30,9 @@ public class EchoClientBase extends SynchronizedFederate {
 		publishFederateInfoObject();
 
 		if(!params.isLateJoiner) {
-			enableTimeConstrained();
-			enableTimeRegulation(getLookAhead());
-		}
+            enableTimeConstrained();
+            enableTimeRegulation(getLookAhead());
+        }
 
 		enableAsynchronousDelivery();
 

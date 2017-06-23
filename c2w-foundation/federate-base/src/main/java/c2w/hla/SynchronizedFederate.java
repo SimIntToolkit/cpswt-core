@@ -112,7 +112,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public CpswtFederateInfoObject federateInfo;
 
     private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
-    public static final int internalThreadWaitTimeMs = 500;
+    public static final int internalThreadWaitTimeMs = 250;
 
     /**
      * Local RTI component. This is where you submit the "requests"
@@ -231,20 +231,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public void createLRC() throws RTIinternalError {
 
-        LOG.debug("[{}] Acquiring connection to RTI ...", this.federateId);
-        if(!this.federateType.equals(SynchronizedFederate.FEDERATION_MANAGER_NAME)) {
-            LOG.debug("[{}] Regular federate waiting {}ms for Federation Manager to initialize", this.federateType, this.federateRTIInitWaitTime);
-
-            try {
-                Thread.sleep(this.federateRTIInitWaitTime);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        LOG.debug("Federate {} acquiring connection to RTI ...", this.federateId);
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();
         this.lrc = factory.createRtiAmbassador();
-        LOG.debug("[{}] CreateRTI successful.", this.federateId);
+        LOG.debug("Federate {} connection to RTI successful.", this.federateId);
     }
 
     /**

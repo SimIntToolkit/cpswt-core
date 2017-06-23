@@ -34,4 +34,12 @@ public class ExperimentConfig {
                 .stream()
                 .anyMatch(fedInfo -> fedInfo.federateType.equalsIgnoreCase(federateType));
     }
+
+    @JsonIgnore
+    public int getRemainingCountForExpectedType(String federateType) {
+        return this.expectedFederates
+                .stream()
+                .filter(item -> item.federateType.equalsIgnoreCase(federateType))
+                .findFirst().get().count;
+    }
 }
