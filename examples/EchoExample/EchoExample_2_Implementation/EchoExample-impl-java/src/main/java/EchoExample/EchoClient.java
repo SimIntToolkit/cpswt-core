@@ -31,6 +31,8 @@ public class EchoClient extends EchoClientBase {
 
         this.federateInfo.updateAttributeValues(getLRC());
 
+        currentTime = this.getCurrentTime();
+
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );
 
