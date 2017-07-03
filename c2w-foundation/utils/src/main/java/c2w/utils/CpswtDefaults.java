@@ -9,4 +9,6 @@ public class CpswtDefaults {
 
     public static final String RootPathEnvVarKey = "CPSWTNG_ROOT";
     public static final String ConfigFileOptionName = "configFile";
+
+    public static final double EPSILON = 1e-6;
 }

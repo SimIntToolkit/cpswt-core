@@ -18,7 +18,6 @@ public class EchoServer extends EchoServerBase {
         super(params);
     }
 
-    double stepSize = 1.0;
     List<ServerReply> replies = new ArrayList<ServerReply>();
 
     private void execute() throws Exception {
@@ -69,7 +68,7 @@ public class EchoServer extends EchoServerBase {
 
             // Prepare to request RTI to advance time to next step
             atr.requestSyncEnd();
-            currentTime += this.stepSize;
+            currentTime += super.getStepSize();
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );
             atr = newATR;
@@ -84,8 +83,8 @@ public class EchoServer extends EchoServerBase {
             EchoServer echoServer = new EchoServer(federateConfig);
             echoServer.execute();
         } catch ( Exception e ) {
-            System.err.println( "Exception caught: " + e.getMessage() );
-            e.printStackTrace();
+            logger.error("There was a problem executing the EchoServer federate: {}", e.getMessage());
+            logger.error(e);
         }
     }
 }
