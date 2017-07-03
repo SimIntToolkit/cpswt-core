@@ -15,84 +15,32 @@ import c2w.hla.SynchronizedFederate;
 
 
 import c2w.hla.*;
+import org.cpswt.config.FederateConfig;
 
 public class PingCounterBase extends SynchronizedFederate {
 
 	private SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
 	
 	// constructor
-	public PingCounterBase( String federation_id, String federate_id ) throws Exception {
-	
-		setLookahead( 0.2 );
-		createRTI();
-		joinFederation( federation_id, federate_id );
+	public PingCounterBase(FederateConfig params) throws Exception {
+		super(params);
 
-		enableTimeConstrained();
+		super.createLRC();
+		super.joinFederation();
 
-		enableTimeRegulation( getLookahead() );
-		enableAsynchronousDelivery();
-        // interaction pubsub
-        
-        		
-		// object pubsub
-                
-        	
-        PingCount.subscribe_RunningCount();
-        PingCount.subscribe_SinkName();
-        PingCount.subscribe( getRTI() );
-                }
-        
-       // constructor
-	public PingCounterBase(  String[] federationInfo ) throws Exception {
+		super.enableTimeConstrained();
 
-		setLookahead( 0.2 );
-		createRTI();
-		joinFederation( federationInfo[ 0 ], federationInfo[ 1 ] );
+		super.enableTimeRegulation( super.getLookAhead() );
+		super.enableAsynchronousDelivery();
 
-		String loglevel = null;
-		if(federationInfo.length == 3)
-			C2WLogger.init( federationInfo[ 2 ] );
-		else if(federationInfo.length > 3)
-			C2WLogger.init( federationInfo[ 2 ], federationInfo[ 3 ] );		
-		
-		if(federationInfo.length == 5)
-			loglevel = federationInfo[ 4 ];
-
-		enableTimeConstrained();
-		enableTimeRegulation( getLookahead() );
-		enableAsynchronousDelivery();
-
-        // interaction pubsub
+		// interaction pubsub
 
 		// object pubsub
-                
-        	
         PingCount.subscribe_RunningCount();
         PingCount.subscribe_SinkName();
-        PingCount.subscribe( getRTI() );
-        		// enable pubsub log
-		if(federationInfo.length  > 2) {
-			
-				
-			
-			
-        		
-	        	PingCount.enableSubscribeLog(
-	        	"PingCount",	
-	        	"RunningCount",
-	        	"PingCounter",
-	        	"NORMAL",
-	        	loglevel);
-	        	PingCount.enableSubscribeLog(
-	        	"PingCount",	
-	        	"SinkName",
-	        	"PingCounter",
-	        	"NORMAL",
-	        	loglevel);
-		}
-		
-	}
-	
+        PingCount.subscribe( super.getLRC() );
+    }
+        
 	@Override
 	public void receiveInteraction(
 	 int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag

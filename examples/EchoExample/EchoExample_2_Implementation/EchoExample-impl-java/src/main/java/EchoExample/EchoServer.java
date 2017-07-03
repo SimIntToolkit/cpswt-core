@@ -1,5 +1,6 @@
 package EchoExample;
 
+import c2w.utils.CpswtDefaults;
 import org.cpswt.config.FederateConfig;
 import org.cpswt.config.FederateConfigParser;
 import c2w.hla.InteractionRoot;
@@ -25,7 +26,11 @@ public class EchoServer extends EchoServerBase {
         // Add time advance request to RTI to go to 1.0 from the start
         double currentTime = 1.0;
 
-        this.federateInfo.updateAttributeValues(getLRC());
+        super.federateInfo.updateAttributeValues(getLRC());
+
+        if (super.isLateJoiner()) {
+            currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+        }
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
         putAdvanceTimeRequest( atr );

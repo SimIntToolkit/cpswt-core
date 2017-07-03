@@ -15,111 +15,75 @@ import c2w.hla.SynchronizedFederate;
 
 
 import c2w.hla.*;
+import org.cpswt.config.FederateConfig;
 
 public class SourceBase extends SynchronizedFederate {
 
-	private SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
-	
-	// constructor
-	public SourceBase( String federation_id, String federate_id ) throws Exception {
-	
-		setLookahead( 0.2 );
-		createRTI();
-		joinFederation( federation_id, federate_id );
+    private SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
 
-		enableTimeConstrained();
+    // constructor
+    public SourceBase(FederateConfig params) throws Exception {
+        super(params);
 
-		enableTimeRegulation( getLookahead() );
-		enableAsynchronousDelivery();
-        // interaction pubsub
-        
-        Ping.publish( getRTI() );
-        		
-		// object pubsub
-                        }
-        
-       // constructor
-	public SourceBase(  String[] federationInfo ) throws Exception {
+        super.createLRC();
+        super.joinFederation();
 
-		setLookahead( 0.2 );
-		createRTI();
-		joinFederation( federationInfo[ 0 ], federationInfo[ 1 ] );
+        super.publishFederateInfoObject();
 
-		String loglevel = null;
-		if(federationInfo.length == 3)
-			C2WLogger.init( federationInfo[ 2 ] );
-		else if(federationInfo.length > 3)
-			C2WLogger.init( federationInfo[ 2 ], federationInfo[ 3 ] );		
-		
-		if(federationInfo.length == 5)
-			loglevel = federationInfo[ 4 ];
-
-		enableTimeConstrained();
-		enableTimeRegulation( getLookahead() );
-		enableAsynchronousDelivery();
+        super.enableTimeConstrained();
+        super.enableTimeRegulation(super.getLookAhead());
+        super.enableAsynchronousDelivery();
 
         // interaction pubsub
 
-        Ping.publish( getRTI() );
-		// object pubsub
-                		// enable pubsub log
-		if(federationInfo.length  > 2) {
-			
-			Ping.enablePublishLog(
-				"Ping",
-				"Source",
-				"NORMAL",
-				loglevel);
-				
-			
-			
-		}
-		
-	}
-	
-	public Ping create_Ping() {
-	   Ping interaction = new Ping();
-	   interaction.set_sourceFed( getFederateId() );
-	   interaction.set_originFed( getFederateId() );
-	   return interaction;
-	}
-	@Override
-	public void receiveInteraction(
-	 int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag
-	) {
-		InteractionRoot interactionRoot = InteractionRoot.create_interaction( interactionClass, theInteraction );
-		if ( interactionRoot instanceof C2WInteractionRoot ) {
-			
-			C2WInteractionRoot c2wInteractionRoot = (C2WInteractionRoot)interactionRoot;
+        Ping.publish(super.getLRC());
 
-	        // Filter interaction if src/origin fed requirements (if any) are not met
-	        if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRoot )  ) {
-	        	return;
-	        } 
-		}
-		
-		super.receiveInteraction( interactionClass, theInteraction, userSuppliedTag );			
-	}
+    }
 
-	@Override
-	public void receiveInteraction(
-	 int interactionClass,
-	 ReceivedInteraction theInteraction,
-	 byte[] userSuppliedTag,
-	 LogicalTime theTime,
-	 EventRetractionHandle retractionHandle
-	) {
-		InteractionRoot interactionRoot = InteractionRoot.create_interaction( interactionClass, theInteraction, theTime );
-		if ( interactionRoot instanceof C2WInteractionRoot ) {
+    public Ping create_Ping() {
+        Ping interaction = new Ping();
+        interaction.set_sourceFed(getFederateId());
+        interaction.set_originFed(getFederateId());
+        return interaction;
+    }
 
-			C2WInteractionRoot c2wInteractionRoot = (C2WInteractionRoot)interactionRoot;
+    @Override
+    public void receiveInteraction(
+            int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag
+    ) {
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction);
+        if (interactionRoot instanceof C2WInteractionRoot) {
 
-	        // Filter interaction if src/origin fed requirements (if any) are not met
-	        if (  _subscribedInteractionFilter.filterC2WInteraction( getFederateId(), c2wInteractionRoot )  ) {
-	        	return;
-	        } 
-		}
+            C2WInteractionRoot c2wInteractionRoot = (C2WInteractionRoot) interactionRoot;
 
-		super.receiveInteraction( interactionClass, theInteraction, userSuppliedTag, theTime, retractionHandle );			
-	}
+            // Filter interaction if src/origin fed requirements (if any) are not met
+            if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {
+                return;
+            }
+        }
+
+        super.receiveInteraction(interactionClass, theInteraction, userSuppliedTag);
+    }
+
+    @Override
+    public void receiveInteraction(
+            int interactionClass,
+            ReceivedInteraction theInteraction,
+            byte[] userSuppliedTag,
+            LogicalTime theTime,
+            EventRetractionHandle retractionHandle
+    ) {
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
+        if (interactionRoot instanceof C2WInteractionRoot) {
+
+            C2WInteractionRoot c2wInteractionRoot = (C2WInteractionRoot) interactionRoot;
+
+            // Filter interaction if src/origin fed requirements (if any) are not met
+            if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {
+                return;
+            }
+        }
+
+        super.receiveInteraction(interactionClass, theInteraction, userSuppliedTag, theTime, retractionHandle);
+    }
 }

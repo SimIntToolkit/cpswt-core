@@ -23,19 +23,32 @@ package HelloWorld_Java_Tutorial;
 
 
 import c2w.hla.base.AdvanceTimeRequest;
+import c2w.utils.CpswtDefaults;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.cpswt.config.FederateConfig;
+import org.cpswt.config.FederateConfigParser;
 
 public class Source extends SourceBase {
-        
-    public Source( String[] args ) throws Exception {
-        super( args );
+
+    private static final Logger logger = LogManager.getLogger(Source.class);
+
+    public Source(FederateConfig params) throws Exception {
+        super(params);
     }
 
     private void execute() throws Exception {
-        
+
         double currentTime = 0;
-        
-        AdvanceTimeRequest atr = new AdvanceTimeRequest( currentTime );
-        putAdvanceTimeRequest( atr );
+
+        super.federateInfo.updateAttributeValues(getLRC());
+
+        if (super.isLateJoiner()) {
+            currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+        }
+
+        AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
+        putAdvanceTimeRequest(atr);
 
         readyToPopulate();
         readyToRun();
@@ -43,35 +56,37 @@ public class Source extends SourceBase {
         startAdvanceTimeThread();
 
         int ix = 0;
-        while( true ) {
+        while (true) {
             Ping ping = create_Ping();
-            ping.set_Count( ix );
-            
+            ping.set_Count(ix);
+
             currentTime += 1;
 
             atr.requestSyncStart();
 
-            System.out.println( "Source: Sending Ping interaction #" + ix );
-            ping.sendInteraction( getRTI(), currentTime );
-            
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
-            putAdvanceTimeRequest( newATR );
-            
+            logger.info("Source: Sending Ping interaction #{}", ix);
+            ping.sendInteraction(super.getLRC(), currentTime);
+
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+
             atr.requestSyncEnd();
             atr = newATR;
 
             ++ix;
         }
-        
+
     }
-    
-    public static void main( String[] args ) {
+
+    public static void main(String[] args) {
         try {
-            Source source = new Source( args );
+            FederateConfigParser federateConfigParser = new FederateConfigParser();
+            FederateConfig federateConfig = federateConfigParser.parseArgs(args, FederateConfig.class);
+            Source source = new Source(federateConfig);
             source.execute();
-        } catch ( Exception e ) {
-            System.err.println( "Exception caught: " + e.getMessage() );
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("There was a problem executing the Source federate: {}", e.getMessage());
+            logger.error(e);
         }
     }
 }

@@ -26,7 +26,7 @@ public class EchoClient extends EchoClientBase {
 
     private void execute() throws Exception {
 
-        this.federateInfo.updateAttributeValues(getLRC());
+        super.federateInfo.updateAttributeValues(getLRC());
         double currentTime = 1.0;
 
         if (super.isLateJoiner()) {
