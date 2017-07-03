@@ -251,11 +251,8 @@
 							<mainClass>${federation.name}.${federate.name}</mainClass>
 
 							<arguments>
-								<argument>--configFile</argument>
+								<argument>-configFile</argument>
 								<argument>${federate.configFile}</argument>
-								<!--<argument>${federation.name}</argument>-->
-								<!--<argument>${federate.name}</argument>-->
-								<!--<argument>${federate.loglevel}</argument>-->
 							</arguments>
 						</configuration>
 					</plugin>

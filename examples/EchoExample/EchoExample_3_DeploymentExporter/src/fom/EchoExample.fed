@@ -22,7 +22,6 @@
           (attribute FederateHandle reliable receive)
           (attribute FederateType reliable receive)
           (attribute FederateHost reliable receive)
-          (attribute FederateIsLateJoiner reliable receive)
           (attribute RTIversion reliable receive)
           (attribute FEDid reliable receive)
           (attribute TimeConstrained reliable receive)
@@ -45,12 +44,17 @@
           (attribute ObjectsReflected reliable receive)
         )
       )
-
-(class FederateObject
-  (attribute FederateHandle reliable timestamp)
-  (attribute FederateHost reliable timestamp)
-  (attribute FederateType reliable timestamp)
-  (attribute FederateIsLateJoiner reliable timestamp) )   )
+      (class FederateObject
+        (attribute FederateHandle reliable timestamp)
+        (attribute FederateHost reliable timestamp)
+        (attribute FederateType reliable timestamp)
+      )
+      (class CpswtFederateInfoObject
+        (attribute FederateId reliable timestamp)
+        (attribute FederateType reliable timestamp)
+        (attribute IsLateJoiner reliable timestamp)
+      )
+    )
   )
   (interactions
     (class InteractionRoot reliable timestamp

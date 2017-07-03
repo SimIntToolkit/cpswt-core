@@ -49,6 +49,11 @@
   (attribute FederateHandle reliable timestamp)
   (attribute FederateHost reliable timestamp)
   (attribute FederateType reliable timestamp) )
+(class CpswtFederateInfoObject
+  (attribute FederateId reliable timestamp)
+  (attribute FederateType reliable timestamp)
+  (attribute IsLateJoiner reliable timestamp)
+)
 (class PingCount
   (attribute RunningCount reliable timestamp)
   (attribute SinkName reliable timestamp) )   ) 

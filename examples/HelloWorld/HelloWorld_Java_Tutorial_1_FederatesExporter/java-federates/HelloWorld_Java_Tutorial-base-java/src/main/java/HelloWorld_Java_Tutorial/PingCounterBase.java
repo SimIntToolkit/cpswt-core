@@ -28,6 +28,8 @@ public class PingCounterBase extends SynchronizedFederate {
 		super.createLRC();
 		super.joinFederation();
 
+        super.publishFederateInfoObject();
+
 		super.enableTimeConstrained();
 
 		super.enableTimeRegulation( super.getLookAhead() );
