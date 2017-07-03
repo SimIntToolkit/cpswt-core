@@ -7,6 +7,7 @@ package c2w.hla;
 import java.util.HashSet;
 import java.util.Set;
 
+//import c2w.utils.CpswtUtils;
 import hla.rti.*;
 
 /**
@@ -261,6 +262,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
+					//CpswtUtils.sleep(50);
 					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 				}
 			}

@@ -21,6 +21,11 @@
             <artifactId>c2w-logging</artifactId>
             <version>0.5.0-SNAPSHOT</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.c2w</groupId>-->
+            <!--<artifactId>utils</artifactId>-->
+            <!--<version>0.5.0-SNAPSHOT</version>-->
+        <!--</dependency>-->
     </dependencies>
 
 </project>
