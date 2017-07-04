@@ -1,5 +1,7 @@
 package org.cpswt.hla.base;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.hla.SynchronizedFederate;
 import hla.rti.FederationTimeAlreadyPassed;
 import hla.rti.RTIambassador;
@@ -71,6 +73,7 @@ import org.portico.impl.hla13.types.DoubleTime;
  * @author Harmon Nine
  */
 public class AdvanceTimeThread extends Thread {
+    private static final Logger logger = LogManager.getLogger(AdvanceTimeThread.class);
 
     // private double _atrStepSize = 0.2;
 
@@ -143,7 +146,7 @@ public class AdvanceTimeThread extends Thread {
                         }
                         tarNotCalled = false;
                     } catch (FederationTimeAlreadyPassed f) {
-                        System.err.println("Time already passed detected.");
+                        logger.error("Time already passed detected.");
                         _synchronizedFederate.setTimeAdvanceNotGranted(false);
                         tarNotCalled = false;
                     } catch (Exception e) {

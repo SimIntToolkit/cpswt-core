@@ -245,7 +245,7 @@ public class FederateObject extends ObjectRoot {
             try {
                 _publishedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.Manager.Federate," + attributeName));
             } catch (Exception e) {
-                System.err.println(publishErrorMessage + "Could not publish \"" + attributeName + "\" attribute.");
+                LOG.error("{} Could not publish \"{}\" attribute.", publishErrorMessage, attributeName);
             }
         }
 
@@ -333,7 +333,7 @@ public class FederateObject extends ObjectRoot {
             try {
             _subscribedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.Manager.Federate," + attributeName));
             } catch (Exception e) {
-                System.err.println(subscribeErrorMessage + "Could not subscribe to \"" + attributeName + "\" attribute.");
+                LOG.error("{} Could not subscribe to \"{}\" attribute.", subscribeErrorMessage, attributeName);
             }
         }
 

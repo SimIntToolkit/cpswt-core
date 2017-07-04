@@ -16,7 +16,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
     }
 
     private static final String OBJECT_CLASS_NAME = "ObjectRoot.CpswtFederateInfoObject";
-    private static final Logger LOG = LogManager.getLogger(CpswtFederateInfoObject.class);
+    private static final Logger logger = LogManager.getLogger(CpswtFederateInfoObject.class);
 
     private static int _FederateId_handle;
     private static int _FederateType_handle;
@@ -109,17 +109,17 @@ public class CpswtFederateInfoObject extends ObjectRoot {
             try {
                 _handle = rti.getObjectClassHandle(OBJECT_CLASS_NAME);
                 isNotInitialized = false;
-                LOG.trace("CpswtFederateInfoObject initialized");
+                logger.trace("CpswtFederateInfoObject initialized");
             } catch (FederateNotExecutionMember f) {
-                LOG.error("{} Federate Not Execution Member", initErrorMessage);
-                LOG.error(f);
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (NameNotFound n) {
-                LOG.error("{} Name Not Found", initErrorMessage);
-                LOG.error(n);
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -137,19 +137,19 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                 _IsLateJoiner_handle = rti.getAttributeHandle("IsLateJoiner", get_handle());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("{} Federate Not Execution Member", initErrorMessage);
-                LOG.error(f);
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (ObjectClassNotDefined i) {
-                LOG.error("{} Object Class Not Defined", initErrorMessage);
-                LOG.error(i);
+                logger.error("{} Object Class Not Defined", initErrorMessage);
+                logger.error(i);
                 return;
             } catch (NameNotFound n) {
-                LOG.error("{} Name Not Found", initErrorMessage);
-                LOG.error(n);
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -180,7 +180,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
             try {
                 _publishedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.CpswtFederateInfo," + attributeName));
             } catch (Exception e) {
-                System.err.println(publishErrorMessage + "Could not publish \"" + attributeName + "\" attribute.");
+                logger.error("{} Could not publish \"{}\" attribute.", publishErrorMessage, attributeName);
             }
         }
 
@@ -191,17 +191,17 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                 try {
                     rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
-                    LOG.trace("CpswtFederateInfoObject published");
+                    logger.trace("CpswtFederateInfoObject published");
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", publishErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", publishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", publishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", publishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -225,19 +225,19 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                     rti.unpublishObjectClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", unpublishErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", unpublishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotPublished i) {
-                    LOG.error("{} Object Class Not Published", unpublishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Published", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -265,7 +265,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
             try {
                 _subscribedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.CpswtFederateInfo," + attributeName));
             } catch (Exception e) {
-                System.err.println(subscribeErrorMessage + "Could not subscribe to \"" + attributeName + "\" attribute.");
+                logger.error("{} Could not subscribe to \"{}\" attribute.", subscribeErrorMessage, attributeName);
             }
         }
 
@@ -276,17 +276,17 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                 try {
                     rti.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
-                    LOG.trace("CpswtFederateInfoObject subscribed");
+                    logger.trace("CpswtFederateInfoObject subscribed");
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", subscribeErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", subscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", subscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -310,19 +310,19 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                     rti.unsubscribeObjectClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", unsubscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotSubscribed i) {
-                    LOG.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -779,7 +779,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateId_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if FederateId is published.");
+            logger.error("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if FederateId is published.");
             isPublished = false;
         }
         if (isPublished && _FederateId.shouldBeUpdated(force)) {
@@ -789,7 +789,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateType_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if FederateType is published.");
+            logger.error("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if FederateType is published.");
             isPublished = false;
         }
         if (isPublished && _FederateType.shouldBeUpdated(force)) {
@@ -800,7 +800,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_IsLateJoiner_handle());
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if IsLateJoiner is published.");
+            logger.error("ERROR:  ObjectRoot.CpswtFederateInfo.createSuppliedAttributes:  could not determine if IsLateJoiner is published.");
             isPublished = false;
         }
         if (isPublished && _IsLateJoiner.shouldBeUpdated(force)) {

@@ -41,7 +41,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final String FACTORY_CLASS_NAME = "org.portico.dlc.HLA13RTIFactory";
     private static final String OBJECTROOT_CLASS_NAME = "ObjectRoot";
 
-    private static final Logger LOG = LogManager.getLogger(ObjectRoot.class);
+    private static final Logger logger = LogManager.getLogger(ObjectRoot.class);
 
     private static int logId = 0;
     private static int _globalUniqueID = 0;
@@ -65,8 +65,8 @@ public class ObjectRoot implements ObjectRootInterface {
                 _factory = RtiFactoryFactory.getRtiFactory(FACTORY_CLASS_NAME);
                 factoryNotAcquired = false;
             } catch (Exception e) {
-                System.err.println("ERROR: acquiring factory");
-                e.printStackTrace();
+                logger.error("ERROR: acquiring factory");
+                logger.error(e);
                 try {
                     Thread.sleep(100);
                 } catch (Exception e1) {
@@ -243,15 +243,15 @@ public class ObjectRoot implements ObjectRootInterface {
                 _handle = rti.getObjectClassHandle(OBJECTROOT_CLASS_NAME);
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println(initErrorMessage + "Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (NameNotFound n) {
-                System.err.println(initErrorMessage + "Name Not Found");
-                n.printStackTrace();
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
                 try {
                     Thread.sleep(50);
                 } catch (Exception e1) {
@@ -286,7 +286,7 @@ public class ObjectRoot implements ObjectRootInterface {
             try {
                 _publishedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot," + attributeName));
             } catch (Exception e) {
-                System.err.println(publishErrorMessage + "Could not publish \"" + attributeName + "\" attribute.");
+                logger.error("{} Could not publish \"" + attributeName + "\" attribute.", publishErrorMessage);
             }
         }
 
@@ -298,15 +298,15 @@ public class ObjectRoot implements ObjectRootInterface {
                     rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(publishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", publishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(publishErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Defined", publishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -336,19 +336,19 @@ public class ObjectRoot implements ObjectRootInterface {
                     rti.unpublishObjectClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unpublishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(unpublishErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Defined", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotPublished i) {
-                    System.err.println(unpublishErrorMessage + "Object Class Not Published");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Published", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -378,7 +378,7 @@ public class ObjectRoot implements ObjectRootInterface {
             try {
                 _subscribedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot," + attributeName));
             } catch (Exception e) {
-                System.err.println(subscribeErrorMessage + "Could not subscribe to \"" + attributeName + "\" attribute.");
+                logger.error("{} Could not subscribe to \"" + attributeName + "\" attribute.", subscribeErrorMessage);
             }
         }
 
@@ -390,15 +390,15 @@ public class ObjectRoot implements ObjectRootInterface {
                     lrc.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(subscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(subscribeErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Defined", subscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -428,19 +428,19 @@ public class ObjectRoot implements ObjectRootInterface {
                     rti.unsubscribeObjectClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unsubscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    System.err.println(unsubscribeErrorMessage + "Object Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Defined", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotSubscribed i) {
-                    System.err.println(unsubscribeErrorMessage + "Object Class Not Subscribed");
-                    i.printStackTrace();
+                    logger.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -648,7 +648,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         Integer classHandle = _classNameHandleMap.get(className);
         if (classHandle == null) {
-            System.err.println("Bad class name \"" + className + "\" on get_handle.");
+            logger.error("Bad class name \"" + className + "\" on get_handle.");
             return -1;
         }
 
@@ -679,7 +679,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         Integer datamemberHandle = _datamemberNameHandleMap.get(className + "," + datamemberName);
         if (datamemberHandle == null) {
-            System.err.println("Bad attribute \"" + datamemberName + "\" for class \"" + className + "\" on get_attribute_handle.");
+            logger.error("Bad attribute \"" + datamemberName + "\" for class \"" + className + "\" on get_attribute_handle.");
             return -1;
         }
 
@@ -702,15 +702,15 @@ public class ObjectRoot implements ObjectRootInterface {
     public static void publish(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on publish.");
+            logger.error("Bad class name \"" + className + "\" on publish.");
             return;
         }
         try {
             Method method = rtiClass.getMethod("publish", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on publish!");
-            e.printStackTrace();
+            logger.error("Exception caught on publish!");
+            logger.error(e);
         }
     }
 
@@ -727,15 +727,15 @@ public class ObjectRoot implements ObjectRootInterface {
     public static void unpublish(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on unpublish.");
+            logger.error("Bad class name \"" + className + "\" on unpublish.");
             return;
         }
         try {
             Method method = rtiClass.getMethod("unpublish", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on unpublish!");
-            e.printStackTrace();
+            logger.error("Exception caught on unpublish!");
+            logger.error(e);
         }
     }
 
@@ -752,15 +752,15 @@ public class ObjectRoot implements ObjectRootInterface {
     public static void subscribe(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on subscribe.");
+            logger.error("Bad class name \"" + className + "\" on subscribe.");
             return;
         }
         try {
             Method method = rtiClass.getMethod("subscribe", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on subscribe!");
-            e.printStackTrace();
+            logger.error("Exception caught on subscribe!");
+            logger.error(e);
         }
     }
 
@@ -780,8 +780,8 @@ public class ObjectRoot implements ObjectRootInterface {
             Method method = rtiClass.getMethod("unsubscribe", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on unsubscribe!");
-            e.printStackTrace();
+            logger.error("Exception caught on unsubscribe!");
+            logger.error(e);
         }
     }
 
@@ -807,8 +807,8 @@ public class ObjectRoot implements ObjectRootInterface {
         try {
             _classNamePublishAttributeNameMap.get(className).add(attributeName);
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.publish:  could not publish class \"" + className + "\" \"" + attributeName + "\" attribute.");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot.publish:  could not publish class \"" + className + "\" \"" + attributeName + "\" attribute.");
+            logger.error(e);
         }
     }
 
@@ -833,8 +833,8 @@ public class ObjectRoot implements ObjectRootInterface {
         try {
             _classNamePublishAttributeNameMap.get(className).remove(attributeName);
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.unpublish:  could not unpublish class \"" + className + "\" \"" + attributeName + "\" attribute.");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot.unpublish:  could not unpublish class \"" + className + "\" \"" + attributeName + "\" attribute.");
+            logger.error(e);
         }
     }
 
@@ -859,8 +859,8 @@ public class ObjectRoot implements ObjectRootInterface {
         try {
             _classNameSubscribeAttributeNameMap.get(className).add(attributeName);
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.subscribe:  could not subscribe to class \"" + className + "\" \"" + attributeName + "\" attribute.");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot.subscribe:  could not subscribe to class \"" + className + "\" \"" + attributeName + "\" attribute.");
+            logger.error(e);
         }
     }
 
@@ -885,8 +885,8 @@ public class ObjectRoot implements ObjectRootInterface {
         try {
             _classNameSubscribeAttributeNameMap.get(className).remove(attributeName);
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot.unsubscribe:  could not unsubscribe class \"" + className + "\" \"" + attributeName + "\" attribute.");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot.unsubscribe:  could not unsubscribe class \"" + className + "\" \"" + attributeName + "\" attribute.");
+            logger.error(e);
         }
     }
 
@@ -896,8 +896,8 @@ public class ObjectRoot implements ObjectRootInterface {
         try {
             classRoot = (ObjectRoot) rtiClass.newInstance();
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot:  create_object:  could not create/cast new Object");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot:  create_object:  could not create/cast new Object");
+            logger.error(e);
         }
 
         return classRoot;
@@ -1067,8 +1067,8 @@ public class ObjectRoot implements ObjectRootInterface {
             objectRoot.setObjectHandle(objectHandle);
             _objectMap.put(objectHandle, objectRoot);
         } catch (Exception e) {
-            System.err.println("ERROR:  ObjectRoot:  discover:  could not discover object");
-            e.printStackTrace();
+            logger.error("ERROR:  ObjectRoot:  discover:  could not discover object");
+            logger.error(e);
         }
         return objectRoot;
     }
@@ -1151,19 +1151,19 @@ public class ObjectRoot implements ObjectRootInterface {
                 rti.requestObjectAttributeValueUpdate(getObjectHandle(), getSubscribedAttributeHandleSet());
                 requestNotSubmitted = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("ERROR: " + getClassName() + "request for update failed:  Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("ERROR: " + getClassName() + "request for update failed:  Federate Not Execution Member");
+                logger.error(f);
                 return;
             } catch (ObjectNotKnown o) {
-                System.err.println("ERROR: " + getClassName() + "request for update failed:  Object Not Known");
-                o.printStackTrace();
+                logger.error("ERROR: " + getClassName() + "request for update failed:  Object Not Known");
+                logger.error(o);
                 return;
             } catch (AttributeNotDefined a) {
-                System.err.println("ERROR: " + getClassName() + "request for update failed:  Name Not Found");
-                a.printStackTrace();
+                logger.error("ERROR: " + getClassName() + "request for update failed:  Name Not Found");
+                logger.error(a);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
                 try {
                     Thread.sleep(50);
                 } catch (Exception e1) {
@@ -1353,18 +1353,18 @@ public class ObjectRoot implements ObjectRootInterface {
             try {
                 setAttribute(datamemberMap.getAttributeHandle(ix), datamemberMap.getValue(ix));
             } catch (Exception e) {
-                System.err.println("setAttributes: Exception caught!");
-                e.printStackTrace();
+                logger.error("setAttributes: Exception caught!");
+                logger.error(e);
             }
         }
     }
 
     private void setAttribute(int handle, byte[] val) {
         if (val == null) {
-            System.err.println("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
+            logger.error("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
         }
         if (!setAttributeAux(handle, new String(val))) {
-            System.err.println("set:  bad attribute handle in class \"" + getClass().getName() + "\"");
+            logger.error("set:  bad attribute handle in class \"" + getClass().getName() + "\"");
         }
     }
 
@@ -1382,7 +1382,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public void setAttribute(String datamemberName, String value) {
         if (!setAttributeAux(datamemberName, value)) {
-            System.err.println("Error:  objectRoot:  invalid attribute \"" + datamemberName + "\"");
+            logger.error("Error:  objectRoot:  invalid attribute \"" + datamemberName + "\"");
         }
     }
 
@@ -1400,7 +1400,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public void setAttribute(String datamemberName, Object value) {
         if (!setAttributeAux(datamemberName, value)) {
-            System.err.println("Error:  objectRoot:  invalid attribute \"" + datamemberName + "\"");
+            logger.error("Error:  objectRoot:  invalid attribute \"" + datamemberName + "\"");
         }
     }
 
@@ -1442,19 +1442,19 @@ public class ObjectRoot implements ObjectRootInterface {
                 _objectMap.put(getObjectHandle(), this);
 
             } catch (ObjectClassNotDefined o) {
-                o.printStackTrace();
+                logger.error(o);
                 return;
             } catch (ObjectClassNotPublished o) {
-                o.printStackTrace();
+                logger.error(o);
                 return;
             } catch (FederateNotExecutionMember f) {
-                f.printStackTrace();
+                logger.error(f);
                 return;
             } catch (Exception e) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {
-                    e1.printStackTrace();
+                    logger.error(e1);
                 }
             }
         }
@@ -1480,19 +1480,19 @@ public class ObjectRoot implements ObjectRootInterface {
                 _objectMap.remove(getObjectHandle());
 
             } catch (ObjectNotKnown o) {
-                o.printStackTrace();
+                logger.error(o);
                 return;
             } catch (DeletePrivilegeNotHeld d) {
-                d.printStackTrace();
+                logger.error(d);
                 return;
             } catch (FederateNotExecutionMember f) {
-                f.printStackTrace();
+                logger.error(f);
                 return;
             } catch (Exception e) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {
-                    e1.printStackTrace();
+                    logger.error(e1);
                 }
             }
         }
@@ -1518,32 +1518,32 @@ public class ObjectRoot implements ObjectRootInterface {
             try {
                 rti.updateAttributeValues(getObjectHandle(), suppliedAttributes, null, new DoubleTime(time));
             } catch (ObjectNotKnown o) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Object Not Known");
-                o.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Object Not Known");
+                logger.error(o);
                 return;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Federate Not Execution Member");
+                logger.error(f);
                 return;
             } catch (AttributeNotDefined a) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Defined");
-                a.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Defined");
+                logger.error(a);
                 return;
             } catch (AttributeNotOwned a) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Owned");
-                a.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Owned");
+                logger.error(a);
                 return;
             } catch (ConcurrentAccessAttempted c) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Concurrent Access Attempted");
-                c.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Concurrent Access Attempted");
+                logger.error(c);
                 return;
             } catch (InvalidFederationTime i) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Invalid Federation Time");
-                i.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Invalid Federation Time");
+                logger.error(i);
                 return;
             } catch (Exception e) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes");
-                e.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes");
+                logger.error(e);
             }
         }
     }
@@ -1578,28 +1578,28 @@ public class ObjectRoot implements ObjectRootInterface {
             try {
                 rti.updateAttributeValues(getObjectHandle(), suppliedAttributes, null);
             } catch (ObjectNotKnown o) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Object Not Known");
-                o.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Object Not Known");
+                logger.error(o);
                 return;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Federate Not Execution Member");
+                logger.error(f);
                 return;
             } catch (AttributeNotDefined a) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Defined");
-                a.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Defined");
+                logger.error(a);
                 return;
             } catch (AttributeNotOwned a) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Owned");
-                a.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Attribute Not Owned");
+                logger.error(a);
                 return;
             } catch (ConcurrentAccessAttempted c) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes:  Concurrent Access Attempted");
-                c.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes:  Concurrent Access Attempted");
+                logger.error(c);
                 return;
             } catch (Exception e) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not update attributes");
-                e.printStackTrace();
+                logger.error("ERROR:  " + getClass().getName() + ":  could not update attributes");
+                logger.error(e);
             }
         }
     }

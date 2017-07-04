@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.util.RandomSingleton;
 
 /**
@@ -37,6 +39,8 @@ import org.cpswt.util.RandomSingleton;
  * @author Himanshu Neema
  */
 public class COAGraph {
+
+	private static final Logger logger = LogManager.getLogger(COAGraph.class);
 
 	private HashMap<String, COANode> _allNodes = new HashMap<String, COANode>();
 
@@ -175,7 +179,7 @@ public class COAGraph {
 
 		node.setExecuted(nodeExecutedTime);
 		_currentRootNodes.remove(node);
-		System.out.println("Node executed in sequence graph: " + node);
+		logger.debug("Node executed in sequence graph: {}", node);
 
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
@@ -198,9 +202,7 @@ public class COAGraph {
 					COAFlowWithProbabilityEdge edgeWithProb = (COAFlowWithProbabilityEdge) edge;
 					double updatedProbability = edgeWithProb.getProbability()
 							/ probabilitiesSum;
-					System.out.println("Normalizing probability of execution of node '"
-							+ edgeWithProb.getToNode() + "' to "
-							+ updatedProbability);
+					logger.debug("Normalizing probability of execution of node '{}' to {}",edgeWithProb.getToNode(), updatedProbability);
 					edgeWithProb.updateProbability(updatedProbability);
 				}
 				// Update successors map with cumulative probabilities for
@@ -219,13 +221,11 @@ public class COAGraph {
 			// Choose
 			Random rand = RandomSingleton.instance();
 			double choiceProb = rand.nextDouble();
-			System.out
-					.println("ProbabilisticChoice cumulative probability chosen = "
-							+ choiceProb);
+			logger.debug("ProbabilisticChoice cumulative probability chosen = {}", choiceProb);
 			for (COANode n : successorsWithCumuProb.keySet()) {
 				if (successorsWithCumuProb.get(n) >= choiceProb) {
 					chosenSuccessor = n;
-					System.out.println("\tThus, choosing successor node: " + n);
+					logger.debug("\tThus, choosing successor node: {}", n);
 					break;
 				}
 			}

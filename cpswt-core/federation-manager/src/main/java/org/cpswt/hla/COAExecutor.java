@@ -1,6 +1,8 @@
 package org.cpswt.hla;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.coa.COAAction;
 import org.cpswt.coa.COAAwaitN;
 import org.cpswt.coa.COADuration;
@@ -24,6 +26,7 @@ import java.util.*;
  * COA executor for FederationManager
  */
 public class COAExecutor {
+    private static final Logger logger = LogManager.getLogger(COAExecutor.class);
 
     COAGraph _coaGraph = new COAGraph();
 
@@ -99,10 +102,10 @@ public class COAExecutor {
         try {
             interactionRoot.sendInteraction(this.rti, tmin);
         } catch (Exception e) {
-            System.out.println("Failed to send interaction: " + interactionRoot);
-            e.printStackTrace();
+            logger.error("Failed to send interaction: " + interactionRoot);
+            logger.error(e);
         }
-        System.out.println("Successfully sent interaction '" + interactionClassName + "' at time '" + tmin + "'");
+        logger.info("Successfully sent interaction '{}' at time '{}'", interactionClassName, tmin);
     }
 
     public void executeCOAGraph() {

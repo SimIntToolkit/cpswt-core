@@ -39,6 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
@@ -64,10 +66,10 @@ import org.portico.impl.hla13.types.DoubleTime;
  * {@link #setParameter(String datamemberName, Object value)}
  */
 public class InteractionRoot implements InteractionRootInterface {
+    
+    private static final Logger logger = LogManager.getLogger(InteractionRoot.class);
 
-    private static int logId = 0;
     private static int _globalUniqueID = 0;
-
     private static int generateUniqueID() {
         return _globalUniqueID++;
     }
@@ -78,7 +80,7 @@ public class InteractionRoot implements InteractionRootInterface {
         return _uniqueID;
     }
 
-    protected static RtiFactory _factory;
+    private static RtiFactory _factory;
 
     static {
         boolean factoryNotAcquired = true;
@@ -87,8 +89,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 _factory = RtiFactoryFactory.getRtiFactory("org.portico.dlc.HLA13RTIFactory");
                 factoryNotAcquired = false;
             } catch (Exception e) {
-                System.err.println("ERROR: acquiring factory");
-                e.printStackTrace();
+                logger.error("ERROR: acquiring factory");
+                logger.error(e);
                 try {
                     Thread.sleep(100);
                 } catch (Exception e1) {
@@ -146,8 +148,8 @@ public class InteractionRoot implements InteractionRootInterface {
         return "InteractionRoot";
     }
 
-    private static Set<String> _datamemberNames = new HashSet<String>();
-    private static Set<String> _allDatamemberNames = new HashSet<String>();
+    private static Set<String> _datamemberNames = new HashSet<>();
+    private static Set<String> _allDatamemberNames = new HashSet<>();
 
     /**
      * Returns a set containing the names of all of the non-hidden parameters in the
@@ -159,7 +161,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * {@link #getParameterNames()}.
      */
     public static Set<String> get_parameter_names() {
-        return new HashSet<String>(_datamemberNames);
+        return new HashSet<>(_datamemberNames);
     }
 
 
@@ -173,7 +175,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * {@link #getParameterNames()}.
      */
     public static Set<String> get_all_parameter_names() {
-        return new HashSet<String>(_allDatamemberNames);
+        return new HashSet<>(_allDatamemberNames);
     }
 
 
@@ -201,15 +203,15 @@ public class InteractionRoot implements InteractionRootInterface {
                 _handle = rti.getInteractionClassHandle("InteractionRoot");
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println(initErrorMessage + "Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (NameNotFound n) {
-                System.err.println(initErrorMessage + "Name Not Found");
-                n.printStackTrace();
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
                 try {
                     Thread.sleep(50);
                 } catch (Exception e1) {
@@ -246,15 +248,15 @@ public class InteractionRoot implements InteractionRootInterface {
                     rti.publishInteractionClass(get_handle());
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(publishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", publishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(publishErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", publishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -285,19 +287,19 @@ public class InteractionRoot implements InteractionRootInterface {
                     rti.unpublishInteractionClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unpublishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(unpublishErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (InteractionClassNotPublished i) {
-                    System.err.println(unpublishErrorMessage + "Interaction Class Not Published");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Published", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -330,15 +332,15 @@ public class InteractionRoot implements InteractionRootInterface {
                     rti.subscribeInteractionClass(get_handle());
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(subscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(subscribeErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", subscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -368,19 +370,19 @@ public class InteractionRoot implements InteractionRootInterface {
                     rti.unsubscribeInteractionClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unsubscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(unsubscribeErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (InteractionClassNotSubscribed i) {
-                    System.err.println(unsubscribeErrorMessage + "Interaction Class Not Subscribed");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Subscribed", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -575,7 +577,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
         Integer classHandle = _classNameHandleMap.get(className);
         if (classHandle == null) {
-            System.err.println("Bad class name \"" + className + "\" on get_handle.");
+            logger.error("Bad class name \"" + className + "\" on get_handle.");
             return -1;
         }
 
@@ -606,7 +608,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
         Integer datamemberHandle = _datamemberNameHandleMap.get(className + "," + datamemberName);
         if (datamemberHandle == null) {
-            System.err.println("Bad parameter \"" + datamemberName + "\" for class \"" + className + "\" on get_parameter_handle.");
+            logger.error("Bad parameter \"{}\" for class \"{}\" on get_parameter_handle.", datamemberName, className);
             return -1;
         }
 
@@ -629,15 +631,15 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void publish(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on publish.");
+            logger.error("Bad class name \"{}\" on publish.", className);
             return;
         }
         try {
             Method method = rtiClass.getMethod("publish", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on publish!");
-            e.printStackTrace();
+            logger.error("Exception caught on publish!");
+            logger.error(e);
         }
     }
 
@@ -654,15 +656,15 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void unpublish(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on unpublish.");
+            logger.error("Bad class name \"{}\" on unpublish.", className);
             return;
         }
         try {
             Method method = rtiClass.getMethod("unpublish", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on unpublish!");
-            e.printStackTrace();
+            logger.error("Exception caught on unpublish!");
+            logger.error(e);
         }
     }
 
@@ -679,15 +681,15 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void subscribe(String className, RTIambassador rti) {
         Class<?> rtiClass = _classNameClassMap.get(className);
         if (rtiClass == null) {
-            System.err.println("Bad class name \"" + className + "\" on subscribe.");
+            logger.error("Bad class name \"{}\" on subscribe.", className);
             return;
         }
         try {
             Method method = rtiClass.getMethod("subscribe", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on subscribe!");
-            e.printStackTrace();
+            logger.error("Exception caught on subscribe!");
+            logger.error(e);
         }
     }
 
@@ -707,8 +709,8 @@ public class InteractionRoot implements InteractionRootInterface {
             Method method = rtiClass.getMethod("unsubscribe", pubsubArguments);
             method.invoke(null, new Object[]{rti});
         } catch (Exception e) {
-            System.err.println("Exception caught on unsubscribe!");
-            e.printStackTrace();
+            logger.error("Exception caught on unsubscribe!");
+            logger.error(e);
         }
     }
 
@@ -718,8 +720,8 @@ public class InteractionRoot implements InteractionRootInterface {
         try {
             classRoot = (InteractionRoot) rtiClass.newInstance();
         } catch (Exception e) {
-            System.err.println("ERROR:  InteractionRoot:  create_interaction:  could not create/cast new Interaction");
-            e.printStackTrace();
+            logger.error("ERROR:  InteractionRoot:  create_interaction:  could not create/cast new Interaction");
+            logger.error(e);
         }
 
         return classRoot;
@@ -985,18 +987,18 @@ public class InteractionRoot implements InteractionRootInterface {
             try {
                 setParameter(datamemberMap.getParameterHandle(ix), datamemberMap.getValue(ix));
             } catch (Exception e) {
-                System.err.println("setParameters: Exception caught!");
-                e.printStackTrace();
+                logger.error("setParameters: Exception caught!");
+                logger.error(e);
             }
         }
     }
 
     private void setParameter(int handle, byte[] val) {
         if (val == null) {
-            System.err.println("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
+            logger.error("set:  Attempt to set null value in class \"{}\"", getClass().getName());
         }
         if (!setParameterAux(handle, new String(val))) {
-            System.err.println("set:  bad parameter handle in class \"" + getClass().getName() + "\"");
+            logger.error("set:  bad parameter handle in class \"{}\"", getClass().getName());
         }
     }
 
@@ -1014,7 +1016,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public void setParameter(String datamemberName, String value) {
         if (!setParameterAux(datamemberName, value)) {
-            System.err.println("Error:  interactionRoot:  invalid parameter \"" + datamemberName + "\"");
+            logger.error("Error:  interactionRoot:  invalid parameter \"{}\"", datamemberName);
         }
     }
 
@@ -1032,7 +1034,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public void setParameter(String datamemberName, Object value) {
         if (!setParameterAux(datamemberName, value)) {
-            System.err.println("Error:  interactionRoot:  invalid parameter \"" + datamemberName + "\"");
+            logger.error("Error:  interactionRoot:  invalid parameter \"{}\"", datamemberName);
         }
     }
 
@@ -1069,8 +1071,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 SuppliedParameters datamembers = createSuppliedDatamembers();
                 rti.sendInteraction(getClassHandle(), datamembers, null, new DoubleTime(time));
             } catch (Exception e) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not send interaction");
-                e.printStackTrace();
+                logger.error("ERROR: {}:  could not send interaction", getClass().getName());
+                logger.error(e);
             }
         }
     }
@@ -1088,8 +1090,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 SuppliedParameters datamembers = createSuppliedDatamembers();
                 rti.sendInteraction(getClassHandle(), datamembers, null);
             } catch (Exception e) {
-                System.err.println("ERROR:  " + getClass().getName() + ":  could not send interaction");
-                e.printStackTrace();
+                logger.error("ERROR: {}:  could not send interaction", getClass().getName());
+                logger.error(e);
             }
         }
     }

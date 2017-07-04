@@ -9,6 +9,8 @@ import java.util.Set;
 
 import hla.rti.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.hla.*;
 
 /**
@@ -16,6 +18,7 @@ import org.cpswt.hla.*;
  * EchoExample simulation.
  */
 public class ActionBase extends C2WInteractionRoot {
+    private static final Logger logger = LogManager.getLogger(ActionBase.class);
 
     /**
      * Default constructor -- creates an instance of the ActionBase interaction
@@ -121,15 +124,15 @@ public class ActionBase extends C2WInteractionRoot {
                 _handle = rti.getInteractionClassHandle("InteractionRoot.C2WInteractionRoot.ActionBase");
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println(initErrorMessage + "Federate Not Execution Member");
-                f.printStackTrace();
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (NameNotFound n) {
-                System.err.println(initErrorMessage + "Name Not Found");
-                n.printStackTrace();
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
                 try {
                     Thread.sleep(50);
                 } catch (Exception e1) {
@@ -164,15 +167,15 @@ public class ActionBase extends C2WInteractionRoot {
                     rti.publishInteractionClass(get_handle());
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(publishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", publishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(publishErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", publishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -200,19 +203,19 @@ public class ActionBase extends C2WInteractionRoot {
                     rti.unpublishInteractionClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unpublishErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(unpublishErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (InteractionClassNotPublished i) {
-                    System.err.println(unpublishErrorMessage + "Interaction Class Not Published");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Published", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -243,15 +246,15 @@ public class ActionBase extends C2WInteractionRoot {
                     rti.subscribeInteractionClass(get_handle());
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(subscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(subscribeErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", subscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {
@@ -279,19 +282,19 @@ public class ActionBase extends C2WInteractionRoot {
                     rti.unsubscribeInteractionClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    System.err.println(unsubscribeErrorMessage + "Federate Not Execution Member");
-                    f.printStackTrace();
+                    logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (InteractionClassNotDefined i) {
-                    System.err.println(unsubscribeErrorMessage + "Interaction Class Not Defined");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Defined", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (InteractionClassNotSubscribed i) {
-                    System.err.println(unsubscribeErrorMessage + "Interaction Class Not Subscribed");
-                    i.printStackTrace();
+                    logger.error("{} Interaction Class Not Subscribed", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                     try {
                         Thread.sleep(50);
                     } catch (Exception e1) {

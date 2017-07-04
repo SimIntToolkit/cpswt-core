@@ -457,14 +457,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 this.lrc.enableAsynchronousDelivery();
                 asynchronousDeliveryNotEnabled = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");
-                f.printStackTrace();
+                LOG.error("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");
+                LOG.error(f);
                 return;
             } catch (AsynchronousDeliveryAlreadyEnabled a) {
                 return;
             } catch (Exception e) {
-                System.err.println("WARNING:  problem encountered enabling asynchronous delivery:  retry");
-                e.printStackTrace();
+                LOG.warn("WARNING:  problem encountered enabling asynchronous delivery:  retry");
+                LOG.warn(e);
                 try {
                     Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e1) {
@@ -497,17 +497,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 getLRC().resignFederationExecution(resignAction);
                 federationNotResigned = false;
             } catch (InvalidResignAction i) {
-                System.err.println("WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.");
+                LOG.warn("WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.");
                 resignAction = DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("WARNING:  While resigning federation:  federate not execution member.");
+                LOG.warn("WARNING:  While resigning federation:  federate not execution member.");
                 return;
             } catch (FederateOwnsAttributes f) {
-                System.err.println("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
+                LOG.warn("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
                 resignAction |= RELEASE_ATTRIBUTES;
             } catch (Exception e) {
-                System.err.println("WARNING:  problem encountered while resigning federation execution:  retry");
-                e.printStackTrace();
+                LOG.warn("WARNING:  problem encountered while resigning federation execution:  retry");
+                LOG.error(e);
                 try {
                     Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 } catch (Exception e1) {
@@ -644,12 +644,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member");
-                f.printStackTrace();
+                LOG.error("SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member");
+                LOG.error(f);
                 return -1;
             } catch (Exception e) {
-                System.err.println("SynchronizedFederate:  getCurrentTime:  Exception caught:  " + e.getMessage());
-                e.printStackTrace(System.err);
+                LOG.error("SynchronizedFederate:  getCurrentTime:  Exception caught: {}", e.getMessage());
+                LOG.error(e);
                 return -1;
             }
         }
@@ -674,12 +674,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member");
-                f.printStackTrace();
+                LOG.error("SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member");
+                LOG.error(f);
                 return -1;
             } catch (Exception e) {
-                System.err.println("SynchronizedFederate:  getLBTS:  Exception caught:  " + e.getMessage());
-                e.printStackTrace(System.err);
+                LOG.error("SynchronizedFederate:  getLBTS:  Exception caught:  " + e.getMessage());
+                LOG.error(e);
                 return -1;
             }
         }
@@ -709,12 +709,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                System.err.println("SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member");
-                f.printStackTrace();
+                LOG.error("SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member");
+                LOG.error(f);
                 return -1;
             } catch (Exception e) {
-                System.err.println("SynchronizedFederate:  getMinTSOTimestamp:  Exception caught:  " + e.getMessage());
-                e.printStackTrace(System.err);
+                LOG.error("SynchronizedFederate:  getMinTSOTimestamp:  Exception caught: {}", e.getMessage());
+                LOG.error(e);
                 return -1;
             }
         }
@@ -803,8 +803,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                        always be its highest super class.
      */
     public static void addInteraction(InteractionRoot interactionRoot) {
+        LOG.trace("Received: {}", interactionRoot);
         _interactionQueue.add(interactionRoot);
-        // System.out.println("Received: " + interactionRoot);
     }
 
     /**
@@ -860,7 +860,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public static InteractionRoot getNextInteractionNoWait() {
         InteractionRoot interactionRoot = _interactionQueue.poll();
-        // System.out.println( "Removed interaction from queue (poll), size now = " + _interactionQueue.size() );
+        LOG.trace("Removed interaction from queue (poll), size now = {}", _interactionQueue.size());
         return interactionRoot;
     }
 
@@ -878,8 +878,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             if (fedFilter != null) {
                 fedFilter = fedFilter.trim();
                 if ((fedFilter.length() > 0) && (fedFilter.compareTo(getFederateId()) != 0)) {
-                    // System.out.println("Filtering due to fed filter: " + fedFilter);
-                    // System.out.println("Filtered interaction was: " + interactionRoot);
+                    LOG.trace("Filtering due to fed filter: {}", fedFilter);
+                    LOG.trace("Filtered interaction was: {}", interactionRoot);
                     return true;
                 }
             }
@@ -903,16 +903,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                         interaction.  Currently ignored.
      */
     @Override
-    public void receiveInteraction(
-            int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag
-    ) {
-        // System.out.println( "SynchronizedFederate::receiveInteraction (no time) for interactionHandle: " + interactionClass);
+    public void receiveInteraction(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
+        LOG.trace("SynchronizedFederate::receiveInteraction (no time) for interactionHandle: {}", interactionClass);
         receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag);
     }
 
-    public final void receiveInteractionSF(
-            int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag
-    ) {
+    public final void receiveInteractionSF(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
         // Himanshu: We normally use only TSO updates, so this shouldn't be
         // called, but due to an RTI bug, it seemingly is getting called. So,
         // for now, use the federate's current time or LBTS whichever is greater
@@ -959,7 +955,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
-        // System.out.println( "SynchronizedFederate::receiveInteraction (with time) for interactionHandle: " + interactionClass);
+        LOG.trace("SynchronizedFederate::receiveInteraction (with time) for interactionHandle: {}", interactionClass);
         this.receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag, theTime, retractionHandle);
     }
 

@@ -5,12 +5,16 @@ import java.util.Set;
 
 //import org.cpswt.utils.CpswtUtils;
 import hla.rti.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 * The C2WInteractionRoot class implements the C2WInteractionRoot interaction in the
 * org.cpswt.hla simulation.
 */
 public class C2WInteractionRoot extends InteractionRoot {
+
+	private static final Logger logger = LogManager.getLogger(C2WInteractionRoot.class);
 
 	/**
 	* Default constructor -- creates an instance of the C2WInteractionRoot interaction
@@ -151,16 +155,16 @@ public class C2WInteractionRoot extends InteractionRoot {
 				_handle = rti.getInteractionClassHandle( "InteractionRoot.C2WInteractionRoot" );
 				isNotInitialized = false;
 			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( initErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;				
+				logger.error("{} Federate Not Execution Member", initErrorMessage);
+				logger.error(f);
+				return;
 			} catch ( NameNotFound n ) {
-				System.err.println( initErrorMessage + "Name Not Found" );
-				n.printStackTrace();
-				return;				
+				logger.error("{} Name Not Found", initErrorMessage);
+				logger.error(n);
+				return;
 			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				logger.error(e);
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 			}
 		}
 
@@ -168,46 +172,46 @@ public class C2WInteractionRoot extends InteractionRoot {
 		_classHandleNameMap.put( get_handle(), "InteractionRoot.C2WInteractionRoot" );
 		_classHandleSimpleNameMap.put( get_handle(), "C2WInteractionRoot" );
 
-		
+
 		isNotInitialized = true;
 		while( isNotInitialized ) {
 			try {
-							
-				_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );			
-				_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );			
-				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );			
+
+				_sourceFed_handle = rti.getParameterHandle( "sourceFed", get_handle() );
+				_originFed_handle = rti.getParameterHandle( "originFed", get_handle() );
+				_federateFilter_handle = rti.getParameterHandle( "federateFilter", get_handle() );
 				_actualLogicalGenerationTime_handle = rti.getParameterHandle( "actualLogicalGenerationTime", get_handle() );
 				isNotInitialized = false;
 			} catch ( FederateNotExecutionMember f ) {
-				System.err.println( initErrorMessage + "Federate Not Execution Member" );
-				f.printStackTrace();
-				return;				
+				logger.error("{} Federate Not Execution Member", initErrorMessage);
+				logger.error(f);
+				return;
 			} catch ( InteractionClassNotDefined i ) {
-				System.err.println( initErrorMessage + "Interaction Class Not Defined" );
-				i.printStackTrace();
-				return;				
+				logger.error("{} Interaction Class Not Defined", initErrorMessage);
+				logger.error(i);
+				return;
 			} catch ( NameNotFound n ) {
-				System.err.println( initErrorMessage + "Name Not Found" );
-				n.printStackTrace();
-				return;				
+				logger.error("{} Name Not Found", initErrorMessage);
+				logger.error(n);
+				return;
 			} catch ( Exception e ) {
-				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				logger.error(e);
+				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 			}
 		}
-			
-			
+
+
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,sourceFed", get_sourceFed_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,originFed", get_originFed_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,federateFilter", get_federateFilter_handle() );
 		_datamemberNameHandleMap.put( "InteractionRoot.C2WInteractionRoot,actualLogicalGenerationTime", get_actualLogicalGenerationTime_handle() );
-			
-			
+
+
 		_datamemberHandleNameMap.put( get_sourceFed_handle(), "sourceFed" );
 		_datamemberHandleNameMap.put( get_originFed_handle(), "originFed" );
 		_datamemberHandleNameMap.put( get_federateFilter_handle(), "federateFilter" );
 		_datamemberHandleNameMap.put( get_actualLogicalGenerationTime_handle(), "actualLogicalGenerationTime" );
-		
+
 	}
 
 
@@ -217,15 +221,14 @@ public class C2WInteractionRoot extends InteractionRoot {
 	/**
 	* Publishes the C2WInteractionRoot interaction class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void publish( RTIambassador rti ) {
 		if ( _isPublished ) return;
-		
+
 		init( rti );
 
-	
+
 
 		synchronized( rti ) {
 			boolean isNotPublished = true;
@@ -234,21 +237,21 @@ public class C2WInteractionRoot extends InteractionRoot {
 					rti.publishInteractionClass( get_handle() );
 					isNotPublished = false;
 				} catch ( FederateNotExecutionMember f ) {
-					System.err.println( publishErrorMessage + "Federate Not Execution Member" );
-					f.printStackTrace();
+					logger.error("{} Federate Not Execution Member", publishErrorMessage);
+					logger.error(f);
 					return;
 				} catch ( InteractionClassNotDefined i ) {
-					System.err.println( publishErrorMessage + "Interaction Class Not Defined" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Defined", publishErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( Exception e ) {
-					e.printStackTrace();
+					logger.error(e);
 					//CpswtUtils.sleep(50);
 					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 				}
 			}
 		}
-		
+
 		_isPublished = true;
 	}
 
@@ -256,12 +259,11 @@ public class C2WInteractionRoot extends InteractionRoot {
 	/**
 	* Unpublishes the C2WInteractionRoot interaction class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void unpublish( RTIambassador rti ) {
 		if ( !_isPublished ) return;
-		
+
 		init( rti );
 		synchronized( rti ) {
 			boolean isNotUnpublished = true;
@@ -270,24 +272,24 @@ public class C2WInteractionRoot extends InteractionRoot {
 					rti.unpublishInteractionClass( get_handle() );
 					isNotUnpublished = false;
 				} catch ( FederateNotExecutionMember f ) {
-					System.err.println( unpublishErrorMessage + "Federate Not Execution Member" );
-					f.printStackTrace();
+					logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+					logger.error(f);
 					return;
 				} catch ( InteractionClassNotDefined i ) {
-					System.err.println( unpublishErrorMessage + "Interaction Class Not Defined" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Defined", unpublishErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( InteractionClassNotPublished i ) {
-					System.err.println( unpublishErrorMessage + "Interaction Class Not Published" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Published", unpublishErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( Exception e ) {
-					e.printStackTrace();
+					logger.error(e);
 					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 				}
 			}
 		}
-		
+
 		_isPublished = false;
 	}
 
@@ -296,15 +298,14 @@ public class C2WInteractionRoot extends InteractionRoot {
 	/**
 	* Subscribes a federate to the C2WInteractionRoot interaction class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void subscribe( RTIambassador rti ) {
 		if ( _isSubscribed ) return;
-		
+
 		init( rti );
-	
-		
+
+
 		synchronized( rti ) {
 			boolean isNotSubscribed = true;
 			while( isNotSubscribed ) {
@@ -312,20 +313,20 @@ public class C2WInteractionRoot extends InteractionRoot {
 					rti.subscribeInteractionClass( get_handle() );
 					isNotSubscribed = false;
 				} catch ( FederateNotExecutionMember f ) {
-					System.err.println( subscribeErrorMessage + "Federate Not Execution Member" );
-					f.printStackTrace();
+					logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+					logger.error(f);
 					return;
 				} catch ( InteractionClassNotDefined i ) {
-					System.err.println( subscribeErrorMessage + "Interaction Class Not Defined" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Defined", subscribeErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( Exception e ) {
-					e.printStackTrace();
+					logger.error(e);
 					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 				}
 			}
 		}
-		
+
 		_isSubscribed = true;
 	}
 
@@ -333,8 +334,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 	/**
 	* Unsubscribes a federate from the C2WInteractionRoot interaction class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void unsubscribe( RTIambassador rti ) {
 		if ( !_isSubscribed ) return;
@@ -347,19 +347,19 @@ public class C2WInteractionRoot extends InteractionRoot {
 					rti.unsubscribeInteractionClass( get_handle() );
 					isNotUnsubscribed = false;
 				} catch ( FederateNotExecutionMember f ) {
-					System.err.println( unsubscribeErrorMessage + "Federate Not Execution Member" );
-					f.printStackTrace();
+					logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+					logger.error(f);
 					return;
 				} catch ( InteractionClassNotDefined i ) {
-					System.err.println( unsubscribeErrorMessage + "Interaction Class Not Defined" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Defined", unsubscribeErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( InteractionClassNotSubscribed i ) {
-					System.err.println( unsubscribeErrorMessage + "Interaction Class Not Subscribed" );
-					i.printStackTrace();
+					logger.error("{} Interaction Class Not Subscribed", unsubscribeErrorMessage);
+					logger.error(i);
 					return;
 				} catch ( Exception e ) {
-					e.printStackTrace();
+					logger.error(e);
 					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
 				}
 			}
@@ -422,32 +422,28 @@ public class C2WInteractionRoot extends InteractionRoot {
 	/**
 	* Publishes the interaction class of this instance of the class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void publishInteraction( RTIambassador rti ) { publish( rti ); }
 
 	/**
 	* Unpublishes the interaction class of this instance of this class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void unpublishInteraction( RTIambassador rti ) { unpublish( rti ); }
 
 	/**
 	* Subscribes a federate to the interaction class of this instance of this class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void subscribeInteraction( RTIambassador rti ) { subscribe( rti ); }
 
 	/**
 	* Unsubscribes a federate from the interaction class of this instance of this class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void unsubscribeInteraction( RTIambassador rti ) { unsubscribe( rti ); }
 
@@ -464,20 +460,13 @@ public class C2WInteractionRoot extends InteractionRoot {
 			+ ")";
 	}
 	
-
-
-
-	
-	
-	private String _sourceFed = "";
+    private String _sourceFed = "";
 	
 	private String _originFed = "";
 	
 	private String _federateFilter = "";
 	
 	private double _actualLogicalGenerationTime = 0;
-
-	
 	
 	/**
 	* Set the value of the "sourceFed" parameter to "value" for this parameter.

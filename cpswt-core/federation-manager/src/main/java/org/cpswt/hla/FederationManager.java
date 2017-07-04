@@ -369,18 +369,18 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     public void recordMainExecutionLoopStartTime() {
-        System.out.println("Main execution loop of federation started at: " + new Date());
+        LOG.debug("Main execution loop of federation started at: {}", new Date());
         tMainLoopStartTime = System.currentTimeMillis();
     }
 
     public void recordMainExecutionLoopEndTime() {
         if (!executionTimeRecorded) {
-            System.out.println("Main execution loop of federation stopped at: " + new Date());
+            LOG.debug("Main execution loop of federation stopped at: {}", new Date());
             tMainLoopEndTime = System.currentTimeMillis();
             executionTimeRecorded = true;
             double execTimeInSecs = (tMainLoopEndTime - tMainLoopStartTime) / 1000.0;
             if (execTimeInSecs > 0) {
-                System.out.println("Total execution time of the main loop: " + execTimeInSecs + " seconds");
+                LOG.debug("Total execution time of the main loop: {} seconds", execTimeInSecs);
             }
         }
     }
@@ -535,7 +535,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                                 // coaExecutor.executeCOAGraph();
 
                                 DoubleTime next_time = new DoubleTime(time.getTime() + step);
-                                System.out.println("Current_time = " + time.getTime() + " and step = " + step + " and requested_time = " + next_time.getTime());
+                                LOG.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
                                 getLRC().timeAdvanceRequest(next_time);
                                 if (realTimeMode) {
                                     time_diff = time_in_millisec - System.currentTimeMillis();
@@ -565,7 +565,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                             }
 
                             if (numStepsExecuted == 10) {
-                                System.out.println("Federation manager current time = " + time.getTime());
+                                LOG.info("Federation manager current time = {}", time.getTime());
                                 numStepsExecuted = 0;
                             }
                         } else {
@@ -666,7 +666,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         double tmin = time.getTime() + super.getLookAhead() + (super.getLookAhead() / 10000.0);
 
         for (double intrtime : script_interactions.keySet()) {
-//            System.out.println("Interaction time = " + intrtime);
+            LOG.trace("Interaction time = {}", intrtime);
             List<InteractionRoot> interactionRootList = script_interactions.get(intrtime);
             if (interactionRootList.size() == 0)
                 continue;
@@ -679,9 +679,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     notFirst = true;
                     interactionClassList += interactionRoot.getClassName();
                 }
-                System.out.println(
-                        "error: simulation passed scheduled interaction time: " + intrtime + "," + interactionClassList
-                );
+                LOG.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList);
             } else if (intrtime >= tmin && intrtime < tmin + super.getStepSize()) {
 
                 List<InteractionRoot> interactionsSent = new ArrayList<InteractionRoot>();
@@ -689,11 +687,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     try {
                         interactionRoot.sendInteraction(getLRC(), intrtime);
                     } catch (Exception e) {
-                        System.out.println("Failed to send interaction: " + interactionRoot);
-                        e.printStackTrace();
+                        LOG.error("Failed to send interaction: {}", interactionRoot);
+                        LOG.error(e.getStackTrace());
                     }
                     interactionsSent.add(interactionRoot);
-                    System.out.println("Sending out the injected interaction");
+                    LOG.info("Sending out the injected interaction");
                 }
                 interactionRootList.removeAll(interactionsSent);
             }
@@ -776,7 +774,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             e.printStackTrace();
         }
 
-        System.out.println("Simulation terminated");
+        LOG.info("Simulation terminated");
 
         running = false;
         paused = false;
@@ -801,13 +799,15 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // Kill the entire federation
         String killCommand = "bash -x " + _stopScriptFilepath;
         try {
-            System.out.println("Killing federation by executing: " + killCommand + "\n\tIn directory: " + rootDir);
+            LOG.info("Killing federation by executing: {}\tIn directory: {}", killCommand, rootDir);
+
+            // TODO: why is this called 3 times???
             Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
             Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
             Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
         } catch (IOException e) {
-            System.out.println("Exception while killing the federation");
-            e.printStackTrace();
+            LOG.error("Exception while killing the federation");
+            LOG.error(e);
         }
         System.exit(0);
     }
@@ -855,16 +855,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             RTIinternalError, ConcurrentAccessAttempted {
         if (level > 0) {
             if (level == 1) {
-                System.out.println("Unsusbcribing to High priority logs");
+                LOG.debug("Unsusbcribing to High priority logs");
                 HighPrio.unsubscribe(getLRC());
             } else if (level == 2) {
-                System.out.println("Unsusbcribing to Medium priority logs");
+                LOG.debug("Unsusbcribing to Medium priority logs");
                 MediumPrio.unsubscribe(getLRC());
             } else if (level == 3) {
-                System.out.println("Unsusbcribing to Low priority logs");
+                LOG.debug("Unsusbcribing to Low priority logs");
                 LowPrio.unsubscribe(getLRC());
             } else if (level == 4) {
-                System.out.println("Unsusbcribing to Very Low priority logs");
+                LOG.debug("Unsusbcribing to Very Low priority logs");
                 VeryLowPrio.unsubscribe(getLRC());
             }
         }
@@ -876,16 +876,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             RTIinternalError, ConcurrentAccessAttempted {
         if (level > 0) {
             if (level == 1) {
-                System.out.println("Susbcribing to High priority logs");
+                LOG.debug("Susbcribing to High priority logs");
                 HighPrio.subscribe(getLRC());
             } else if (level == 2) {
-                System.out.println("Susbcribing to Medium priority logs");
+                LOG.debug("Susbcribing to Medium priority logs");
                 MediumPrio.subscribe(getLRC());
             } else if (level == 3) {
-                System.out.println("Susbcribing to Low priority logs");
+                LOG.debug("Susbcribing to Low priority logs");
                 LowPrio.subscribe(getLRC());
             } else if (level == 4) {
-                System.out.println("Susbcribing to Very Low priority logs");
+                LOG.debug("Susbcribing to Very Low priority logs");
                 VeryLowPrio.subscribe(getLRC());
             }
         }
@@ -940,8 +940,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             }
             return;
         } catch (Exception e) {
-            System.out.println("Error while parsing the Federate object: " + e.getMessage());
-            e.printStackTrace();
+            LOG.error("Error while parsing the Federate object: {}", e.getMessage());
+            LOG.error(e);
         }
     }
 
@@ -1107,8 +1107,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 // support.firePropertyChange(PROP_LOG_VERY_LOW_PRIO, null, vlp);
             }
         } catch (Exception e) {
-            System.out.println("Error while parsing the LOG interaction");
-            e.printStackTrace();
+            LOG.error("Error while parsing the LOG interaction");
+            LOG.error(e);
         }
     }
 
@@ -1130,9 +1130,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             InteractionRoot interactionRoot = InteractionRoot.create_interaction(handle, receivedInteraction);
 
             if (interactionRoot != null) {
-                System.out.println("FederationManager: Received interaction " + interactionRoot);
+                LOG.debug("FederationManager: Received interaction {}", interactionRoot);
             } else {
-                System.err.println("FederationManager: WARNING! Received interaction with handle " + handle + ".. COULD NOT CREATE PROPER INTERACTION");
+                LOG.warn("FederationManager: WARNING! Received interaction with handle {}.. COULD NOT CREATE PROPER INTERACTION", handle);
                 return;
             }
 
@@ -1194,8 +1194,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // monitor_out.print(intrBuf.toString());
             LOG.info(intrBuf.toString());
         } catch (Exception e) {
-            System.out.println("Exception while dumping interaction with handle: " + handle);
-            e.printStackTrace();
+            LOG.error("Exception while dumping interaction with handle: {}", handle);
+            LOG.error(e);
         }
     }
 

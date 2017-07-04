@@ -12,6 +12,8 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cpswt.host.api.FederationManagerControlRequest;
 import org.cpswt.host.api.StateResponse;
 import org.cpswt.config.FederateConfigParser;
@@ -20,7 +22,6 @@ import org.cpswt.hla.FederationManager;
 import org.cpswt.hla.FederationManagerConfig;
 import org.cpswt.host.api.ControlAction;
 import org.cpswt.host.api.StateChangeResponse;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
@@ -30,7 +31,7 @@ import java.util.concurrent.CompletionStage;
  */
 public class FederationManagerHostApp extends AllDirectives {
 
-    static final Logger logger = Logger.getLogger(FederationManagerHostApp.class);
+    private static final Logger logger = LogManager.getLogger(FederationManagerHostApp.class);
     private FederationManager federationManager;
 
     String bindingAddress;
@@ -55,8 +56,8 @@ public class FederationManagerHostApp extends AllDirectives {
             this.federationManager = new FederationManager(this.federationManagerConfig);
         }
         catch(Exception e) {
-            System.err.println("Error while initializing FederationManager!" + e.getMessage());
-            System.err.println(e);
+            logger.error("Error while initializing FederationManager!" + e.getMessage());
+            logger.error(e);
         }
     }
 
@@ -69,7 +70,8 @@ public class FederationManagerHostApp extends AllDirectives {
             return federationManagerConfig;
         }
         catch (Exception fedMgrExp) {
-            logger.error("There was an error starting the federation manager. Reason: " + fedMgrExp.getMessage(), fedMgrExp);
+            logger.error("There was an error starting the federation manager. Reason: {}", fedMgrExp.getMessage());
+            logger.error(fedMgrExp);
             System.exit(-1);
         }
 
@@ -116,10 +118,12 @@ public class FederationManagerHostApp extends AllDirectives {
                                     }
                                 }
                                 catch(IOException ioEx) {
-                                    logger.error("Closing ChunkedOutput encountered a problem.", ioEx);
+                                    logger.error("Closing ChunkedOutput encountered a problem.");
+                                    logger.error(ioEx);
                                 }
                                 catch (Exception ex) {
-                                    logger.error("There was an error while trying to transition FederationManager for action " + action, ex);
+                                    logger.error("There was an error while trying to transition FederationManager for action {}", action);
+                                    logger.error(ex);
                                 }
                             }
                             else {
@@ -178,7 +182,7 @@ public class FederationManagerHostApp extends AllDirectives {
 
         app.initFederationManager();
 
-        System.out.println("Server online at " + app.getBindingAddress() + ":" + app.getPort() + "...");
+        logger.info("Server online at {}:{} ...", app.getBindingAddress(), app.getPort());
         System.in.read();
 
         binding.thenCompose(ServerBinding::unbind)
