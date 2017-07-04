@@ -12,6 +12,7 @@ import hla.rti.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.hla.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
  * The ActionBase class implements the ActionBase interaction in the
@@ -133,10 +134,7 @@ public class ActionBase extends C2WInteractionRoot {
                 return;
             } catch (Exception e) {
                 logger.error(e);
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleepDefault();
             }
         }
 
@@ -176,10 +174,7 @@ public class ActionBase extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -216,10 +211,7 @@ public class ActionBase extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -255,10 +247,7 @@ public class ActionBase extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -295,10 +284,7 @@ public class ActionBase extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }

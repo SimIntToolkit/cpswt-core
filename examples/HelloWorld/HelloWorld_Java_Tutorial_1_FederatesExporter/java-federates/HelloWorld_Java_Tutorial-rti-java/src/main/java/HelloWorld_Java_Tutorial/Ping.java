@@ -152,10 +152,7 @@ public class Ping extends C2WInteractionRoot {
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleepDefault();
             }
         }
 
@@ -184,10 +181,7 @@ public class Ping extends C2WInteractionRoot {
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleepDefault();
             }
         }
 
@@ -228,10 +222,7 @@ public class Ping extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -268,10 +259,7 @@ public class Ping extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -307,10 +295,7 @@ public class Ping extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -347,10 +332,7 @@ public class Ping extends C2WInteractionRoot {
                     return;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }

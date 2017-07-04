@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hla.rti.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
 * The SimulationControl class implements the SimulationControl interaction in the
@@ -138,7 +139,7 @@ public class SimulationControl extends C2WInteractionRoot {
 				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -156,8 +157,7 @@ public class SimulationControl extends C2WInteractionRoot {
 	/**
 	* Publishes the SimulationControl interaction class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void publish( RTIambassador rti ) {
 		if ( _isPublished ) return;
@@ -182,7 +182,7 @@ public class SimulationControl extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -194,8 +194,7 @@ public class SimulationControl extends C2WInteractionRoot {
 	/**
 	* Unpublishes the SimulationControl interaction class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void unpublish( RTIambassador rti ) {
 		if ( !_isPublished ) return;
@@ -221,7 +220,7 @@ public class SimulationControl extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -234,8 +233,7 @@ public class SimulationControl extends C2WInteractionRoot {
 	/**
 	* Subscribes a federate to the SimulationControl interaction class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void subscribe( RTIambassador rti ) {
 		if ( _isSubscribed ) return;
@@ -259,7 +257,7 @@ public class SimulationControl extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -271,8 +269,7 @@ public class SimulationControl extends C2WInteractionRoot {
 	/**
 	* Unsubscribes a federate from the SimulationControl interaction class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public static void unsubscribe( RTIambassador rti ) {
 		if ( !_isSubscribed ) return;
@@ -298,7 +295,7 @@ public class SimulationControl extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -360,32 +357,28 @@ public class SimulationControl extends C2WInteractionRoot {
 	/**
 	* Publishes the interaction class of this instance of the class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void publishInteraction( RTIambassador rti ) { publish( rti ); }
 
 	/**
 	* Unpublishes the interaction class of this instance of this class for a federate.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void unpublishInteraction( RTIambassador rti ) { unpublish( rti ); }
 
 	/**
 	* Subscribes a federate to the interaction class of this instance of this class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void subscribeInteraction( RTIambassador rti ) { subscribe( rti ); }
 
 	/**
 	* Unsubscribes a federate from the interaction class of this instance of this class.
 	*
-	* @param rti handle to the RTI, usu. obtained through the
-	* {@link SynchronizedFederate#getRTI()} call
+	* @param rti handle to the Local RTI Component
 	*/
 	public void unsubscribeInteraction( RTIambassador rti ) { unsubscribe( rti ); }
 

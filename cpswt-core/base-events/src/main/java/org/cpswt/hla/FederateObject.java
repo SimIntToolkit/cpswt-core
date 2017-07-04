@@ -6,6 +6,7 @@ import java.util.Set;
 import hla.rti.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.utils.CpswtUtils;
 
 /**
  * The FederateObject class implements the FederateObject object in the
@@ -14,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 public class FederateObject extends ObjectRoot {
 
     private static final String OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME = "ObjectRoot.Manager.Federate";
-    private static final Logger LOG = LogManager.getLogger(ObjectRoot.class);
+    private static final Logger logger = LogManager.getLogger(ObjectRoot.class);
 
     /**
      * Default constructor -- creates an instance of the FederateObject object
@@ -176,15 +177,15 @@ public class FederateObject extends ObjectRoot {
                 _handle = rti.getObjectClassHandle(OBJECTROOT_MANAGER_FEDERATE_CLASS_NAME);
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("{} Federate Not Execution Member", initErrorMessage);
-                LOG.error(f);
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (NameNotFound n) {
-                LOG.error("{} Name Not Found", initErrorMessage);
-                LOG.error(n);
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -201,19 +202,19 @@ public class FederateObject extends ObjectRoot {
                 _FederateHost_handle = rti.getAttributeHandle("FederateHost", get_handle());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("{} Federate Not Execution Member", initErrorMessage);
-                LOG.error(f);
+                logger.error("{} Federate Not Execution Member", initErrorMessage);
+                logger.error(f);
                 return;
             } catch (ObjectClassNotDefined i) {
-                LOG.error("{} Object Class Not Defined", initErrorMessage);
-                LOG.error(i);
+                logger.error("{} Object Class Not Defined", initErrorMessage);
+                logger.error(i);
                 return;
             } catch (NameNotFound n) {
-                LOG.error("{} Name Not Found", initErrorMessage);
-                LOG.error(n);
+                logger.error("{} Name Not Found", initErrorMessage);
+                logger.error(n);
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
 
@@ -245,7 +246,7 @@ public class FederateObject extends ObjectRoot {
             try {
                 _publishedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.Manager.Federate," + attributeName));
             } catch (Exception e) {
-                LOG.error("{} Could not publish \"{}\" attribute.", publishErrorMessage, attributeName);
+                logger.error("{} Could not publish \"{}\" attribute.", publishErrorMessage, attributeName);
             }
         }
 
@@ -257,15 +258,15 @@ public class FederateObject extends ObjectRoot {
                     rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", publishErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", publishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", publishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", publishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -291,23 +292,20 @@ public class FederateObject extends ObjectRoot {
                     rti.unpublishObjectClass(get_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", unpublishErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", unpublishErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", unpublishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotPublished i) {
-                    LOG.error("{} Object Class Not Published", unpublishErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Published", unpublishErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -333,7 +331,7 @@ public class FederateObject extends ObjectRoot {
             try {
             _subscribedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot.Manager.Federate," + attributeName));
             } catch (Exception e) {
-                LOG.error("{} Could not subscribe to \"{}\" attribute.", subscribeErrorMessage, attributeName);
+                logger.error("{} Could not subscribe to \"{}\" attribute.", subscribeErrorMessage, attributeName);
             }
         }
 
@@ -345,15 +343,15 @@ public class FederateObject extends ObjectRoot {
                     rti.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", subscribeErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", subscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", subscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", subscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -379,19 +377,19 @@ public class FederateObject extends ObjectRoot {
                     rti.unsubscribeObjectClass(get_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember f) {
-                    LOG.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
-                    LOG.error(f);
+                    logger.error("{} Federate Not Execution Member", unsubscribeErrorMessage);
+                    logger.error(f);
                     return;
                 } catch (ObjectClassNotDefined i) {
-                    LOG.error("{} Object Class Not Defined", unsubscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Defined", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (ObjectClassNotSubscribed i) {
-                    LOG.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
-                    LOG.error(i);
+                    logger.error("{} Object Class Not Subscribed", unsubscribeErrorMessage);
+                    logger.error(i);
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e);
                 }
             }
         }
@@ -891,7 +889,7 @@ public class FederateObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateHandle_handle());
         } catch (Exception e) {
-            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHandle is published.");
+            logger.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHandle is published.");
             isPublished = false;
         }
         if (isPublished && _FederateHandle.shouldBeUpdated(force)) {
@@ -901,7 +899,7 @@ public class FederateObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateType_handle());
         } catch (Exception e) {
-            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateType is published.");
+            logger.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateType is published.");
             isPublished = false;
         }
         if (isPublished && _FederateId.shouldBeUpdated(force)) {
@@ -911,7 +909,7 @@ public class FederateObject extends ObjectRoot {
         try {
             isPublished = _publishedAttributeHandleSet.isMember(get_FederateHost_handle());
         } catch (Exception e) {
-            LOG.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHost is published.");
+            logger.error("ERROR:  ObjectRoot.Manager.Federate.createSuppliedAttributes:  could not determine if FederateHost is published.");
             isPublished = false;
         }
         if (isPublished && _FederateHost.shouldBeUpdated(force)) {

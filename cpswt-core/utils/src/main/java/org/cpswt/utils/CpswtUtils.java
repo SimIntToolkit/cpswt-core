@@ -14,4 +14,8 @@ public class CpswtUtils {
         }
         catch(InterruptedException e) {}
     }
+
+    public static void sleepDefault() {
+        CpswtUtils.sleep(50);
+    }
 }

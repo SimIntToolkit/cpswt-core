@@ -41,6 +41,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
@@ -91,10 +92,7 @@ public class InteractionRoot implements InteractionRootInterface {
             } catch (Exception e) {
                 logger.error("ERROR: acquiring factory");
                 logger.error(e);
-                try {
-                    Thread.sleep(100);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleep(100);
             }
         }
     }
@@ -212,10 +210,7 @@ public class InteractionRoot implements InteractionRootInterface {
                 return;
             } catch (Exception e) {
                 logger.error(e);
-                try {
-                    Thread.sleep(50);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleepDefault();
             }
         }
 
@@ -257,10 +252,7 @@ public class InteractionRoot implements InteractionRootInterface {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -300,10 +292,7 @@ public class InteractionRoot implements InteractionRootInterface {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -341,10 +330,7 @@ public class InteractionRoot implements InteractionRootInterface {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }
@@ -383,10 +369,7 @@ public class InteractionRoot implements InteractionRootInterface {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }

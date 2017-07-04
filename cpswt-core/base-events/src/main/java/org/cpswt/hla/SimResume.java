@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hla.rti.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
 * The SimResume class implements the SimResume interaction in the
@@ -138,7 +139,7 @@ public class SimResume extends SimulationControl {
 				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -182,7 +183,7 @@ public class SimResume extends SimulationControl {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -221,7 +222,7 @@ public class SimResume extends SimulationControl {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -259,7 +260,7 @@ public class SimResume extends SimulationControl {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -298,7 +299,7 @@ public class SimResume extends SimulationControl {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}

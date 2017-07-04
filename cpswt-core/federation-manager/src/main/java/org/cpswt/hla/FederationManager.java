@@ -49,6 +49,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.config.*;
+import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
@@ -308,10 +309,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                                     rtiDiscoveredObjectsObs.remove(obj);
                                 }
                             } catch (Exception e) {
-                                try {
-                                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                                } catch (Exception e2) {
-                                }
+                                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                             }
                         }
                     }
@@ -419,7 +417,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
             super.lrc.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToPopulate)) {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 super.lrc.tick();
             }
             LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToPopulate);
@@ -428,7 +426,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
             super.lrc.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToRun)) {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 super.lrc.tick();
             }
             LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToRun);
@@ -437,7 +435,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
             super.lrc.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToResign)) {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 super.lrc.tick();
             }
             LOG.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToResign);
@@ -479,7 +477,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if (!_autoStart) {
             this.pauseSimulation();
             while (this.paused) {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
 
@@ -522,7 +520,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                             while (sleep_time > 0 && realTimeMode) {
                                 long local_sleep_time = sleep_time;
                                 if (local_sleep_time > 1000) local_sleep_time = 1000;
-                                Thread.sleep(local_sleep_time);
+                                CpswtUtils.sleep(local_sleep_time);
                                 sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
                             }
                         }
@@ -569,7 +567,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                                 numStepsExecuted = 0;
                             }
                         } else {
-                            Thread.sleep(10);
+                            CpswtUtils.sleep(10);
                         }
 
                         // If we have reached federation end time (if it was configured), terminate the federation
@@ -631,11 +629,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 }
 
                 super.lrc.tick();
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 numOfFedsToWaitFor = this.workingExperimentConfig.expectedFederateItemsCount();
             }
             catch(Exception e) {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
         LOG.debug("All expected federates have joined the federation. Proceeding with the simulation...");
@@ -657,7 +655,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private void waitForFederatesToResign() throws Exception {
         while (_processedFederates.size() != 0) {
             getLRC().tick();
-            Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
         }
         LOG.info("All federates have resigned the federation.  Simulation terminated.\n");
     }
@@ -768,11 +766,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
 
         // Wait for 2 seconds for SimEnd to reach others
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CpswtUtils.sleep(2000);
 
         LOG.info("Simulation terminated");
 
@@ -781,11 +775,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.setFederateState(FederateState.TERMINATED);
 
         // Wait for 10 seconds for Simulation to gracefully exit
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CpswtUtils.sleep(10000);
 
         // If simulation has still not exited gracefully, run kill command
         killEntireFederation();

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import hla.rti.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
 * The SimLog class implements the SimLog interaction in the
@@ -174,7 +175,7 @@ public class SimLog extends C2WInteractionRoot {
 				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -205,7 +206,7 @@ public class SimLog extends C2WInteractionRoot {
 				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				CpswtUtils.sleepDefault();
 			}
 		}
 			
@@ -254,7 +255,7 @@ public class SimLog extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -293,7 +294,7 @@ public class SimLog extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -331,7 +332,7 @@ public class SimLog extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -370,7 +371,7 @@ public class SimLog extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}

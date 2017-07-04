@@ -25,6 +25,7 @@
 package org.cpswt.hla;
 
 import org.cpswt.hla.base.*;
+import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
 import hla.rti.ArrayIndexOutOfBounds;
 import hla.rti.AsynchronousDeliveryAlreadyEnabled;
@@ -329,10 +330,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (FederateNotExecutionMember f) {
                 throw f;
             } catch (Exception e) {
-                try {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                } catch (Exception e2) {
-                }
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
 
@@ -343,10 +341,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         } catch (Exception e) {
         }
         while (_timeConstrainedNotEnabled) {
-            try {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            } catch (Exception e) {
-            }
+            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             try {
                 synchronized (lrc) {
                     lrc.tick();
@@ -396,10 +391,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (InvalidLookahead i) {
                 throw i;
             } catch (Exception e) {
-                try {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                } catch (Exception e2) {
-                }
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
 
@@ -410,10 +402,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         } catch (Exception e) {
         }
         while (_timeRegulationNotEnabled) {
-            try {
-                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            } catch (Exception e) {
-            }
+            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             try {
                 synchronized (lrc) {
                     lrc.tick();
@@ -465,10 +454,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (Exception e) {
                 LOG.warn("WARNING:  problem encountered enabling asynchronous delivery:  retry");
                 LOG.warn(e);
-                try {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
     }
@@ -508,10 +494,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (Exception e) {
                 LOG.warn("WARNING:  problem encountered while resigning federation execution:  retry");
                 LOG.error(e);
-                try {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                } catch (Exception e1) {
-                }
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
     }
@@ -585,7 +568,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                     lrc.synchronizationPointAchieved(label);
                 }
                 while (!_achievedSynchronizationPoints.contains(label)) {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                    CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                     synchronized (lrc) {
                         lrc.tick();
                     }
@@ -603,18 +586,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                         } catch (RTIinternalError r) {
                             throw r;
                         } catch (Exception e) {
-                            try {
-                                Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                            } catch (Exception e2) {
-                            }
+                            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                         }
                     }
                 }
             } catch (Exception e) {
-                try {
-                    Thread.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                } catch (Exception e2) {
-                }
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
     }

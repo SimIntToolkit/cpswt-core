@@ -6,6 +6,7 @@ import java.util.Set;
 import hla.rti.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.utils.CpswtUtils;
 
 /**
  * CpswtFederateInfoObject represents the information that should be shared when a federate joins a federation.
@@ -238,10 +239,7 @@ public class CpswtFederateInfoObject extends ObjectRoot {
                     return;
                 } catch (Exception e) {
                     logger.error(e);
-                    try {
-                        Thread.sleep(50);
-                    } catch (Exception e1) {
-                    }
+                    CpswtUtils.sleepDefault();
                 }
             }
         }

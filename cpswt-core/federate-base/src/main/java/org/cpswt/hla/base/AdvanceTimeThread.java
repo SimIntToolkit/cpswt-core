@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.cpswt.hla.SynchronizedFederate;
 import hla.rti.FederationTimeAlreadyPassed;
 import hla.rti.RTIambassador;
+import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
@@ -160,10 +161,7 @@ public class AdvanceTimeThread extends Thread {
                         }
                     } catch (Exception e) {
                     }
-                    try {
-                        Thread.sleep(10);
-                    } catch (Exception e) {
-                    }
+                    CpswtUtils.sleep(10);
                 }
 
                 currentTime = _synchronizedFederate.getCurrentTime();

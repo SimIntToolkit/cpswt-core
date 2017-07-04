@@ -3,10 +3,11 @@ package org.cpswt.hla;
 import java.util.HashSet;
 import java.util.Set;
 
-//import org.cpswt.utils.CpswtUtils;
 import hla.rti.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.utils.CpswtDefaults;
+import org.cpswt.utils.CpswtUtils;
 
 /**
 * The C2WInteractionRoot class implements the C2WInteractionRoot interaction in the
@@ -164,7 +165,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 				return;
 			} catch ( Exception e ) {
 				logger.error(e);
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -196,7 +197,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 				return;
 			} catch ( Exception e ) {
 				logger.error(e);
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -247,7 +248,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 				} catch ( Exception e ) {
 					logger.error(e);
 					//CpswtUtils.sleep(50);
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                    CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -285,7 +286,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					logger.error(e);
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                    CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -322,7 +323,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					logger.error(e);
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                    CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -360,7 +361,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					logger.error(e);
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+                    CpswtUtils.sleepDefault();
 				}
 			}
 		}

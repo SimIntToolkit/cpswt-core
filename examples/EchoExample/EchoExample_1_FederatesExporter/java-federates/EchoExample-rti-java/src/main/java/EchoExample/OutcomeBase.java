@@ -10,6 +10,7 @@ import java.util.Set;
 import hla.rti.*;
 
 import org.cpswt.hla.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
 * The OutcomeBase class implements the OutcomeBase interaction in the
@@ -140,7 +141,7 @@ public class OutcomeBase extends C2WInteractionRoot {
 				return;				
 			} catch ( Exception e ) {
 				e.printStackTrace();
-				try { Thread.sleep( 50 ); } catch( Exception e1 ) { }					
+				CpswtUtils.sleepDefault();
 			}
 		}
 
@@ -184,7 +185,7 @@ public class OutcomeBase extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -223,7 +224,7 @@ public class OutcomeBase extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -261,7 +262,7 @@ public class OutcomeBase extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
@@ -300,7 +301,7 @@ public class OutcomeBase extends C2WInteractionRoot {
 					return;
 				} catch ( Exception e ) {
 					e.printStackTrace();
-					try { Thread.sleep( 50 ); } catch( Exception e1 ) { }
+					CpswtUtils.sleepDefault();
 				}
 			}
 		}
