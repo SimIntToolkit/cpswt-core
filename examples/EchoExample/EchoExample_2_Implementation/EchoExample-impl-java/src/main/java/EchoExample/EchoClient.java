@@ -86,6 +86,10 @@ public class EchoClient extends EchoClientBase {
             // wait until next message to send
             // Thread.sleep(this.waitToSendNextMessage);
         }
+
+        // done with sending the messages, time to resign
+        this.federateInfo.unpublishObject(getLRC());
+        super.resignFederationExecution();
     }
 
     void sendClientMessage(double currentTime) throws Exception {
@@ -106,6 +110,8 @@ public class EchoClient extends EchoClientBase {
             FederateConfig federateConfig = federateConfigParser.parseArgs(args, FederateConfig.class);
             EchoClient echoClient = new EchoClient(federateConfig);
             echoClient.execute();
+
+            System.exit(1);
         } catch (Exception e) {
             logger.error("There was a problem executing the EchoClient federate: {}", e.getMessage());
             logger.error(e);

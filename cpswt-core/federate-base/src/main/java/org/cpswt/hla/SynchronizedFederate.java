@@ -27,7 +27,6 @@ package org.cpswt.hla;
 import org.cpswt.hla.base.*;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
-import hla.rti.ArrayIndexOutOfBounds;
 import hla.rti.AsynchronousDeliveryAlreadyEnabled;
 import hla.rti.EnableTimeConstrainedPending;
 import hla.rti.EnableTimeRegulationPending;
@@ -59,7 +58,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.hla.base.*;
 import org.cpswt.config.FederateConfig;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
@@ -113,7 +111,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public CpswtFederateInfoObject federateInfo;
 
-    private static final Logger LOG = LogManager.getLogger(SynchronizedFederate.class);
+    private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 250;
 
     /**
@@ -123,8 +121,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     protected RTIambassador lrc;
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
-
-    public static int logId = 0;
 
     private Set<String> _achievedSynchronizationPoints = new HashSet<String>();
 
@@ -233,10 +229,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public void createLRC() throws RTIinternalError {
 
-        LOG.debug("Federate {} acquiring connection to RTI ...", this.federateId);
+        logger.debug("Federate {} acquiring connection to RTI ...", this.federateId);
         RtiFactory factory = RtiFactoryFactory.getRtiFactory();
         this.lrc = factory.createRtiAmbassador();
-        LOG.debug("Federate {} connection to RTI successful.", this.federateId);
+        logger.debug("Federate {} connection to RTI successful.", this.federateId);
     }
 
     /**
@@ -255,17 +251,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         boolean federationNotPresent = true;
         while (federationNotPresent) {
             try {
-                LOG.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
+                logger.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
                 synchronized (lrc) {
                     this.lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
                 federationNotPresent = false;
-                LOG.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
+                logger.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
             } catch (FederateAlreadyExecutionMember f) {
-                LOG.error("Federate already execution member: {}", f);
+                logger.error("Federate already execution member: {}", f);
                 return;
             } catch (Exception e) {
-                LOG.error("General error while trying to join federation. {}", e);
+                logger.error("General error while trying to join federation. {}", e);
             }
         }
     }
@@ -384,12 +380,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 return;
             } catch (EnableTimeRegulationPending e) {
                 timeRegulationEnabledNotCalled = false;
-            } catch (FederateNotExecutionMember f) {
-                throw f;
-            } catch (InvalidFederationTime i) {
-                throw i;
-            } catch (InvalidLookahead i) {
-                throw i;
+            } catch (FederateNotExecutionMember | InvalidFederationTime | InvalidLookahead ex) {
+                throw ex;
             } catch (Exception e) {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
@@ -446,23 +438,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 this.lrc.enableAsynchronousDelivery();
                 asynchronousDeliveryNotEnabled = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");
-                LOG.error(f);
+                logger.error("ERROR:  Could not enable asynchronous delivery:  Federate Not Execution Member");
+                logger.error(f);
                 return;
             } catch (AsynchronousDeliveryAlreadyEnabled a) {
                 return;
             } catch (Exception e) {
-                LOG.warn("WARNING:  problem encountered enabling asynchronous delivery:  retry");
-                LOG.warn(e);
+                logger.warn("WARNING:  problem encountered enabling asynchronous delivery:  retry");
+                logger.warn(e);
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
     }
-
-    public static final int DELETE_OBJECTS = ResignAction.DELETE_OBJECTS;
-    public static final int DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES = ResignAction.DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
-    public static final int NO_ACTION = ResignAction.NO_ACTION;
-    public static final int RELEASE_ATTRIBUTES = ResignAction.RELEASE_ATTRIBUTES;
 
     /**
      * Resigns federate from the federation execution.
@@ -483,17 +470,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 getLRC().resignFederationExecution(resignAction);
                 federationNotResigned = false;
             } catch (InvalidResignAction i) {
-                LOG.warn("WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.");
-                resignAction = DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
+                logger.warn("WARNING:  Invalid resign action when attempting to resign federation.  Changing resign action to DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.");
+                resignAction = ResignAction.DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES;
             } catch (FederateNotExecutionMember f) {
-                LOG.warn("WARNING:  While resigning federation:  federate not execution member.");
+                logger.warn("WARNING:  While resigning federation:  federate not execution member.");
                 return;
             } catch (FederateOwnsAttributes f) {
-                LOG.warn("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
-                resignAction |= RELEASE_ATTRIBUTES;
+                logger.warn("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
+                resignAction |= ResignAction.RELEASE_ATTRIBUTES;
             } catch (Exception e) {
-                LOG.warn("WARNING:  problem encountered while resigning federation execution:  retry");
-                LOG.error(e);
+                logger.warn("WARNING:  problem encountered while resigning federation execution:  retry");
+                logger.error(e);
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
@@ -504,7 +491,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES.
      */
     public void resignFederationExecution() {
-        resignFederationExecution(DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES);
+        resignFederationExecution(ResignAction.DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES);
     }
 
     /**
@@ -621,12 +608,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member");
-                LOG.error(f);
+                logger.error("SynchronizedFederate:  getCurrentTime:  ERROR:  Federate not execution member");
+                logger.error(f);
                 return -1;
             } catch (Exception e) {
-                LOG.error("SynchronizedFederate:  getCurrentTime:  Exception caught: {}", e.getMessage());
-                LOG.error(e);
+                logger.error("SynchronizedFederate:  getCurrentTime:  Exception caught: {}", e.getMessage());
+                logger.error(e);
                 return -1;
             }
         }
@@ -651,12 +638,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member");
-                LOG.error(f);
+                logger.error("SynchronizedFederate:  getLBTS:  ERROR:  Federate not execution member");
+                logger.error(f);
                 return -1;
             } catch (Exception e) {
-                LOG.error("SynchronizedFederate:  getLBTS:  Exception caught:  " + e.getMessage());
-                LOG.error(e);
+                logger.error("SynchronizedFederate:  getLBTS:  Exception caught:  " + e.getMessage());
+                logger.error(e);
                 return -1;
             }
         }
@@ -686,12 +673,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 }
                 timeNotAcquired = false;
             } catch (FederateNotExecutionMember f) {
-                LOG.error("SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member");
-                LOG.error(f);
+                logger.error("SynchronizedFederate:  getMinTSOTimestamp:  ERROR:  Federate not execution member");
+                logger.error(f);
                 return -1;
             } catch (Exception e) {
-                LOG.error("SynchronizedFederate:  getMinTSOTimestamp:  Exception caught: {}", e.getMessage());
-                LOG.error(e);
+                logger.error("SynchronizedFederate:  getMinTSOTimestamp:  Exception caught: {}", e.getMessage());
+                logger.error(e);
                 return -1;
             }
         }
@@ -780,7 +767,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                        always be its highest super class.
      */
     public static void addInteraction(InteractionRoot interactionRoot) {
-        LOG.trace("Received: {}", interactionRoot);
+        logger.trace("Received: {}", interactionRoot);
         _interactionQueue.add(interactionRoot);
     }
 
@@ -837,7 +824,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public static InteractionRoot getNextInteractionNoWait() {
         InteractionRoot interactionRoot = _interactionQueue.poll();
-        LOG.trace("Removed interaction from queue (poll), size now = {}", _interactionQueue.size());
+        logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueue.size());
         return interactionRoot;
     }
 
@@ -855,8 +842,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             if (fedFilter != null) {
                 fedFilter = fedFilter.trim();
                 if ((fedFilter.length() > 0) && (fedFilter.compareTo(getFederateId()) != 0)) {
-                    LOG.trace("Filtering due to fed filter: {}", fedFilter);
-                    LOG.trace("Filtered interaction was: {}", interactionRoot);
+                    logger.trace("Filtering due to fed filter: {}", fedFilter);
+                    logger.trace("Filtered interaction was: {}", interactionRoot);
                     return true;
                 }
             }
@@ -881,7 +868,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     @Override
     public void receiveInteraction(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
-        LOG.trace("SynchronizedFederate::receiveInteraction (no time) for interactionHandle: {}", interactionClass);
+        logger.trace("SynchronizedFederate::receiveInteraction (no time) for interactionHandle: {}", interactionClass);
         receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag);
     }
 
@@ -932,7 +919,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
-        LOG.trace("SynchronizedFederate::receiveInteraction (with time) for interactionHandle: {}", interactionClass);
+        logger.trace("SynchronizedFederate::receiveInteraction (with time) for interactionHandle: {}", interactionClass);
         this.receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag, theTime, retractionHandle);
     }
 

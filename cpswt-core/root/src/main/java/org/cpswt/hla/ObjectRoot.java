@@ -1421,20 +1421,13 @@ public class ObjectRoot implements ObjectRootInterface {
                 _isRegistered = true;
                 _objectMap.put(getObjectHandle(), this);
 
-            } catch (ObjectClassNotDefined o) {
-                logger.error(o);
-                return;
-            } catch (ObjectClassNotPublished o) {
-                logger.error(o);
-                return;
-            } catch (FederateNotExecutionMember f) {
-                logger.error(f);
+            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember ex) {
+                logger.error(ex);
                 return;
             } catch (Exception e) {
                 CpswtUtils.sleep(500);
             }
         }
-
     }
 
     /**
@@ -1455,14 +1448,8 @@ public class ObjectRoot implements ObjectRootInterface {
                 _isRegistered = false;
                 _objectMap.remove(getObjectHandle());
 
-            } catch (ObjectNotKnown o) {
-                logger.error(o);
-                return;
-            } catch (DeletePrivilegeNotHeld d) {
-                logger.error(d);
-                return;
-            } catch (FederateNotExecutionMember f) {
-                logger.error(f);
+            } catch (ObjectNotKnown | DeletePrivilegeNotHeld | FederateNotExecutionMember ex) {
+                logger.error(ex);
                 return;
             } catch (Exception e) {
                 CpswtUtils.sleepDefault();
