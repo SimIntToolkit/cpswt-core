@@ -1,10 +1,10 @@
 package EchoExample;
 
-import c2w.utils.CpswtDefaults;
+import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.config.FederateConfig;
 import org.cpswt.config.FederateConfigParser;
-import c2w.hla.InteractionRoot;
-import c2w.hla.base.AdvanceTimeRequest;
+import org.cpswt.hla.InteractionRoot;
+import org.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

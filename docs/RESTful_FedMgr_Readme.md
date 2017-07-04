@@ -25,7 +25,7 @@ In `fedmanager-exec/pom.xml` the `RESTfulFedMgr` profile is defined. The second 
                     <goal>java</goal>
                 </goals>
                 <configuration>
-                    <mainClass>c2w.host.FederationManagerHostApplication</mainClass>
+                    <mainClass>org.cpswt.host.FederationManagerHostApplication</mainClass>
                     <classpathScope>runtime</classpathScope>
                     <systemProperties>
                         <systemProperty>
@@ -74,7 +74,7 @@ curl -i -X POST http://127.0.0.1:8083/api/fedmgr --data '{"action": "TERMINATE"}
 
 ## Running a Federate
 
-In our example we use the `c2w-examples-structured` project from `c2wtng-java` where we create the federation named _HelloWorld_Java_Tutorial_.
+In our example we use the `org.c2w-examples-structured` project from `c2wtng-java` where we create the federation named _HelloWorld_Java_Tutorial_.
 
 The folder structure is the following:
  

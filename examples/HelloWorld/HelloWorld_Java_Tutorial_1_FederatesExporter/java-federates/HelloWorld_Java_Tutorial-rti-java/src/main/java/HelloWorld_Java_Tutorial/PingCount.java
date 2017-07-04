@@ -9,7 +9,7 @@ import java.util.Set;
 
 import hla.rti.*;
 
-import c2w.hla.*;
+import org.cpswt.hla.*;
 
 /**
  * The PingCount class implements the PingCount object in the

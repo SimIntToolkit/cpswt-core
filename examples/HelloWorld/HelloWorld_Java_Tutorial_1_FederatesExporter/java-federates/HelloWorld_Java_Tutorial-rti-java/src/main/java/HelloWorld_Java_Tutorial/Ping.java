@@ -9,7 +9,7 @@ import java.util.Set;
 
 import hla.rti.*;
 
-import c2w.hla.*;
+import org.cpswt.hla.*;
 
 /**
  * The Ping class implements the Ping interaction in the

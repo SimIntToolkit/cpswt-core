@@ -9,7 +9,7 @@ import java.util.Set;
 
 import hla.rti.*;
 
-import c2w.hla.*;
+import org.cpswt.hla.*;
 
 /**
  * The ActionBase class implements the ActionBase interaction in the

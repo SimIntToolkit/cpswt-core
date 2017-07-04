@@ -9,7 +9,7 @@ import java.util.Set;
 
 import hla.rti.*;
 
-import c2w.hla.*;
+import org.cpswt.hla.*;
 
 /**
  * The OutcomeBase class implements the OutcomeBase interaction in the

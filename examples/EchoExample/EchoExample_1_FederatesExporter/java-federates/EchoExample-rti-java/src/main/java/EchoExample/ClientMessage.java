@@ -9,7 +9,7 @@ import java.util.Set;
 
 import hla.rti.*;
 
-import c2w.hla.*;
+import org.cpswt.hla.*;
 
 /**
 * The ClientMessage class implements the ClientMessage interaction in the

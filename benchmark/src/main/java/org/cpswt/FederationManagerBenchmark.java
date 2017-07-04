@@ -1,8 +1,8 @@
 package org.cpswt;
 
 import org.cpswt.config.FederateConfigParser;
-import c2w.hla.FederationManager;
-import c2w.hla.FederationManagerConfig;
+import org.cpswt.hla.FederationManager;
+import org.cpswt.hla.FederationManagerConfig;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;

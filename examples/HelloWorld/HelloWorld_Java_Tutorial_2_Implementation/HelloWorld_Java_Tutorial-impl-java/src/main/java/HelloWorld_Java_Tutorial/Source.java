@@ -22,8 +22,8 @@
 package HelloWorld_Java_Tutorial;
 
 
-import c2w.hla.base.AdvanceTimeRequest;
-import c2w.utils.CpswtDefaults;
+import org.cpswt.hla.base.AdvanceTimeRequest;
+import org.cpswt.utils.CpswtDefaults;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.config.FederateConfig;
