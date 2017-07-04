@@ -9,6 +9,7 @@
     <modules>
         <module>EchoExample-impl-java</module>
     </modules>
+
     <repositories>
         <repository>
             <id>archiva.internal</id>

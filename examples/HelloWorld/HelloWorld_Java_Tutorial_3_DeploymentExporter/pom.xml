@@ -279,7 +279,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>FederationManagerHostApp</mainClass>
+                            <mainClass>org.cpswt.host.FederationManagerHostApp</mainClass>
                             <classpathScope>runtime</classpathScope>
 
                             <systemProperties>

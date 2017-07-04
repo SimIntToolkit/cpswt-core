@@ -21,9 +21,9 @@
     <modules>
         <module>hla-wrapper</module>
         <module>root</module>
-        <module>config</module>
         <module>base-events</module>
         <module>utils</module>
+        <module>config</module>
         <module>federate-base</module>
         <module>coa</module>
         <module>coa-gui</module>
