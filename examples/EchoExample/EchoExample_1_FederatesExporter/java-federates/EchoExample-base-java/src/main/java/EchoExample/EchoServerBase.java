@@ -22,7 +22,6 @@ public class EchoServerBase extends SynchronizedFederate {
 
 		super.createLRC();
 		super.joinFederation();
-		super.publishFederateInfoObject();
 
 		super.enableTimeConstrained();
 		super.enableTimeRegulation(getLookAhead());

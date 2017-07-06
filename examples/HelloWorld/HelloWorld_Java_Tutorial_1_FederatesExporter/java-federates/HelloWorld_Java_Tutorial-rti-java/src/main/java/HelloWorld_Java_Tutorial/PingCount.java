@@ -10,6 +10,7 @@ import java.util.Set;
 import hla.rti.*;
 
 import org.cpswt.hla.*;
+import org.cpswt.utils.CpswtUtils;
 
 /**
  * The PingCount class implements the PingCount object in the

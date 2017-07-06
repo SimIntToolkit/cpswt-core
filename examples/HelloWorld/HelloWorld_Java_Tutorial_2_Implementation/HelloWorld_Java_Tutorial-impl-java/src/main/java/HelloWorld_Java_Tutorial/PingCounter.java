@@ -42,8 +42,6 @@ public class PingCounter extends PingCounterBase {
 
         double currentTime = 0;
 
-        super.federateInfo.updateAttributeValues(getLRC());
-
         if (super.isLateJoiner()) {
             currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
         }
@@ -51,8 +49,10 @@ public class PingCounter extends PingCounterBase {
         AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
         putAdvanceTimeRequest(atr);
 
-        readyToPopulate();
-        readyToRun();
+        if(!super.isLateJoiner()) {
+            readyToPopulate();
+            readyToRun();
+        }
 
         startAdvanceTimeThread();
 

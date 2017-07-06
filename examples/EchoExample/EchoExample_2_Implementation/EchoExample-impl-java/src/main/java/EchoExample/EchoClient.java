@@ -7,6 +7,7 @@ import org.cpswt.hla.InteractionRoot;
 import org.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cpswt.utils.CpswtUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,14 +20,13 @@ public class EchoClient extends EchoClientBase {
         super(params);
     }
 
-    private final int sendMessageCount = 10;
+    private final int sendMessageCount = 25;
     int sequenceNumber = 0;
     Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
     // long waitToSendNextMessage = 10000;
 
     private void execute() throws Exception {
 
-        super.federateInfo.updateAttributeValues(getLRC());
         double currentTime = 1.0;
 
         if (super.isLateJoiner()) {
@@ -36,7 +36,7 @@ public class EchoClient extends EchoClientBase {
         AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
         putAdvanceTimeRequest(atr);
 
-        if (!this.isLateJoiner()) {
+        if (!super.isLateJoiner()) {
             readyToPopulate();
             readyToRun();
         }
@@ -88,8 +88,7 @@ public class EchoClient extends EchoClientBase {
         }
 
         // done with sending the messages, time to resign
-        this.federateInfo.unpublishObject(getLRC());
-        super.resignFederationExecution();
+        super.notifyFederationOfResign();
     }
 
     void sendClientMessage(double currentTime) throws Exception {
@@ -110,6 +109,8 @@ public class EchoClient extends EchoClientBase {
             FederateConfig federateConfig = federateConfigParser.parseArgs(args, FederateConfig.class);
             EchoClient echoClient = new EchoClient(federateConfig);
             echoClient.execute();
+
+            CpswtUtils.sleep(500);
 
             System.exit(1);
         } catch (Exception e) {

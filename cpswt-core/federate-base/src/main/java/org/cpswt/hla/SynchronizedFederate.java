@@ -108,9 +108,6 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * @author Harmon Nine
  */
 public class SynchronizedFederate extends NullFederateAmbassador {
-
-    public CpswtFederateInfoObject federateInfo;
-
     private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 250;
 
@@ -264,20 +261,51 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 logger.error("General error while trying to join federation. {}", e);
             }
         }
+
+        this.notifyFederationOfJoin();
     }
 
-    public void publishFederateInfoObject() {
+    public void notifyFederationOfJoin() {
         synchronized (this.lrc) {
-            CpswtFederateInfoObject.publish_FederateId();
-            CpswtFederateInfoObject.publish_FederateType();
-            CpswtFederateInfoObject.publish_IsLateJoiner();
-            CpswtFederateInfoObject.publish(this.lrc);
+            // every federate will send a "FederateJoinInteraction" and a "FederateResignInteraction"
+            // so we need to publish these objects on current LRC
+            FederateJoinInteraction.publish(this.lrc);
+            FederateResignInteraction.publish(this.lrc);
 
-            this.federateInfo = new CpswtFederateInfoObject();
-            federateInfo.set_FederateId(this.federateId);
-            federateInfo.set_FederateType(this.federateType);
-            federateInfo.set_IsLateJoiner(this.isLateJoiner);
-            federateInfo.registerObject(this.lrc);
+            // create a notification for "join" and send it
+            FederateJoinInteraction joinInteraction = new FederateJoinInteraction();
+            joinInteraction.set_sourceFed(this.federateId);
+            joinInteraction.set_originFed(this.federateId);
+            joinInteraction.setFederateId(this.federateId);
+            joinInteraction.setFederateType(this.federateType);
+            joinInteraction.setLateJoiner(this.isLateJoiner);
+
+            try {
+                logger.trace("Sending FederateJoinInteraction for federate {}", this.federateId);
+                joinInteraction.sendInteraction(this.lrc);
+            }
+            catch (Exception ex) {
+                logger.error("Error while sending FederateJoinInteraction for federate {}", this.federateId);
+            }
+        }
+    }
+
+    public void notifyFederationOfResign() {
+        synchronized (this.lrc) {
+            FederateResignInteraction resignInteraction = new FederateResignInteraction();
+            resignInteraction.set_sourceFed(this.federateId);
+            resignInteraction.set_originFed(this.federateId);
+            resignInteraction.setFederateId(this.federateId);
+            resignInteraction.setFederateType(this.federateType);
+            resignInteraction.setLateJoiner(this.isLateJoiner);
+
+            try {
+                logger.trace("Sending FederateResignInteraction for federate {}", this.federateId);
+                resignInteraction.sendInteraction(this.lrc);
+            }
+            catch(Exception ex) {
+                logger.error("Error while sending FederateResignInteraction for federate {}", this.federateId);
+            }
         }
     }
 

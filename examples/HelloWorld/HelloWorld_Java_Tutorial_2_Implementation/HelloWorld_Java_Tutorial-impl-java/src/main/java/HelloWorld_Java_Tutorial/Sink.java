@@ -40,7 +40,6 @@ public class Sink extends SinkBase {
     private void execute() throws Exception {
 
         double currentTime = 0;
-        super.federateInfo.updateAttributeValues(getLRC());
 
         if (super.isLateJoiner()) {
             currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
@@ -51,8 +50,10 @@ public class Sink extends SinkBase {
         AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
         putAdvanceTimeRequest(atr);
 
-        readyToPopulate();
-        readyToRun();
+        if(!super.isLateJoiner()) {
+            readyToPopulate();
+            readyToRun();
+        }
 
         startAdvanceTimeThread();
 

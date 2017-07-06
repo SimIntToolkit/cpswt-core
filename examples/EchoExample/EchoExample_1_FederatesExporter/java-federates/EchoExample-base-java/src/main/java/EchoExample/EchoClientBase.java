@@ -23,8 +23,6 @@ public class EchoClientBase extends SynchronizedFederate {
 		super.createLRC();
 		super.joinFederation();
 
-		super.publishFederateInfoObject();
-
         super.enableTimeConstrained();
         super.enableTimeRegulation(super.getLookAhead());
 		super.enableAsynchronousDelivery();

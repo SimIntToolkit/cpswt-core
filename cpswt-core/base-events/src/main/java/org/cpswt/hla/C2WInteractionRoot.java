@@ -23,14 +23,11 @@ public class C2WInteractionRoot extends InteractionRoot {
 	*/
 	public C2WInteractionRoot() { }
 
-	
-	
 	private static int _sourceFed_handle;
 	private static int _originFed_handle;
 	private static int _federateFilter_handle;
 	private static int _actualLogicalGenerationTime_handle;
-	
-	
+
 	/**
 	* Returns the handle (RTI assigned) of the "sourceFed" parameter of
 	* its containing interaction class.
