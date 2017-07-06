@@ -41,9 +41,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.cpswt.config.*;
 import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
@@ -64,7 +64,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private Set<String> _synchronizationLabels = new HashSet<>();
 
-    FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
+    private FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
     private IC2WFederationEventsHandler _federationEventsHandler = null;
 
     /*
@@ -74,7 +74,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     // THIS IS ONLY FOR DEVELOPMENT PURPOSES
     // MUST BE true IN PRODUCTION
-    boolean useSyncPoints = true;
+    private boolean useSyncPoints = true;
 
     /**
      * The name of the Federation
@@ -387,20 +387,22 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private synchronized void startFederationRun() throws Exception {
         federationAttempted = true;
 
-        Thread waitExpectedThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    waitExpectedFederatesToJoin();
-                }
-                catch(Exception ex) {
-                    logger.error("ERROR: {}", ex);
-                }
-            }
-        });
+//        Thread waitExpectedThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    waitExpectedFederatesToJoin();
+//                }
+//                catch(Exception ex) {
+//                    logger.error("ERROR: {}", ex);
+//                }
+//            }
+//        });
+//
+//        waitExpectedThread.run();
+//        waitExpectedThread.join();
 
-        waitExpectedThread.run();
-        waitExpectedThread.join();
+        waitExpectedFederatesToJoin();
 
         if (useSyncPoints) {
             logger.trace("Waiting for \"{}\"...", SynchronizationPoints.ReadyToPopulate);
@@ -564,7 +566,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 //                    objectRoot.requestUpdate(this.lrc);
 //                }
 
-//                super.lrc.tick();
+                super.lrc.tick();
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 numOfFedsToWaitFor = this.federatesMaintainer.expectedFederatesLeftToJoinCount();
             }
@@ -923,6 +925,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         try {
             ObjectRoot objRootInstance = ObjectRoot.reflect(objectHandle, reflectedAttributes);
+
+            logger.trace("ObjectRootInstance received through reflectAttributeValues");
 
             // Federate info type object
 //            if(objRootInstance instanceof CpswtFederateInfoObject) {

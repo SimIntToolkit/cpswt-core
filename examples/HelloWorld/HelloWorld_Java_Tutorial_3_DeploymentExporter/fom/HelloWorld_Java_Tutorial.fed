@@ -270,7 +270,25 @@
   (parameter sourceFed)
   (parameter actualLogicalGenerationTime)
   (parameter federateFilter)
-(class OutcomeBase reliable timestamp 
+(class FederateJoinInteraction reliable timestamp
+    (parameter actualLogicalGenerationTime)
+    (parameter federateFilter)
+    (parameter originFed)
+    (parameter sourceFed)
+    (parameter FederateId)
+    (parameter FederateType)
+    (parameter IsLateJoiner)
+)
+(class FederateResignInteraction reliable timestamp
+    (parameter actualLogicalGenerationTime)
+    (parameter federateFilter)
+    (parameter originFed)
+    (parameter sourceFed)
+    (parameter FederateId)
+    (parameter FederateType)
+    (parameter IsLateJoiner)
+)
+(class OutcomeBase reliable timestamp
   (parameter originFed)
   (parameter sourceFed)
   (parameter actualLogicalGenerationTime)
