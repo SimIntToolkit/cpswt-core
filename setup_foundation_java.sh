@@ -5,7 +5,7 @@ if [ -z "$RTI_HOME" ]; then
 fi
 
 PROJECT_DIR=${PWD}
-JAVA_FOUNDATION_DIR=${PROJECT_DIR}/c2w-foundation
+JAVA_FOUNDATION_DIR=${PROJECT_DIR}/cpswt-core
 
 
 mvn_install_deploy() {
