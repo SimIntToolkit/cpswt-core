@@ -1,5 +1,6 @@
 package org.cpswt.hla;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;
 
 /**
@@ -25,6 +26,14 @@ public class FederateInfo {
         return isLateJoiner;
     }
 
+    public DateTime getJoinTime() {
+        return joinTime;
+    }
+
+    public DateTime getResignTime() {
+        return resignTime;
+    }
+
     public void setJoinTime(DateTime joinTime) {
         this.joinTime = joinTime;
     }
@@ -33,10 +42,12 @@ public class FederateInfo {
         this.resignTime = resignTime;
     }
 
+    @JsonIgnore
     public boolean hasJoined() {
         return this.joinTime != null;
     }
 
+    @JsonIgnore
     public boolean hasResigned() {
         return this.resignTime != null;
     }
@@ -49,8 +60,8 @@ public class FederateInfo {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof FederateInfo) {
-            return this.federateId.equalsIgnoreCase(((FederateInfo)obj).federateId);
+        if (obj instanceof FederateInfo) {
+            return this.federateId.equalsIgnoreCase(((FederateInfo) obj).federateId);
         }
         return false;
     }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * FederatesMaintainer
@@ -126,6 +127,10 @@ public class FederatesMaintainer {
                 .stream()
                 .filter(FederateInfo::isLateJoiner)
                 .collect(Collectors.toList());
+    }
+
+    List<FederateInfo> getAllMaintainedFederates() {
+        return Stream.concat(this.onlineFederates.stream(), this.resignedFederates.stream()).collect(Collectors.toList());
     }
 
     // TEMP

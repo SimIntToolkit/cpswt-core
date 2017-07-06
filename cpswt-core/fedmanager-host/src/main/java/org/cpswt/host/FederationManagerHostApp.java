@@ -12,6 +12,9 @@ import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.host.api.FederationManagerControlRequest;
@@ -34,15 +37,23 @@ public class FederationManagerHostApp extends AllDirectives {
     private static final Logger logger = LogManager.getLogger(FederationManagerHostApp.class);
     private FederationManager federationManager;
 
-    String bindingAddress;
-    public String getBindingAddress() {
+    private String bindingAddress;
+    private String getBindingAddress() {
         return bindingAddress;
     }
-    int port;
-    public int getPort() {
+    private int port;
+    private int getPort() {
         return port;
     }
-    FederationManagerConfig federationManagerConfig;
+    private FederationManagerConfig federationManagerConfig;
+    private ObjectMapper objectMapper;
+
+    public FederationManagerHostApp() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JodaModule());
+        this.objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS ,false);
+        this.objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, false);
+    }
 
     void parseConfig(String[] args) {
         this.federationManagerConfig = this.getFederationManagerParameter(args);
@@ -82,7 +93,12 @@ public class FederationManagerHostApp extends AllDirectives {
         return route(
                 get(() ->
                         path("fedmgr", () ->
-                            completeOK(new StateResponse(federationManager.getFederateState()), Jackson.marshaller())
+                            completeOK(new StateResponse(federationManager.getFederateState()), Jackson.marshaller(this.objectMapper))
+                        )
+                ),
+                get(() ->
+                        path("federates", () ->
+                            completeOK(federationManager.getFederatesStatus(), Jackson.marshaller(this.objectMapper))
                         )
                 ),
                 post(() ->
@@ -130,7 +146,7 @@ public class FederationManagerHostApp extends AllDirectives {
                                 response = new StateChangeResponse(currentState, currentState, "FederationManager cannot transition from " + currentState + " state to " + targetState);
                             }
 
-                            return completeOK(response, Jackson.marshaller());
+                            return completeOK(response, Jackson.marshaller(this.objectMapper));
                         })
                     )
                 )

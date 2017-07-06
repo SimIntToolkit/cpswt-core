@@ -1186,4 +1186,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public double onCurrentTimeRequested() {
         return this.getCurrentTime();
     }
+
+    public List<FederateInfo> getFederatesStatus() {
+        return this.federatesMaintainer.getAllMaintainedFederates();
+    }
 }
