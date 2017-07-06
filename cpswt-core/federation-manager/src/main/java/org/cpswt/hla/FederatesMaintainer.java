@@ -8,24 +8,33 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * FederatesMaintainer
  */
 public class FederatesMaintainer {
+    private enum CounterDirection {
+        Increment(1),
+        Decrement(-1);
+        private int value;
+        CounterDirection(int value) {
+            this.value = value;
+        }
+    }
+
     private static final Logger logger = LogManager.getLogger(FederatesMaintainer.class);
 
-    private List<FederateJoinInfo> expectedFederateJoinInfo;
-    private List<FederateJoinInfo> lateJoinerFederateJoinInfo;
+    private Map<String, FederateJoinInfo> expectedFederatesByType;
+    private Map<String, FederateJoinInfo> lateJoinerFederatesByType;
+
     private final List<FederateInfo> onlineFederates;
     private final List<FederateInfo> resignedFederates;
 
     private ExperimentConfig originalExperimentConfig;
 
     public FederatesMaintainer() {
-        this.expectedFederateJoinInfo = new ArrayList<>();
-        this.lateJoinerFederateJoinInfo = new ArrayList<>();
         this.onlineFederates = new ArrayList<>();
         this.resignedFederates = new ArrayList<>();
     }
@@ -34,34 +43,8 @@ public class FederatesMaintainer {
         federateInfo.setJoinTime(DateTime.now());
         this.onlineFederates.add(federateInfo);
 
-        if(federateInfo.isLateJoiner()) {
-            FederateJoinInfo federateJoinInfo = this.lateJoinerFederateJoinInfo
-                    .stream()
-                    .filter(fji -> fji.federateType.equalsIgnoreCase(federateInfo.getFederateType()))
-                    .findFirst()
-                    .get();
-
-            if(federateJoinInfo != null && federateJoinInfo.count > 0) {
-                federateJoinInfo.count--;
-            }
-            else {
-                logger.warn("Late joiner federate of type {} joined and exceeded allowed number of instances!", federateInfo.getFederateType());
-            }
-        }
-        else {
-            FederateJoinInfo federateJoinInfo = this.expectedFederateJoinInfo
-                    .stream()
-                    .filter(fji -> fji.federateType.equalsIgnoreCase(federateInfo.getFederateType()))
-                    .findFirst()
-                    .get();
-
-            if(federateJoinInfo != null && federateJoinInfo.count > 0) {
-                federateJoinInfo.count--;
-            }
-            else {
-                logger.warn("Expected federate of type {} joined and exceeded allowed number of instances!", federateInfo.getFederateType());
-            }
-        }
+        this.maintainExpectedFederateCount(federateInfo, CounterDirection.Decrement);
+        this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Decrement);
     }
 
     public void federateResigned(FederateInfo federateInfo) {
@@ -69,6 +52,30 @@ public class FederatesMaintainer {
 
         federateInfo.setResignTime(DateTime.now());
         this.resignedFederates.add(federateInfo);
+
+        this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Increment);
+    }
+
+    private void maintainExpectedFederateCount(FederateInfo federateInfo, CounterDirection counterDirection) {
+        if(!federateInfo.isLateJoiner()) {
+            FederateJoinInfo federateJoinInfo = this.expectedFederatesByType.get(federateInfo.getFederateType());
+
+            federateJoinInfo.count += counterDirection.value;
+            if (federateJoinInfo.count < 0) {
+                logger.warn("Expected federate of type {} joined and exceeded allowed number of instances!", federateInfo.getFederateType());
+            }
+        }
+    }
+
+    private void maintainLateJoinerFederateCount(FederateInfo federateInfo, CounterDirection counterDirection) {
+        if (federateInfo.isLateJoiner()) {
+            FederateJoinInfo federateJoinInfo = this.lateJoinerFederatesByType.get(federateInfo.getFederateType());
+
+            federateJoinInfo.count += counterDirection.value;
+            if (federateJoinInfo.count < 0) {
+                logger.warn("Late joiner federate of type {} joined and exceeded allowed number of instances!", federateInfo.getFederateType());
+            }
+        }
     }
 
     public FederateInfo getFederateInfo(String federateId) {
@@ -76,9 +83,9 @@ public class FederatesMaintainer {
                 .stream()
                 .filter(f -> f.getFederateId().equalsIgnoreCase(federateId))
                 .findFirst()
-                .get();
+                .orElse(null);
 
-        if(federateInfo == null) {
+        if (federateInfo == null) {
             federateInfo = this.resignedFederates
                     .stream()
                     .filter(f -> f.getFederateId().equalsIgnoreCase(federateId))
@@ -89,55 +96,70 @@ public class FederatesMaintainer {
         return federateInfo;
     }
 
-    public int expectedFederatesLeftToJoinCount() {
-        int cnt = this.expectedFederateJoinInfo
+    int expectedFederatesLeftToJoinCount() {
+        return this.expectedFederatesByType.values()
                 .stream()
                 .mapToInt(o -> o.count)
                 .sum();
-        return cnt;
     }
 
-    public void updateFederateJoinInfo(ExperimentConfig experimentConfig) {
-        this.expectedFederateJoinInfo.addAll(experimentConfig.expectedFederates);
-        this.lateJoinerFederateJoinInfo.addAll(experimentConfig.lateJoinerFederates);
+    void updateFederateJoinInfo(ExperimentConfig experimentConfig) {
+        this.expectedFederatesByType = experimentConfig.expectedFederates
+                .stream()
+                .collect(Collectors.toMap(f -> f.federateType, f -> f));
+        this.lateJoinerFederatesByType = experimentConfig.lateJoinerFederates
+                .stream()
+                .collect(Collectors.toMap(f -> f.federateType, f -> f));
 
         this.originalExperimentConfig = experimentConfig;
     }
 
-    public List<FederateInfo> getOnlineExpectedFederates() {
+    List<FederateInfo> getOnlineExpectedFederates() {
         return this.onlineFederates
                 .stream()
                 .filter(fi -> !fi.isLateJoiner())
                 .collect(Collectors.toList());
     }
 
-    public List<FederateInfo> getOnlineLateJoinerFederates() {
+    List<FederateInfo> getOnlineLateJoinerFederates() {
         return this.onlineFederates
                 .stream()
-                .filter(fi -> fi.isLateJoiner())
+                .filter(FederateInfo::isLateJoiner)
                 .collect(Collectors.toList());
     }
 
     // TEMP
-    public void logCurrentStatus() {
+    void logCurrentStatus() {
         logger.trace("expectedFederateJoinInfo ::");
-        for(FederateJoinInfo fji : this.expectedFederateJoinInfo) {
+        for (FederateJoinInfo fji : this.expectedFederatesByType.values()) {
             logger.trace("\t[{}] [{}]", fji.count, fji.federateType);
+        }
+        if (this.expectedFederatesByType.size() == 0) {
+            logger.trace("\t NONE");
         }
 
         logger.trace("lateJoinerFederateJoinInfo ::");
-        for(FederateJoinInfo fji : this.lateJoinerFederateJoinInfo) {
+        for (FederateJoinInfo fji : this.lateJoinerFederatesByType.values()) {
             logger.trace("\t[{}] {}", fji.count, fji.federateType);
+        }
+        if (this.lateJoinerFederatesByType.size() == 0) {
+            logger.trace("\t NONE");
         }
 
         logger.trace("onlineFederates ::");
-        for(FederateInfo fi : this.onlineFederates) {
+        for (FederateInfo fi : this.onlineFederates) {
             logger.trace("\t[{}] :: [JOINED @ {}] :: {}", fi.isLateJoiner() ? "LATEJOINER" : " EXPECTED ", fi.joinTime, fi.getFederateId());
+        }
+        if (this.onlineFederates.size() == 0) {
+            logger.trace("\t NONE");
         }
 
         logger.trace("resignedFederates ::");
-        for(FederateInfo fi : this.resignedFederates) {
+        for (FederateInfo fi : this.resignedFederates) {
             logger.trace("\t[{}] :: [RESIGNED @ {}] :: {}", fi.isLateJoiner() ? "LATEJOINER" : " EXPECTED ", fi.resignTime, fi.getFederateId());
+        }
+        if (this.resignedFederates.size() == 0) {
+            logger.trace("\t NONE");
         }
     }
 }
