@@ -49,11 +49,6 @@
         (attribute FederateHost reliable timestamp)
         (attribute FederateType reliable timestamp)
       )
-      (class CpswtFederateInfoObject
-        (attribute FederateId reliable timestamp)
-        (attribute FederateType reliable timestamp)
-        (attribute IsLateJoiner reliable timestamp)
-      )
     )
   )
   (interactions
