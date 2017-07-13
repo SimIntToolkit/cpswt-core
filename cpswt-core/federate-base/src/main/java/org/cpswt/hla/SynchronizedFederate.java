@@ -517,7 +517,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void resignFederationExecution(int resignAction) {
 
         boolean federationNotResigned = true;
-        int resignAttempts = 10;
+        int resignAttempts = 0;
         while (federationNotResigned) {
             try {
                 getLRC().resignFederationExecution(resignAction);
@@ -532,16 +532,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 logger.warn("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
                 resignAction |= ResignAction.RELEASE_ATTRIBUTES;
             } catch (Exception e) {
-                if (resignAttempts == 10) {
-                    logger.warn(e);
-                    logger.warn("WARNING:  problem encountered while resigning federation execution:  retry");
-                }
-                if (resignAttempts-- < 1) {
-                    logger.error( "\nResigned Failed. Exiting from the Federation" );
-                    federationNotResigned = false;
-                } else {
-                    logger.warn(".");
+                if (resignAttempts < 10) {
+                    resignAttempts++;
+                    logger.warn("WARNING:  problem encountered while resigning federation execution: {} | retrying #{}",
+                            e.getMessage(), resignAttempts);
+
                     CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                }
+                else {
+                    logger.error( "Resigned Failed. Exiting from the Federation" );
+                    federationNotResigned = false;
+                    logger.error(e);
                 }
             }
         }
