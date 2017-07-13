@@ -31,6 +31,7 @@ public class EchoClient extends EchoClientBase {
 
         if (super.isLateJoiner()) {
             currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+            super.disableTimeRegulation();
         }
 
         AdvanceTimeRequest atr = new AdvanceTimeRequest(currentTime);
