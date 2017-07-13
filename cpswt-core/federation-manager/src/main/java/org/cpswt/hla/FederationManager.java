@@ -72,12 +72,13 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         FederationManager fields
     */
 
-    // THIS IS ONLY FOR DEVELOPMENT PURPOSES
-    // MUST BE true IN PRODUCTION
+    /**
+     * Indicates whether the FederationManager should create synchronization points.
+     */
     private boolean useSyncPoints = true;
 
     /**
-     * The name of the Federation
+     * The name of the Federation.
      */
     private String federationId;
 
@@ -246,6 +247,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
 
+        if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
+            this.useSyncPoints = false;
+            logger.debug("No expected federates are defined, not setting up synchronization points.");
+        }
+
         this.initializeLRC(fedFileURL);
 
         /*
@@ -336,10 +342,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         super.enableAsynchronousDelivery();
 
-        logger.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
-
         if (useSyncPoints) {
-            // REGISTER "ReadyToPopulate" SYNCHRONIZATION POINT
+            logger.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
             super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
             super.lrc.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToPopulate)) {
