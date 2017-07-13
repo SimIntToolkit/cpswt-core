@@ -19,6 +19,10 @@
     {
       "federateType": "EchoClient",
       "count": 10
+    },
+    {
+      "federateType": "EchoServer",
+      "count": 1
     }
   ]
 }

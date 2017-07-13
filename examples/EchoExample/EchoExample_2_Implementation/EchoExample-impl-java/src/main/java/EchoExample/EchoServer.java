@@ -47,24 +47,29 @@ public class EchoServer extends EchoServerBase {
         while( true ) {
             // Wait for time to be granted by the RTI
             logger.debug("{}: requesting RTI to go to time: {}", this.getFederateId(), currentTime);
+
+            currentTime += super.getStepSize();
+
             atr.requestSyncStart();
 
             // Process any incoming interactions in the queue
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
-                if(!(interactionRoot instanceof ClientMessage)) {
-                    continue;
+                if(interactionRoot instanceof ClientMessage) {
+
+                    // handle incoming message
+                    ClientMessage message = (ClientMessage) interactionRoot;
+                    logger.debug("{}: Received ClientMessage interaction | from: {}\t seq#: {}", this.getFederateId(), message.get_originFed(), message.get_sequenceNumber());
+
+                    // assemble reply to that message
+                    ServerReply reply = create_ServerReply();
+                    reply.set_sequenceNumber(message.get_sequenceNumber());
+                    reply.set_targetFed(message.get_originFed());
+
+                    replies.add(reply);
                 }
-
-                // handle incoming message
-                ClientMessage message = (ClientMessage) interactionRoot;
-                logger.debug("{}: Received ClientMessage interaction | from: {}\t seq#: {}", this.getFederateId(), message.get_originFed(), message.get_sequenceNumber());
-
-                // assemble reply to that message
-                ServerReply reply = create_ServerReply();
-                reply.set_sequenceNumber(message.get_sequenceNumber());
-                reply.set_targetFed(message.get_originFed());
-
-                replies.add(reply);
+                else {
+                    logger.trace("Interaction object was not a ClientMessage");
+                }
             }
 
             // send replies
@@ -74,10 +79,10 @@ public class EchoServer extends EchoServerBase {
             replies.clear();
 
             // Prepare to request RTI to advance time to next step
-            atr.requestSyncEnd();
-            currentTime += super.getStepSize();
             AdvanceTimeRequest newATR = new AdvanceTimeRequest( currentTime );
             putAdvanceTimeRequest( newATR );
+
+            atr.requestSyncEnd();
             atr = newATR;
         }
 

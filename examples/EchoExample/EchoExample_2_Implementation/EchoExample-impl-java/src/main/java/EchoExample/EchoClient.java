@@ -48,39 +48,43 @@ public class EchoClient extends EchoClientBase {
         while (true) {
             // Wait for time to be granted by the RTI
             logger.debug("{}: requesting RTI to go to time: {}", this.getFederateId(), currentTime);
+
+            currentTime += super.getStepSize();
+
             atr.requestSyncStart();
 
             // Waiting for incoming interactions
             while ((interactionRoot = getNextInteractionNoWait()) != null) {
-                if (!(interactionRoot instanceof ServerReply)) {
-                    continue;
-                }
+                if (interactionRoot instanceof ServerReply) {
 
-                ServerReply reply = (ServerReply) interactionRoot;
-                if (reply.get_targetFed().equals(this.getFederateId())) {
-                    int replySeqNum = reply.get_sequenceNumber();
-                    if (this.sentSequenceNumbers.contains(replySeqNum)) {
-                        this.sentSequenceNumbers.remove(replySeqNum);
-                        logger.debug("{}: Got a server reply back with sequence number: {}", this.getFederateId(), replySeqNum);
-                    } else {
-                        logger.debug("{}: Server reply with sequence number unknown: {}", this.getFederateId(), replySeqNum);
+                    ServerReply reply = (ServerReply) interactionRoot;
+                    if (reply.get_targetFed().equals(this.getFederateId())) {
+                        int replySeqNum = reply.get_sequenceNumber();
+                        if (this.sentSequenceNumbers.contains(replySeqNum)) {
+                            this.sentSequenceNumbers.remove(replySeqNum);
+                            logger.debug("{}: Got a server reply back with sequence number: {}", this.getFederateId(), replySeqNum);
+                        } else {
+                            logger.debug("{}: Server reply with sequence number unknown: {}", this.getFederateId(), replySeqNum);
+                        }
                     }
+                }
+                else {
+                    logger.trace("Interaction received is not type of ServerReply");
                 }
             }
 
-            if (this.sequenceNumber > this.sendMessageCount) {
+            if (this.sequenceNumber >= this.sendMessageCount) {
                 break;
             }
 
             // Send interactions to RTI
             this.sendClientMessage(currentTime + this.getLookAhead());
 
-            // Request RTI to advance time
-            atr.requestSyncEnd();
-            currentTime += super.getStepSize();
+
             AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
             putAdvanceTimeRequest(newATR);
 
+            atr.requestSyncEnd();
             atr = newATR;
 
             // wait until next message to send

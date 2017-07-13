@@ -54,15 +54,6 @@
 		</resources>
 		<plugins>
 			<plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-surefire-plugin</artifactId>
-		      <version>2.19.1</version>
-		      <configuration>
-		        <forkMode>once</forkMode>
-		        <argLine>-Djava.library.path=${project.basedir}/target/nar/processid-${org.cpswt.version}-${nar.aol}-jni/lib/${nar.aol}/jni/</argLine>
-		      </configuration>
-		    </plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.10</version>
@@ -209,7 +200,13 @@
 				<federate.configFile>echoserver.json</federate.configFile>
             </properties>
         </profile>
-
+		<profile>
+			<id>EchoServer-LateJoiner</id>
+			<properties>
+				<federate.name>EchoServer</federate.name>
+				<federate.configFile>echoserver-latejoin.json</federate.configFile>
+			</properties>
+		</profile>
 		<profile>
 			<id>ExecJava</id>
 			<properties>
