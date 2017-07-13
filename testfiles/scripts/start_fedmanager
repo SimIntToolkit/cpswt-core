@@ -5,8 +5,8 @@ while [[ $PWD != '/' && ${PWD##*/} != 'testfiles' ]]; do cd ..; done # we're in 
 cd ..
 ROOT_DIR=$(pwd)
 
-cd ${ROOT_DIR}/examples/EchoExample/EchoExample_3_DeploymentExporter/
+cd ${ROOT_DIR}/testfiles/
 
 RTI_RID_FILE=${ROOT_DIR}/testfiles/RTI.rid \
 CPSWTNG_ROOT=${ROOT_DIR}/testfiles/ \
-mvn exec:java -X -P EchoClient,ExecJava
+mvn exec:java -X -P FederationManagerExecJavaAKKA

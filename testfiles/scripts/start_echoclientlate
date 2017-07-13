@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-cd /Users/sph3r/projects/c2wt/repos/cpswtng-core/examples/EchoExample/EchoExample_3_DeploymentExporter/
+# get project root
+while [[ $PWD != '/' && ${PWD##*/} != 'testfiles' ]]; do cd ..; done # we're in ROOT/testfiles/
+cd ..
+ROOT_DIR=$(pwd)
 
-RTI_RID_FILE=/Users/sph3r/projects/c2wt/repos/cpswtng-core/testfiles/RTI.rid \
-CPSWTNG_ROOT=/Users/sph3r/projects/c2wt/repos/cpswtng-core/testfiles/ \
+cd ${ROOT_DIR}/examples/EchoExample/EchoExample_3_DeploymentExporter/
+
+RTI_RID_FILE=${ROOT_DIR}/testfiles/RTI.rid \
+CPSWTNG_ROOT=${ROOT_DIR}/testfiles/ \
 mvn exec:java -X -P EchoClient-LateJoiner,ExecJava
