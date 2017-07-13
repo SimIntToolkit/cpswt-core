@@ -24,28 +24,10 @@
 
 package org.cpswt.hla;
 
+import hla.rti.*;
 import org.cpswt.hla.base.*;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
-import hla.rti.AsynchronousDeliveryAlreadyEnabled;
-import hla.rti.EnableTimeConstrainedPending;
-import hla.rti.EnableTimeRegulationPending;
-import hla.rti.EventRetractionHandle;
-import hla.rti.FederateAlreadyExecutionMember;
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.FederateOwnsAttributes;
-import hla.rti.InvalidFederationTime;
-import hla.rti.InvalidLookahead;
-import hla.rti.InvalidResignAction;
-import hla.rti.LogicalTime;
-import hla.rti.RTIambassador;
-import hla.rti.RTIinternalError;
-import hla.rti.ReceivedInteraction;
-import hla.rti.ReflectedAttributes;
-import hla.rti.ResignAction;
-import hla.rti.SynchronizationLabelNotAnnounced;
-import hla.rti.TimeConstrainedAlreadyEnabled;
-import hla.rti.TimeRegulationAlreadyEnabled;
 import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
@@ -384,7 +366,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         _timeRegulationNotEnabled = false;
     }
 
-
     /**
      * When a federate calls this method, it becomes time-regulating within
      * its federation.
@@ -422,6 +403,49 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         } catch (Exception e) {
         }
         while (_timeRegulationNotEnabled) {
+            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+            try {
+                synchronized (lrc) {
+                    lrc.tick();
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * When a federate calls this method, it stops time-regulating within
+     * its federation.
+     */
+    public void disableTimeRegulation()
+            throws InvalidFederationTime, RTIinternalError , FederateNotExecutionMember {
+
+        if (_timeRegulationNotEnabled) return;
+
+        boolean timeRegulationDisabledNotCalled = true;
+        while (timeRegulationDisabledNotCalled) {
+            try {
+                synchronized (lrc) {
+                    lrc.disableTimeRegulation();
+                    _timeRegulationNotEnabled = true;
+                }
+                timeRegulationDisabledNotCalled = false;
+            } catch (SaveInProgress | RestoreInProgress | ConcurrentAccessAttempted e) {
+                timeRegulationDisabledNotCalled = false;
+            } catch (FederateNotExecutionMember | RTIinternalError ex) {
+                throw ex;
+            } catch (Exception e) {
+                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+            }
+        }
+
+        try {
+            synchronized (lrc) {
+                lrc.tick();
+            }
+        } catch (Exception e) {
+        }
+        while (!_timeRegulationNotEnabled) {
             CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             try {
                 synchronized (lrc) {
