@@ -11,4 +11,7 @@ public class CpswtDefaults {
     public static final String ConfigFileOptionName = "configFile";
 
     public static final double EPSILON = 1e-6;
+
+    public static final int MaxJoinResignAttempt = 10;
+    public static final int JoinResignWaitMillis = 500;
 }

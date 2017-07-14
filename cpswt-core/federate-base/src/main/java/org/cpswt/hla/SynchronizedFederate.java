@@ -26,6 +26,7 @@ package org.cpswt.hla;
 
 import hla.rti.*;
 import org.cpswt.hla.base.*;
+import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
 import hla.rti.jlc.NullFederateAmbassador;
@@ -228,9 +229,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public void joinFederation() {
         boolean federationNotPresent = true;
+        int attempts = 0;
         while (federationNotPresent) {
             try {
-                logger.debug("[{}] federate joining federation [{}]", this.federateId, this.federationId);
+                attempts++;
+                logger.debug("[{}] federate joining federation [{}] attempt #{}", this.federateId, this.federationId, attempts);
                 synchronized (lrc) {
                     this.lrc.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
@@ -239,6 +242,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             } catch (FederateAlreadyExecutionMember f) {
                 logger.error("Federate already execution member: {}", f);
                 return;
+            } catch(FederationExecutionDoesNotExist ex) {
+                if(attempts < CpswtDefaults.MaxJoinResignAttempt) {
+                    logger.warn("Federation with the name {} doesn't exist (yet). Trying to wait and join...", this.federationId);
+                    CpswtUtils.sleep(CpswtDefaults.JoinResignWaitMillis);
+                }
+                else {
+                    logger.error("Federation was not found with the name {}. Quitting...");
+                    return;
+                }
             } catch (Exception e) {
                 logger.error("General error while trying to join federation. {}", e);
             }
@@ -517,9 +529,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void resignFederationExecution(int resignAction) {
 
         boolean federationNotResigned = true;
-        int resignAttempts = 0;
+        int attempts = 0;
         while (federationNotResigned) {
             try {
+                attempts++;
                 getLRC().resignFederationExecution(resignAction);
                 federationNotResigned = false;
             } catch (InvalidResignAction i) {
@@ -532,12 +545,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 logger.warn("WARNING:  While resigning federation:  federate owns attributes.  Releasing attributes.");
                 resignAction |= ResignAction.RELEASE_ATTRIBUTES;
             } catch (Exception e) {
-                if (resignAttempts < 10) {
-                    resignAttempts++;
+                if (attempts < CpswtDefaults.MaxJoinResignAttempt) {
                     logger.warn("WARNING:  problem encountered while resigning federation execution: {} | retrying #{}",
-                            e.getMessage(), resignAttempts);
+                            e.getMessage(), attempts);
 
-                    CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+                    CpswtUtils.sleep(CpswtDefaults.JoinResignWaitMillis);
                 }
                 else {
                     logger.error( "Resigned Failed. Exiting from the Federation" );
