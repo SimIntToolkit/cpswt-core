@@ -8,5 +8,5 @@ ROOT_DIR=$(pwd)
 cd ${ROOT_DIR}/examples/EchoExample/EchoExample_3_DeploymentExporter/
 
 RTI_RID_FILE=${ROOT_DIR}/testfiles/RTI.rid \
-CPSWTNG_ROOT=${ROOT_DIR}/testfiles/ \
+CPSWT_ROOT=${ROOT_DIR}/testfiles/ \
 mvn exec:java -X -P EchoClient,ExecJava
