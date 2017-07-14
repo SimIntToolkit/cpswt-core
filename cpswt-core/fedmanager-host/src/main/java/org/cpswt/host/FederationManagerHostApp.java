@@ -38,20 +38,24 @@ public class FederationManagerHostApp extends AllDirectives {
     private FederationManager federationManager;
 
     private String bindingAddress;
+
     private String getBindingAddress() {
         return bindingAddress;
     }
+
     private int port;
+
     private int getPort() {
         return port;
     }
+
     private FederationManagerConfig federationManagerConfig;
     private ObjectMapper objectMapper;
 
     public FederationManagerHostApp() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JodaModule());
-        this.objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS ,false);
+        this.objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         this.objectMapper.configure(SerializationFeature.WRITE_DATES_WITH_ZONE_ID, false);
     }
 
@@ -65,8 +69,7 @@ public class FederationManagerHostApp extends AllDirectives {
     void initFederationManager() {
         try {
             this.federationManager = new FederationManager(this.federationManagerConfig);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Error while initializing FederationManager!" + e.getMessage());
             logger.error(e);
         }
@@ -79,8 +82,7 @@ public class FederationManagerHostApp extends AllDirectives {
 
             federationManagerConfig = federateConfigParser.parseArgs(args, FederationManagerConfig.class);
             return federationManagerConfig;
-        }
-        catch (Exception fedMgrExp) {
+        } catch (Exception fedMgrExp) {
             logger.error("There was an error starting the federation manager. Reason: {}", fedMgrExp.getMessage());
             logger.error(fedMgrExp);
             System.exit(-1);
@@ -92,63 +94,63 @@ public class FederationManagerHostApp extends AllDirectives {
     Route createRoute() {
         return route(
                 get(() ->
-                        path("fedmgr", () ->
-                            completeOK(new StateResponse(federationManager.getFederateState()), Jackson.marshaller(this.objectMapper))
-                        )
+                        path("fedmgr", () -> {
+                            if(federationManager == null) {
+                                return reject();
+                            }
+                            return completeOK(new StateResponse(federationManager.getFederateState()), Jackson.marshaller(this.objectMapper));
+                        })
                 ),
                 get(() ->
                         path("federates", () ->
-                            completeOK(federationManager.getFederatesStatus(), Jackson.marshaller(this.objectMapper))
+                                completeOK(federationManager.getFederatesStatus(), Jackson.marshaller(this.objectMapper))
                         )
                 ),
                 post(() ->
-                    path("fedmgr", () ->
-                                    entity(Jackson.unmarshaller(FederationManagerControlRequest.class), controlRequest -> {
-                        //parameter("action", actionStr -> {
+                        path("fedmgr", () ->
+                                entity(Jackson.unmarshaller(FederationManagerControlRequest.class), controlRequest -> {
+                                    //parameter("action", actionStr -> {
 
-                            ControlAction action = controlRequest.action; // ControlAction.valueOf(actionStr);
-                            FederateState currentState = federationManager.getFederateState();
-                            FederateState targetState = action.getTargetState();
+                                    ControlAction action = controlRequest.action; // ControlAction.valueOf(actionStr);
+                                    FederateState currentState = federationManager.getFederateState();
+                                    FederateState targetState = action.getTargetState();
 
-                            StateChangeResponse response = null;
+                                    StateChangeResponse response = null;
 
-                            if (currentState.CanTransitionTo(targetState)) {
-                                try {
-                                    switch (action) {
-                                        case START:
-                                            response = new StateChangeResponse(currentState, FederateState.STARTING);
-                                            this.startSimulationAsync();
-                                            break;
-                                        case PAUSE:
-                                            this.federationManager.pauseSimulation();
-                                            response = new StateChangeResponse(currentState, federationManager.getFederateState());
-                                            break;
-                                        case RESUME:
-                                            this.federationManager.resumeSimulation();
-                                            response = new StateChangeResponse(currentState, federationManager.getFederateState());
-                                            break;
-                                        case TERMINATE:
-                                            response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
-                                            this.terminateSimulationAsync();
-                                            break;
+                                    if (currentState.CanTransitionTo(targetState)) {
+                                        try {
+                                            switch (action) {
+                                                case START:
+                                                    response = new StateChangeResponse(currentState, FederateState.STARTING);
+                                                    this.startSimulationAsync();
+                                                    break;
+                                                case PAUSE:
+                                                    this.federationManager.pauseSimulation();
+                                                    response = new StateChangeResponse(currentState, federationManager.getFederateState());
+                                                    break;
+                                                case RESUME:
+                                                    this.federationManager.resumeSimulation();
+                                                    response = new StateChangeResponse(currentState, federationManager.getFederateState());
+                                                    break;
+                                                case TERMINATE:
+                                                    response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
+                                                    this.terminateSimulationAsync();
+                                                    break;
+                                            }
+                                        } catch (IOException ioEx) {
+                                            logger.error("Closing ChunkedOutput encountered a problem.");
+                                            logger.error(ioEx);
+                                        } catch (Exception ex) {
+                                            logger.error("There was an error while trying to transition FederationManager for action {}", action);
+                                            logger.error(ex);
+                                        }
+                                    } else {
+                                        response = new StateChangeResponse(currentState, currentState, "FederationManager cannot transition from " + currentState + " state to " + targetState);
                                     }
-                                }
-                                catch(IOException ioEx) {
-                                    logger.error("Closing ChunkedOutput encountered a problem.");
-                                    logger.error(ioEx);
-                                }
-                                catch (Exception ex) {
-                                    logger.error("There was an error while trying to transition FederationManager for action {}", action);
-                                    logger.error(ex);
-                                }
-                            }
-                            else {
-                                response = new StateChangeResponse(currentState, currentState, "FederationManager cannot transition from " + currentState + " state to " + targetState);
-                            }
 
-                            return completeOK(response, Jackson.marshaller(this.objectMapper));
-                        })
-                    )
+                                    return completeOK(response, Jackson.marshaller(this.objectMapper));
+                                })
+                        )
                 )
         );
     }
@@ -159,8 +161,7 @@ public class FederationManagerHostApp extends AllDirectives {
             public void run() {
                 try {
                     federationManager.startSimulation();
-                }
-                catch(Exception ex) {
+                } catch (Exception ex) {
                     logger.error("There was an error while starting the simulation", ex);
                 }
             }
@@ -173,8 +174,7 @@ public class FederationManagerHostApp extends AllDirectives {
             public void run() {
                 try {
                     federationManager.terminateSimulation();
-                }
-                catch(Exception ex) {
+                } catch (Exception ex) {
                     logger.error("There was an error while terminating the simulation", ex);
                 }
             }
@@ -192,11 +192,11 @@ public class FederationManagerHostApp extends AllDirectives {
         FederationManagerHostApp app = new FederationManagerHostApp();
         app.parseConfig(args);
 
+        app.initFederationManager();
+
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost(app.getBindingAddress(), app.getPort()), materializer);
-
-        app.initFederationManager();
 
         logger.info("Server online at {}:{} ...", app.getBindingAddress(), app.getPort());
         System.in.read();

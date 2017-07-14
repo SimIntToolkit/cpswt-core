@@ -14,20 +14,18 @@
 	</properties>
 
 	<dependencies>
-		
-		<dependency><!-- The depenency for the generated code-->
-			<groupId>org.cpswt.examples</groupId>
-			<artifactId>EchoExample-base-java</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
+
+        <dependency>
+            <groupId>org.cpswt</groupId>
+            <artifactId>fedmanager-host</artifactId>
+            <version>0.5.0-SNAPSHOT</version>
+        </dependency>
 		
 		<dependency><!-- The depenency for the user written code-->
 			<groupId>org.cpswt.examples</groupId>
 			<artifactId>EchoExample-impl-java</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
-		
-		
 		
 		<dependency>
 	        <groupId>junit</groupId>
@@ -40,7 +38,7 @@
 	<build>
 		<resources>
 		    <resource>
-		    	<directory>src/fom</directory>
+		    	<directory>fom</directory>
 		    </resource>
 		    <resource>
 		    	<directory>src/experiments</directory>
@@ -183,35 +181,32 @@
             <id>EchoClient</id>
             <properties>
                 <federate.name>EchoClient</federate.name>
-                <federate.configFile>echoclient.json</federate.configFile>
+                <federate.configFile>conf/echoclient.json</federate.configFile>
             </properties>
         </profile>
 		<profile>
 			<id>EchoClient-LateJoiner</id>
 			<properties>
 				<federate.name>EchoClient</federate.name>
-				<federate.configFile>echoclient-latejoin.json</federate.configFile>
+				<federate.configFile>conf/echoclient-latejoin.json</federate.configFile>
 			</properties>
 		</profile>
         <profile>
             <id>EchoServer</id>
             <properties>
                 <federate.name>EchoServer</federate.name>
-				<federate.configFile>echoserver.json</federate.configFile>
+				<federate.configFile>conf/echoserver.json</federate.configFile>
             </properties>
         </profile>
 		<profile>
 			<id>EchoServer-LateJoiner</id>
 			<properties>
 				<federate.name>EchoServer</federate.name>
-				<federate.configFile>echoserver-latejoin.json</federate.configFile>
+				<federate.configFile>conf/echoserver-latejoin.json</federate.configFile>
 			</properties>
 		</profile>
 		<profile>
 			<id>ExecJava</id>
-			<properties>
-				<federate.loglevel>NORMAL</federate.loglevel>
-			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.porticoproject</groupId>
@@ -235,12 +230,8 @@
 									<value>true</value>
 								</systemProperty>
 								<systemProperty>
-									<key>org.apache.logging.log4j.simplelog.StatusLogger.level</key>
-									<value>TRACE</value>
-								</systemProperty>
-								<systemProperty>
 									<key>log4j.configurationFile</key>
-									<value>./log4j2.xml</value>
+									<value>conf/log4j2.xml</value>
 								</systemProperty>
 							</systemProperties>
 
@@ -251,6 +242,50 @@
 								<argument>-configFile</argument>
 								<argument>${federate.configFile}</argument>
 							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>FederationManagerExecJava</id>
+			<properties>
+				<configFile>conf/fedmgrconfig.json</configFile>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.5.0</version>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>org.cpswt.host.FederationManagerHostApp</mainClass>
+							<classpathScope>runtime</classpathScope>
+
+							<systemProperties>
+								<systemProperty>
+									<key>java.net.preferIPv4Stack</key>
+									<value>true</value>
+								</systemProperty>
+								<systemProperty>
+									<key>log4j.configurationFile</key>
+									<value>conf/log4j2.xml</value>
+								</systemProperty>
+							</systemProperties>
+
+							<arguments>
+								<argument>-configFile</argument>
+								<argument>${configFile}</argument>
+								<argument>-stepSize</argument>
+								<argument>1.0</argument>
+								<argument>-federationEndTime</argument>
+								<argument>0</argument>
+							</arguments>
+
 						</configuration>
 					</plugin>
 				</plugins>
