@@ -619,6 +619,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public void readyToResign() throws FederateNotExecutionMember, RTIinternalError {
         achieveSynchronizationPoint(SynchronizationPoints.ReadyToResign);
+        this.setFederateState(FederateState.TERMINATING);
     }
 
     private void achieveSynchronizationPoint(String label) throws FederateNotExecutionMember, RTIinternalError {
