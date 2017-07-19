@@ -29,7 +29,7 @@ public class EchoServer extends EchoServerBase {
 //        super.federateInfo.updateAttributeValues(getLRC());
 
         if (super.isLateJoiner()) {
-            currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+            currentTime = super.getLBTS() - super.getLookAhead();
             super.disableTimeRegulation();
         }
 

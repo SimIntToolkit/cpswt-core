@@ -42,7 +42,7 @@ public class Sink extends SinkBase {
         double currentTime = 0;
 
         if (super.isLateJoiner()) {
-            currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+            currentTime = super.getLBTS() - super.getLookAhead();
             super.disableTimeRegulation();
         }
 

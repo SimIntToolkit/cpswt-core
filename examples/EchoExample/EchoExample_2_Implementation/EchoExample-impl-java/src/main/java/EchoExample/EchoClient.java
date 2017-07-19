@@ -30,7 +30,7 @@ public class EchoClient extends EchoClientBase {
         double currentTime = 1.0;
 
         if (super.isLateJoiner()) {
-            currentTime = super.getLBTS() - super.getLookAhead() + CpswtDefaults.EPSILON;
+            currentTime = super.getLBTS() - super.getLookAhead();
             super.disableTimeRegulation();
         }
 
