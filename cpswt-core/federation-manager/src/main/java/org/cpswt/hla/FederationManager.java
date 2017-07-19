@@ -112,8 +112,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private double _federationEndTime = 0.0;
     private Random _rand4Dur = null;
-    private String _stopScriptFilepath;
-
     private String _logLevel;
 
     private boolean _killingFederation = false;
@@ -541,9 +539,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
                     prepareForFederatesToResign();
 
-                    logger.info("Waiting for \"ReadyToResign\" ... ");
-                    readyToResign();
-                    logger.info("done.\n");
+                    if(useSyncPoints) {
+                        logger.info("Waiting for \"ReadyToResign\" ... ");
+                        readyToResign();
+                        logger.info("Done with resign");
+                    }
 
                     waitForFederatesToResign();
 
@@ -731,19 +731,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         recordMainExecutionLoopEndTime();
 
-        // Kill the entire federation
-        String killCommand = "bash -x " + _stopScriptFilepath;
-        try {
-            logger.info("Killing federation by executing: {}\tIn directory: {}", killCommand, rootDir);
-
-            // TODO: why is this called 3 times???
-            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
-            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
-            Runtime.getRuntime().exec(killCommand, null, new File(rootDir));
-        } catch (IOException e) {
-            logger.error("Exception while killing the federation");
-            logger.error(e);
-        }
         System.exit(0);
     }
 
