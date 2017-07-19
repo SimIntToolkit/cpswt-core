@@ -14,4 +14,5 @@ public class CpswtDefaults {
 
     public static final int MaxJoinResignAttempt = 10;
     public static final int JoinResignWaitMillis = 500;
+    public static final int MaintainFederatesLoopWaitTimeMillis = 1500;
 }

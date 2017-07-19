@@ -14,6 +14,8 @@ public class FederateInfo {
     DateTime joinTime;
     DateTime resignTime;
 
+    boolean timedOutResign;
+
     public String getFederateId() {
         return federateId;
     }
@@ -24,6 +26,10 @@ public class FederateInfo {
 
     public boolean isLateJoiner() {
         return isLateJoiner;
+    }
+
+    public boolean isTimedOutResign() {
+        return timedOutResign;
     }
 
     public DateTime getJoinTime() {
@@ -40,6 +46,10 @@ public class FederateInfo {
 
     public void setResignTime(DateTime resignTime) {
         this.resignTime = resignTime;
+    }
+
+    public void setTimedOutResign(boolean timedOutResign) {
+        this.timedOutResign = timedOutResign;
     }
 
     @JsonIgnore

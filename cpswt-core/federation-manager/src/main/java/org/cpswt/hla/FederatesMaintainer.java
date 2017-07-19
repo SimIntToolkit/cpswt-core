@@ -48,13 +48,18 @@ public class FederatesMaintainer {
         this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Decrement);
     }
 
-    public void federateResigned(FederateInfo federateInfo) {
+    public void federateResigned(FederateInfo federateInfo, boolean hasTimedOut) {
         this.onlineFederates.remove(federateInfo);
 
         federateInfo.setResignTime(DateTime.now());
+        federateInfo.setTimedOutResign(hasTimedOut);
         this.resignedFederates.add(federateInfo);
 
         this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Increment);
+    }
+
+    public void federateResigned(FederateInfo federateInfo) {
+        this.federateResigned(federateInfo, false);
     }
 
     private void maintainExpectedFederateCount(FederateInfo federateInfo, CounterDirection counterDirection) {
@@ -127,6 +132,10 @@ public class FederatesMaintainer {
                 .stream()
                 .filter(FederateInfo::isLateJoiner)
                 .collect(Collectors.toList());
+    }
+
+    List<FederateInfo> getOnlineFederates() {
+        return this.onlineFederates;
     }
 
     List<FederateInfo> getAllMaintainedFederates() {
