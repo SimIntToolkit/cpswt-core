@@ -46,6 +46,8 @@ public class FederatesMaintainer {
 
         this.maintainExpectedFederateCount(federateInfo, CounterDirection.Decrement);
         this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Decrement);
+
+        this.logCurrentStatus();
     }
 
     public void federateResigned(FederateInfo federateInfo, boolean hasTimedOut) {
@@ -56,6 +58,8 @@ public class FederatesMaintainer {
         this.resignedFederates.add(federateInfo);
 
         this.maintainLateJoinerFederateCount(federateInfo, CounterDirection.Increment);
+
+        this.logCurrentStatus();
     }
 
     public void federateResigned(FederateInfo federateInfo) {
@@ -170,7 +174,7 @@ public class FederatesMaintainer {
 
         logger.trace("resignedFederates ::");
         for (FederateInfo fi : this.resignedFederates) {
-            logger.trace("\t[{}] :: [RESIGNED @ {}] :: {}", fi.isLateJoiner() ? "LATEJOINER" : " EXPECTED ", fi.resignTime, fi.getFederateId());
+            logger.trace("\t[{}] :: [RESIGNED @ {}] :: {} :: {}", fi.isLateJoiner() ? "LATEJOINER" : " EXPECTED ", fi.resignTime, fi.isTimedOutResign() ? "CRASHED" : "", fi.getFederateId());
         }
         if (this.resignedFederates.size() == 0) {
             logger.trace("\t NONE");

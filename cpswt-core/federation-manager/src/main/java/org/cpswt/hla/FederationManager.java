@@ -1023,9 +1023,14 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag) {
 
         try {
-            // TODO: get rid of this sh*t
-            // First dump the interaction (if monitored)
-            dumpInteraction(intrHandle, receivedIntr, null);
+
+            // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
+            // TODO: review when doing something with COAs
+            if(this.coaExecutor != null) {
+                InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
+                coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
+            }
 
             // "federate join" interaction
             if(FederateJoinInteraction.match(intrHandle)) {
@@ -1037,9 +1042,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                 this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.getFederateId(), federateJoinInteraction.getFederateType(), federateJoinInteraction.isLateJoiner()));
 
-                this.federatesMaintainer.logCurrentStatus();
-
-                maintainFederatesFromFederationManifest();
             }
             // "federate resign" interaction
             else if(FederateResignInteraction.match(intrHandle)) {
@@ -1051,124 +1053,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                 FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.getFederateId());
                 this.federatesMaintainer.federateResigned(federateInfo);
-
-                this.federatesMaintainer.logCurrentStatus();
             }
 
-//            TODO: get rid of this shit
-//            // Now process the interactions as needed
-//            if (HighPrio.match(intrHandle) && logLevel >= 1) {
-//                HighPrio hp = new HighPrio(receivedIntr);
-//                // support.firePropertyChange(PROP_LOG_HIGH_PRIO, null, hp);
-//            } else if (MediumPrio.match(intrHandle) && logLevel >= 2) {
-//                MediumPrio mp = new MediumPrio(receivedIntr);
-//                // support.firePropertyChange(PROP_LOG_MEDIUM_PRIO, null, mp);
-//            } else if (LowPrio.match(intrHandle) && logLevel >= 3) {
-//                LowPrio lp = new LowPrio(receivedIntr);
-//                // support.firePropertyChange(PROP_LOG_LOW_PRIO, null, lp);
-//            } else if (VeryLowPrio.match(intrHandle) && logLevel >= 4) {
-//                VeryLowPrio vlp = new VeryLowPrio(receivedIntr);
-//                // support.firePropertyChange(PROP_LOG_VERY_LOW_PRIO, null, vlp);
-//            }
         } catch (Exception e) {
             logger.error("Error while parsing the logger interaction");
-            logger.error(e);
-        }
-    }
-
-    @Override
-    public void receiveInteraction(
-            int intrHandle,
-            ReceivedInteraction receivedIntr,
-            byte[] tag,
-            LogicalTime intrTime,
-            EventRetractionHandle erh
-    ) {
-
-        // TODO: this callback shouldn't be called, right?
-        if(FederateJoinInteraction.match(intrHandle)) {
-            logger.trace("FederateJoinInteraction received in FederationManager!");
-            FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
-
-            logger.trace("Received: {}", federateJoinInteraction.toString());
-        }
-
-        // TODO: get rid of this sh*t
-        // First dump the interaction (if monitored)
-        dumpInteraction(intrHandle, receivedIntr, intrTime);
-    }
-
-    private void dumpInteraction(int handle, ReceivedInteraction receivedInteraction, LogicalTime time) {
-
-        try {
-            InteractionRoot interactionRoot = InteractionRoot.create_interaction(handle, receivedInteraction);
-
-            if (interactionRoot != null) {
-                logger.debug("FederationManager: Received interaction {}", interactionRoot);
-            } else {
-                logger.warn("FederationManager: WARNING! Received interaction with handle {}.. COULD NOT CREATE PROPER INTERACTION", handle);
-                return;
-            }
-
-            // Himanshu: Enabling Manager Logging to Database
-            DoubleTime intrTimestamp = new DoubleTime();
-            if (time != null) {
-                intrTimestamp.setTo(time);
-            } else {
-                // Himanshu: We normally use only TSO updates, so this shouldn't be
-                // called, but due to an RTI bug, it seemingly is getting called. So,
-                // for now, use the federate's current time or LBTS whichever is greater
-                // as the timestamp
-                if (getLBTS() >= getCurrentTime()) {
-                    intrTimestamp.setTime(getLBTS());
-                } else {
-                    intrTimestamp.setTime(getCurrentTime());
-                }
-            }
-            // createLog(handle, receivedInteraction, intrTimestamp);
-
-
-            // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
-            coaExecutor.updateArrivedInteractions(handle, time, interactionRoot);
-
-            if (!monitored_interactions.contains(handle)) {
-                // This is not a monitored interaction
-                return;
-            }
-
-            /*String str = "time=";
-            if (time == null) {
-                str += "unknown\t";
-            } else {
-                DoubleTime t = new DoubleTime();
-                t.setTo(time);
-                str += String.format("%.4f\t", t.getTime());
-            }
-            //str += monitored_interactions.get(handle) + "\t";
-            for (int j = 0; j < i.size(); ++j) {
-                str += new String(i.getValue(j)) + "\t";
-            }*/
-
-            double t = this.time.getTime();
-            if (time != null) {
-                DoubleTime t2 = new DoubleTime();
-                t2.setTo(time);
-                t = t2.getTime();
-            }
-
-            StringBuffer intrBuf = new StringBuffer();
-            intrBuf.append("Received " + InteractionRoot.get_class_name(handle) + " interaction at time (" + t + "):\n");
-            for (int ix = 0; ix < receivedInteraction.size(); ++ix) {
-                int parameterHandle = receivedInteraction.getParameterHandle(ix);
-                Object val = interactionRoot.getParameter(parameterHandle);
-                if (val != null) {
-                    intrBuf.append("\t" + InteractionRoot.get_parameter_name(parameterHandle) + " = " + val.toString() + "\n");
-                }
-            }
-            // monitor_out.print(intrBuf.toString());
-            logger.info(intrBuf.toString());
-        } catch (Exception e) {
-            logger.error("Exception while dumping interaction with handle: {}", handle);
             logger.error(e);
         }
     }
