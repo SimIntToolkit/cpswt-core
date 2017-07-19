@@ -29,13 +29,6 @@ public class FederationManagerConfig extends FederateConfig {
     public String federatesEndpoint;
 
     /**
-     * Indicates if federation manager should autostart.
-     */
-    @Deprecated
-    @FederateParameter
-    public boolean autoStart;
-
-    /**
      * Indicates the federation end time.
      */
     @FederateParameter

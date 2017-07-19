@@ -110,7 +110,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
      */
     private ExperimentConfig experimentConfig;
 
-    private boolean _autoStart;
     private double _federationEndTime = 0.0;
     private Random _rand4Dur = null;
     private String _stopScriptFilepath;
@@ -157,11 +156,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private double tMainLoopEndTime = 0.0;
     private boolean executionTimeRecorded = false;
 
-    // expose autostart
-    public boolean getAutoStart() {
-        return this._autoStart;
-    }
-
     private COAExecutor coaExecutor;
 
     //private PrintStream monitor_out;
@@ -197,7 +191,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         // record config parameters
         this.federationId = params.federationId;
-        this._autoStart = params.autoStart;
         this._federationEndTime = params.federationEndTime;
         this.realTimeMode = params.realTimeMode;
         this.terminateOnCOAFinish = params.terminateOnCOAFinish;
@@ -256,6 +249,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
+            // there are no expected federates --> no need for synchronization points
             this.useSyncPoints = false;
             logger.debug("No expected federates are defined, not setting up synchronization points.");
         }
@@ -437,18 +431,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             logger.trace("Waiting for \"{}\"...", SynchronizationPoints.ReadyToPopulate);
             super.readyToPopulate();
             logger.trace("{} done.", SynchronizationPoints.ReadyToPopulate);
-        }
 
-        // IF FEDERATION MANAGER WAS NOT CONFIGURED TO AUTO-START, THEN
-        // PROCEED SIMULATION ONLY WHEN USER PRESSES THE START BUTTON
-        if (!_autoStart) {
-            this.pauseSimulation();
-            while (this.paused) {
-                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            }
-        }
-
-        if (useSyncPoints) {
             logger.trace("Waiting for \"{}\"...", SynchronizationPoints.ReadyToRun);
             super.readyToRun();
             logger.trace("{} done.", SynchronizationPoints.ReadyToRun);
