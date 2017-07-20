@@ -11,6 +11,7 @@ public class ExperimentConfig {
     public List<String> federateTypesAllowed;
     public List<FederateJoinInfo> expectedFederates;
     public List<FederateJoinInfo> lateJoinerFederates;
+    public List<Double> pauseTimes;
 
     @JsonIgnore
     public int expectedFederateItemsCount() {

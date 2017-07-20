@@ -24,5 +24,6 @@
       "federateType": "EchoServer",
       "count": 1
     }
-  ]
+  ],
+  "pauseTimes": [1.0]
 }

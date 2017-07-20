@@ -27,7 +27,6 @@ import org.cpswt.utils.CpswtDefaults;
 import hla.rti.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.*;
@@ -40,7 +39,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,6 +108,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
      */
     private ExperimentConfig experimentConfig;
 
+    /**
+     * Pause times
+     */
+    private Set<Double> pauseTimes = new HashSet<>();
+
     private double _federationEndTime = 0.0;
     private Random _rand4Dur = null;
     private String _logLevel;
@@ -119,8 +122,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
     private List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
-
-    private Set<Double> pause_times = new TreeSet<Double>();
 
     private List<Integer> monitored_interactions = new ArrayList<Integer>();
 
@@ -245,6 +246,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         logger.trace("Loading experiment config file {}", experimentConfigFilePath);
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
+        if(this.experimentConfig.pauseTimes != null) {
+            this.pauseTimes.addAll(this.experimentConfig.pauseTimes);
+        }
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
             // there are no expected federates --> no need for synchronization points
@@ -274,7 +278,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             _processedFederates.addAll(xmlHandler.getExpectedFederates());
 
             _injectedInteraction = xmlHandler.getInjectedInteraction();
-            pause_times.addAll(xmlHandler.getPauseTimes());
+            pauseTimes.addAll(xmlHandler.getPauseTimes());
             monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
             expectedFederateTypes.addAll(xmlHandler.getExpectedFederates());
 
@@ -511,7 +515,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
 
                                 // if we passed next pause time go to pause mode
-                                Iterator<Double> it = pause_times.iterator();
+                                Iterator<Double> it = pauseTimes.iterator();
                                 if (it.hasNext()) {
                                     double pause_time = it.next();
                                     if (time.getTime() > pause_time) {
