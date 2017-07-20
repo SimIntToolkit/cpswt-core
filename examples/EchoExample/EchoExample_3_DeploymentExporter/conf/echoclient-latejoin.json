@@ -4,5 +4,6 @@
   "federationId": "EchoExample",
   "isLateJoiner": true,
   "lookAhead": 0.1,
-  "stepSize": 1.0
+  "stepSize": 1.0,
+  "name": "EchoClientLateJoinerNameFromConfig"
 }

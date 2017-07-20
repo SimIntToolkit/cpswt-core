@@ -52,6 +52,12 @@ public class FederateConfig {
     public double stepSize;
 
     /**
+     * Optional 'name' parameter that will be acquired as 'id'
+     */
+    @FederateParameter
+    public String name;
+
+    /**
      * Default constructor for FederateConfig.
      */
     public FederateConfig() {}

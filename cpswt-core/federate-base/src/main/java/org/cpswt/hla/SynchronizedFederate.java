@@ -144,7 +144,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.lookAhead = federateConfig.lookAhead;
         this.stepSize = federateConfig.stepSize;
 
-        this.federateId = FederateIdUtility.generateID(this.federateType);
+        if(federateConfig.name == null || federateConfig.name.isEmpty()) {
+            this.federateId = FederateIdUtility.generateID(this.federateType);
+        }
+        else {
+            this.federateId = federateConfig.name;
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------------------
