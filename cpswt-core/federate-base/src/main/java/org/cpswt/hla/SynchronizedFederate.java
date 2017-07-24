@@ -1027,7 +1027,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    protected void enteredTimeGrantedStated() {
+    protected void enteredTimeGrantedState() {
         if(_receivedSimEnd != null) {
             handleIfSimEnd(SimEnd.get_handle(), _receivedSimEnd, null);
         }
