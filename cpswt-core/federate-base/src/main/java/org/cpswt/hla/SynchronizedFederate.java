@@ -1024,7 +1024,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         if (SimEnd.match(interactionClass)) {
             logger.info("{}: SimEnd interaction received, exiting...", getFederateId());
             try {
-                getLRC().tick();
+                // getLRC().tick();
                 getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
             } catch (Exception e) {
                 logger.error("Error during resigning federate: {}", getFederateId());
