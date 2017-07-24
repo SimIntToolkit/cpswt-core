@@ -715,7 +715,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
 
         // Wait for 2 seconds for SimEnd to reach others
-        CpswtUtils.sleep(2000);
+        CpswtUtils.sleep(10000);
 
         logger.info("Simulation terminated");
 
@@ -724,7 +724,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.setFederateState(FederateState.TERMINATED);
 
         // Wait for 10 seconds for Simulation to gracefully exit
-        CpswtUtils.sleep(10000);
+        CpswtUtils.sleep(2000);
 
         // If simulation has still not exited gracefully, run kill command
         killEntireFederation();
