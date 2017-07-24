@@ -53,6 +53,7 @@ public class EchoClient extends EchoClientBase {
             currentTime += super.getStepSize();
 
             atr.requestSyncStart();
+            enteredTimeGrantedStated();
 
             // Waiting for incoming interactions
             while ((interactionRoot = getNextInteractionNoWait()) != null) {

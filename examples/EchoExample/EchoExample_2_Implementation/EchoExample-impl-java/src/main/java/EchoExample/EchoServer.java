@@ -52,6 +52,7 @@ public class EchoServer extends EchoServerBase {
             currentTime += super.getStepSize();
 
             atr.requestSyncStart();
+            enteredTimeGrantedStated();
 
             // Process any incoming interactions in the queue
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {

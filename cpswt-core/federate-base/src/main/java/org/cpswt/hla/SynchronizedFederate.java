@@ -109,6 +109,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _simEndNotSubscribed = true;
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
+    private ReceivedInteraction _receivedSimEnd = null;
 
     /**
      * General federate parameters
@@ -969,7 +970,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction);
         if (!unmatchingFedFilterProvided(ir)) {
-            handleIfSimEnd(interactionClass, theInteraction, assumedTimestamp);
+            if(SimEnd.match(interactionClass)) {
+                _receivedSimEnd = theInteraction;
+            }
+            // handleIfSimEnd(interactionClass, theInteraction, assumedTimestamp);
             addInteraction(ir);
             // createLog(interactionClass, theInteraction, assumedTimestamp);
         }
@@ -1014,9 +1018,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     ) {
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
         if (!unmatchingFedFilterProvided(ir)) {
-            handleIfSimEnd(interactionClass, theInteraction, theTime);
+            if(SimEnd.match(interactionClass)) {
+                _receivedSimEnd = theInteraction;
+            }
+            // handleIfSimEnd(interactionClass, theInteraction, theTime);
             addInteraction(ir);
             // createLog(interactionClass, theInteraction, theTime);
+        }
+    }
+
+    protected void enteredTimeGrantedStated() {
+        if(_receivedSimEnd != null) {
+            handleIfSimEnd(SimEnd.get_handle(), _receivedSimEnd, null);
         }
     }
 
