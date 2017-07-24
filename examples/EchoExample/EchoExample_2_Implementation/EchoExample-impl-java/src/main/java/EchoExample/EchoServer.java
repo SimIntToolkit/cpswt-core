@@ -52,6 +52,7 @@ public class EchoServer extends EchoServerBase {
             currentTime += super.getStepSize();
 
             atr.requestSyncStart();
+            enteredTimeGrantedState();
 
             // Process any incoming interactions in the queue
             while(  ( interactionRoot = getNextInteractionNoWait() ) != null ) {
@@ -95,9 +96,12 @@ public class EchoServer extends EchoServerBase {
             FederateConfig federateConfig = federateConfigParser.parseArgs(args, FederateConfig.class);
             EchoServer echoServer = new EchoServer(federateConfig);
             echoServer.execute();
+
+            System.exit(0);
         } catch ( Exception e ) {
             logger.error("There was a problem executing the EchoServer federate: {}", e.getMessage());
             logger.error(e);
         }
+        System.exit(1);
     }
 }

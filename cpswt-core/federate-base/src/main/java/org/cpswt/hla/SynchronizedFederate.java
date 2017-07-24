@@ -109,6 +109,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _simEndNotSubscribed = true;
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
+    private ReceivedInteraction _receivedSimEnd = null;
 
     /**
      * General federate parameters
@@ -260,6 +261,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 logger.error("General error while trying to join federation. {}", e);
             }
         }
+
+        this.ensureSimEndSubscription();
 
         this.notifyFederationOfJoin();
     }
@@ -967,6 +970,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction);
         if (!unmatchingFedFilterProvided(ir)) {
+            if(SimEnd.match(interactionClass)) {
+                _receivedSimEnd = theInteraction;
+            }
             // handleIfSimEnd(interactionClass, theInteraction, assumedTimestamp);
             addInteraction(ir);
             // createLog(interactionClass, theInteraction, assumedTimestamp);
@@ -1012,38 +1018,47 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     ) {
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
         if (!unmatchingFedFilterProvided(ir)) {
+            if(SimEnd.match(interactionClass)) {
+                _receivedSimEnd = theInteraction;
+            }
             // handleIfSimEnd(interactionClass, theInteraction, theTime);
             addInteraction(ir);
             // createLog(interactionClass, theInteraction, theTime);
         }
     }
 
-//    protected void handleIfSimEnd(int interactionClass, ReceivedInteraction theInteraction, LogicalTime theTime) {
-//        if (SimEnd.match(interactionClass)) {
-//            System.out.println(getFederateId() + ": SimEnd interaction received, exiting...");
-//            createLog(interactionClass, theInteraction, theTime);
-//            try {
-//                getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-//            } catch (Exception e) {
-//                System.out.println("Error during resigning federate: " + getFederateId());
-//                e.printStackTrace();
-//            }
-//
-//            // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
-//            try {
-//                Thread.sleep(10000);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            // TODO: CONSIDER SETTING UP A SHUTDOWN HOOK
-//            // this one will terminate the JVM not only the current process
-//            Runtime.getRuntime().exit(0);
-//
-//            // Exit
-//            System.exit(0);
-//        }
-//    }
+    protected void enteredTimeGrantedState() {
+        if(_receivedSimEnd != null) {
+            handleIfSimEnd(SimEnd.get_handle(), _receivedSimEnd, null);
+        }
+    }
+
+    protected void handleIfSimEnd(int interactionClass, ReceivedInteraction theInteraction, LogicalTime theTime) {
+        if (SimEnd.match(interactionClass)) {
+            logger.info("{}: SimEnd interaction received, exiting...", getFederateId());
+            try {
+                // getLRC().tick();
+                getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+            } catch (Exception e) {
+                logger.error("Error during resigning federate: {}", getFederateId());
+                logger.error(e.getMessage());
+            }
+
+            // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
+            try {
+                Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+
+            // TODO: CONSIDER SETTING UP A SHUTDOWN HOOK
+            // this one will terminate the JVM not only the current process
+            Runtime.getRuntime().exit(0);
+
+            // Exit
+            System.exit(0);
+        }
+    }
 
     private static PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue = new PriorityBlockingQueue<ObjectReflector>(10, new ObjectReflectorComparator());
 

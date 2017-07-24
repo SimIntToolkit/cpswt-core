@@ -551,6 +551,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                     waitForFederatesToResign();
 
+                    while(getFederateState() != FederateState.TERMINATED) {
+                        CpswtUtils.sleepDefault();
+                    }
+
                     // destroy federation
                     getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
                     getLRC().destroyFederationExecution(federationId);
@@ -560,7 +564,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     // In case some federate is still hanging around
                     killEntireFederation();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
                 }
             }
         };
@@ -701,6 +705,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         _killingFederation = true;
         recordMainExecutionLoopEndTime();
+        this.setFederateState(FederateState.TERMINATING);
 
         synchronized (super.lrc) {
             try {
@@ -714,17 +719,18 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             }
         }
 
+        running = false;
+        paused = false;
+
         // Wait for 2 seconds for SimEnd to reach others
-        CpswtUtils.sleep(2000);
+        CpswtUtils.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
 
         logger.info("Simulation terminated");
 
-        running = false;
-        paused = false;
         this.setFederateState(FederateState.TERMINATED);
 
         // Wait for 10 seconds for Simulation to gracefully exit
-        CpswtUtils.sleep(10000);
+        CpswtUtils.sleep(2000);
 
         // If simulation has still not exited gracefully, run kill command
         killEntireFederation();

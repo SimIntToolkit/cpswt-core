@@ -20,7 +20,7 @@ public class EchoClient extends EchoClientBase {
         super(params);
     }
 
-    private final int sendMessageCount = 25;
+    private final int sendMessageCount = 125;
     int sequenceNumber = 0;
     Set<Integer> sentSequenceNumbers = new HashSet<Integer>();
     // long waitToSendNextMessage = 10000;
@@ -53,6 +53,7 @@ public class EchoClient extends EchoClientBase {
             currentTime += super.getStepSize();
 
             atr.requestSyncStart();
+            enteredTimeGrantedState();
 
             // Waiting for incoming interactions
             while ((interactionRoot = getNextInteractionNoWait()) != null) {
@@ -115,12 +116,11 @@ public class EchoClient extends EchoClientBase {
             EchoClient echoClient = new EchoClient(federateConfig);
             echoClient.execute();
 
-            CpswtUtils.sleep(500);
-
-            System.exit(1);
+            System.exit(0);
         } catch (Exception e) {
             logger.error("There was a problem executing the EchoClient federate: {}", e.getMessage());
             logger.error(e);
         }
+        System.exit(1);
     }
 }
