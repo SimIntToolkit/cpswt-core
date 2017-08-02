@@ -183,18 +183,29 @@ public class FederationManagerHostApp extends AllDirectives {
 
 
     public static void main(String[] args) throws Exception {
+    	System.out.println("Start==>");
 
         ActorSystem system = ActorSystem.create("routes");
+    	System.out.println("Start1==>");
 
         final Http http = Http.get(system);
+    	System.out.println("Start2==>");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
+    	System.out.println("Start3==>");
+        logger.debug("-2=>");
+       FederationManagerHostApp app = new FederationManagerHostApp();
+   	System.out.println("Start4==>");
+        logger.debug("-1=>");
+       app.parseConfig(args);
 
-        FederationManagerHostApp app = new FederationManagerHostApp();
-        app.parseConfig(args);
-
+   	System.out.println("Start5==>");
+        logger.debug("0=>");
         app.initFederationManager();
-
+    	System.out.println("Start6==>");
+        logger.debug("1=>");
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
+    	System.out.println("Start7==>");
+        logger.debug("2=>");
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost(app.getBindingAddress(), app.getPort()), materializer);
 
