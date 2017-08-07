@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-RTI_RID_FILE=RTI.rid
+printf "\ec"
+RTI_FILE=RTI.rid
 java \
 -Djava.net.preferIPv4Stack=true \
 -Dorg.apache.logging.log4j.simplelog.StatusLogger.level=TRACE \
