@@ -9,7 +9,7 @@
     <properties>
         <federation.name>HelloWorld_Java_Tutorial</federation.name>
         <federation.version>0.0.1-SNAPSHOT</federation.version>
-        <org.cpswt.version>0.5.0-SNAPSHOT</org.cpswt.version>
+        <org.cpswt.version>0.6.0-SNAPSHOT</org.cpswt.version>
         <nar.version>3.3.0</nar.version>
         <maven.repository.url>http://cpswtng_archiva:8080/repository</maven.repository.url>
     </properties>
