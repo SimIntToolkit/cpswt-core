@@ -2,7 +2,7 @@
   "federateRTIInitWaitTimeMs": 200,
   "federateType": "FederationManager",
   "federationId": "FedManager",
-  "isLateJoiner": true,
+  "isLateJoiner": false,
   "lookAhead": 0.1,
   "stepSize": 1,
   "bindHost": "127.0.0.1",

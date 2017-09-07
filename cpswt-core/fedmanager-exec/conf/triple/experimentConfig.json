@@ -7,15 +7,15 @@
   "expectedFederates": [
     {
       "federateType": "GatewayMain",
-      "count": 0
+      "count": 1
     },
     {
       "federateType": "TripleSend",
-      "count": 0
+      "count": 1
     },
     {
       "federateType": "TripleReceive",
-      "count": 0
+      "count": 1
     }
   ],
   "lateJoinerFederates": []
