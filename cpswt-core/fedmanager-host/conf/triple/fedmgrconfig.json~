@@ -9,9 +9,9 @@
   "port": 8083,
   "controlEndpoint": "/fedmgr",
   "federatesEndpoint": "/federates",
-  "federationEndTime": 0,
+  "federationEndTime": 2,
   "realTimeMode": true,
   "terminateOnCOAFinish": false,
-  "fedFile": "fom/FedManager.fed",
-  "experimentConfig": "conf/experimentConfig.json"
+  "fedFile": "fom/triple/TripleFederation.fed",
+  "experimentConfig": "conf/triple/experimentConfig.json"
 }
