@@ -121,19 +121,23 @@ public class FederationManagerHostApp extends AllDirectives {
                                         try {
                                             switch (action) {
                                                 case START:
-                                                    response = new StateChangeResponse(currentState, FederateState.STARTING);
+                                                    logger.debug("Starting simulation");
+                                                   response = new StateChangeResponse(currentState, FederateState.STARTING);
                                                     this.startSimulationAsync();
                                                     break;
                                                 case PAUSE:
-                                                    this.federationManager.pauseSimulation();
+                                                    logger.debug("Pause simulation");
+                                                  this.federationManager.pauseSimulation();
                                                     response = new StateChangeResponse(currentState, federationManager.getFederateState());
                                                     break;
                                                 case RESUME:
-                                                    this.federationManager.resumeSimulation();
+                                                    logger.debug("Resume simulation");
+                                                   this.federationManager.resumeSimulation();
                                                     response = new StateChangeResponse(currentState, federationManager.getFederateState());
                                                     break;
                                                 case TERMINATE:
-                                                    response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
+                                                    logger.debug("Terminate simulation");
+                                                  response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
                                                     this.terminateSimulationAsync();
                                                     break;
                                             }

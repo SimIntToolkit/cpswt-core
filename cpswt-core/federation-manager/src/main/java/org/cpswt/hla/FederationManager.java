@@ -680,6 +680,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     public void startSimulation() throws Exception {
+        logger.debug("Starting simulation");
         this.setFederateState(FederateState.STARTING);
         if (!federationAlreadyAttempted()) {
             this.startFederationRun();
@@ -703,7 +704,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     public void terminateSimulation() {
 
-        _killingFederation = true;
+        logger.debug("Terminating simulation");
+       _killingFederation = true;
         recordMainExecutionLoopEndTime();
         this.setFederateState(FederateState.TERMINATING);
 
@@ -1067,6 +1069,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         } catch (Exception e) {
             logger.error("Error while parsing the logger interaction");
+            logger.error("intrHandle=" + intrHandle);
+            logger.error("_federationEventsHandler=" + _federationEventsHandler);
             logger.error(e);
         }
     }

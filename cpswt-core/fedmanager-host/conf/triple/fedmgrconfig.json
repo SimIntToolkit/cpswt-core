@@ -12,6 +12,6 @@
   "federationEndTime": 2,
   "realTimeMode": true,
   "terminateOnCOAFinish": false,
-  "fedFile": "fom/triple/TripleFederation.fed",
+  "fedFile": "conf/triple/TripleFederation.fed",
   "experimentConfig": "conf/triple/experimentConfig.json"
 }
