@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
+import hla.rti.jlc.EncodingHelpers;
 
 /**
  * ObjectRoot is the base class for all objects
@@ -1343,7 +1344,7 @@ public class ObjectRoot implements ObjectRootInterface {
         if (val == null) {
             logger.error("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
         }
-        if (!setAttributeAux(handle, new String(val))) {
+        if (!setAttributeAux(handle, EncodingHelpers.decodeString(val))) {
             logger.error("set:  bad attribute handle in class \"" + getClass().getName() + "\"");
         }
     }
