@@ -96,7 +96,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * Indicates if federation manager terminates when COA finishes.
      */
-    private boolean terminateOnCOAFinish;
+    // private boolean terminateOnCOAFinish;
 
     /**
      * Project root directory
@@ -192,7 +192,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.federationId = params.federationId;
         this._federationEndTime = params.federationEndTime;
         this.realTimeMode = params.realTimeMode;
-        this.terminateOnCOAFinish = params.terminateOnCOAFinish;
+        // this.terminateOnCOAFinish = params.terminateOnCOAFinish;
 
         // set project's root directory
         this.rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
@@ -214,8 +214,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: eliminate loglevels @see #18
         this._logLevel = "NORMAL";
 
-        // See if fixed see must be used
-        // TODO: WHAT IS THIS SHIT
+        // See if fixed seed must be used
+        // TODO: WHAT IS THIS
         int seed4Dur = 0;
         if (seed4Dur > 0) {
             RandomWithFixedSeed.init(seed4Dur);
@@ -224,7 +224,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this._rand4Dur = new Random();
         }
 
-        // TODO: logging #18 , #13, #7
+        // TODO: logging #18
         Path logDirPath = Paths.get(this.rootDir, "log"); // params.LogDir);
         File logDir = logDirPath.toFile();
         if (Files.notExists(logDirPath)) {
@@ -235,15 +235,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
-        Path experimentConfigFilePath = Paths.get(params.experimentConfig);
-        File experimentConfigFile;
-        if (experimentConfigFilePath.isAbsolute()) {
-            experimentConfigFile = experimentConfigFilePath.toFile();
-        } else {
-            experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
-        }
+        File experimentConfigFile = CpswtUtils.loadConfigFile(params.experimentConfig, this.rootDir);
 
-        logger.trace("Loading experiment config file {}", experimentConfigFilePath);
+        logger.trace("Loading experiment config file {}", experimentConfigFile.getPath());
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
         if(this.experimentConfig.pauseTimes != null) {

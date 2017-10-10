@@ -12,6 +12,8 @@ public class ExperimentConfig {
     public List<FederateJoinInfo> expectedFederates;
     public List<FederateJoinInfo> lateJoinerFederates;
     public List<Double> pauseTimes;
+    public String coaDefinition;
+    public String coaSelection;
 
     @JsonIgnore
     public int expectedFederateItemsCount() {
