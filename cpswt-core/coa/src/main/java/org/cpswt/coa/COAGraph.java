@@ -23,8 +23,6 @@
 
 package org.cpswt.coa;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -53,14 +51,6 @@ public class COAGraph {
 	private HashSet<COAEdge> _allEdges = new HashSet<COAEdge>();
 
 	private HashMap<COANode, HashSet<COAEdge>> _edgesFromNodeMap = new HashMap<COANode, HashSet<COAEdge>>();
-
-	public static final String PROP_GRAPH_STATUS = "property_graph_status";
-
-	/**
-	 * Property change event handling.
-	 */
-	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(
-			this);
 
 	public COAGraph() {
 	}
@@ -293,12 +283,5 @@ public class COAGraph {
 				}
 			}
 		}
-
-		changeSupport.firePropertyChange(PROP_GRAPH_STATUS, 0, 1);
-	}
-
-	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
-		changeSupport.addPropertyChangeListener(propertyName, listener);
 	}
 }
