@@ -27,8 +27,6 @@ import java.util.HashSet;
 
 /**
  * A simple base class for a COA node in the COA sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COANode {
 

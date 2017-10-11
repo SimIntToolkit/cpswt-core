@@ -35,8 +35,6 @@ import org.cpswt.util.RandomSingleton;
 
 /**
  * This is the main class to represent the COA sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAGraph {
 

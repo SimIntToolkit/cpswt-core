@@ -25,8 +25,6 @@ package org.cpswt.coa;
 
 /**
  * Represents a Synchronization point in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COASyncPt extends COANode {
 

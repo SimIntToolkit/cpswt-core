@@ -27,8 +27,6 @@ package org.cpswt.coa;
 
 /**
  * Represents an Outcome element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAOutcome extends COANode {
 

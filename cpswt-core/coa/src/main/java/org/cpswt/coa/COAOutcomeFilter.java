@@ -25,8 +25,6 @@ package org.cpswt.coa;
 
 /**
  * Represents an outcome filter element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAOutcomeFilter extends COANode {
 

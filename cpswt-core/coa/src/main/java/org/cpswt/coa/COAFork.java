@@ -25,8 +25,6 @@ package org.cpswt.coa;
 
 /**
  * Represents a Fork element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAFork extends COANode {
 

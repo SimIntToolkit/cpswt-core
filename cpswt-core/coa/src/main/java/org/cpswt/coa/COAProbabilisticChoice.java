@@ -27,8 +27,6 @@ package org.cpswt.coa;
  * Represents a ProbabilisticChoice element in the sequence graph. One and only
  * one subsequent branch is executed. The choice is made randomly and different
  * runs of the experiment will result in randomly different branch selections.
- * 
- * @author Himanshu Neema
  */
 public class COAProbabilisticChoice extends COANode {
 

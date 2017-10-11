@@ -27,8 +27,6 @@ import java.util.HashSet;
 
 /**
  * A simple class for a COA edge with probability in the COA sequence graph. This is used to connect COA elements from a probabilistic choice node.
- * 
- * @author Himanshu Neema
  */
 public class COAFlowWithProbabilityEdge extends COAEdge {
 

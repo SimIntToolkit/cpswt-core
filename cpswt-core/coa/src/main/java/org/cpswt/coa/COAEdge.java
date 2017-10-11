@@ -27,8 +27,6 @@ import java.util.HashSet;
 
 /**
  * A simple class for a COA edge in the COA sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAEdge {
 
