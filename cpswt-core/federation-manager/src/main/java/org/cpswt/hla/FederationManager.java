@@ -244,6 +244,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this.pauseTimes.addAll(this.experimentConfig.pauseTimes);
         }
 
+        // load COA related stuff
+        File coaDefinitionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaDefinition, this.rootDir);
+        File coaSelectionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaSelection, this.rootDir);
+
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
             // there are no expected federates --> no need for synchronization points
             this.useSyncPoints = false;
