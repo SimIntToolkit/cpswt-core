@@ -1,5 +1,4 @@
 {
-  "terminateOnCOAFinish": false,
   "COAs": {
     "COA1": {
       "nodes": [

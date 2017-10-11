@@ -96,7 +96,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * Indicates if federation manager terminates when COA finishes.
      */
-    // private boolean terminateOnCOAFinish;
+    private boolean terminateOnCOAFinish;
 
     /**
      * Project root directory
@@ -192,7 +192,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.federationId = params.federationId;
         this._federationEndTime = params.federationEndTime;
         this.realTimeMode = params.realTimeMode;
-        // this.terminateOnCOAFinish = params.terminateOnCOAFinish;
 
         // set project's root directory
         this.rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
@@ -239,6 +238,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         logger.trace("Loading experiment config file {}", experimentConfigFile.getPath());
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
+        this.terminateOnCOAFinish = this.experimentConfig.terminateOnCOAFinish;
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
         if(this.experimentConfig.pauseTimes != null) {
             this.pauseTimes.addAll(this.experimentConfig.pauseTimes);

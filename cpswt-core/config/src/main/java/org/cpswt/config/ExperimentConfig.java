@@ -14,6 +14,7 @@ public class ExperimentConfig {
     public List<Double> pauseTimes;
     public String coaDefinition;
     public String coaSelection;
+    public boolean terminateOnCOAFinish;
 
     @JsonIgnore
     public int expectedFederateItemsCount() {
