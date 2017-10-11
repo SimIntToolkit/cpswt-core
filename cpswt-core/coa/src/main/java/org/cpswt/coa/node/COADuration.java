@@ -20,16 +20,19 @@
  * 
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANode;
 
 /**
  * Represents a duration element in the sequence graph.
  */
 public class COADuration extends COANode {
 
-	protected double _duration = 0.0;
-	protected double _endTime = -1.0;
-	protected boolean _isTimerOn = false;
+	protected double duration = 0.0;
+	protected double endTime = -1.0;
+	protected boolean isTimerOn = false;
 
 	public COADuration(String nodeName, String uniqueID, double duration) {
 		this(nodeName, uniqueID, duration, COANodeType.Duration);
@@ -38,36 +41,34 @@ public class COADuration extends COANode {
 	protected COADuration(String nodeName, String uniqueID, double duration, COANodeType nodeType) {
 		super(nodeName, uniqueID, nodeType);
 		if (duration < 0) {
-			throw new IllegalArgumentException(
-					"Error! Negative duration not permitted");
+			throw new IllegalArgumentException("Error! Negative duration not permitted");
 		}
-		this._duration = duration;
+		this.duration = duration;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", Duration: " + _duration + ", TimerON: "
-				+ _isTimerOn;
+		return super.toString() + ", Duration: " + duration + ", TimerON: "
+				+ isTimerOn;
 	}
 
 	public double getDuration() {
-		return _duration;
+		return duration;
 	}
 
 	public void startTimer(double currentTime) {
 		if (currentTime < 0) {
-			throw new IllegalArgumentException(
-					"Error! Negative currentTime given for: " + this);
+			throw new IllegalArgumentException("Error! Negative currentTime given for: " + this);
 		}
-		this._endTime = currentTime + this._duration;
-		this._isTimerOn = true;
+		this.endTime = currentTime + this.duration;
+		this.isTimerOn = true;
 	}
 
 	public double getEndTime() {
-		return _endTime;
+		return endTime;
 	}
 
 	public boolean getIsTimerOn() {
-		return _isTimerOn;
+		return isTimerOn;
 	}
 }

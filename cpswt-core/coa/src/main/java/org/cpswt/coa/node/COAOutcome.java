@@ -21,57 +21,50 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
 
 //import org.cpswt.hla.InteractionRoot;
+
+import org.cpswt.coa.enums.COANodeType;
 
 /**
  * Represents an Outcome element in the sequence graph.
  */
 public class COAOutcome extends COANode {
 
-	private String _interactionClassName;
+	private String interactionClassName;
+	private int interactionClassHandle = 0;
+	private double awaitStartTime = -1;
+	private boolean isTimerOn = false;
+	private Object lastArrivedInteraction = null;
 
-	private int _interactionClassHandle = 0;
-
-	private double _awaitStartTime = -1;
-
-	private boolean _isTimerOn = false;
-
-	private Object _lastArrivedIntr = null;
-
-	public COAOutcome(String nodeName, String uniqueID,
-			String interactionClassName) {
+	public COAOutcome(String nodeName, String uniqueID, String interactionClassName) {
 		super(nodeName, uniqueID, COANodeType.Outcome);
 
-		this._interactionClassName = interactionClassName;
+		this.interactionClassName = interactionClassName;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", Interaction: " + _interactionClassName
-				+ ", TimerON: " + _isTimerOn + ", AwaitStartTime: "
-				+ _awaitStartTime;
+		return super.toString() + ", Interaction: " + interactionClassName
+				+ ", TimerON: " + isTimerOn + ", AwaitStartTime: "
+				+ awaitStartTime;
 	}
 
 	public String getInteractionClassName() {
-		return _interactionClassName;
+		return interactionClassName;
 	}
-
 	public int getInteractionClassHandle() {
-		return _interactionClassHandle;
+		return interactionClassHandle;
 	}
-
 	public double getAwaitStartTime() {
-		return _awaitStartTime;
+		return awaitStartTime;
 	}
-
 	public boolean getIsTimerOn() {
-		return _isTimerOn;
+		return isTimerOn;
 	}
-
 	public Object getLastArrivedInteraction() {
-		return _lastArrivedIntr;
+		return lastArrivedInteraction;
 	}
 
 	public void setLastArrivedInteraction(Object interactionRoot) {
@@ -80,7 +73,7 @@ public class COAOutcome extends COANode {
 					"Error! NULL interaction was set in the COA Outcome!");
 		}
 
-		this._lastArrivedIntr = interactionRoot;
+		this.lastArrivedInteraction = interactionRoot;
 	}
 
 	public void setInteractionClassHandle(int interactionClassHandle) {
@@ -88,7 +81,7 @@ public class COAOutcome extends COANode {
 			throw new IllegalArgumentException(
 					"Error! Negative values given while configuring: " + this);
 		}
-		this._interactionClassHandle = interactionClassHandle;
+		this.interactionClassHandle = interactionClassHandle;
 	}
 
 	public void startTimer(double currentTime) {
@@ -97,7 +90,7 @@ public class COAOutcome extends COANode {
 					"Error! Negative values given while setting awaitStartTime for: "
 							+ this);
 		}
-		this._awaitStartTime = currentTime;
-		this._isTimerOn = true;
+		this.awaitStartTime = currentTime;
+		this.isTimerOn = true;
 	}
 }

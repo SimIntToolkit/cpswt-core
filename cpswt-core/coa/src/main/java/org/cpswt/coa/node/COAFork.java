@@ -21,50 +21,30 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANode;
 
 /**
- * Represents a Synchronization point in the sequence graph.
+ * Represents a Fork element in the sequence graph.
  */
-public class COASyncPt extends COANode {
+public class COAFork extends COANode {
 
-	private double _syncTime = 0.0;
+	private boolean isDecisionPoint = false;
 
-	private int _numBranchesToFinish = 0;
+	public COAFork(String nodeName, String uniqueID, boolean isDecisionPoint) {
+		super(nodeName, uniqueID, COANodeType.Fork);
 
-	private int _numBranchesFinished = 0;
-
-	public COASyncPt(String nodeName, String uniqueID, double syncTime,
-			int numBranchesToFinish) {
-		super(nodeName, uniqueID, COANodeType.SyncPoint);
-
-		this._syncTime = syncTime;
-		this._numBranchesToFinish = numBranchesToFinish;
+		this.isDecisionPoint = isDecisionPoint;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", SyncTime: " + _syncTime
-				+ ", No. of branches to finish: " + _numBranchesToFinish;
+		return super.toString() + ", DecisionPoint: " + isDecisionPoint;
 	}
 
-	public double getSyncTime() {
-		return _syncTime;
-	}
-
-	public int getNumBranchesToFinish() {
-		return _numBranchesToFinish;
-	}
-
-	public void incrementBranchesFinished() {
-		_numBranchesFinished++;
-	}
-
-	public int getNumBranchesFinished() {
-		return _numBranchesFinished;
-	}
-
-	public boolean getIsRequiredNumOfBranchesFinished() {
-		return _numBranchesFinished >= _numBranchesToFinish;
+	public boolean getIsDecisionPoint() {
+		return isDecisionPoint;
 	}
 }

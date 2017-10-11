@@ -21,30 +21,44 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.edge;
+
+import org.cpswt.coa.edge.COAEdge;
+import org.cpswt.coa.enums.COAEdgeType;
+import org.cpswt.coa.node.COANode;
+
+import java.util.HashSet;
 
 /**
- * Represents a ProbabilisticChoice element in the sequence graph. One and only
- * one subsequent branch is executed. The choice is made randomly and different
- * runs of the experiment will result in randomly different branch selections.
+ * A simple class for a COA edge with probability in the COA sequence graph. This is used to connect COA elements from a probabilistic choice node.
  */
-public class COAProbabilisticChoice extends COANode {
+public class COAFlowWithProbabilityEdge extends COAEdge {
 
-	private boolean _isDecisionPoint = false;
+	private double probability;
 
-	public COAProbabilisticChoice(String nodeName, String uniqueID,
-			boolean isDecisionPoint) {
-		super(nodeName, uniqueID, COANodeType.ProbabilisticChoice);
+	public COAFlowWithProbabilityEdge(COANode fromNode, COANode toNode,
+									  String flowID, double probability, HashSet<String> branchesFinishedCondition) {
 
-		this._isDecisionPoint = isDecisionPoint;
+		super(COAEdgeType.COAFlowWithProbability, fromNode, toNode, flowID, branchesFinishedCondition);
+
+		if (probability < 0) {
+			throw new IllegalArgumentException(
+					"Probability of COAFlowWithProbability edge must not be negative.");
+		}
+
+		this.probability = probability;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", DecisionPoint: " + _isDecisionPoint;
+		return getFromNode().getNodeName() + " --to--> " + getToNode().getNodeName() + "[with probability " + probability + "]";
 	}
 
-	public boolean getIsDecisionPoint() {
-		return _isDecisionPoint;
+	public double getProbability() {
+		return probability;
+	}
+	
+	public void updateProbability(double probability) {
+		this.probability = probability;
 	}
 }

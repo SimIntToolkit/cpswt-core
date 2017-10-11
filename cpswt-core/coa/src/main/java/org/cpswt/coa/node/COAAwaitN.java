@@ -21,45 +21,42 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANode;
 
 /**
  * Represents an AwaitN COA element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAAwaitN extends COANode {
 
-	private int _numBranchesToFinish = 0;
-
-	private int _numBranchesFinished = 0;
+	private int numBranchesToFinish = 0;
+	private int numBranchesFinished = 0;
 
 	public COAAwaitN(String nodeName, String uniqueID, int numBranchesToFinish) {
 		super(nodeName, uniqueID, COANodeType.AwaitN);
 
-		this._numBranchesToFinish = numBranchesToFinish;
+		this.numBranchesToFinish = numBranchesToFinish;
 	}
 
 	@Override
 	public String toString() {
 		return super.toString() + ", No. of branches to finish: "
-				+ _numBranchesToFinish + ", No. of branches already finished: "
-				+ _numBranchesFinished;
+				+ numBranchesToFinish + ", No. of branches already finished: "
+				+ numBranchesFinished;
 	}
 
 	public int getNumBranchesToFinish() {
-		return _numBranchesToFinish;
+		return numBranchesToFinish;
 	}
-
 	public void incrementBranchesFinished() {
-		_numBranchesFinished++;
+		numBranchesFinished++;
 	}
-
 	public int getNumBranchesFinished() {
-		return _numBranchesFinished;
+		return numBranchesFinished;
 	}
-
 	public boolean getIsRequiredNumOfBranchesFinished() {
-		return _numBranchesFinished >= _numBranchesToFinish;
+		return numBranchesFinished >= numBranchesToFinish;
 	}
 }

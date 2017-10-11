@@ -1,4 +1,4 @@
-package org.cpswt.coa;
+package org.cpswt.coa.enums;
 
 public enum COAEdgeType {
     COAFlow("COAFlow"),

@@ -21,7 +21,10 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.edge;
+
+import org.cpswt.coa.enums.COAEdgeType;
+import org.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
 
@@ -30,15 +33,13 @@ import java.util.HashSet;
  */
 public class COAEdge {
 
-	private COAEdgeType _edgeType;
+	private final COAEdgeType edgeType;
+	private final String flowID;
 
-	private String _flowID;
+	private HashSet<String> branchesFinishedCondition = new HashSet<String>();
 
-	private HashSet<String> _branchesFinishedCondition = new HashSet<String>();
-
-	private COANode _fromNode = null;
-
-	private COANode _toNode = null;
+	private final COANode fromNode;
+	private final COANode toNode;
 
 	public COAEdge(COAEdgeType edgeType, COANode fromNode, COANode toNode,
 			String flowID, HashSet<String> branchesFinishedCondition) {
@@ -51,39 +52,39 @@ public class COAEdge {
 			throw new IllegalArgumentException(
 					"Branches that should have finished not specified for the COAException edge.");
 		}
-		this._edgeType = edgeType;
-		this._fromNode = fromNode;
-		this._toNode = toNode;
-		this._flowID = flowID;
+		this.edgeType = edgeType;
+		this.fromNode = fromNode;
+		this.toNode = toNode;
+		this.flowID = flowID;
 		if (branchesFinishedCondition != null
 				&& !branchesFinishedCondition.isEmpty()) {
-			this._branchesFinishedCondition.addAll(branchesFinishedCondition);
+			this.branchesFinishedCondition.addAll(branchesFinishedCondition);
 		}
 	}
 
 	@Override
 	public String toString() {
-		return _fromNode.getNodeName() + " --to--> " + _toNode.getNodeName();
+		return fromNode.getNodeName() + " --to--> " + toNode.getNodeName();
 	}
 
 	public COAEdgeType getEdgeType() {
-		return _edgeType;
+		return edgeType;
 	}
 
 	public String getFlowID() {
-		return _flowID;
+		return flowID;
 	}
 
 	public HashSet<String> getBranchesFinishedCondition() {
-		return _branchesFinishedCondition;
+		return branchesFinishedCondition;
 	}
 
 	public COANode getFromNode() {
-		return _fromNode;
+		return fromNode;
 	}
 
 	public COANode getToNode() {
-		return _toNode;
+		return toNode;
 	}
 
 }

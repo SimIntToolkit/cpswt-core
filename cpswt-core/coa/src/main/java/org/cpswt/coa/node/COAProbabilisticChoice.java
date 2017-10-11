@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
  * All rights reserved.
  *
@@ -22,23 +21,32 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.util;
+package org.cpswt.coa.node;
 
-import java.util.Random;
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANode;
 
 /**
- * RandomSingleton uses the current date and time to seed the random number generator
- * so that different runs of the same experiment (with same starting parameters)
- * still result in different values.
+ * Represents a ProbabilisticChoice element in the sequence graph. One and only
+ * one subsequent branch is executed. The choice is made randomly and different
+ * runs of the experiment will result in randomly different branch selections.
  */
-public class RandomSingleton {
-	private static Random _rand = new Random();
+public class COAProbabilisticChoice extends COANode {
 
-	/**
-	 * Gives back the instance of Random number generator with a unique seed
-	 * depending on current date and time.
-	 */
-	public static Random instance() {
-		return _rand;
+	private boolean isDecisionPoint = false;
+
+	public COAProbabilisticChoice(String nodeName, String uniqueID, boolean isDecisionPoint) {
+		super(nodeName, uniqueID, COANodeType.ProbabilisticChoice);
+
+		this.isDecisionPoint = isDecisionPoint;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", DecisionPoint: " + isDecisionPoint;
+	}
+
+	public boolean getIsDecisionPoint() {
+		return isDecisionPoint;
 	}
 }

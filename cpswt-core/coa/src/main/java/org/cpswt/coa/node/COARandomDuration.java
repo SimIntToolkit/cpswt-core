@@ -18,43 +18,54 @@
  * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  * 
- * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
 
-import java.util.HashSet;
+import java.util.Random;
+
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.utils.RandomSingleton;
 
 /**
- * A simple class for a COA edge with probability in the COA sequence graph. This is used to connect COA elements from a probabilistic choice node.
+ * Represents a random duration element in the sequence graph.
  */
-public class COAFlowWithProbabilityEdge extends COAEdge {
+public class COARandomDuration extends COADuration {
 
-	private double _probability;
+	private double lowerBound = 0.0;
+	private double upperBound = 0.0;
+	private Random rand = null;
 
-	public COAFlowWithProbabilityEdge(COANode fromNode, COANode toNode,
-			String flowID, double probability, HashSet<String> branchesFinishedCondition) {
+	public COARandomDuration(String nodeName, String uniqueID,
+			double lowerBound, double upperBound, Random rand) {
+		super(nodeName, uniqueID, 0.0, COANodeType.RandomDuration);
 
-		super(COAEdgeType.COAFlowWithProbability, fromNode, toNode, flowID, branchesFinishedCondition);
-
-		if (probability < 0) {
+		if (lowerBound < 0 || upperBound < 0 || upperBound < lowerBound) {
 			throw new IllegalArgumentException(
-					"Probability of COAFlowWithProbability edge must not be negative.");
+					"Error! Incorrect bounds on duration provided");
 		}
 
-		this._probability = probability;
+		this.lowerBound = lowerBound;
+		this.upperBound = upperBound;
+
+		if (lowerBound == upperBound) {
+			this.duration = lowerBound;
+		} else {
+			if (rand == null) {
+				this.rand = RandomSingleton.instance();
+			} else {
+				this.rand = rand;
+			}
+
+			this.duration = this.lowerBound + this.rand.nextDouble()
+					* (this.upperBound - this.lowerBound);
+		}
 	}
 
 	@Override
 	public String toString() {
-		return getFromNode().getNodeName() + " --to--> " + getToNode().getNodeName() + "[with probability " + _probability + "]";
-	}
-
-	public double getProbability() {
-		return _probability;
-	}
-	
-	public void updateProbability(double probability) {
-		this._probability = probability;
+		return super.toString() + ", RandomDuration: " + this.duration + "["
+				+ this.lowerBound + "," + this.upperBound + "], TimerON: "
+				+ this.isTimerOn;
 	}
 }

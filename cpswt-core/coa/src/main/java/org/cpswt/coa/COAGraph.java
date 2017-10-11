@@ -31,7 +31,11 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.util.RandomSingleton;
+
+import org.cpswt.coa.edge.*;
+import org.cpswt.coa.enums.*;
+import org.cpswt.coa.node.*;
+import org.cpswt.utils.RandomSingleton;
 
 /**
  * This is the main class to represent the COA sequence graph.
@@ -149,7 +153,7 @@ public class COAGraph {
 
 		_rootNodes.remove(toNode);
 		_currentRootNodes.remove(toNode);
-		fromNode.addSucccessor(toNode);
+		fromNode.addSuccessor(toNode);
 		toNode.addPredecessor(fromNode);
 
 		_allEdges.add(edge);
@@ -281,7 +285,7 @@ public class COAGraph {
 
 				// Do post-processing on successors, if any
 				if (COANodeType.SyncPoint == succ.getNodeType()) {
-					COASyncPt nodeSyncPt = (COASyncPt) succ;
+					COASyncPoint nodeSyncPt = (COASyncPoint) succ;
 					nodeSyncPt.incrementBranchesFinished();
 				} else if (COANodeType.AwaitN == succ.getNodeType()) {
 					COAAwaitN nodeAwaitN = (COAAwaitN) succ;

@@ -21,29 +21,49 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.cpswt.coa.enums.COANodeType;
 
 /**
- * Represents an outcome filter element in the sequence graph.
+ * Represents a Synchronization point in the sequence graph.
  */
-public class COAOutcomeFilter extends COANode {
+public class COASyncPoint extends COANode {
 
-	private COAOutcome _outcome = null;
+	private double syncTime = 0.0;
+	private int numBranchesToFinish = 0;
+	private int numBranchesFinished = 0;
 
-	public COAOutcomeFilter(String nodeName, String uniqueID) {
-		super(nodeName, uniqueID, COANodeType.OutcomeFilter);
+	public COASyncPoint(String nodeName, String uniqueID, double syncTime, int numBranchesToFinish) {
+		super(nodeName, uniqueID, COANodeType.SyncPoint);
+
+		this.syncTime = syncTime;
+		this.numBranchesToFinish = numBranchesToFinish;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", Filter for Outcome: " + _outcome;
+		return String.format("%s, SyncTime: %f, No. of branches to finish: %d",
+				super.toString(), syncTime, numBranchesToFinish);
 	}
 
-	public void setOutcome(COAOutcome outcome) {
-		this._outcome = outcome;
+	public double getSyncTime() {
+		return syncTime;
 	}
 
-	public COAOutcome getOutcome() {
-		return _outcome;
+	public int getNumBranchesToFinish() {
+		return numBranchesToFinish;
+	}
+
+	public void incrementBranchesFinished() {
+		numBranchesFinished++;
+	}
+
+	public int getNumBranchesFinished() {
+		return numBranchesFinished;
+	}
+
+	public boolean getIsRequiredNumOfBranchesFinished() {
+		return numBranchesFinished >= numBranchesToFinish;
 	}
 }

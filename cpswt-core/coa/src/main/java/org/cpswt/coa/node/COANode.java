@@ -21,7 +21,12 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.cpswt.coa.enums.COANodeStatus;
+import org.cpswt.coa.enums.COANodeType;
 
 import java.util.HashSet;
 
@@ -30,43 +35,39 @@ import java.util.HashSet;
  */
 public class COANode {
 
-	private String _nodeName;
+    private static final Logger logger = LogManager.getLogger(COANode.class);
 
-	private String _uniqueID;
+	private String nodeName;
+	private String uniqueID;
+	private COANodeType nodeType;
+	private COANodeStatus nodeStatus;
+	private double nodeExecutedTime;
+	private boolean enabledAsChoice;
 
-	private COANodeType _nodeType;
-
-	private COANodeStatus _nodeStatus;
-
-	private double _nodeExecutedTime;
-	
-	private boolean _enabledAsChoice;
-
-	private HashSet<COANode> _predecessors = new HashSet<COANode>();
-
-	private HashSet<COANode> _successors = new HashSet<COANode>();
+	private HashSet<COANode> predecessors = new HashSet<COANode>();
+	private HashSet<COANode> successors = new HashSet<COANode>();
 
 	public COANode(String nodeName, String uniqueID, COANodeType nodeType) {
 
-		this._nodeName = nodeName;
-		this._uniqueID = uniqueID;
-		this._nodeType = nodeType;
+		this.nodeName = nodeName;
+		this.uniqueID = uniqueID;
+		this.nodeType = nodeType;
 
-		this._nodeStatus = COANodeStatus.Inactive;
-		this._enabledAsChoice = true;
-		this._nodeExecutedTime = -1;
+		this.nodeStatus = COANodeStatus.Inactive;
+		this.enabledAsChoice = true;
+		this.nodeExecutedTime = -1;
 	}
 
 	@Override
 	public String toString() {
-		return "Name: " + _nodeName + ", Type: " + _nodeType + ", Status: "
-				+ _nodeStatus + ", NodeExecutedTime: " + _nodeExecutedTime;
+		return String.format("Name: %s, Type: %s, Status: %s, NodeExecutedTime: %f",
+				nodeName, nodeType, nodeStatus, nodeExecutedTime);
 	}
 
 	public String getSuccessorGraphString(String prefix) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(prefix + _nodeName);
-		for (COANode n : _successors) {
+		buffer.append(prefix + nodeName);
+		for (COANode n : successors) {
 			buffer.append(prefix + "\n\t");
 			buffer.append(n.getSuccessorGraphString(prefix + "\t"));
 		}
@@ -74,67 +75,56 @@ public class COANode {
 	}
 
 	public String getNodeName() {
-		return _nodeName;
+		return nodeName;
 	}
-
 	public String getUniqueID() {
-		return _uniqueID;
+		return uniqueID;
 	}
-
 	public COANodeType getNodeType() {
-		return _nodeType;
+		return nodeType;
 	}
-
 	public COANodeStatus getNodeStatus() {
-		return _nodeStatus;
+		return nodeStatus;
 	}
-	
 	public boolean enabledAsChoice() {
-		return _enabledAsChoice;
+		return enabledAsChoice;
 	}
-
-	public String getNodeStatusImagePath() {
-		return "/org.cpswt/gui/coa/resources/" + _nodeStatus + _nodeType + ".bmp";
-	}
-
 	public double getNodeExecutedTime() {
-		return _nodeExecutedTime;
+		return nodeExecutedTime;
 	}
 
 	public HashSet<COANode> getPredecessors() {
-		return _predecessors;
+		return predecessors;
 	}
-
 	public HashSet<COANode> getSuccessors() {
-		return _successors;
+		return successors;
 	}
 
 	public void setActive() {
-		_nodeStatus = COANodeStatus.Active;
+		nodeStatus = COANodeStatus.Active;
 	}
-	
 	public void setEnabledAsChoice(boolean enabledAsChoice) {
-		_enabledAsChoice = enabledAsChoice;
+		this.enabledAsChoice = enabledAsChoice;
 	}
 
 	public void setExecuted(double nodeExecutedTime) {
-		_nodeStatus = COANodeStatus.Executed;
-		_nodeExecutedTime = nodeExecutedTime;
+		nodeStatus = COANodeStatus.Executed;
+		this.nodeExecutedTime = nodeExecutedTime;
 	}
 
 	public void addPredecessor(COANode predecessor) {
 		if (predecessor == null) {
-			throw new RuntimeException("(" + this
-					+ "): Predecessor supplied to add is NULL");
+		    logger.error("({}): Predecessor supplied to add is NULL. Skipping...", this.toString());
+		    return;
 		}
-		_predecessors.add(predecessor);
+		predecessors.add(predecessor);
 	}
 
-	public void addSucccessor(COANode succecessor) {
-		if (succecessor == null) {
-			throw new RuntimeException("(" + this
-					+ "): Succecessor supplied to add is NULL");
+	public void addSuccessor(COANode successor) {
+		if (successor == null) {
+			logger.error("({}): Successor supplied to add is NULL. Skipping...", this.toString());
+			return;
 		}
-		_successors.add(succecessor);
+		successors.add(successor);
 	}
 }

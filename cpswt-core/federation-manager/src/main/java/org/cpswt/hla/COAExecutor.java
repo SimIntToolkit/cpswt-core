@@ -3,18 +3,18 @@ package org.cpswt.hla;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.coa.COAAction;
-import org.cpswt.coa.COAAwaitN;
-import org.cpswt.coa.COADuration;
-import org.cpswt.coa.COAFork;
+import org.cpswt.coa.node.COAAction;
+import org.cpswt.coa.node.COAAwaitN;
+import org.cpswt.coa.node.COADuration;
+import org.cpswt.coa.node.COAFork;
 import org.cpswt.coa.COAGraph;
-import org.cpswt.coa.COANode;
-import org.cpswt.coa.COAOutcome;
-import org.cpswt.coa.COAOutcomeFilter;
-import org.cpswt.coa.COAProbabilisticChoice;
-import org.cpswt.coa.COARandomDuration;
-import org.cpswt.coa.COASyncPt;
-import org.cpswt.coa.COANodeType;
+import org.cpswt.coa.node.COANode;
+import org.cpswt.coa.node.COAOutcome;
+import org.cpswt.coa.node.COAOutcomeFilter;
+import org.cpswt.coa.node.COAProbabilisticChoice;
+import org.cpswt.coa.node.COARandomDuration;
+import org.cpswt.coa.node.COASyncPoint;
+import org.cpswt.coa.enums.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import org.portico.impl.hla13.types.DoubleTime;
@@ -126,7 +126,7 @@ public class COAExecutor {
         for (COANode n : currentRootNodes) {
             COANodeType nodeType = n.getNodeType();
             if (nodeType == COANodeType.SyncPoint) {
-                COASyncPt nodeSyncPt = (COASyncPt) n;
+                COASyncPoint nodeSyncPt = (COASyncPoint) n;
                 double timeToReachSyncPt = nodeSyncPt.getSyncTime() - getCurrentTime();
                 if (timeToReachSyncPt > 0.0) {
                     // SyncPt is not reached, nothing to be done

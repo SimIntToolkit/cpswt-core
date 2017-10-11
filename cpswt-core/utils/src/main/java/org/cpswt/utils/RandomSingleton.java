@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
  * All rights reserved.
  *
@@ -21,27 +22,23 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.utils;
+
+import java.util.Random;
 
 /**
- * Represents a Fork element in the sequence graph.
+ * RandomSingleton uses the current date and time to seed the random number generator
+ * so that different runs of the same experiment (with same starting parameters)
+ * still result in different values.
  */
-public class COAFork extends COANode {
+public class RandomSingleton {
+	private static Random _rand = new Random();
 
-	private boolean _isDecisionPoint = false;
-
-	public COAFork(String nodeName, String uniqueID, boolean isDecisionPoint) {
-		super(nodeName, uniqueID, COANodeType.Fork);
-
-		this._isDecisionPoint = isDecisionPoint;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", DecisionPoint: " + _isDecisionPoint;
-	}
-
-	public boolean getIsDecisionPoint() {
-		return _isDecisionPoint;
+	/**
+	 * Gives back the instance of Random number generator with a unique seed
+	 * depending on current date and time.
+	 */
+	public static Random instance() {
+		return _rand;
 	}
 }

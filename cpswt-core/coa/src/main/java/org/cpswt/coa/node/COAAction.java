@@ -21,42 +21,40 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.coa;
+package org.cpswt.coa.node;
+
+import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANode;
 
 import java.util.HashMap;
 
 /**
  * Represents an action element in the sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAAction extends COANode {
 
-	private String _interactionClassName;
+	private String interactionClassName;
+	private HashMap<String, String> nameValueParamPairs = new HashMap<String, String>();
 
-	private HashMap<String, String> _nameValueParamPairs = new HashMap<String, String>();
-
-	public COAAction(String nodeName, String uniqueID,
-			String interactionClassName) {
+	public COAAction(String nodeName, String uniqueID, String interactionClassName) {
 		super(nodeName, uniqueID, COANodeType.Action);
 
-		this._interactionClassName = interactionClassName;
+		this.interactionClassName = interactionClassName;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString() + ", Interaction: " + _interactionClassName;
+		return String.format("%s, Interaction: %s", super.toString(), interactionClassName);
 	}
 
 	public String getInteractionClassName() {
-		return _interactionClassName;
+		return interactionClassName;
 	}
-
 	public HashMap<String, String> getNameValueParamPairs() {
-		return _nameValueParamPairs;
+		return nameValueParamPairs;
 	}
 
 	public void addNameValueParamPair(String name, String value) {
-		_nameValueParamPairs.put(name, value);
+		nameValueParamPairs.put(name, value);
 	}
 }
