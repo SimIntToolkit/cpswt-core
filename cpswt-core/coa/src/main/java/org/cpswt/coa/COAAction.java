@@ -38,7 +38,7 @@ public class COAAction extends COANode {
 
 	public COAAction(String nodeName, String uniqueID,
 			String interactionClassName) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_ACTION);
+		super(nodeName, uniqueID, COANodeType.Action);
 
 		this._interactionClassName = interactionClassName;
 	}

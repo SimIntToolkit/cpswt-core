@@ -32,10 +32,10 @@ public class COADuration extends COANode {
 	protected boolean _isTimerOn = false;
 
 	public COADuration(String nodeName, String uniqueID, double duration) {
-		this(nodeName, uniqueID, duration, NODE_TYPE.NODE_DURATION);
+		this(nodeName, uniqueID, duration, COANodeType.Duration);
 	}
 
-	protected COADuration(String nodeName, String uniqueID, double duration, NODE_TYPE nodeType) {
+	protected COADuration(String nodeName, String uniqueID, double duration, COANodeType nodeType) {
 		super(nodeName, uniqueID, nodeType);
 		if (duration < 0) {
 			throw new IllegalArgumentException(

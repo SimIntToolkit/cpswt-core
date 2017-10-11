@@ -37,7 +37,7 @@ public class COARandomDuration extends COADuration {
 
 	public COARandomDuration(String nodeName, String uniqueID,
 			double lowerBound, double upperBound, Random rand) {
-		super(nodeName, uniqueID, 0.0, NODE_TYPE.NODE_RANDOM_DURATION);
+		super(nodeName, uniqueID, 0.0, COANodeType.RandomDuration);
 
 		if (lowerBound < 0 || upperBound < 0 || upperBound < lowerBound) {
 			throw new IllegalArgumentException(

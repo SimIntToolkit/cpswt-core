@@ -131,13 +131,13 @@ public class COAGraph {
 
 		// First, check for correct use of Outcome and OutcomeFilter nodes and
 		// update link of Outcome node in OutcomeFilter node
-		if (toNode.getNodeType() == COANode.NODE_TYPE.NODE_OUTCOME_FILTER) {
+		if (toNode.getNodeType() == COANodeType.OutcomeFilter) {
 			if (toNode.getPredecessors().size() > 0) {
 				throw new RuntimeException("OutcomeFilter "
 						+ toNode.getNodeName()
 						+ " must be preceeded only by an Outcome node!");
 			}
-			if (fromNode.getNodeType() != COANode.NODE_TYPE.NODE_OUTCOME) {
+			if (fromNode.getNodeType() != COANodeType.Outcome) {
 				throw new RuntimeException(
 						"OutcomeFilter "
 								+ toNode.getNodeName()
@@ -181,7 +181,7 @@ public class COAGraph {
 
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
-		if (COANode.NODE_TYPE.NODE_PROBABILISTIC_CHOICE == node.getNodeType()) {
+		if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
 			HashMap<COANode, Double> successorsWithCumuProb = new HashMap<COANode, Double>();
 			HashSet<COAEdge> outEdges = _edgesFromNodeMap.get(node);
 			COANode chosenSuccessor = null;
@@ -251,7 +251,7 @@ public class COAGraph {
 				boolean succAlreadyInCurrentRootNodes = _currentRootNodes
 						.contains(succ);
 				if (!succAlreadyInCurrentRootNodes
-						&& COANode.NODE_STATUS.NODE_EXECUTED != succ.getNodeStatus()) {
+						&& COANodeStatus.Executed != succ.getNodeStatus()) {
 					boolean aSuccPredecessorInCurrentRootNodes = false;
 					for (COANode succPred : succ.getPredecessors()) {
 						if (_currentRootNodes.contains(succPred)) {
@@ -260,9 +260,9 @@ public class COAGraph {
 						}
 					}
 					if (!aSuccPredecessorInCurrentRootNodes
-							|| COANode.NODE_TYPE.NODE_SYNC_PT == succ.getNodeType()
-							|| COANode.NODE_TYPE.NODE_AWAITN == succ.getNodeType()) {
-						if (COANode.NODE_TYPE.NODE_SYNC_PT == node.getNodeType()) {
+							|| COANodeType.SyncPoint == succ.getNodeType()
+							|| COANodeType.AwaitN== succ.getNodeType()) {
+						if (COANodeType.SyncPoint == node.getNodeType()) {
 							// TODO: If node that executed is SyncPt, then
 							// enable only those successors that have valid
 							// branches finished (i.e., handle exceptions)
@@ -280,10 +280,10 @@ public class COAGraph {
 				}
 
 				// Do post-processing on successors, if any
-				if (COANode.NODE_TYPE.NODE_SYNC_PT == succ.getNodeType()) {
+				if (COANodeType.SyncPoint == succ.getNodeType()) {
 					COASyncPt nodeSyncPt = (COASyncPt) succ;
 					nodeSyncPt.incrementBranchesFinished();
-				} else if (COANode.NODE_TYPE.NODE_AWAITN == succ.getNodeType()) {
+				} else if (COANodeType.AwaitN == succ.getNodeType()) {
 					COAAwaitN nodeAwaitN = (COAAwaitN) succ;
 					nodeAwaitN.incrementBranchesFinished();
 				}

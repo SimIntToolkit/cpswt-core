@@ -35,7 +35,7 @@ public class COAFlowWithProbabilityEdge extends COAEdge {
 	public COAFlowWithProbabilityEdge(COANode fromNode, COANode toNode,
 			String flowID, double probability, HashSet<String> branchesFinishedCondition) {
 
-		super(EDGE_TYPE.EDGE_COAFLOW_WITH_PROBABILITY, fromNode, toNode, flowID, branchesFinishedCondition);
+		super(COAEdgeType.COAFlowWithProbability, fromNode, toNode, flowID, branchesFinishedCondition);
 
 		if (probability < 0) {
 			throw new IllegalArgumentException(

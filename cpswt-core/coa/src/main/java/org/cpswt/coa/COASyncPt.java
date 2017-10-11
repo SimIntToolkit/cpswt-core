@@ -36,7 +36,7 @@ public class COASyncPt extends COANode {
 
 	public COASyncPt(String nodeName, String uniqueID, double syncTime,
 			int numBranchesToFinish) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_SYNC_PT);
+		super(nodeName, uniqueID, COANodeType.SyncPoint);
 
 		this._syncTime = syncTime;
 		this._numBranchesToFinish = numBranchesToFinish;

@@ -35,7 +35,7 @@ public class COAAwaitN extends COANode {
 	private int _numBranchesFinished = 0;
 
 	public COAAwaitN(String nodeName, String uniqueID, int numBranchesToFinish) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_AWAITN);
+		super(nodeName, uniqueID, COANodeType.AwaitN);
 
 		this._numBranchesToFinish = numBranchesToFinish;
 	}

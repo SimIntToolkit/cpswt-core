@@ -30,26 +30,7 @@ import java.util.HashSet;
  */
 public class COAEdge {
 
-	public static enum EDGE_TYPE {
-		EDGE_COAFLOW("COAFlow"), EDGE_COAFLOW_WITH_PROBABILITY("COAFlowWithProbability"), EDGE_OUTCOME2FILTER("Outcome2Filter"), EDGE_FILTER2COAELEMENT(
-				"Filter2COAElement"), EDGE_COAEXCEPTION("COAException");
-		private String _name;
-
-		EDGE_TYPE(String name) {
-			this._name = name;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		@Override
-		public String toString() {
-			return _name;
-		}
-	}
-
-	private EDGE_TYPE _edgeType;
+	private COAEdgeType _edgeType;
 
 	private String _flowID;
 
@@ -59,13 +40,13 @@ public class COAEdge {
 
 	private COANode _toNode = null;
 
-	public COAEdge(EDGE_TYPE edgeType, COANode fromNode, COANode toNode,
+	public COAEdge(COAEdgeType edgeType, COANode fromNode, COANode toNode,
 			String flowID, HashSet<String> branchesFinishedCondition) {
 		if (fromNode == null || toNode == null || flowID == null) {
 			throw new IllegalArgumentException(
 					"Null parameters given while creating an edge.");
 		}
-		if (EDGE_TYPE.EDGE_COAEXCEPTION.equals(edgeType)
+		if (COAEdgeType.COAException == edgeType
 				&& branchesFinishedCondition == null) {
 			throw new IllegalArgumentException(
 					"Branches that should have finished not specified for the COAException edge.");
@@ -85,7 +66,7 @@ public class COAEdge {
 		return _fromNode.getNodeName() + " --to--> " + _toNode.getNodeName();
 	}
 
-	public EDGE_TYPE getEdgeType() {
+	public COAEdgeType getEdgeType() {
 		return _edgeType;
 	}
 

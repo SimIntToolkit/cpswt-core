@@ -42,7 +42,7 @@ public class COAOutcome extends COANode {
 
 	public COAOutcome(String nodeName, String uniqueID,
 			String interactionClassName) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_OUTCOME);
+		super(nodeName, uniqueID, COANodeType.Outcome);
 
 		this._interactionClassName = interactionClassName;
 	}

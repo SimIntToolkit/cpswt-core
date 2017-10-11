@@ -30,54 +30,13 @@ import java.util.HashSet;
  */
 public class COANode {
 
-	public static enum NODE_TYPE {
-		NODE_ACTION("Action"), NODE_OUTCOME("Outcome"), NODE_SYNC_PT(
-				"SyncPoint"), NODE_AWAITN("AwaitN"), NODE_FORK("Fork"), NODE_PROBABILISTIC_CHOICE("ProbabilisticChoice"), NODE_DURATION(
-				"Dur"), NODE_RANDOM_DURATION("RandomDur"), NODE_OUTCOME_FILTER("OutcomeFilter"), NODE_TERMINATE_COA(
-				"TerminateCOA"), NODE_TERMINATE_SIMULATION(
-				"TerminateSimulation");
-		private String _name;
-
-		NODE_TYPE(String name) {
-			this._name = name;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		@Override
-		public String toString() {
-			return _name;
-		}
-	}
-
-	public static enum NODE_STATUS {
-		NODE_INACTIVE("Inactive"), NODE_ACTIVE("Active"), NODE_EXECUTED(
-				"Executed");
-		private String _name;
-
-		NODE_STATUS(String name) {
-			this._name = name;
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		@Override
-		public String toString() {
-			return _name;
-		}
-	}
-
 	private String _nodeName;
 
 	private String _uniqueID;
 
-	private NODE_TYPE _nodeType;
+	private COANodeType _nodeType;
 
-	private NODE_STATUS _nodeStatus;
+	private COANodeStatus _nodeStatus;
 
 	private double _nodeExecutedTime;
 	
@@ -87,13 +46,13 @@ public class COANode {
 
 	private HashSet<COANode> _successors = new HashSet<COANode>();
 
-	public COANode(String nodeName, String uniqueID, NODE_TYPE nodeType) {
+	public COANode(String nodeName, String uniqueID, COANodeType nodeType) {
 
 		this._nodeName = nodeName;
 		this._uniqueID = uniqueID;
 		this._nodeType = nodeType;
 
-		this._nodeStatus = NODE_STATUS.NODE_INACTIVE;
+		this._nodeStatus = COANodeStatus.Inactive;
 		this._enabledAsChoice = true;
 		this._nodeExecutedTime = -1;
 	}
@@ -122,11 +81,11 @@ public class COANode {
 		return _uniqueID;
 	}
 
-	public NODE_TYPE getNodeType() {
+	public COANodeType getNodeType() {
 		return _nodeType;
 	}
 
-	public NODE_STATUS getNodeStatus() {
+	public COANodeStatus getNodeStatus() {
 		return _nodeStatus;
 	}
 	
@@ -151,7 +110,7 @@ public class COANode {
 	}
 
 	public void setActive() {
-		_nodeStatus = NODE_STATUS.NODE_ACTIVE;
+		_nodeStatus = COANodeStatus.Active;
 	}
 	
 	public void setEnabledAsChoice(boolean enabledAsChoice) {
@@ -159,7 +118,7 @@ public class COANode {
 	}
 
 	public void setExecuted(double nodeExecutedTime) {
-		_nodeStatus = NODE_STATUS.NODE_EXECUTED;
+		_nodeStatus = COANodeStatus.Executed;
 		_nodeExecutedTime = nodeExecutedTime;
 	}
 

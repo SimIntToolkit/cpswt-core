@@ -31,7 +31,7 @@ public class COAFork extends COANode {
 	private boolean _isDecisionPoint = false;
 
 	public COAFork(String nodeName, String uniqueID, boolean isDecisionPoint) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_FORK);
+		super(nodeName, uniqueID, COANodeType.Fork);
 
 		this._isDecisionPoint = isDecisionPoint;
 	}

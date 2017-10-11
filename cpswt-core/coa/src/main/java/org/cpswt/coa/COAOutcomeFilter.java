@@ -31,7 +31,7 @@ public class COAOutcomeFilter extends COANode {
 	private COAOutcome _outcome = null;
 
 	public COAOutcomeFilter(String nodeName, String uniqueID) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_OUTCOME_FILTER);
+		super(nodeName, uniqueID, COANodeType.OutcomeFilter);
 	}
 
 	@Override

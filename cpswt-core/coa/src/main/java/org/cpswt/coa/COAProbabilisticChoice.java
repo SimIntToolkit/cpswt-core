@@ -34,7 +34,7 @@ public class COAProbabilisticChoice extends COANode {
 
 	public COAProbabilisticChoice(String nodeName, String uniqueID,
 			boolean isDecisionPoint) {
-		super(nodeName, uniqueID, NODE_TYPE.NODE_PROBABILISTIC_CHOICE);
+		super(nodeName, uniqueID, COANodeType.ProbabilisticChoice);
 
 		this._isDecisionPoint = isDecisionPoint;
 	}

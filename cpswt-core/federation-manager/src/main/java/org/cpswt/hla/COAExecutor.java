@@ -14,7 +14,7 @@ import org.cpswt.coa.COAOutcomeFilter;
 import org.cpswt.coa.COAProbabilisticChoice;
 import org.cpswt.coa.COARandomDuration;
 import org.cpswt.coa.COASyncPt;
-import org.cpswt.coa.COANode.NODE_TYPE;
+import org.cpswt.coa.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import org.portico.impl.hla13.types.DoubleTime;
@@ -124,8 +124,8 @@ public class COAExecutor {
         // can be executed.
         boolean nodeExecuted = false;
         for (COANode n : currentRootNodes) {
-            NODE_TYPE nodeType = n.getNodeType();
-            if (nodeType == NODE_TYPE.NODE_SYNC_PT) {
+            COANodeType nodeType = n.getNodeType();
+            if (nodeType == COANodeType.SyncPoint) {
                 COASyncPt nodeSyncPt = (COASyncPt) n;
                 double timeToReachSyncPt = nodeSyncPt.getSyncTime() - getCurrentTime();
                 if (timeToReachSyncPt > 0.0) {
@@ -135,7 +135,7 @@ public class COAExecutor {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-            } else if (nodeType == NODE_TYPE.NODE_AWAITN) {
+            } else if (nodeType == COANodeType.AwaitN) {
                 COAAwaitN nodeAwaitN = (COAAwaitN) n;
                 if (!nodeAwaitN.getIsRequiredNumOfBranchesFinished()) {
                     // AwaitN is not reached, nothing to be done
@@ -144,9 +144,9 @@ public class COAExecutor {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-            } else if (nodeType == NODE_TYPE.NODE_DURATION || nodeType == NODE_TYPE.NODE_RANDOM_DURATION) {
+            } else if (nodeType == COANodeType.Duration || nodeType == COANodeType.RandomDuration) {
                 COADuration nodeDuration = null;
-                if (nodeType == NODE_TYPE.NODE_DURATION) {
+                if (nodeType == COANodeType.Duration) {
                     nodeDuration = (COADuration) n;
                 } else {
                     nodeDuration = (COARandomDuration) n;
@@ -163,28 +163,28 @@ public class COAExecutor {
                         nodeExecuted = true;
                     }
                 }
-            } else if (nodeType == NODE_TYPE.NODE_FORK) {
+            } else if (nodeType == COANodeType.Fork) {
                 COAFork nodeFork = (COAFork) n;
                 boolean isDecisionPoint = nodeFork.getIsDecisionPoint(); // TODO: handle decision points
 
                 // As of now Fork is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (nodeType == NODE_TYPE.NODE_PROBABILISTIC_CHOICE) {
+            } else if (nodeType == COANodeType.ProbabilisticChoice) {
                 COAProbabilisticChoice nodeProbChoice = (COAProbabilisticChoice) n;
                 boolean isDecisionPoint = nodeProbChoice.getIsDecisionPoint(); // TODO: handle decision points
 
                 // As of now Probabilistic Choice is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (nodeType == NODE_TYPE.NODE_ACTION) {
+            } else if (nodeType == COANodeType.Action) {
                 COAAction nodeAction = (COAAction) n;
 
                 // As of now Action is always executed as soon as it is encountered
                 executeCOAAction(nodeAction);
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
-            } else if (nodeType == NODE_TYPE.NODE_OUTCOME) {
+            } else if (nodeType == COANodeType.Outcome) {
                 COAOutcome nodeOutcome = (COAOutcome) n;
                 if (!nodeOutcome.getIsTimerOn()) {
                     // Start executing Outcome element
@@ -196,7 +196,7 @@ public class COAExecutor {
                         nodeExecuted = true;
                     }
                 }
-            } else if (nodeType == NODE_TYPE.NODE_OUTCOME_FILTER) {
+            } else if (nodeType == COANodeType.OutcomeFilter) {
                 COAOutcomeFilter outcomeFilter = (COAOutcomeFilter) n;
                 COAOutcome outcomeToFilter = outcomeFilter.getOutcome();
 
