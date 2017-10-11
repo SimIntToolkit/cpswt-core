@@ -25,6 +25,7 @@ public class ConfigParser {
             String fieldName = jsonParser.getCurrentName();
             configObj.fieldsSet.add(fieldName);
         }
+        jsonParser.close();
 
         return configObj;
     }

@@ -23,6 +23,7 @@
 
 package org.cpswt.hla;
 
+import org.cpswt.coa.COALoader;
 import org.cpswt.utils.CpswtDefaults;
 import hla.rti.*;
 
@@ -247,6 +248,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // load COA related stuff
         File coaDefinitionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaDefinition, this.rootDir);
         File coaSelectionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaSelection, this.rootDir);
+
+        COALoader coaLoader = new COALoader(coaDefinitionFile, coaSelectionFile);
+        coaLoader.loadGraph();
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
             // there are no expected federates --> no need for synchronization points
