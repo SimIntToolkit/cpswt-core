@@ -23,12 +23,19 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents a Fork element in the sequence graph.
  */
 public class COAFork extends COANode {
 
+	@JsonProperty("isDecisionPoint")
 	private boolean isDecisionPoint = false;
+
+	COAFork() {
+		super(COANodeType.Fork);
+	}
 
 	public COAFork(String nodeName, String uniqueID, boolean isDecisionPoint) {
 		super(nodeName, uniqueID, COANodeType.Fork);
@@ -41,7 +48,11 @@ public class COAFork extends COANode {
 		return super.toString() + ", DecisionPoint: " + isDecisionPoint;
 	}
 
-	public boolean getIsDecisionPoint() {
+	public boolean isDecisionPoint() {
 		return isDecisionPoint;
+	}
+
+	public void setDecisionPoint(boolean decisionPoint) {
+		isDecisionPoint = decisionPoint;
 	}
 }

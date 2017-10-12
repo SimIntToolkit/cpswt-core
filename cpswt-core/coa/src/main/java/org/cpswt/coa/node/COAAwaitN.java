@@ -23,13 +23,20 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents an AwaitN COA element in the sequence graph.
  */
 public class COAAwaitN extends COANode {
 
+	@JsonProperty("numBranchesToFinish")
 	private int numBranchesToFinish = 0;
 	private int numBranchesFinished = 0;
+
+	COAAwaitN() {
+		super(COANodeType.AwaitN);
+	}
 
 	public COAAwaitN(String nodeName, String uniqueID, int numBranchesToFinish) {
 		super(nodeName, uniqueID, COANodeType.AwaitN);
@@ -47,6 +54,10 @@ public class COAAwaitN extends COANode {
 	public int getNumBranchesToFinish() {
 		return numBranchesToFinish;
 	}
+	public void setNumBranchesToFinish(int numBranchesToFinish) {
+		this.numBranchesToFinish = numBranchesToFinish;
+	}
+
 	public void incrementBranchesFinished() {
 		numBranchesFinished++;
 	}

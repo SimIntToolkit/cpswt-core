@@ -22,14 +22,22 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents a duration element in the sequence graph.
  */
 public class COADuration extends COANode {
 
+    @JsonProperty("duration")
 	protected double duration = 0.0;
+
 	protected double endTime = -1.0;
 	protected boolean isTimerOn = false;
+
+	COADuration() {
+	    super(COANodeType.Duration);
+    }
 
 	public COADuration(String nodeName, String uniqueID, double duration) {
 		this(nodeName, uniqueID, duration, COANodeType.Duration);
@@ -52,8 +60,11 @@ public class COADuration extends COANode {
 	public double getDuration() {
 		return duration;
 	}
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
 
-	public void startTimer(double currentTime) {
+    public void startTimer(double currentTime) {
 		if (currentTime < 0) {
 			throw new IllegalArgumentException("Error! Negative currentTime given for: " + this);
 		}
