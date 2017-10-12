@@ -23,8 +23,6 @@
 
 package org.cpswt.coa.edge;
 
-import org.cpswt.coa.edge.COAEdge;
-import org.cpswt.coa.enums.COAEdgeType;
 import org.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
@@ -51,7 +49,7 @@ public class COAFlowWithProbabilityEdge extends COAEdge {
 
 	@Override
 	public String toString() {
-		return getFromNode().getNodeName() + " --to--> " + getToNode().getNodeName() + "[with probability " + probability + "]";
+		return getFromNode().getName() + " --to--> " + getToNode().getName() + "[with probability " + probability + "]";
 	}
 
 	public double getProbability() {

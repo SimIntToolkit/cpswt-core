@@ -26,7 +26,7 @@
     }
   ],
   "pauseTimes": [],
-  "coaDefinition": "coaConfig.json",
-  "coaSelection": "coaSelection.json",
+  "coaDefinition": "coa/coaConfig.json",
+  "coaSelection": "coa/coaSelection.json",
   "terminateOnCOAFinish": false
 }

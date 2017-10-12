@@ -22,9 +22,6 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-import org.cpswt.coa.node.COANode;
-
 /**
  * Represents a duration element in the sequence graph.
  */

@@ -1,4 +1,4 @@
-package org.cpswt.coa.enums;
+package org.cpswt.coa.node;
 
 public enum COANodeStatus {
     Inactive("Inactive"),

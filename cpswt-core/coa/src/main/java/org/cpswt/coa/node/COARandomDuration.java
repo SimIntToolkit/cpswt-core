@@ -24,7 +24,6 @@ package org.cpswt.coa.node;
 
 import java.util.Random;
 
-import org.cpswt.coa.enums.COANodeType;
 import org.cpswt.utils.RandomSingleton;
 
 /**

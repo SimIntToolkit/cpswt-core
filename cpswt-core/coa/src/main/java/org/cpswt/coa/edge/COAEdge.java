@@ -23,7 +23,6 @@
 
 package org.cpswt.coa.edge;
 
-import org.cpswt.coa.enums.COAEdgeType;
 import org.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
@@ -34,7 +33,7 @@ import java.util.HashSet;
 public class COAEdge {
 
 	private final COAEdgeType edgeType;
-	private final String flowID;
+	private final String id;
 
 	private HashSet<String> branchesFinishedCondition = new HashSet<String>();
 
@@ -42,8 +41,8 @@ public class COAEdge {
 	private final COANode toNode;
 
 	public COAEdge(COAEdgeType edgeType, COANode fromNode, COANode toNode,
-			String flowID, HashSet<String> branchesFinishedCondition) {
-		if (fromNode == null || toNode == null || flowID == null) {
+				   String id, HashSet<String> branchesFinishedCondition) {
+		if (fromNode == null || toNode == null || id == null) {
 			throw new IllegalArgumentException(
 					"Null parameters given while creating an edge.");
 		}
@@ -55,7 +54,7 @@ public class COAEdge {
 		this.edgeType = edgeType;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
-		this.flowID = flowID;
+		this.id = id;
 		if (branchesFinishedCondition != null
 				&& !branchesFinishedCondition.isEmpty()) {
 			this.branchesFinishedCondition.addAll(branchesFinishedCondition);
@@ -64,15 +63,15 @@ public class COAEdge {
 
 	@Override
 	public String toString() {
-		return fromNode.getNodeName() + " --to--> " + toNode.getNodeName();
+		return fromNode.getName() + " --to--> " + toNode.getName();
 	}
 
 	public COAEdgeType getEdgeType() {
 		return edgeType;
 	}
 
-	public String getFlowID() {
-		return flowID;
+	public String getId() {
+		return id;
 	}
 
 	public HashSet<String> getBranchesFinishedCondition() {

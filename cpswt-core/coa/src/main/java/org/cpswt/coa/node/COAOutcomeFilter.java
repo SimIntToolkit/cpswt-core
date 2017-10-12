@@ -23,10 +23,6 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-import org.cpswt.coa.node.COANode;
-import org.cpswt.coa.node.COAOutcome;
-
 /**
  * Represents an outcome filter element in the sequence graph.
  */

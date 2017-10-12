@@ -23,8 +23,6 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-
 /**
  * Represents a Synchronization point in the sequence graph.
  */

@@ -23,9 +23,6 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-import org.cpswt.coa.node.COANode;
-
 /**
  * Represents a ProbabilisticChoice element in the sequence graph. One and only
  * one subsequent branch is executed. The choice is made randomly and different

@@ -23,18 +23,27 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-import org.cpswt.coa.node.COANode;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents an action element in the sequence graph.
  */
 public class COAAction extends COANode {
 
+    @JsonIgnore
 	private String interactionClassName;
+
+    @JsonIgnore
 	private HashMap<String, String> nameValueParamPairs = new HashMap<String, String>();
+
+	COAAction() {
+        super(COANodeType.Action);
+	}
 
 	public COAAction(String nodeName, String uniqueID, String interactionClassName) {
 		super(nodeName, uniqueID, COANodeType.Action);
@@ -50,10 +59,13 @@ public class COAAction extends COANode {
 	public String getInteractionClassName() {
 		return interactionClassName;
 	}
-	public HashMap<String, String> getNameValueParamPairs() {
+
+	@JsonAnyGetter
+	public Map<String, String> getNameValueParamPairs() {
 		return nameValueParamPairs;
 	}
 
+	@JsonAnySetter
 	public void addNameValueParamPair(String name, String value) {
 		nameValueParamPairs.put(name, value);
 	}

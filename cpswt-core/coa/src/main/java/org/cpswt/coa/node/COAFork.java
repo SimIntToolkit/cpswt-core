@@ -23,9 +23,6 @@
 
 package org.cpswt.coa.node;
 
-import org.cpswt.coa.enums.COANodeType;
-import org.cpswt.coa.node.COANode;
-
 /**
  * Represents a Fork element in the sequence graph.
  */

@@ -30,13 +30,15 @@ public class CpswtUtils {
      * @return The config {@link File}.
      */
     public static File loadConfigFile(String filePath, String filePathDir) {
+        Path configFilePath = getConfigFilePath(filePath, filePathDir);
+        return configFilePath.toFile();
+    }
+
+    public static Path getConfigFilePath(String filePath, String filePathDir) {
         Path configFilePath = Paths.get(filePath);
-        File configFile;
-        if(configFilePath.isAbsolute()) {
-            configFile = configFilePath.toFile();
-        } else {
-            configFile = Paths.get(filePathDir, filePath).toFile();
+        if(!configFilePath.isAbsolute()) {
+            configFilePath = Paths.get(filePathDir, filePath);
         }
-        return configFile;
+        return configFilePath;
     }
 }

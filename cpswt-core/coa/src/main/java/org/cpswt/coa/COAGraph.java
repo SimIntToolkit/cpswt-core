@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.cpswt.coa.edge.*;
-import org.cpswt.coa.enums.*;
 import org.cpswt.coa.node.*;
 import org.cpswt.utils.RandomSingleton;
 
@@ -94,7 +93,7 @@ public class COAGraph {
 			throw new RuntimeException("(" + this
 					+ "): Node supplied to add is NULL");
 		}
-		_allNodes.put(node.getUniqueID(), node);
+		_allNodes.put(node.getId(), node);
 		_rootNodes.add(node);
 		_currentRootNodes.add(node);
 	}
@@ -117,8 +116,8 @@ public class COAGraph {
 		COANode toNode = edge.getToNode();
 
 		if (_allNodes.isEmpty()
-				|| !_allNodes.containsKey(fromNode.getUniqueID())
-				|| !_allNodes.containsKey(toNode.getUniqueID())) {
+				|| !_allNodes.containsKey(fromNode.getId())
+				|| !_allNodes.containsKey(toNode.getId())) {
 			throw new RuntimeException(
 					"All nodes must be added before edges are added in the graph.");
 		}
@@ -128,13 +127,13 @@ public class COAGraph {
 		if (toNode.getNodeType() == COANodeType.OutcomeFilter) {
 			if (toNode.getPredecessors().size() > 0) {
 				throw new RuntimeException("OutcomeFilter "
-						+ toNode.getNodeName()
+						+ toNode.getName()
 						+ " must be preceeded only by an Outcome node!");
 			}
 			if (fromNode.getNodeType() != COANodeType.Outcome) {
 				throw new RuntimeException(
 						"OutcomeFilter "
-								+ toNode.getNodeName()
+								+ toNode.getName()
 								+ " node can only be preceeded by a node of type Outcome!");
 			}
 

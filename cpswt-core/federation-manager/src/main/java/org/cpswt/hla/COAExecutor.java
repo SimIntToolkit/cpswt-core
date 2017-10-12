@@ -14,7 +14,7 @@ import org.cpswt.coa.node.COAOutcomeFilter;
 import org.cpswt.coa.node.COAProbabilisticChoice;
 import org.cpswt.coa.node.COARandomDuration;
 import org.cpswt.coa.node.COASyncPoint;
-import org.cpswt.coa.enums.COANodeType;
+import org.cpswt.coa.node.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import org.portico.impl.hla13.types.DoubleTime;
@@ -89,7 +89,7 @@ public class COAExecutor {
         // It is not a SimEnd interaction, send normally
         interactionRoot.setParameter("sourceFed", this.federateId);
         interactionRoot.setParameter("originFed", this.federateId);
-        HashMap<String, String> nameValueParamPairs = nodeAction.getNameValueParamPairs();
+        Map<String, String> nameValueParamPairs = nodeAction.getNameValueParamPairs();
         for (String paramName : nameValueParamPairs.keySet()) {
             String paramValue = nameValueParamPairs.get(paramName);
             interactionRoot.setParameter(paramName, paramValue);
@@ -230,7 +230,7 @@ public class COAExecutor {
                             outcomeFilterEvalMethod = _outcomeFilter2EvalMethodMap.get(outcomeFilter);
                         } else {
                             // Method doesn't exist in the cache, use reflection to load it
-                            String filterID = outcomeFilter.getUniqueID();
+                            String filterID = outcomeFilter.getId();
                             filterID = filterID.replaceAll("-", "_");
                             String method2Load = "evaluateFilter_" + filterID;
 
@@ -267,7 +267,7 @@ public class COAExecutor {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
-                // System.out.println("Result of evaluation of filter for outcome: " + outcomeToFilter.getNodeName() + " = " + filterEvaluation + ". Interaction it contained was: " + outcomeToFilter.getLastArrivedInteraction());
+                // System.out.println("Result of evaluation of filter for outcome: " + outcomeToFilter.getName() + " = " + filterEvaluation + ". Interaction it contained was: " + outcomeToFilter.getLastArrivedInteraction());
             }
         }
 
@@ -289,7 +289,7 @@ public class COAExecutor {
                 for (ArrivedInteraction arrivedIntr : arrivedIntrs) {
                     if (arrivedIntr.getArrivalTime() > nodeOutcome.getAwaitStartTime()) {
                         // Awaited interaction arrived after outcome was initiated
-                        // System.out.println("Setting last arrived interaction in outcome node " + nodeOutcome.getNodeName() + ": " + arrivedIntr.getInteractionRoot());
+                        // System.out.println("Setting last arrived interaction in outcome node " + nodeOutcome.getName() + ": " + arrivedIntr.getInteractionRoot());
                         nodeOutcome.setLastArrivedInteraction(arrivedIntr.getInteractionRoot());
                         outcomeExecutable = true;
                     }

@@ -25,8 +25,6 @@ package org.cpswt.coa.node;
 
 //import org.cpswt.hla.InteractionRoot;
 
-import org.cpswt.coa.enums.COANodeType;
-
 /**
  * Represents an Outcome element in the sequence graph.
  */

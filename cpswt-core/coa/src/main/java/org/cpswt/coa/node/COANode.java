@@ -23,10 +23,10 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.coa.enums.COANodeStatus;
-import org.cpswt.coa.enums.COANodeType;
 
 import java.util.HashSet;
 
@@ -35,11 +35,18 @@ import java.util.HashSet;
  */
 public class COANode {
 
+    @JsonIgnore
     private static final Logger logger = LogManager.getLogger(COANode.class);
 
-	private String nodeName;
-	private String uniqueID;
+    @JsonProperty("name")
+	private String name;
+
+    @JsonProperty("id")
+	private String id;
+
+    @JsonProperty("nodeType")
 	private COANodeType nodeType;
+
 	private COANodeStatus nodeStatus;
 	private double nodeExecutedTime;
 	private boolean enabledAsChoice;
@@ -47,11 +54,15 @@ public class COANode {
 	private HashSet<COANode> predecessors = new HashSet<COANode>();
 	private HashSet<COANode> successors = new HashSet<COANode>();
 
-	public COANode(String nodeName, String uniqueID, COANodeType nodeType) {
-
-		this.nodeName = nodeName;
-		this.uniqueID = uniqueID;
+	COANode(COANodeType nodeType) {
 		this.nodeType = nodeType;
+	}
+
+	public COANode(String name, String id, COANodeType nodeType) {
+		this(nodeType);
+
+		this.name = name;
+		this.id = id;
 
 		this.nodeStatus = COANodeStatus.Inactive;
 		this.enabledAsChoice = true;
@@ -61,12 +72,12 @@ public class COANode {
 	@Override
 	public String toString() {
 		return String.format("Name: %s, Type: %s, Status: %s, NodeExecutedTime: %f",
-				nodeName, nodeType, nodeStatus, nodeExecutedTime);
+                name, nodeType, nodeStatus, nodeExecutedTime);
 	}
 
 	public String getSuccessorGraphString(String prefix) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(prefix + nodeName);
+		buffer.append(prefix + name);
 		for (COANode n : successors) {
 			buffer.append(prefix + "\n\t");
 			buffer.append(n.getSuccessorGraphString(prefix + "\t"));
@@ -74,11 +85,15 @@ public class COANode {
 		return buffer.toString();
 	}
 
-	public String getNodeName() {
-		return nodeName;
+	public String getName() {
+		return name;
 	}
-	public String getUniqueID() {
-		return uniqueID;
+	void setName(String name) {
+	    this.name = name;
+    }
+
+	public String getId() {
+		return id;
 	}
 	public COANodeType getNodeType() {
 		return nodeType;

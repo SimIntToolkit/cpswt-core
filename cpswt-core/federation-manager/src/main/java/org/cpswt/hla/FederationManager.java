@@ -235,10 +235,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
-        File experimentConfigFile = CpswtUtils.loadConfigFile(params.experimentConfig, this.rootDir);
+        Path experimentConfigFilePath = CpswtUtils.getConfigFilePath(params.experimentConfig, this.rootDir);
 
-        logger.trace("Loading experiment config file {}", experimentConfigFile.getPath());
-        this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
+        logger.trace("Loading experiment config file {}", experimentConfigFilePath);
+        this.experimentConfig = ConfigParser.parseConfig(experimentConfigFilePath.toFile(), ExperimentConfig.class);
         this.terminateOnCOAFinish = this.experimentConfig.terminateOnCOAFinish;
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
         if(this.experimentConfig.pauseTimes != null) {
@@ -246,10 +246,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
 
         // load COA related stuff
-        File coaDefinitionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaDefinition, this.rootDir);
-        File coaSelectionFile = CpswtUtils.loadConfigFile(this.experimentConfig.coaSelection, this.rootDir);
+        Path coaDefinitionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaDefinition, this.rootDir);
+        Path coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
 
-        COALoader coaLoader = new COALoader(coaDefinitionFile, coaSelectionFile);
+        COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath);
         coaLoader.loadGraph();
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
