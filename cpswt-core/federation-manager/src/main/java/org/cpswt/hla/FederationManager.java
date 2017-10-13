@@ -23,6 +23,9 @@
 
 package org.cpswt.hla;
 
+import org.cpswt.coa.COAExecutor;
+import org.cpswt.coa.COAExecutorEventListener;
+import org.cpswt.coa.COAGraph;
 import org.cpswt.coa.COALoader;
 import org.cpswt.utils.CpswtDefaults;
 import hla.rti.*;
@@ -250,7 +253,13 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         Path coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
 
         COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath);
-        coaLoader.loadGraph();
+        COAGraph coaGraph = coaLoader.loadGraph();
+
+        coaGraph.initialize();
+
+        this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
+        this.coaExecutor.setCoaExecutorEventListener(this);
+        coaExecutor.setCOAGraph(coaGraph);
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
             // there are no expected federates --> no need for synchronization points
@@ -259,44 +268,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
 
         this.initializeLRC(fedFileURL);
-
-        /*
-
-        // read script file
-        if (params.experimentConfig != null) {
-            File f = Paths.get(this.rootDir, params.experimentConfig).toFile();
-
-            ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationId, this.getFederateId(), this._rand4Dur, this._logLevel, this.getLRC());
-
-            SAXParserFactory.newInstance().newSAXParser().parse(f, xmlHandler);
-            if (xmlHandler.getParseFailed())
-                throw new Exception("Config file reading failed.");
-
-            // Script file loaded
-            // System.out.println("COAGraph is:\n" + _coaGraph.toString());
-
-            // PREPARE FOR FEDERATES TO JOIN -- INITIALIZE _processedFederates AND ELIMINATE
-            // FEDERATES NAMES FROM IT AS THEY JOIN            
-            _processedFederates.addAll(xmlHandler.getExpectedFederates());
-
-            _injectedInteraction = xmlHandler.getInjectedInteraction();
-            pauseTimes.addAll(xmlHandler.getPauseTimes());
-            monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
-            expectedFederateTypes.addAll(xmlHandler.getExpectedFederates());
-
-            this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
-            this.coaExecutor.setCoaExecutorEventListener(this);
-            coaExecutor.setCOAGraph(xmlHandler.getCoaGraph());
-
-            initialization_interactions.addAll(xmlHandler.getInitInteractions());
-            script_interactions = xmlHandler.getScriptInteractions();
-
-            // Remember stop script file's full path
-            // TODO: stop script remove, @see #25
-            _stopScriptFilepath = Paths.get(this.rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
-        }
-
-        */
 
         // Before beginning simulation, initialize COA sequence graph
         // coaExecutor.initializeCOAGraph();
@@ -497,7 +468,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                                 sendScriptInteractions();
 
-                                // coaExecutor.executeCOAGraph();
+                                coaExecutor.executeCOAGraph();
 
                                 DoubleTime next_time = new DoubleTime(time.getTime() + step);
                                 logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
@@ -1039,7 +1010,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         try {
 
             // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
-            // TODO: review when doing something with COAs
             if(this.coaExecutor != null) {
                 InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
                 // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)

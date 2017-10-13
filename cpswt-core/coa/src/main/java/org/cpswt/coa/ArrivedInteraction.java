@@ -21,7 +21,9 @@
  * @author Himanshu Neema
  */
 
-package org.cpswt.hla;
+package org.cpswt.coa;
+
+import org.cpswt.hla.InteractionRoot;
 
 /**
  * Stores last arrived interaction in the Federation Manager and is used by

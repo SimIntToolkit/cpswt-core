@@ -1,4 +1,4 @@
-package org.cpswt.hla;
+package org.cpswt.coa;
 
 /**
  * COAExecutorEventListeren
