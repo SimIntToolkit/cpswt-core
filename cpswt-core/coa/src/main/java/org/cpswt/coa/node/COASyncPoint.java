@@ -23,14 +23,24 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents a Synchronization point in the sequence graph.
  */
 public class COASyncPoint extends COANode {
 
+	@JsonProperty("time")
 	private double syncTime = 0.0;
+
+	@JsonProperty("minBranchesToSync")
 	private int numBranchesToFinish = 0;
+
 	private int numBranchesFinished = 0;
+
+	COASyncPoint() {
+	    super(COANodeType.SyncPoint);
+    }
 
 	public COASyncPoint(String nodeName, String uniqueID, double syncTime, int numBranchesToFinish) {
 		super(nodeName, uniqueID, COANodeType.SyncPoint);
@@ -49,11 +59,19 @@ public class COASyncPoint extends COANode {
 		return syncTime;
 	}
 
-	public int getNumBranchesToFinish() {
+    public void setSyncTime(double syncTime) {
+        this.syncTime = syncTime;
+    }
+
+    public int getNumBranchesToFinish() {
 		return numBranchesToFinish;
 	}
 
-	public void incrementBranchesFinished() {
+    public void setNumBranchesToFinish(int numBranchesToFinish) {
+        this.numBranchesToFinish = numBranchesToFinish;
+    }
+
+    public void incrementBranchesFinished() {
 		numBranchesFinished++;
 	}
 

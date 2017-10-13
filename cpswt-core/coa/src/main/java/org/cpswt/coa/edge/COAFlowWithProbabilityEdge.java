@@ -23,6 +23,7 @@
 
 package org.cpswt.coa.edge;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
@@ -32,7 +33,12 @@ import java.util.HashSet;
  */
 public class COAFlowWithProbabilityEdge extends COAEdge {
 
+	@JsonProperty("probability")
 	private double probability;
+
+	COAFlowWithProbabilityEdge() {
+	    super(COAEdgeType.COAFlowWithProbability);
+    }
 
 	public COAFlowWithProbabilityEdge(COANode fromNode, COANode toNode,
 									  String flowID, double probability, HashSet<String> branchesFinishedCondition) {
@@ -55,8 +61,12 @@ public class COAFlowWithProbabilityEdge extends COAEdge {
 	public double getProbability() {
 		return probability;
 	}
-	
-	public void updateProbability(double probability) {
+
+    public void setProbability(double probability) {
+        this.probability = probability;
+    }
+
+    public void updateProbability(double probability) {
 		this.probability = probability;
 	}
 }

@@ -25,16 +25,24 @@ package org.cpswt.coa.node;
 
 //import org.cpswt.hla.InteractionRoot;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents an Outcome element in the sequence graph.
  */
 public class COAOutcome extends COANode {
 
+    @JsonProperty("interactionName")
 	private String interactionClassName;
+
 	private int interactionClassHandle = 0;
 	private double awaitStartTime = -1;
 	private boolean isTimerOn = false;
 	private Object lastArrivedInteraction = null;
+
+	COAOutcome() {
+	    super(COANodeType.Outcome);
+    }
 
 	public COAOutcome(String nodeName, String uniqueID, String interactionClassName) {
 		super(nodeName, uniqueID, COANodeType.Outcome);
@@ -52,7 +60,12 @@ public class COAOutcome extends COANode {
 	public String getInteractionClassName() {
 		return interactionClassName;
 	}
-	public int getInteractionClassHandle() {
+
+    public void setInteractionClassName(String interactionClassName) {
+        this.interactionClassName = interactionClassName;
+    }
+
+    public int getInteractionClassHandle() {
 		return interactionClassHandle;
 	}
 	public double getAwaitStartTime() {

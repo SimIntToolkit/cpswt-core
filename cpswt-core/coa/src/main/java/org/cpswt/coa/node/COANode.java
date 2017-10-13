@@ -41,7 +41,7 @@ public class COANode {
     @JsonProperty("name")
 	private String name;
 
-    @JsonProperty("id")
+    @JsonProperty("ID")
 	private String id;
 
     @JsonProperty("nodeType")
@@ -53,6 +53,8 @@ public class COANode {
 
 	private HashSet<COANode> predecessors = new HashSet<COANode>();
 	private HashSet<COANode> successors = new HashSet<COANode>();
+
+	COANode() {}
 
 	COANode(COANodeType nodeType) {
 		this.nodeType = nodeType;

@@ -38,7 +38,7 @@ public class COALoader {
         for(Iterator<Map.Entry<String, JsonNode>> iter = jsonRoot.fields(); iter.hasNext(); ) {
             Map.Entry<String, JsonNode> coaKV = iter.next();
 
-            COA coa = new COA(coaKV.getKey());
+            // COA coa = new COA(coaKV.getKey());
 
             JsonNode nodes = coaKV.getValue().get("nodes");
             JsonNode edges = coaKV.getValue().get("edges");

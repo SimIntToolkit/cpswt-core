@@ -24,6 +24,7 @@ package org.cpswt.coa.node;
 
 import java.util.Random;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cpswt.utils.RandomSingleton;
 
 /**
@@ -31,13 +32,20 @@ import org.cpswt.utils.RandomSingleton;
  */
 public class COARandomDuration extends COADuration {
 
+    @JsonProperty("lowerBound")
 	private double lowerBound = 0.0;
+
+    @JsonProperty("upperBound")
 	private double upperBound = 0.0;
 	private Random rand = null;
 
+	COARandomDuration() {
+	    super(COANodeType.RandomDur);
+    }
+
 	public COARandomDuration(String nodeName, String uniqueID,
 			double lowerBound, double upperBound, Random rand) {
-		super(nodeName, uniqueID, 0.0, COANodeType.RandomDuration);
+		super(nodeName, uniqueID, 0.0, COANodeType.RandomDur);
 
 		if (lowerBound < 0 || upperBound < 0 || upperBound < lowerBound) {
 			throw new IllegalArgumentException(
@@ -67,4 +75,20 @@ public class COARandomDuration extends COADuration {
 				+ this.lowerBound + "," + this.upperBound + "], TimerON: "
 				+ this.isTimerOn;
 	}
+
+    public double getLowerBound() {
+        return lowerBound;
+    }
+
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
+    public double getUpperBound() {
+        return upperBound;
+    }
+
+    public void setUpperBound(double upperBound) {
+        this.upperBound = upperBound;
+    }
 }

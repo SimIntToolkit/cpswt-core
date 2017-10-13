@@ -30,6 +30,10 @@ public class COAOutcomeFilter extends COANode {
 
 	private COAOutcome outcome = null;
 
+	COAOutcomeFilter() {
+		super(COANodeType.OutcomeFilter);
+	}
+
 	public COAOutcomeFilter(String nodeName, String uniqueID) {
 		super(nodeName, uniqueID, COANodeType.OutcomeFilter);
 	}

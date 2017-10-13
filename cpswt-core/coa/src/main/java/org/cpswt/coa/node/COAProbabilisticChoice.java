@@ -23,6 +23,8 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Represents a ProbabilisticChoice element in the sequence graph. One and only
  * one subsequent branch is executed. The choice is made randomly and different
@@ -30,7 +32,12 @@ package org.cpswt.coa.node;
  */
 public class COAProbabilisticChoice extends COANode {
 
+	@JsonProperty("isDecisionPoint")
 	private boolean isDecisionPoint = false;
+
+	COAProbabilisticChoice() {
+	    super(COANodeType.ProbabilisticChoice);
+    }
 
 	public COAProbabilisticChoice(String nodeName, String uniqueID, boolean isDecisionPoint) {
 		super(nodeName, uniqueID, COANodeType.ProbabilisticChoice);
@@ -43,7 +50,11 @@ public class COAProbabilisticChoice extends COANode {
 		return super.toString() + ", DecisionPoint: " + isDecisionPoint;
 	}
 
-	public boolean getIsDecisionPoint() {
-		return isDecisionPoint;
-	}
+    public boolean isDecisionPoint() {
+        return isDecisionPoint;
+    }
+
+    public void setDecisionPoint(boolean decisionPoint) {
+        isDecisionPoint = decisionPoint;
+    }
 }

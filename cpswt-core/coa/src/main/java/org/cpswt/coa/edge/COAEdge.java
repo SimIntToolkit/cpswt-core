@@ -23,6 +23,8 @@
 
 package org.cpswt.coa.edge;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
@@ -32,13 +34,34 @@ import java.util.HashSet;
  */
 public class COAEdge {
 
-	private final COAEdgeType edgeType;
-	private final String id;
+    @JsonProperty("type")
+	private COAEdgeType edgeType;
 
+	@JsonProperty("ID")
+	private String id;
+
+	@JsonIgnore
 	private HashSet<String> branchesFinishedCondition = new HashSet<String>();
 
-	private final COANode fromNode;
-	private final COANode toNode;
+	@JsonProperty("name")
+    private String name;
+
+	@JsonProperty("fromNode")
+    private String fromNodeId;
+
+	@JsonProperty("toNode")
+    private String toNodeId;
+
+	@JsonIgnore
+	private COANode fromNode;
+	@JsonIgnore
+	private COANode toNode;
+
+	COAEdge() {}
+
+    COAEdge(COAEdgeType edgeType) {
+	    this.edgeType = edgeType;
+    }
 
 	public COAEdge(COAEdgeType edgeType, COANode fromNode, COANode toNode,
 				   String id, HashSet<String> branchesFinishedCondition) {
@@ -63,18 +86,49 @@ public class COAEdge {
 
 	@Override
 	public String toString() {
-		return fromNode.getName() + " --to--> " + toNode.getName();
+	    return String.format("[%s] %s --to--> %s", name, fromNode.getName(), toNode.getName());
 	}
 
 	public COAEdgeType getEdgeType() {
 		return edgeType;
 	}
 
-	public String getId() {
+    public void setEdgeType(COAEdgeType edgeType) {
+        this.edgeType = edgeType;
+    }
+
+    public String getId() {
 		return id;
 	}
+	public void setId(String id) {
+		this.id = id;
+	}
 
-	public HashSet<String> getBranchesFinishedCondition() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getFromNodeId() {
+        return fromNodeId;
+    }
+
+    public void setFromNodeId(String fromNodeId) {
+        this.fromNodeId = fromNodeId;
+    }
+
+    public String getToNodeId() {
+        return toNodeId;
+    }
+
+    public void setToNodeId(String toNodeId) {
+        this.toNodeId = toNodeId;
+    }
+
+    public HashSet<String> getBranchesFinishedCondition() {
 		return branchesFinishedCondition;
 	}
 
@@ -82,8 +136,15 @@ public class COAEdge {
 		return fromNode;
 	}
 
-	public COANode getToNode() {
+    public void setFromNode(COANode fromNode) {
+        this.fromNode = fromNode;
+    }
+
+    public COANode getToNode() {
 		return toNode;
 	}
 
+	public void setToNode(COANode toNode) {
+        this.toNode = toNode;
+    }
 }

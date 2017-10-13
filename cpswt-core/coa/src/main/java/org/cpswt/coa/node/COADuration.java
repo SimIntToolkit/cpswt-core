@@ -29,18 +29,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class COADuration extends COANode {
 
-    @JsonProperty("duration")
+    @JsonProperty("time")
 	protected double duration = 0.0;
 
 	protected double endTime = -1.0;
 	protected boolean isTimerOn = false;
 
 	COADuration() {
-	    super(COANodeType.Duration);
+	    super(COANodeType.Dur);
+    }
+
+    COADuration(COANodeType nodeType) {
+	    super(nodeType);
     }
 
 	public COADuration(String nodeName, String uniqueID, double duration) {
-		this(nodeName, uniqueID, duration, COANodeType.Duration);
+		this(nodeName, uniqueID, duration, COANodeType.Dur);
 	}
 
 	protected COADuration(String nodeName, String uniqueID, double duration, COANodeType nodeType) {

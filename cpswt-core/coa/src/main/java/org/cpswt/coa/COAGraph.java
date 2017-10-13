@@ -112,6 +112,14 @@ public class COAGraph {
 					+ "): Edge supplied to add is NULL");
 		}
 
+		// fill fromNode and toNode after deserialization
+		if(edge.getFromNode() == null) {
+			edge.setFromNode(this.getNode(edge.getFromNodeId()));
+		}
+		if(edge.getToNode() == null) {
+			edge.setToNode(this.getNode(edge.getToNodeId()));
+		}
+
 		COANode fromNode = edge.getFromNode();
 		COANode toNode = edge.getToNode();
 

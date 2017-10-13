@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class COAAwaitN extends COANode {
 
-	@JsonProperty("numBranchesToFinish")
+	@JsonProperty("minBranchesToAwait")
 	private int numBranchesToFinish = 0;
 	private int numBranchesFinished = 0;
 
