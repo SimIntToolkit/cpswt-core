@@ -291,7 +291,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 Manifest joinedFederationManifest = joinedFederation.getManifest();
 
                 synchronized (this.federatesMaintainer) {
-                    List<FederateInfo> onlineFederatesList = this.federatesMaintainer.getOnlineExpectedFederates();
+                    List<FederateInfo> onlineFederatesList = this.federatesMaintainer.getOnlineFederates();
                     FederateInfo[] onlineFederates = onlineFederatesList.toArray(new FederateInfo[onlineFederatesList.size()]);
                     for (FederateInfo federateInfo : onlineFederates) {
                         boolean containsFed = joinedFederationManifest.containsFederate(federateInfo.getFederateId());
