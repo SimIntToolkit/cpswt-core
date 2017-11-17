@@ -58,6 +58,7 @@ public class COANode {
 
 	COANode(COANodeType nodeType) {
 		this.nodeType = nodeType;
+		initializeNode();
 	}
 
 	public COANode(String name, String id, COANodeType nodeType) {
@@ -65,7 +66,10 @@ public class COANode {
 
 		this.name = name;
 		this.id = id;
+		initializeNode();
+	}
 
+	public void initializeNode() {
 		this.nodeStatus = COANodeStatus.Inactive;
 		this.enabledAsChoice = true;
 		this.nodeExecutedTime = -1;
