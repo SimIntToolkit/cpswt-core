@@ -39,7 +39,7 @@ public class COAExecutor {
     private final String federateId;
     private final double lookahead;
     private final boolean terminateOnCoaFinish;
-    private final RTIambassador rti;
+    private RTIambassador rti;
 
     private Map<Integer, ArrayList<ArrivedInteraction>> _arrived_interactions = new HashMap<Integer, ArrayList<ArrivedInteraction>>();
 
@@ -60,8 +60,13 @@ public class COAExecutor {
         this._coaGraph = graph;
     }
 
+    public void setRTIambassador(RTIambassador rti) {
+        this.rti = rti;
+    }
+
     public void initializeCOAGraph() {
-        this._coaGraph.initialize();
+    // this._coaGraph.setCurrentRootNodesAsActive();
+        this._coaGraph.initialize(this.federationId, this.rti);
     }
 
     private void terminateSimulation() {
@@ -78,7 +83,27 @@ public class COAExecutor {
 
     private void executeCOAAction(COAAction nodeAction) {
         // Create interaction to be sent
+        logger.trace("COAExecutor:executeCOAAction: Trying to executed node: {}", nodeAction);
         String interactionClassName = nodeAction.getInteractionClassName();
+        logger.trace("COAExecutor:executeCOAAction: Got interaction class name: {}... now trying to create interaction..", interactionClassName);
+
+        String simpleClassName = "HelloWorld." + interactionClassName.substring( interactionClassName.lastIndexOf( '.' ) + 1 );
+        Class intrClass = null;
+        try {
+            intrClass = Class.forName(simpleClassName);
+            logger.trace("COAExecutor:executeCOAAction: Class loaded successfully: {}", simpleClassName);
+            Class[] publishMethodArgs = new Class[1];
+            publishMethodArgs[0] = hla.rti.RTIambassador.class;
+            logger.trace("COAExecutor:executeCOAAction: Getting publish method.");
+            Method publishMethod = intrClass.getDeclaredMethod("publish", publishMethodArgs);
+            logger.trace("COAExecutor:executeCOAAction: Invoking publish method.");
+            publishMethod.invoke(null, this.rti);
+            logger.trace("COAExecutor:executeCOAAction: Publish method invokation successful.");
+        } catch (Exception e) {
+            logger.error("COAExecutor:executeCOAAction: Could not load class: {}", simpleClassName);
+            e.printStackTrace();
+        }
+
         InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClassName);
 
         // First check for simulation termination
@@ -133,6 +158,7 @@ public class COAExecutor {
                 } else {
                     // SyncPt reached, mark executed
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
+                    logger.trace("COAExecutor:executeCOAGraph: SyncPt node executed: {}", nodeSyncPt);
                     nodeExecuted = true;
                 }
             } else if (nodeType == COANodeType.AwaitN) {
@@ -141,6 +167,7 @@ public class COAExecutor {
                     logger.trace("AwaitN is not reached, nothing to be done");
                 } else {
                     logger.trace("AwaitN reached, mark executed");
+                    logger.trace("COAExecutor:executeCOAGraph: AwaitN node executed: {}", nodeAwaitN);
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     nodeExecuted = true;
                 }
@@ -158,7 +185,7 @@ public class COAExecutor {
                 } else {
                     // Check if the duration node has executed
                     if (getCurrentTime() >= nodeDuration.getEndTime()) {
-                        logger.trace("Duration node finished, mark executed");
+                        logger.trace("Duration node finished, mark executed: {}", nodeDuration);
                         _coaGraph.markNodeExecuted(n, getCurrentTime());
                         nodeExecuted = true;
                     }
@@ -169,6 +196,7 @@ public class COAExecutor {
 
                 // As of now Fork is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
+                logger.trace("COAExecutor:executeCOAGraph: Fork node executed: {}", nodeFork);
                 nodeExecuted = true;
             } else if (nodeType == COANodeType.ProbabilisticChoice) {
                 COAProbabilisticChoice nodeProbChoice = (COAProbabilisticChoice) n;
@@ -176,12 +204,15 @@ public class COAExecutor {
 
                 // As of now Probabilistic Choice is always executed as soon as it is encountered
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
+                logger.trace("COAExecutor:executeCOAGraph: ProbabilisticChoice node executed: {}", nodeProbChoice);
                 nodeExecuted = true;
             } else if (nodeType == COANodeType.Action) {
                 COAAction nodeAction = (COAAction) n;
 
                 // As of now Action is always executed as soon as it is encountered
+                logger.trace("COAExecutor:executeCOAGraph: Trying to execute action node: {}", nodeAction);
                 executeCOAAction(nodeAction);
+                logger.trace("COAExecutor:executeCOAGraph: Action node executed: {}", nodeAction);
                 _coaGraph.markNodeExecuted(n, getCurrentTime());
                 nodeExecuted = true;
             } else if (nodeType == COANodeType.Outcome) {
@@ -193,6 +224,7 @@ public class COAExecutor {
                     boolean outcomeExecutable = checkIfOutcomeExecutableAndUpdateArrivedInteraction(nodeOutcome);
                     if (outcomeExecutable) {
                         _coaGraph.markNodeExecuted(n, getCurrentTime());
+                        logger.trace("COAExecutor:executeCOAGraph: Outcome node executed: {}", nodeOutcome);
                         nodeExecuted = true;
                     }
                 }
@@ -265,6 +297,7 @@ public class COAExecutor {
 
                 if (filterEvaluation) {
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
+                    logger.trace("COAExecutor:executeCOAGraph: OutcomeFilter node executed: {}", outcomeFilter);
                     nodeExecuted = true;
                 }
                 logger.trace("Result of evaluation of filter for outcome: {} = {}. Interaction it contained was: {}",
@@ -332,6 +365,6 @@ public class COAExecutor {
 
         ArrivedInteraction arrivedIntr = new ArrivedInteraction(receivedIntr, arrivalTime.getTime());
         intrArrivalTimeList.add(arrivedIntr);
-        // System.out.println("Adding interaction to arrived list: " + receivedIntr);
+        logger.trace("COAExecutor:updateArrivedInteractions: Adding interaction to arrived list: {}", receivedIntr);
     }
 }

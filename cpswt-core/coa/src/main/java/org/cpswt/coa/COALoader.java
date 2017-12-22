@@ -53,6 +53,7 @@ public class COALoader {
 
                 COANode node = objectMapper.treeToValue(jsonNode, nodeType.getCOANodeClass());
                 coaGraph.addNode(node);
+                logger.debug("Adding node to the COA graph: {}", node);
             }
 
             for(JsonNode jsonNode : edges) {
@@ -65,8 +66,12 @@ public class COALoader {
 
                 COAEdge edge = objectMapper.treeToValue(jsonNode, edgeType.getCOAEdgeClass());
                 coaGraph.addEdge(edge);
+                logger.debug("Adding edge to the COA graph: {}", edge);
             }
         }
+
+        logger.info("Loaded COAGraph successfully");
+        logger.debug("Loaded the following COAGraph:\n{}" + coaGraph);
 
         return coaGraph;
     }

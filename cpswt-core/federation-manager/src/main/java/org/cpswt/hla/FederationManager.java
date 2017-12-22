@@ -255,8 +255,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath);
         COAGraph coaGraph = coaLoader.loadGraph();
 
-        coaGraph.initialize();
-
         this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
         this.coaExecutor.setCoaExecutorEventListener(this);
         coaExecutor.setCOAGraph(coaGraph);
@@ -270,7 +268,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.initializeLRC(fedFileURL);
 
         // Before beginning simulation, initialize COA sequence graph
-        // coaExecutor.initializeCOAGraph();
+        coaExecutor.setRTIambassador(getLRC());
+        coaExecutor.initializeCOAGraph();
         this.setFederateState(FederateState.INITIALIZED);
 
     }

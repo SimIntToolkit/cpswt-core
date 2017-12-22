@@ -34,6 +34,11 @@ import org.cpswt.coa.edge.*;
 import org.cpswt.coa.node.*;
 import org.cpswt.utils.RandomSingleton;
 
+import hla.rti.RTIambassador;
+import org.cpswt.hla.InteractionRoot;
+
+import java.lang.reflect.Method;
+
 /**
  * This is the main class to represent the COA sequence graph.
  */
@@ -54,11 +59,101 @@ public class COAGraph {
 	public COAGraph() {
 	}
 
-	public void initialize() {
+	public void setCurrentRootNodesAsActive() {
 		// Mark COA nodes at the beginning of the graph as active from the
 		// beginning
 		for (COANode n : _currentRootNodes) {
 			n.setActive();
+		}
+	}
+
+	public void initialize(String federationName, RTIambassador rti) {
+		synchronized(rti) {
+			// Mark COA nodes at the beginning of the graph as active from the
+			// beginning
+			for (COANode n : _currentRootNodes) {
+				n.setActive();
+			}
+
+			// Make sure all interaction classes are loaded and pub-sub is configured
+			for (COANode node: _allNodes.values()) {
+				if (COANodeType.Action == node.getNodeType()) {
+					COAAction actionNode = (COAAction) node;
+					loadPublishedInteractionAndConfigurePublish(actionNode.getInteractionClassName(), federationName, rti);
+				} else if (COANodeType.Outcome == node.getNodeType()) {
+					COAOutcome outcomeNode = (COAOutcome) node;
+					loadSubscribedInteractionAndConfigureSubscribe(outcomeNode.getInteractionClassName(), federationName, rti);
+				}
+			}
+		}
+	}
+
+	public Class loadInteractionClass(String intrFullyQualifiedName, String federationName) {
+		// Get class name for the fully qualified interaction name and try loading it
+		logger.trace("COAGraph: Interaction class name: {}... Now trying to load interaction class", intrFullyQualifiedName);
+		String intrClassName = federationName + "." + intrFullyQualifiedName.substring( intrFullyQualifiedName.lastIndexOf( '.' ) + 1 );
+		Class intrClass = null;
+		try {
+			intrClass = Class.forName(intrClassName);
+			logger.trace("COAGraph: Class loaded successfully: {}", intrClassName);
+			return intrClass;
+		} catch (Exception e) {
+			logger.error("COAGraph: Could not load class: {}", intrClassName);
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public InteractionRoot createInteractionInstance(String intrFullyQualifiedName, String intrClassName) {
+		logger.trace("COAGraph: Trying to create interaction using class: {}", intrClassName);
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrFullyQualifiedName);
+		logger.trace("COAGraph: Interaction created was: {}", interactionRoot);
+		return interactionRoot;
+	}
+
+	public void publishOrSubscribeAnInteractionClass(Class intrClass, RTIambassador rti, boolean bPublish) {
+		synchronized (rti) {
+			logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Got interaction class as: {}", intrClass);
+			if (intrClass == null)
+				return;
+			try {
+				Class[] pubSubMethodArgs = new Class[1];
+				pubSubMethodArgs[0] = hla.rti.RTIambassador.class;
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Getting Publish/Subscribe method to invoke");
+				Method pubSubMethod = null;
+				if (bPublish) {
+					pubSubMethod = intrClass.getDeclaredMethod("publish", pubSubMethodArgs);
+				} else {
+					pubSubMethod = intrClass.getDeclaredMethod("subscribe", pubSubMethodArgs);
+				}
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Invoking Publish/Subscribe method: {}", pubSubMethod);
+				pubSubMethod.invoke(null, rti);
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Publish/Subscribe method invokation was successful");
+			} catch (Exception e) {
+				logger.error("COAGraph:publishOrSubscribeAnInteractionClass: Failed to invoke Publish/Subscribe method");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void loadPublishedInteractionAndConfigurePublish(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
+		synchronized (rti) {
+			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
+			if ( intrClass != null ) {
+				logger.trace("COAGraph: For COAs, PUBLISHING interaction class: {}", intrClass);
+				publishOrSubscribeAnInteractionClass(intrClass, rti, true);
+			}
+		}
+	}
+
+	public void loadSubscribedInteractionAndConfigureSubscribe(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
+		synchronized(rti) {
+			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
+			if ( intrClass != null ) {
+				logger.trace("COAGraph: For COAs, SUBSCRIBING to interaction class: {}", intrClass);
+				publishOrSubscribeAnInteractionClass(intrClass, rti, false);
+			}
 		}
 	}
 
@@ -239,6 +334,7 @@ public class COAGraph {
 
 		// Successor status updates and graph updates
 		HashSet<COANode> successors = node.getSuccessors();
+		logger.trace("COAGraph: Node {} has {} successors", node, successors.size());
 		if (successors.size() > 0) {
 			for (COANode succ : successors) {
 				// Take care of multiple directed edges coming to the successor
@@ -249,6 +345,7 @@ public class COAGraph {
 				// the successor is of type SyncPt or AwaitN).
 				// Also, before activating make sure that the chosen successor
 				// is enabled as choice.
+				logger.trace("COAGraph: Checking out the successor {}", succ);
 				boolean succAlreadyInCurrentRootNodes = _currentRootNodes
 						.contains(succ);
 				if (!succAlreadyInCurrentRootNodes

@@ -23,6 +23,7 @@
 
 package org.cpswt.coa.node;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class COAAction extends COANode {
 
-    @JsonIgnore
+    @JsonProperty("interactionName")
 	private String interactionClassName;
 
     @JsonIgnore
