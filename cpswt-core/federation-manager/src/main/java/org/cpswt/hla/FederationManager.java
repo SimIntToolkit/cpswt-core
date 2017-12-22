@@ -1005,6 +1005,49 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     @Override
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag) {
+        logger.trace("FederationManager::receiveInteraction (no time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
+
+        try {
+
+            // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
+            if(this.coaExecutor != null) {
+                InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
+                coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
+            }
+
+            // "federate join" interaction
+            if(FederateJoinInteraction.match(intrHandle)) {
+                FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
+                logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
+
+                // ??
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.getFederateId());
+
+                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.getFederateId(), federateJoinInteraction.getFederateType(), federateJoinInteraction.isLateJoiner()));
+
+            }
+            // "federate resign" interaction
+            else if(FederateResignInteraction.match(intrHandle)) {
+                FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
+                logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
+
+                // ??
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.getFederateId());
+
+                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.getFederateId());
+                this.federatesMaintainer.federateResigned(federateInfo);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while parsing the logger interaction");
+            logger.error(e);
+        }
+    }
+
+    @Override
+    public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag, LogicalTime theTime, EventRetractionHandle retractionHandle) {
+        logger.trace("FederationManager::receiveInteraction (with time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
 
         try {
 

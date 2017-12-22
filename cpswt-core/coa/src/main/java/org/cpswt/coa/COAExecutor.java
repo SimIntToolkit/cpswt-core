@@ -222,6 +222,7 @@ public class COAExecutor {
                     nodeOutcome.startTimer(getCurrentTime());
                 } else {
                     boolean outcomeExecutable = checkIfOutcomeExecutableAndUpdateArrivedInteraction(nodeOutcome);
+                    logger.trace("COAExecutor:executeCOAGraph: Checking if outcome node is executable: {}", nodeOutcome);
                     if (outcomeExecutable) {
                         _coaGraph.markNodeExecuted(n, getCurrentTime());
                         logger.trace("COAExecutor:executeCOAGraph: Outcome node executed: {}", nodeOutcome);
@@ -348,6 +349,7 @@ public class COAExecutor {
     // This method and arrivalTimes are used by the COA Orchestrator while executing
     // Outcome elements of the COA sequence graph.
     public void updateArrivedInteractions(int handle, LogicalTime time, InteractionRoot receivedIntr) throws Exception {
+        logger.trace("COAExecutor:updateArrivedInteractions: Received interaction with handle {} with time {} as: {}", handle, time, receivedIntr);
         ArrayList<ArrivedInteraction> intrArrivalTimeList = null;
         if (!_arrived_interactions.keySet().contains(handle)) {
             intrArrivalTimeList = new ArrayList<ArrivedInteraction>();

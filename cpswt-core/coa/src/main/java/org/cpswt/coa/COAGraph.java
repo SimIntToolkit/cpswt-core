@@ -83,6 +83,9 @@ public class COAGraph {
 				} else if (COANodeType.Outcome == node.getNodeType()) {
 					COAOutcome outcomeNode = (COAOutcome) node;
 					loadSubscribedInteractionAndConfigureSubscribe(outcomeNode.getInteractionClassName(), federationName, rti);
+					logger.trace("COAGraph: Before setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
+					outcomeNode.setInteractionClassHandle(InteractionRoot.get_handle(outcomeNode.getInteractionClassName()));
+					logger.trace("COAGraph: After setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
 				}
 			}
 		}
