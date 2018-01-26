@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class COALoader {
 
@@ -21,14 +22,71 @@ public class COALoader {
 
     Path coaDefinitionPath;
     Path coaSelectionPath;
+    String coaSelectionToExecute;
 
-    public COALoader(Path coaDefinitionPath, Path coaSelectionPath) {
+    public COALoader(Path coaDefinitionPath, Path coaSelectionPath, String coaSelectionToExecute) {
         this.coaDefinitionPath = coaDefinitionPath;
         this.coaSelectionPath = coaSelectionPath;
+	this.coaSelectionToExecute = coaSelectionToExecute;
+    }
+
+    public ArrayList<String> getListOfIDsofCOAsToExecute() throws IOException {
+	ArrayList<String> coaIDs = new ArrayList<String>();
+	if (coaSelectionToExecute == null || "".equals(coaSelectionToExecute)) {
+	    return null;
+	}
+
+	byte[] jsonData = Files.readAllBytes(this.coaSelectionPath);
+	ObjectMapper objectMapper = new ObjectMapper();
+	JsonNode jsonRoot = objectMapper.readTree(jsonData);
+
+	logger.trace("Looking at COASelection for IDs: {}", coaSelectionToExecute);
+	for(Iterator<Map.Entry<String, JsonNode>> iter = jsonRoot.fields(); iter.hasNext(); ) {
+	    Map.Entry<String, JsonNode> coaKV = iter.next();
+	    logger.trace("Next COASelection to check is: {}", coaKV.getKey());
+	    if(coaSelectionToExecute.equals(coaKV.getKey())) { // Found COA-Selection
+	        logger.trace("This COASelection matches what's needed");
+	        JsonNode coas = coaKV.getValue();
+	        logger.trace("This COASelection has value: {}", coas);
+		for(JsonNode coaArray: coas) {
+		    logger.trace("In this COASelection, next COA to get its ID is: {}", coaArray);
+		    for(JsonNode coa : coaArray) {
+			    // Has only 1 COA in it, so break after processing
+			    logger.trace("Got COA as : {}", coa);
+			    String coaID = coa.get("Name").asText("");
+			    logger.trace("Got COA's ID as {}", coaID);
+			    coaIDs.add(coaID);
+
+			    break;
+		    }
+	        }
+
+	        if(coaIDs.size() > 0) {
+	            return coaIDs;
+	        } else {
+	            return null;
+	        }
+	    }
+	    else
+	        continue;
+	}
+
+	return null;
     }
 
     public COAGraph loadGraph() throws IOException {
         COAGraph coaGraph = new COAGraph();
+	ArrayList<String> idsOfCoasToExecute = null;
+	boolean coaSelectionSpecified = false;
+	if(coaSelectionToExecute != null && !"".equals(coaSelectionToExecute)) {
+	    coaSelectionSpecified = true;
+	    logger.trace("COASelection was specified as: {}", coaSelectionToExecute);
+	    idsOfCoasToExecute = getListOfIDsofCOAsToExecute();
+	    if(idsOfCoasToExecute == null || idsOfCoasToExecute.size() == 0) {
+	        logger.trace("COASelection was specified, couldn't find IDs");
+	        return coaGraph; // If COA-Selection given, but wrongly, return empty graph
+	    }
+	}
 
         byte[] jsonData = Files.readAllBytes(this.coaDefinitionPath);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -38,7 +96,12 @@ public class COALoader {
         for(Iterator<Map.Entry<String, JsonNode>> iter = jsonRoot.fields(); iter.hasNext(); ) {
             Map.Entry<String, JsonNode> coaKV = iter.next();
 
-            // COA coa = new COA(coaKV.getKey());
+            String coaName = coaKV.getKey();
+	    if(coaSelectionSpecified) { // By default, executes all COAs from defnition, if a COA-Selection isn't specified
+	        if(!idsOfCoasToExecute.contains(coaName)) {
+	            continue;
+	        }
+	    }
 
             JsonNode nodes = coaKV.getValue().get("nodes");
             JsonNode edges = coaKV.getValue().get("edges");

@@ -103,6 +103,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private boolean terminateOnCOAFinish;
 
     /**
+     * Represents which combination of COAs to execute in current run of an experiment.
+     */
+    private String coaSelectionToExecute;
+
+    /**
      * Project root directory
      */
     private String rootDir;
@@ -243,6 +248,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         logger.trace("Loading experiment config file {}", experimentConfigFilePath);
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFilePath.toFile(), ExperimentConfig.class);
         this.terminateOnCOAFinish = this.experimentConfig.terminateOnCOAFinish;
+	this.coaSelectionToExecute = this.experimentConfig.COASelectionToExecute;
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
         if(this.experimentConfig.pauseTimes != null) {
             this.pauseTimes.addAll(this.experimentConfig.pauseTimes);
@@ -252,7 +258,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         Path coaDefinitionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaDefinition, this.rootDir);
         Path coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
 
-        COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath);
+	logger.trace("COASelectionToExecute: {}", coaSelectionToExecute);
+        COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath, coaSelectionToExecute);
         COAGraph coaGraph = coaLoader.loadGraph();
 
         this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());

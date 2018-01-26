@@ -15,6 +15,7 @@ public class ExperimentConfig {
     public String coaDefinition;
     public String coaSelection;
     public boolean terminateOnCOAFinish;
+    public String COASelectionToExecute;
 
     @JsonIgnore
     public int expectedFederateItemsCount() {
