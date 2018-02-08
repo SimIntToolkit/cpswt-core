@@ -1056,11 +1056,25 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag, LogicalTime theTime, EventRetractionHandle retractionHandle) {
         logger.trace("FederationManager::receiveInteraction (with time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
 
+        if(intrHandle < 0) {
+            logger.error("Invalid interaction handle received");
+            return;
+        }
+
+        if(receivedIntr == null) {
+            logger.error("Invalid interaction object received");
+            return;
+        }
+
         try {
 
             // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
             if(this.coaExecutor != null) {
                 InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                if(interactionRoot == null) {
+                    logger.error("Unable to instantiate interactionRoot");
+                    return;
+                }
                 // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
                 coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
             }
@@ -1068,6 +1082,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate join" interaction
             if(FederateJoinInteraction.match(intrHandle)) {
                 FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
+                if(federateJoinInteraction == null) {
+                    logger.error("Unable to instantiate FederateJoinInteraction");
+                    return;
+                }
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
@@ -1079,6 +1097,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate resign" interaction
             else if(FederateResignInteraction.match(intrHandle)) {
                 FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
+                if(federateResignInteraction == null) {
+                    logger.error("Unable to instantiate federateResignInteraction");
+                    return;
+                }
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
