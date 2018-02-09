@@ -1012,6 +1012,17 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     @Override
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag) {
+        //some sanity checking to avoid NPE
+        if(intrHandle < 0) {
+            logger.error("FederationManager::receiveInteraction (no time): Invalid interaction handle received");
+            return;
+        }
+
+        if(receivedIntr == null) {
+            logger.error("FederationManager::receiveInteraction (no time): Invalid interaction object received");
+            return;
+        }
+
         logger.trace("FederationManager::receiveInteraction (no time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
 
         try {
@@ -1019,6 +1030,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
             if(this.coaExecutor != null) {
                 InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                if(interactionRoot == null) {
+                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate interactionRoot");
+                    return;
+                }
                 // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
                 coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
             }
@@ -1026,6 +1041,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate join" interaction
             if(FederateJoinInteraction.match(intrHandle)) {
                 FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
+                if(federateJoinInteraction == null) {
+                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate federateJoinInteraction");
+                    return;
+                }
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
@@ -1037,6 +1056,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate resign" interaction
             else if(FederateResignInteraction.match(intrHandle)) {
                 FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
+                if(federateResignInteraction == null) {
+                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate federateResignInteraction");
+                    return;
+                }
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
@@ -1054,17 +1077,18 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     @Override
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag, LogicalTime theTime, EventRetractionHandle retractionHandle) {
-        logger.trace("FederationManager::receiveInteraction (with time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
-
+        //some sanity checking to avoid NPE
         if(intrHandle < 0) {
-            logger.error("Invalid interaction handle received");
+            logger.error("FederationManager::receiveInteraction (with time): Invalid interaction handle received");
             return;
         }
 
         if(receivedIntr == null) {
-            logger.error("Invalid interaction object received");
+            logger.error("FederationManager::receiveInteraction (with time): Invalid interaction object received");
             return;
         }
+
+        logger.trace("FederationManager::receiveInteraction (with time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
 
         try {
 
@@ -1072,7 +1096,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             if(this.coaExecutor != null) {
                 InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
                 if(interactionRoot == null) {
-                    logger.error("Unable to instantiate interactionRoot");
+                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate interactionRoot");
                     return;
                 }
                 // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
@@ -1083,7 +1107,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             if(FederateJoinInteraction.match(intrHandle)) {
                 FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
                 if(federateJoinInteraction == null) {
-                    logger.error("Unable to instantiate FederateJoinInteraction");
+                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate federateJoinInteraction");
                     return;
                 }
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
@@ -1098,7 +1122,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             else if(FederateResignInteraction.match(intrHandle)) {
                 FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
                 if(federateResignInteraction == null) {
-                    logger.error("Unable to instantiate federateResignInteraction");
+                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate federateResignInteraction");
                     return;
                 }
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
