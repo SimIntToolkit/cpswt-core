@@ -980,7 +980,12 @@ public class InteractionRoot implements InteractionRootInterface {
         if (val == null) {
             logger.error("set:  Attempt to set null value in class \"{}\"", getClass().getName());
         }
-        if (!setParameterAux(handle, new String(val))) {
+        String valAsString = new String( val, 0, val.length );
+        if (valAsString != null && valAsString.length() > 0 && valAsString.charAt(valAsString.length() - 1) == '\0') {
+            valAsString = valAsString.substring(0, valAsString.length() - 1);
+        }
+
+        if (!setParameterAux(handle, valAsString)) {
             logger.error("set:  bad parameter handle in class \"{}\"", getClass().getName());
         }
     }

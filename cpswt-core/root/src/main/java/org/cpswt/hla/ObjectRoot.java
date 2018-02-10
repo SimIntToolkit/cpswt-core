@@ -1344,7 +1344,12 @@ public class ObjectRoot implements ObjectRootInterface {
         if (val == null) {
             logger.error("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
         }
-        if (!setAttributeAux(handle, EncodingHelpers.decodeString(val))) {
+        String valAsString = new String( val, 0, val.length );
+        if (valAsString != null && valAsString.length() > 0 && valAsString.charAt(valAsString.length() - 1) == '\0') {
+            valAsString = valAsString.substring(0, valAsString.length() - 1);
+        }
+
+        if (!setAttributeAux(handle, valAsString)) {
             logger.error("set:  bad attribute handle in class \"" + getClass().getName() + "\"");
         }
     }
