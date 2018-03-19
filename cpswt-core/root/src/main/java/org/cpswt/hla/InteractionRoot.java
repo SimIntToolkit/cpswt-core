@@ -45,7 +45,7 @@ import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
- * InteractionRoot is the base class for all intereractions
+ * InteractionRoot is the base class for all interactions
  * defined in a given federation.  As such, an InteractionRoot
  * variable may refer to any type of interaction defined in the
  * federation.
