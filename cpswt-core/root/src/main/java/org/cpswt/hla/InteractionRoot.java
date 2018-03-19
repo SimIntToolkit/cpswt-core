@@ -45,7 +45,7 @@ import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
- * InteractionRoot is the base class for all interactions
+ * InteractionRoot is the base class for all intereractions
  * defined in a given federation.  As such, an InteractionRoot
  * variable may refer to any type of interaction defined in the
  * federation.
@@ -112,6 +112,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
 
     private static boolean _isInitialized = false;
+    private static RTIambassador _rti;
 
     private static int _handle;
 
@@ -193,6 +194,7 @@ public class InteractionRoot implements InteractionRootInterface {
     protected static void init(RTIambassador rti) {
         if (_isInitialized) return;
         _isInitialized = true;
+        _rti = rti;
 
 
         boolean isNotInitialized = true;
@@ -952,8 +954,14 @@ public class InteractionRoot implements InteractionRootInterface {
      *                         value to retrieve
      * @return the value of the parameter whose handle is "datamemberHandle"
      */
-    public Object getParameter(int datamemberHandle) {
-        return null;
+    public Object getParameter( int datamemberHandle ) {
+        try {
+            final String datamemberName = _rti.getParameterName(datamemberHandle, getClassHandle());
+            return getParameter(datamemberName);
+        } catch (InteractionClassNotDefined | InteractionParameterNotDefined | FederateNotExecutionMember | RTIinternalError e) {
+            logger.warn("failed to get parameter: ", e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -1026,8 +1034,14 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    protected boolean setParameterAux(int param_handle, String val) {
-        return false;
+    protected boolean setParameterAux( int param_handle, String val ) {
+        try {
+            final String datamemberName = _rti.getParameterName(param_handle, getClassHandle());
+            return setParameterAux(datamemberName, val);
+        } catch (InteractionClassNotDefined | InteractionParameterNotDefined | FederateNotExecutionMember | RTIinternalError e) {
+            logger.warn("failed to set parameter: ", e.getMessage());
+            return false;
+        }
     }
 
     protected boolean setParameterAux(String datamemberName, String value) {
