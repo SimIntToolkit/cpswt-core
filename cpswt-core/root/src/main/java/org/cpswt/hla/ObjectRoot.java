@@ -1322,7 +1322,7 @@ public class ObjectRoot implements ObjectRootInterface {
             final String datamemberName = _rti.getAttributeName(datamemberHandle, getClassHandle());
             return getAttribute(datamemberName);
         } catch (ObjectClassNotDefined | AttributeNotDefined | FederateNotExecutionMember | RTIinternalError  e) {
-            logger.warn("failed to get parameter: ", e.getMessage());
+            logger.warn("failed to get parameter: {}", e.getMessage());
             return null;
         }
     }

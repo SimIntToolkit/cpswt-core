@@ -959,7 +959,7 @@ public class InteractionRoot implements InteractionRootInterface {
             final String datamemberName = _rti.getParameterName(datamemberHandle, getClassHandle());
             return getParameter(datamemberName);
         } catch (InteractionClassNotDefined | InteractionParameterNotDefined | FederateNotExecutionMember | RTIinternalError e) {
-            logger.warn("failed to get parameter: ", e.getMessage());
+            logger.warn("failed to get parameter: {}", e.getMessage());
             return null;
         }
     }
