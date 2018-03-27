@@ -164,7 +164,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private double tMainLoopEndTime = 0.0;
     private boolean executionTimeRecorded = false;
 
-    private COAExecutor coaExecutor;
+    private COAExecutor coaExecutor = null;
 
     //private PrintStream monitor_out;
 
@@ -247,24 +247,49 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
         logger.trace("Loading experiment config file {}", experimentConfigFilePath);
         this.experimentConfig = ConfigParser.parseConfig(experimentConfigFilePath.toFile(), ExperimentConfig.class);
+        logger.trace("Experiment config loaded");
         this.terminateOnCOAFinish = this.experimentConfig.terminateOnCOAFinish;
 	this.coaSelectionToExecute = this.experimentConfig.COASelectionToExecute;
+        logger.trace("Updating Federate Join Info in the FederatesMaintainer");
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
+        logger.trace("Checking pause times in experiment config: {}", this.experimentConfig.pauseTimes);
         if(this.experimentConfig.pauseTimes != null) {
             this.pauseTimes.addAll(this.experimentConfig.pauseTimes);
         }
 
         // load COA related stuff
-        Path coaDefinitionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaDefinition, this.rootDir);
-        Path coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
+        logger.trace("Checking COA coaDefinitions, coaSelections, and coaSelectionToExecute");
+        Path coaDefinitionPath = null;
+        if( this.experimentConfig.coaDefinition != null && !"".equals(this.experimentConfig.coaDefinition) ) {
+                coaDefinitionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaDefinition, this.rootDir);
+        } else {
+                logger.info("No COA definitions were provided!");
+        }
+        Path coaSelectionPath = null;
+        if( this.experimentConfig.coaSelection != null && !"".equals(this.experimentConfig.coaSelection) ) {
+                coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
+        } else {
+                logger.info("No COA selections were provided!");
+        }
+        if( coaSelectionToExecute != null && !"".equals(coaSelectionToExecute) ) {
+	        logger.trace("COASelectionToExecute: {}", coaSelectionToExecute);
+        } else {
+                logger.info("No specific COA-selection was specified for execution!");
+        }
 
-	logger.trace("COASelectionToExecute: {}", coaSelectionToExecute);
-        COALoader coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath, coaSelectionToExecute);
-        COAGraph coaGraph = coaLoader.loadGraph();
+        COALoader coaLoader = null;        
+        if( coaDefinitionPath != null && coaSelectionPath != null && coaSelectionToExecute != null) {
+                coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath, coaSelectionToExecute);
+        }
+        if(coaLoader != null) {
+                COAGraph coaGraph = coaLoader.loadGraph();
 
-        this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
-        this.coaExecutor.setCoaExecutorEventListener(this);
-        coaExecutor.setCOAGraph(coaGraph);
+                this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
+                this.coaExecutor.setCoaExecutorEventListener(this);
+                this.coaExecutor.setCOAGraph(coaGraph);
+        } else {
+                logger.info("No COAs are used in this experiment.");
+        }
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
             // there are no expected federates --> no need for synchronization points
@@ -275,8 +300,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.initializeLRC(fedFileURL);
 
         // Before beginning simulation, initialize COA sequence graph
-        coaExecutor.setRTIambassador(getLRC());
-        coaExecutor.initializeCOAGraph();
+        if(this.coaExecutor != null) {
+                this.coaExecutor.setRTIambassador(getLRC());
+                this.coaExecutor.initializeCOAGraph();
+        }
+
         this.setFederateState(FederateState.INITIALIZED);
 
     }
@@ -474,7 +502,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
                                 sendScriptInteractions();
 
-                                coaExecutor.executeCOAGraph();
+                                if(coaExecutor != null) {
+                                   coaExecutor.executeCOAGraph();
+                                }
 
                                 DoubleTime next_time = new DoubleTime(time.getTime() + step);
                                 logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
