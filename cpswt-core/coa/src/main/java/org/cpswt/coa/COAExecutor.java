@@ -87,7 +87,7 @@ public class COAExecutor {
         String interactionClassName = nodeAction.getInteractionClassName();
         logger.trace("COAExecutor:executeCOAAction: Got interaction class name: {}... now trying to create interaction..", interactionClassName);
 
-        String simpleClassName = "HelloWorld." + interactionClassName.substring( interactionClassName.lastIndexOf( '.' ) + 1 );
+        String simpleClassName = this.federationId + "." + interactionClassName.substring( interactionClassName.lastIndexOf( '.' ) + 1 );
         Class intrClass = null;
         try {
             intrClass = Class.forName(simpleClassName);
