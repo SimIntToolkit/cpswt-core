@@ -139,6 +139,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
 
     private static boolean _isInitialized = false;
+    private static RTIambassador _rti;
 
     private static int _handle;
 
@@ -234,7 +235,7 @@ public class ObjectRoot implements ObjectRootInterface {
     protected static void init(RTIambassador rti) {
         if (_isInitialized) return;
         _isInitialized = true;
-
+        _rti = rti;
 
         boolean isNotInitialized = true;
         while (isNotInitialized) {
@@ -1317,7 +1318,13 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the value of the attribute whose handle is "datamemberHandle"
      */
     public Object getAttribute(int datamemberHandle) {
-        return null;
+        try {
+            final String datamemberName = _rti.getAttributeName(datamemberHandle, getClassHandle());
+            return getAttribute(datamemberName);
+        } catch (ObjectClassNotDefined | AttributeNotDefined | FederateNotExecutionMember | RTIinternalError  e) {
+            logger.warn("failed to get parameter: {}", e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -1390,9 +1397,16 @@ public class ObjectRoot implements ObjectRootInterface {
         }
     }
 
-    protected boolean setAttributeAux(int param_handle, String val) {
-        return false;
+    protected boolean setAttributeAux(int datamemberHandle, String val) {
+        try {
+            final String datamemberName = _rti.getAttributeName(datamemberHandle, getClassHandle());
+            return setAttributeAux(datamemberName, val);
+        } catch (ObjectClassNotDefined | AttributeNotDefined | FederateNotExecutionMember | RTIinternalError e) {
+            logger.warn("failed to set attribute: ", e.getMessage());
+            return false;
+        }
     }
+
 
     protected boolean setAttributeAux(String datamemberName, String value) {
         return false;

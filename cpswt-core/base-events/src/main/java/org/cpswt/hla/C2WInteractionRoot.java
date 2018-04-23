@@ -22,7 +22,7 @@ public class C2WInteractionRoot extends InteractionRoot {
 	* class with default parameter values.
 	*/
 	public C2WInteractionRoot() { }
-
+	
 	private static int _sourceFed_handle;
 	private static int _originFed_handle;
 	private static int _federateFilter_handle;
@@ -602,40 +602,6 @@ public class C2WInteractionRoot extends InteractionRoot {
 		else if (  "federateFilter".equals( datamemberName )  ) return get_federateFilter();
 		else if (  "actualLogicalGenerationTime".equals( datamemberName )  ) return new Double( get_actualLogicalGenerationTime() );
 		else return super.getParameter( datamemberName );
-	}
-	
-	/**
-	* Returns the value of the parameter whose handle (RTI assigned)
-	* is "datamemberHandle" for this interaction.
-	*
-	* @param datamemberHandle handle (RTI assigned) of parameter whose
-	* value is to be returned
-	* @return value of the parameter whose handle (RTI assigned) is
-	* "datamemberHandle" for this interaction
-	*/
-	public Object getParameter( int datamemberHandle ) {
-		
-				
-		
-		if ( get_sourceFed_handle() == datamemberHandle ) return get_sourceFed();
-		else if ( get_originFed_handle() == datamemberHandle ) return get_originFed();
-		else if ( get_federateFilter_handle() == datamemberHandle ) return get_federateFilter();
-		else if ( get_actualLogicalGenerationTime_handle() == datamemberHandle ) return new Double( get_actualLogicalGenerationTime() );
-		else return super.getParameter( datamemberHandle );
-	}
-	
-	protected boolean setParameterAux( int param_handle, String val ) {
-		boolean retval = true;		
-		
-			
-		
-		if ( param_handle == get_sourceFed_handle() ) set_sourceFed( val );
-		else if ( param_handle == get_originFed_handle() ) set_originFed( val );
-		else if ( param_handle == get_federateFilter_handle() ) set_federateFilter( val );
-		else if ( param_handle == get_actualLogicalGenerationTime_handle() ) set_actualLogicalGenerationTime( Double.parseDouble( val ) );
-		else retval = super.setParameterAux( param_handle, val );
-		
-		return retval;
 	}
 	
 	protected boolean setParameterAux( String datamemberName, String val ) {

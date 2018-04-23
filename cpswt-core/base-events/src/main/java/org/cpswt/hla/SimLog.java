@@ -608,38 +608,6 @@ public class SimLog extends C2WInteractionRoot {
 		else return super.getParameter( datamemberName );
 	}
 	
-	/**
-	* Returns the value of the parameter whose handle (RTI assigned)
-	* is "datamemberHandle" for this interaction.
-	*
-	* @param datamemberHandle handle (RTI assigned) of parameter whose
-	* value is to be returned
-	* @return value of the parameter whose handle (RTI assigned) is
-	* "datamemberHandle" for this interaction
-	*/
-	public Object getParameter( int datamemberHandle ) {
-		
-				
-		
-		if ( get_Time_handle() == datamemberHandle ) return new Double( get_Time() );
-		else if ( get_FedName_handle() == datamemberHandle ) return get_FedName();
-		else if ( get_Comment_handle() == datamemberHandle ) return get_Comment();
-		else return super.getParameter( datamemberHandle );
-	}
-	
-	protected boolean setParameterAux( int param_handle, String val ) {
-		boolean retval = true;		
-		
-			
-		
-		if ( param_handle == get_Time_handle() ) set_Time( Double.parseDouble( val ) );
-		else if ( param_handle == get_FedName_handle() ) set_FedName( val );
-		else if ( param_handle == get_Comment_handle() ) set_Comment( val );
-		else retval = super.setParameterAux( param_handle, val );
-		
-		return retval;
-	}
-	
 	protected boolean setParameterAux( String datamemberName, String val ) {
 		boolean retval = true;
 		

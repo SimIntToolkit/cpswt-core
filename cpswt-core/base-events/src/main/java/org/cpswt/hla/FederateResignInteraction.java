@@ -350,24 +350,6 @@ public class FederateResignInteraction extends C2WInteractionRoot {
         else return super.getParameter(datamemberName);
     }
 
-    public Object getParameter( int datamemberHandle ) {
-        if (get_FederateId_handle() == datamemberHandle) return getFederateId();
-        else if (get_FederateType_handle() == datamemberHandle) return getFederateType();
-        else if (get_IsLateJoiner_handle() == datamemberHandle) return new Boolean(isLateJoiner());
-        else return super.getParameter(datamemberHandle);
-    }
-
-    protected boolean setParameterAux( int param_handle, String val ) {
-        boolean retval = true;
-
-        if (param_handle == get_FederateId_handle()) setFederateId(val);
-        else if (param_handle == get_FederateType_handle()) setFederateType(val);
-        else if (param_handle == get_IsLateJoiner_handle()) setLateJoiner(Boolean.parseBoolean(val));
-        else retval = super.setParameterAux(param_handle, val);
-
-        return retval;
-    }
-
     protected boolean setParameterAux( String datamemberName, String val ) {
         boolean retval = true;
 

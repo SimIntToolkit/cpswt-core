@@ -832,33 +832,6 @@ public class FederateObject extends ObjectRoot {
         else return super.getAttribute(datamemberName);
     }
 
-    /**
-     * Returns the value of the attribute whose handle (RTI assigned)
-     * is "datamemberHandle" for this object.
-     *
-     * @param datamemberHandle handle (RTI assigned) of attribute whose
-     *                         value is to be returned
-     * @return value of the attribute whose handle (RTI assigned) is
-     * "datamemberHandle" for this object
-     */
-    public Object getAttribute(int datamemberHandle) {
-        if (get_FederateHandle_handle() == datamemberHandle) return get_FederateHandle();
-        else if (get_FederateType_handle() == datamemberHandle) return get_FederateId();
-        else if (get_FederateHost_handle() == datamemberHandle) return get_FederateHost();
-        else return super.getAttribute(datamemberHandle);
-    }
-
-    protected boolean setAttributeAux(int param_handle, String val) {
-        boolean retval = true;
-
-        if (param_handle == get_FederateHandle_handle()) set_FederateHandle(Integer.parseInt(val));
-        else if (param_handle == get_FederateType_handle()) set_FederateId(val);
-        else if (param_handle == get_FederateHost_handle()) set_FederateHost(val);
-        else retval = super.setAttributeAux(param_handle, val);
-
-        return retval;
-    }
-
     protected boolean setAttributeAux(String datamemberName, String val) {
         boolean retval = true;
 
