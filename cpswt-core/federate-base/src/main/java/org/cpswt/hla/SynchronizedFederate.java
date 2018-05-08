@@ -278,9 +278,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             FederateJoinInteraction joinInteraction = new FederateJoinInteraction();
             joinInteraction.set_sourceFed(this.federateId);
             joinInteraction.set_originFed(this.federateId);
-            joinInteraction.setFederateId(this.federateId);
-            joinInteraction.setFederateType(this.federateType);
-            joinInteraction.setLateJoiner(this.isLateJoiner);
+            joinInteraction.set_FederateId(this.federateId);
+            joinInteraction.set_FederateType(this.federateType);
+            joinInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateJoinInteraction for federate {}", this.federateId);
@@ -297,9 +297,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             FederateResignInteraction resignInteraction = new FederateResignInteraction();
             resignInteraction.set_sourceFed(this.federateId);
             resignInteraction.set_originFed(this.federateId);
-            resignInteraction.setFederateId(this.federateId);
-            resignInteraction.setFederateType(this.federateType);
-            resignInteraction.setLateJoiner(this.isLateJoiner);
+            resignInteraction.set_FederateId(this.federateId);
+            resignInteraction.set_FederateType(this.federateType);
+            resignInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateResignInteraction for federate {}", this.federateId);
