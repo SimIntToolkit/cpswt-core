@@ -228,7 +228,7 @@ interface ObjectRootInterface {
     void updateAttributeValues(RTIambassador rti, double time, boolean force);
 
     /**
-     * Like {@link #updateAttrributeValues(RTIambassador rti, double time, boolean force)},
+     * Like {@link #updateAttributeValues(RTIambassador rti, double time, boolean force)},
      * except "force" is always false.
      *
      * @param rti  handle to the RTI
