@@ -9,12 +9,16 @@ import hla.rti.FederateNotExecutionMember;
 import hla.rti.InvalidFederationTime;
 import hla.rti.LogicalTime;
 import hla.rti.NameNotFound;
+import hla.rti.ObjectAlreadyRegistered;
 import hla.rti.ObjectClassNotDefined;
 import hla.rti.ObjectClassNotPublished;
 import hla.rti.ObjectClassNotSubscribed;
 import hla.rti.ObjectNotKnown;
 import hla.rti.RTIambassador;
+import hla.rti.RTIinternalError;
 import hla.rti.ReflectedAttributes;
+import hla.rti.RestoreInProgress;
+import hla.rti.SaveInProgress;
 import hla.rti.SuppliedAttributes;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
@@ -1420,6 +1424,35 @@ public class ObjectRoot implements ObjectRootInterface {
                 logger.error(e);
                 return;
             } catch (Exception e) {
+                CpswtUtils.sleep(500);
+            }
+        }
+    }
+
+    /**
+     * Registers this object with the RTI using the given name.  This method is usually
+     * called by a federate who "owns" this object, i.e. the federate that created it and
+     * has write-privileges to its attributes (so, it is responsible for updating
+     * these attribute and conveying their updated values to the RTI).
+     *
+     * @param rti handle to the RTI
+     * @param name unique identifier to assign to the object instance
+     * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
+     */
+    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered {
+
+        while (!_isRegistered) {
+            try {
+                synchronized (rti) {
+                    _objectHandle = rti.registerObjectInstance(getClassHandle(), name);
+                }
+                _isRegistered = true;
+                _objectMap.put(getObjectHandle(), this);
+
+            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember ex) {
+                logger.error(ex);
+                return;
+            } catch (SaveInProgress | RestoreInProgress | RTIinternalError | ConcurrentAccessAttempted e) {
                 CpswtUtils.sleep(500);
             }
         }
