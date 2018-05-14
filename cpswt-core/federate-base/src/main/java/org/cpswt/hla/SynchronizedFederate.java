@@ -958,11 +958,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public final void receiveInteractionSF(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
+        logger.trace("SynchronizedFederate::receiveInteractionSF (no time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
+
         // Himanshu: We normally use only TSO updates, so this shouldn't be
         // called, but due to an RTI bug, it seemingly is getting called. So,
         // for now, use the federate's current time or LBTS whichever is greater
         // as the timestamp
-
         DoubleTime assumedTimestamp = new DoubleTime();
         if (getLBTS() >= getCurrentTime()) {
             assumedTimestamp.setTime(getLBTS());
@@ -971,6 +972,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction);
+        logger.trace("SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", ir);
+
         if (!unmatchingFedFilterProvided(ir)) {
             if(SimEnd.match(interactionClass)) {
                 _receivedSimEnd = theInteraction;
@@ -1018,7 +1021,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
+        logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
+
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
+        logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Created interaction root as: {}", ir);
         if (!unmatchingFedFilterProvided(ir)) {
             if(SimEnd.match(interactionClass)) {
                 _receivedSimEnd = theInteraction;

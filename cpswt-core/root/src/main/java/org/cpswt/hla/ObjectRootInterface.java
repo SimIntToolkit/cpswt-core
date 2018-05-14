@@ -197,6 +197,18 @@ interface ObjectRootInterface {
     void registerObject(RTIambassador rti);
 
     /**
+     * Registers this object with the RTI using the given name.  This method is usually
+     * called by a federate who "owns" this object, i.e. the federate that created it and
+     * has write-privileges to its attributes (so, it is responsible for updating
+     * these attribute and conveying their updated values to the RTI).
+     *
+     * @param rti handle to the RTI
+     * @param name unique identifier to assign to the object instance
+     * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
+     */
+    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered;
+
+    /**
      * Unregisters this object with the RTI.  The RTI will destroy all information
      * it contains regarding this object as a result.  This method is usually
      * called by a federate who "owns" this object, i.e. the federate that created

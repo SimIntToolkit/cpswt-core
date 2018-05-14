@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
+import hla.rti.jlc.EncodingHelpers;
 
 /**
  * ObjectRoot is the base class for all objects
@@ -1343,7 +1344,12 @@ public class ObjectRoot implements ObjectRootInterface {
         if (val == null) {
             logger.error("set:  Attempt to set null value in class \"" + getClass().getName() + "\"");
         }
-        if (!setAttributeAux(handle, new String(val))) {
+        String valAsString = new String( val, 0, val.length );
+        if (valAsString != null && valAsString.length() > 0 && valAsString.charAt(valAsString.length() - 1) == '\0') {
+            valAsString = valAsString.substring(0, valAsString.length() - 1);
+        }
+
+        if (!setAttributeAux(handle, valAsString)) {
             logger.error("set:  bad attribute handle in class \"" + getClass().getName() + "\"");
         }
     }
@@ -1425,6 +1431,35 @@ public class ObjectRoot implements ObjectRootInterface {
                 logger.error(ex);
                 return;
             } catch (Exception e) {
+                CpswtUtils.sleep(500);
+            }
+        }
+    }
+
+    /**
+     * Registers this object with the RTI using the given name.  This method is usually
+     * called by a federate who "owns" this object, i.e. the federate that created it and
+     * has write-privileges to its attributes (so, it is responsible for updating
+     * these attribute and conveying their updated values to the RTI).
+     *
+     * @param rti handle to the RTI
+     * @param name unique identifier to assign to the object instance
+     * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
+     */
+    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered {
+
+        while (!_isRegistered) {
+            try {
+                synchronized (rti) {
+                    _objectHandle = rti.registerObjectInstance(getClassHandle(), name);
+                }
+                _isRegistered = true;
+                _objectMap.put(getObjectHandle(), this);
+
+            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember ex) {
+                logger.error(ex);
+                return;
+            } catch (SaveInProgress | RestoreInProgress | RTIinternalError | ConcurrentAccessAttempted e) {
                 CpswtUtils.sleep(500);
             }
         }

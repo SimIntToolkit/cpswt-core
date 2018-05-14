@@ -70,7 +70,7 @@ public class FederationManagerHostApp extends AllDirectives {
         try {
             this.federationManager = new FederationManager(this.federationManagerConfig);
         } catch (Exception e) {
-            logger.error("Error while initializing FederationManager!" + e.getMessage());
+            logger.error("Error while initializing FederationManager! " + e.getMessage());
             logger.error(e);
         }
     }
