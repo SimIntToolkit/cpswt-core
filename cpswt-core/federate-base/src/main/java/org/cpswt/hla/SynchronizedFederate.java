@@ -110,6 +110,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
     private ReceivedInteraction _receivedSimEnd = null;
+    
+	public boolean exitCondition = false;	// set to true when SimEnd is received
+
 
     /**
      * General federate parameters
@@ -1044,27 +1047,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     protected void handleIfSimEnd(int interactionClass, ReceivedInteraction theInteraction, LogicalTime theTime) {
         if (SimEnd.match(interactionClass)) {
             logger.info("{}: SimEnd interaction received, exiting...", getFederateId());
-            try {
-                // getLRC().tick();
-                getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-            } catch (Exception e) {
-                logger.error("Error during resigning federate: {}", getFederateId());
-                logger.error(e.getMessage());
-            }
 
-            // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
-            try {
-                Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-
-            // TODO: CONSIDER SETTING UP A SHUTDOWN HOOK
-            // this one will terminate the JVM not only the current process
-            Runtime.getRuntime().exit(0);
-
-            // Exit
-            System.exit(0);
+            // this one will set flag allowing foreground federate to gracefully shut down
+            exitCondition = true;
         }
     }
 
@@ -1324,4 +1309,33 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             listener.federateStateChanged(e);
         }
     }
+    
+    /**
+     * Processes graceful shut-down of hla federate
+     *
+     * @return void
+     */
+    public void exitGracefully()
+    {
+    	
+		// notify FederationManager about resign
+		notifyFederationOfResign();
+
+		try {
+			// getLRC().tick();
+			getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+		} catch (Exception e) {
+			logger.error("Error during resigning federate: {}", getFederateId());
+			logger.error(e.getMessage());
+		}
+
+
+		// Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
+		try {
+			Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+    }
+
 }
