@@ -1321,14 +1321,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 		// notify FederationManager about resign
 		notifyFederationOfResign();
 
-		try {
-			// getLRC().tick();
-			getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-		} catch (Exception e) {
-			logger.error("Error during resigning federate: {}", getFederateId());
-			logger.error(e.getMessage());
-		}
-
+		resignFederationExecution();
 
 		// Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
 		try {
