@@ -1317,11 +1317,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public void exitGracefully()
     {
+    	logger.info("Exiting gracefully ....");
     	
 		// notify FederationManager about resign
 		notifyFederationOfResign();
-
-		resignFederationExecution();
 
 		// Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
 		try {
@@ -1329,6 +1328,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+
+		resignFederationExecution(ResignAction.DELETE_OBJECTS);
+
+
     }
 
 }
