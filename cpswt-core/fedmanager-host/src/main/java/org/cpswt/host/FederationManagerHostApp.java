@@ -177,7 +177,7 @@ public class FederationManagerHostApp extends AllDirectives {
             @Override
             public void run() {
                 try {
-                	federationManager.onTerminateRequested();
+                    federationManager.terminateSimulation();
                 } catch (Exception ex) {
                     logger.error("There was an error while terminating the simulation", ex);
                 }
