@@ -165,8 +165,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private boolean executionTimeRecorded = false;
 
     private COAExecutor coaExecutor = null;
-    
-    private boolean doTerminateSimulation = false;
 
     //private PrintStream monitor_out;
 
@@ -547,12 +545,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                         }
 
                         // If we have reached federation end time (if it was configured), terminate the federation
-                        // or if doTerminateSimulation flag is set asynchronously
                         if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
                             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
                             terminateSimulation();
-                        } else if (doTerminateSimulation == true) {
-                        	terminateSimulation();
                         }
 
                     }
@@ -1181,8 +1176,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     @Override
     public void onTerminateRequested() {
-    	doTerminateSimulation = true;
-        //this.terminateSimulation();
+        this.terminateSimulation();
     }
 
     @Override
