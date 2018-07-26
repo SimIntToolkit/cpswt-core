@@ -110,9 +110,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
     private ReceivedInteraction _receivedSimEnd = null;
-    
-	public boolean exitCondition = false;	// set to true when SimEnd is received
 
+	protected boolean exitCondition = false;	// set to true when SimEnd is received
 
     /**
      * General federate parameters
@@ -1317,21 +1316,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public void exitGracefully()
     {
-    	logger.info("Exiting gracefully ....");
-    	
-		// notify FederationManager about resign
-		notifyFederationOfResign();
+        logger.info("Exiting gracefully ....");
 
-		// Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
-		try {
-			Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
+        // notify FederationManager about resign
+        notifyFederationOfResign();
 
-		resignFederationExecution(ResignAction.DELETE_OBJECTS);
+        // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
+        try {
+            Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
-
+        resignFederationExecution(ResignAction.DELETE_OBJECTS);
     }
-
 }
