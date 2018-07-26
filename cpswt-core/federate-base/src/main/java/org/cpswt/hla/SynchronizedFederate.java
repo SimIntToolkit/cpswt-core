@@ -111,7 +111,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _advanceTimeThreadNotStarted = true;
     private ReceivedInteraction _receivedSimEnd = null;
 
-	protected boolean exitCondition = false;	// set to true when SimEnd is received
+    protected boolean exitCondition = false;	// set to true when SimEnd is received
 
     /**
      * General federate parameters
@@ -633,7 +633,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     private void achieveSynchronizationPoint(String label) throws FederateNotExecutionMember, RTIinternalError {
-    	logger.trace("achieveSynchronizationPoint==>");
+        logger.trace("achieveSynchronizationPoint==>");
         boolean synchronizationPointNotAccepted = true;
         while (synchronizationPointNotAccepted) {
             try {
@@ -667,7 +667,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
-    	logger.trace("<==achieveSynchronizationPoint");
+        logger.trace("<==achieveSynchronizationPoint");
     }
 
     /**
