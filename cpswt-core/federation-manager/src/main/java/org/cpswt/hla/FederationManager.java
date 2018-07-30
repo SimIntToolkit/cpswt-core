@@ -1080,9 +1080,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.get_FederateId());
 
-                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.getFederateId(), federateJoinInteraction.getFederateType(), federateJoinInteraction.isLateJoiner()));
+                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.get_FederateId(), federateJoinInteraction.get_FederateType(), federateJoinInteraction.get_IsLateJoiner()));
 
             }
             // "federate resign" interaction
@@ -1095,9 +1095,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.get_FederateId());
 
-                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.getFederateId());
+                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.get_FederateId());
                 this.federatesMaintainer.federateResigned(federateInfo);
             }
 
@@ -1145,9 +1145,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.get_FederateId());
 
-                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.getFederateId(), federateJoinInteraction.getFederateType(), federateJoinInteraction.isLateJoiner()));
+                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.get_FederateId(), federateJoinInteraction.get_FederateType(), federateJoinInteraction.get_IsLateJoiner()));
 
             }
             // "federate resign" interaction
@@ -1160,9 +1160,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.get_FederateId());
 
-                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.getFederateId());
+                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.get_FederateId());
                 this.federatesMaintainer.federateResigned(federateInfo);
             }
 
