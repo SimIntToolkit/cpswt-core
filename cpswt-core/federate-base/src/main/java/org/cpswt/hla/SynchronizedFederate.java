@@ -631,6 +631,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     private void achieveSynchronizationPoint(String label) throws FederateNotExecutionMember, RTIinternalError {
+    	logger.trace("achieveSynchronizationPoint==>");
         boolean synchronizationPointNotAccepted = true;
         while (synchronizationPointNotAccepted) {
             try {
@@ -640,7 +641,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 while (!_achievedSynchronizationPoints.contains(label)) {
                     CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                     synchronized (lrc) {
-                        lrc.tick();
+                         lrc.tick();
                     }
                 }
                 synchronizationPointNotAccepted = false;
@@ -664,6 +665,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
         }
+    	logger.trace("<==achieveSynchronizationPoint");
     }
 
     /**
