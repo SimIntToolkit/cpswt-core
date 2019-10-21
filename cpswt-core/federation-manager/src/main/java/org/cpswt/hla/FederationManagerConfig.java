@@ -52,4 +52,7 @@ public class FederationManagerConfig extends FederateConfig {
     @FederateParameter
     public String experimentConfig;
 
+    @FederateParameter
+    public String traceID;
+
 }

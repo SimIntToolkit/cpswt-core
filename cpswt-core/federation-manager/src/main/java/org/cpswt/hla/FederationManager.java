@@ -23,6 +23,7 @@
 
 package org.cpswt.hla;
 
+import io.opentracing.Scope;
 import org.cpswt.coa.COAExecutor;
 import org.cpswt.coa.COAExecutorEventListener;
 import org.cpswt.coa.COAGraph;
@@ -65,6 +66,11 @@ import org.cpswt.util.RandomWithFixedSeed;
 import org.cpswt.hla.rtievents.IC2WFederationEventsHandler;
 import org.cpswt.hla.rtievents.C2WFederationEventsHandler;
 
+
+import org.cpswt.fedtracer.FederateTracer;
+import io.opentracing.Span;
+import io.opentracing.Scope;
+
 /**
  * Model class for the Federation Manager.
  */
@@ -76,6 +82,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
     private IC2WFederationEventsHandler _federationEventsHandler = null;
+
+
+    private FederateTracer fedtracer;
 
     /*
         ==============================================================================================================
@@ -166,6 +175,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private COAExecutor coaExecutor = null;
 
+
+    private String traceID = null;
+
     //private PrintStream monitor_out;
 
 //    @Override
@@ -201,6 +213,11 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.federationId = params.federationId;
         this._federationEndTime = params.federationEndTime;
         this.realTimeMode = params.realTimeMode;
+
+        // Opentracing Specific
+        this.traceID = params.traceID;
+        this.fedtracer = FederateTracer.initFedTracer(this.federationId,this.traceID,Boolean.TRUE);
+
 
         // set project's root directory
         this.rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
@@ -483,101 +500,133 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             public void run() {
 
                 try {
-                    recordMainExecutionLoopStartTime();
+                    // Opentracing
+                    try (Scope scopemain = fedtracer.startFederateSpan("MainThread")) {
+                        logger.debug("Inside the MainThread Span");
+                        recordMainExecutionLoopStartTime();
 
-                    int numStepsExecuted = 0;
-                    while (running) {
-                        if (realTimeMode) {
-                            long sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
-                            while (sleep_time > 0 && realTimeMode) {
-                                long local_sleep_time = sleep_time;
-                                if (local_sleep_time > 1000) local_sleep_time = 1000;
-                                CpswtUtils.sleep(local_sleep_time);
-                                sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
-                            }
-                        }
+                        int numStepsExecuted = 0;
+                        while (running) {
+//                            try (Scope scopeChild = fedtracer.startChildSpan(scopemain.span(), "MainExecute")) {
+                            //! Step part1 Started
+                            if (realTimeMode) {
+                                try (Scope scopeR = fedtracer.startFederateSpan("MainThread-RealTime")) {
 
-                        if (!paused) {
-                            synchronized (getLRC()) {
-
-                                sendScriptInteractions();
-
-                                if(coaExecutor != null) {
-                                   coaExecutor.executeCOAGraph();
-                                }
-
-                                DoubleTime next_time = new DoubleTime(time.getTime() + step);
-                                logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
-                                getLRC().timeAdvanceRequest(next_time);
-                                if (realTimeMode) {
-                                    time_diff = time_in_millisec - System.currentTimeMillis();
-                                }
-
-                                // wait for grant
-                                granted = false;
-                                int numTicks = 0;
-                                boolean stuckWhileWaiting = false;
-                                while (!granted && running) {
-                                    getLRC().tick();
-                                }
-                                numTicks = 0;
-
-                                numStepsExecuted++;
-
-
-                                // if we passed next pause time go to pause mode
-                                Iterator<Double> it = pauseTimes.iterator();
-                                if (it.hasNext()) {
-                                    double pause_time = it.next();
-                                    if (time.getTime() > pause_time) {
-                                        it.remove();
-                                        pauseSimulation();
+                                    long sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
+                                    while (sleep_time > 0 && realTimeMode) {
+                                        long local_sleep_time = sleep_time;
+                                        if (local_sleep_time > 1000) local_sleep_time = 1000;
+                                        CpswtUtils.sleep(local_sleep_time);
+                                        sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
                                     }
                                 }
                             }
 
-                            if (numStepsExecuted == 10) {
-                                logger.info("Federation manager current time = {}", time.getTime());
-                                numStepsExecuted = 0;
+                            if (!paused) {
+                                synchronized (getLRC()) {
+
+                                    try (Scope scopePart1 = fedtracer.startFederateSpan("MainThread-Part1")) {
+
+                                        sendScriptInteractions();
+
+                                        if (coaExecutor != null) {
+                                            coaExecutor.executeCOAGraph();
+                                        }
+
+                                        DoubleTime next_time = new DoubleTime(time.getTime() + step);
+                                        logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
+                                        getLRC().timeAdvanceRequest(next_time);
+                                    }
+                                    // Part 1 Finish
+
+                                    /// ----waiting Start
+                                    int numTicks = 0;
+
+                                    try (Scope scopeWait = fedtracer.startFederateSpan("MainThread-WaitState")) {
+
+                                        if (realTimeMode) {
+                                            time_diff = time_in_millisec - System.currentTimeMillis();
+                                        }
+
+                                        // wait for grant
+                                        granted = false;
+                                        boolean stuckWhileWaiting = false;
+
+                                        while (!granted && running) {
+                                            getLRC().tick();
+                                        }
+                                    }
+                                    // waiting finish!
+                                    // Part 2 start
+
+                                    numTicks = 0;
+
+                                    numStepsExecuted++;
+
+                                    try (Scope scopeWait = fedtracer.startFederateSpan("MainThread-Part2")) {
+
+                                        // if we passed next pause time go to pause mode
+                                        Iterator<Double> it = pauseTimes.iterator();
+                                        if (it.hasNext()) {
+                                            double pause_time = it.next();
+                                            if (time.getTime() > pause_time) {
+                                                it.remove();
+                                                pauseSimulation();
+                                            }
+                                        }
+                                        //Part 2 end
+                                    }// End of Part 2
+                                }
+
+                                if (numStepsExecuted == 10) {
+                                    logger.info("Federation manager current time = {}", time.getTime());
+                                    numStepsExecuted = 0;
+                                }
+                            } else {
+                                CpswtUtils.sleep(10);
+                                // Part 1 end too...
                             }
-                        } else {
-                            CpswtUtils.sleep(10);
+
+                            // If we have reached federation end time (if it was configured), terminate the federation
+                            if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
+                                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
+                                terminateSimulation();
+                            }
+
+                        }
+                    }// Mainn Span End
+                        logger.debug("Ended the MainThread Span");
+                        _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
+                        prepareForFederatesToResign();
+
+                        if (useSyncPoints) {
+                            logger.info("Waiting for \"ReadyToResign\" ... ");
+                            readyToResign();
+                            logger.info("Done with resign");
                         }
 
-                        // If we have reached federation end time (if it was configured), terminate the federation
-                        if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
-                            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
-                            terminateSimulation();
-                        }
-
-                    }
-                    _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
-                    prepareForFederatesToResign();
-
-                    if(useSyncPoints) {
-                        logger.info("Waiting for \"ReadyToResign\" ... ");
-                        readyToResign();
-                        logger.info("Done with resign");
-                    }
 
                     waitForFederatesToResign();
 
-                    while(getFederateState() != FederateState.TERMINATED) {
-                        CpswtUtils.sleepDefault();
-                    }
+                            while (getFederateState() != FederateState.TERMINATED) {
+                                CpswtUtils.sleepDefault();
+                            }
 
-                    // destroy federation
-                    getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-                    getLRC().destroyFederationExecution(federationId);
-                    destroyRTI();
-                    logLevel = 0;
+                            // destroy federation
+                            getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+                            getLRC().destroyFederationExecution(federationId);
+                            destroyRTI();
+                            logLevel = 0;
 
-                    // In case some federate is still hanging around
-                    killEntireFederation();
-                } catch (Exception e) {
+                            // In case some federate is still hanging around
+                            killEntireFederation();
+//                        } //End Span1
+//                    }// End of Span2
+                    } catch (Exception e) {
                     logger.error(e.getMessage());
                 }
             }
+
         };
 
         running = true;

@@ -62,6 +62,25 @@ public class FederateTracer {
 
     }
 
+//    public Scope startChildSpan(Span rootSpan, String operationName){
+//        Tracer.SpanBuilder spanBuilder;
+//        spanBuilder = this.tracer.buildSpan(operationName).asChildOf(rootSpan);
+//        return spanBuilder.startActive(true);
+//    }
+
+    public static FederateTracer initFedTracer(String federateName, String tracerID, Boolean isFedMgr){
+        System.out.println("entered the init fedtracer");
+
+        if (isFedMgr == Boolean.TRUE){
+            return new FederateTracer(federateName,tracerID,true);
+
+        }
+        else {
+            return new FederateTracer(federateName, tracerID, false);
+        }
+
+    }
+
 //    public Scope activateSpan(Span span){
 //        return this.tracer.
 ////        return this.tracer.scopeManager().activate(span);

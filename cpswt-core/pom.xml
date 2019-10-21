@@ -29,6 +29,7 @@
         <module>federation-manager</module>
         <module>fedmanager-exec</module>
         <module>fedmanager-host</module>
+        <module>federate-tracer</module>
     </modules>
 
     <dependencies>
