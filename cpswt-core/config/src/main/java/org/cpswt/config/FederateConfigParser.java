@@ -67,7 +67,7 @@ public class FederateConfigParser {
         this.cliOptions.addOption(option);
     }
 
-    static final Set<Class<?>> supportedCLIArgTypes = new HashSet();
+    static final Set<Class<?>> supportedCLIArgTypes = new HashSet<Class<?>>();
 
     static {
         supportedCLIArgTypes.add(Double.class);

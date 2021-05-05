@@ -1022,7 +1022,7 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    private boolean setParameterAux(int datamemberHandle, String val) {
+    protected boolean setParameterAux(int datamemberHandle, String val) {
         String datamemberName = getParameterName(datamemberHandle);
         if (datamemberName == null) {
             return false;
