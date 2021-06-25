@@ -192,8 +192,8 @@ public class FederationManagerHostApp extends AllDirectives {
 
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
-       FederationManagerHostApp app = new FederationManagerHostApp();
-       app.parseConfig(args);
+        FederationManagerHostApp app = new FederationManagerHostApp();
+        app.parseConfig(args);
 
         app.initFederationManager();
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
