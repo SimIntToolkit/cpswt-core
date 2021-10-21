@@ -37,10 +37,7 @@ import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -590,10 +587,21 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the handle (RTI assigned) of the parameter "datamemberName" of interaction class "className"
      */
     public static int get_parameter_handle(String className, String datamemberName) {
-        Integer datamemberHandle = _datamemberNameHandleMap.get(className + "." + datamemberName);
-        
+
+        List<String> classNameComponents = new ArrayList<>(Arrays.asList(className.split("\\.")));
+        Integer datamemberHandle = null;
+        while(!classNameComponents.isEmpty() && datamemberHandle == null) {
+            String localClassName = String.join(".", classNameComponents);
+            datamemberHandle = _datamemberNameHandleMap.get(localClassName + "." + datamemberName);
+
+            classNameComponents.remove(classNameComponents.size() - 1);
+        }
+
         if (datamemberHandle == null) {
-            logger.error("Bad parameter \"{}\" for class \"{}\" on get_parameter_handle.", datamemberName, className);
+            logger.error(
+                    "Bad parameter \"{}\" for class \"{}\" and super-classes on get_parameter_handle.",
+                    datamemberName, className
+            );
             return -1;
         }
         return datamemberHandle;

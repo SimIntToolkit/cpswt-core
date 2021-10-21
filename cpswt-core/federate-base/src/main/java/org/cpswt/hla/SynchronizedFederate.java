@@ -102,7 +102,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
-    private Set<String> _achievedSynchronizationPoints = new HashSet<String>();
+    private final Set<String> _achievedSynchronizationPoints = new HashSet<>();
 
     private boolean _timeConstrainedNotEnabled = true;
     private boolean _timeRegulationNotEnabled = true;
