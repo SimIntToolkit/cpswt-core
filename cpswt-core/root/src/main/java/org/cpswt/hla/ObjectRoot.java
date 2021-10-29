@@ -24,10 +24,7 @@ import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -670,10 +667,20 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the handle (RTI assigned) of the attribute "datamemberName" of object class "className"
      */
     public static int get_attribute_handle(String className, String datamemberName) {
-        Integer datamemberHandle = _datamemberNameHandleMap.get(className + "." + datamemberName);
+        List<String> classNameComponents = new ArrayList<>(Arrays.asList(className.split("\\.")));
+        Integer datamemberHandle = null;
+        while(!classNameComponents.isEmpty() && datamemberHandle == null) {
+            String localClassName = String.join(".", classNameComponents);
+            datamemberHandle = _datamemberNameHandleMap.get(localClassName + "." + datamemberName);
+
+            classNameComponents.remove(classNameComponents.size() - 1);
+        }
 
         if (datamemberHandle == null) {
-            logger.error("Bad attribute \"{}\" for class \"{}\" on get_attribute_handle.", datamemberName, className);
+            logger.error(
+                    "Bad attribute \"{}\" for class \"{}\" and super-classes on get_attribute_handle.",
+                    datamemberName, className
+            );
             return -1;
         }
         return datamemberHandle;
