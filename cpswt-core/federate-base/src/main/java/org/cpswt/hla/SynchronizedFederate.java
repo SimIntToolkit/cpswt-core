@@ -25,7 +25,17 @@
 package org.cpswt.hla;
 
 import hla.rti.*;
-import org.cpswt.hla.base.*;
+import org.cpswt.hla.base.AdvanceTimeRequest;
+import org.cpswt.hla.base.AdvanceTimeThread;
+import org.cpswt.hla.base.ATRComparator;
+import org.cpswt.hla.base.ATRQueue;
+import org.cpswt.hla.base.ObjectReflector;
+import org.cpswt.hla.base.ObjectReflectorComparator;
+import org.cpswt.hla.base.TimeAdvanceMode;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
@@ -273,8 +283,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         synchronized (this.lrc) {
             // every federate will send a "FederateJoinInteraction" and a "FederateResignInteraction"
             // so we need to publish these objects on current LRC
-            FederateJoinInteraction.publish(this.lrc);
-            FederateResignInteraction.publish(this.lrc);
+            FederateJoinInteraction.publish_interaction(this.lrc);
+            FederateResignInteraction.publish_interaction(this.lrc);
 
             // create a notification for "join" and send it
             FederateJoinInteraction joinInteraction = new FederateJoinInteraction();
@@ -485,7 +495,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (_simEndNotSubscribed) {
             // Auto-subscribing also ensures that there is no filter set for SimEnd
-            SimEnd.subscribe(getLRC());
+            SimEnd.subscribe_interaction(getLRC());
             _simEndNotSubscribed = false;
         }
     }
@@ -1039,7 +1049,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     protected void enteredTimeGrantedState() {
         if(_receivedSimEnd != null) {
-            handleIfSimEnd(SimEnd.get_handle(), _receivedSimEnd, null);
+            handleIfSimEnd(SimEnd.get_class_handle(), _receivedSimEnd, null);
         }
     }
 

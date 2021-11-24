@@ -1,6 +1,9 @@
 package org.cpswt.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -40,5 +43,20 @@ public class CpswtUtils {
             configFilePath = Paths.get(filePathDir, filePath);
         }
         return configFilePath;
+    }
+
+    public static String getStackTrace(Exception exception) {
+        String output = null;
+        try(
+                StringWriter stringWriter = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(stringWriter)
+        ) {
+            exception.printStackTrace(printWriter);
+            output = stringWriter.toString();
+        } catch (IOException ioException) {
+            output = "Error trying to get stacktrack of exception with message \"" + exception.getMessage() + "\"";
+        }
+
+        return output;
     }
 }

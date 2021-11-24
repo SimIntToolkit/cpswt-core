@@ -1,5 +1,7 @@
 package org.cpswt.hla;
 
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+
 import java.util.TreeMap;
 
 public class SubscribedInteractionFilter {

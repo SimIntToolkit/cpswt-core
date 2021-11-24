@@ -65,6 +65,20 @@ import org.cpswt.util.RandomWithFixedSeed;
 import org.cpswt.hla.rtievents.IC2WFederationEventsHandler;
 import org.cpswt.hla.rtievents.C2WFederationEventsHandler;
 
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume;
+
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
+
+import org.cpswt.hla.ObjectRoot_p.FederateObject;
+
 /**
  * Model class for the Federation Manager.
  */
@@ -418,15 +432,15 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
 
         // subscribe for "join" and "resign" interactions
-        FederateJoinInteraction.subscribe(super.getLRC());
-        FederateResignInteraction.subscribe(super.getLRC());
+        FederateJoinInteraction.subscribe_interaction(super.getLRC());
+        FederateResignInteraction.subscribe_interaction(super.getLRC());
 
         super.notifyFederationOfJoin();
 
         // TODO: overview this later
-        SimEnd.publish(getLRC());
-        SimPause.publish(getLRC());
-        SimResume.publish(getLRC());
+        SimEnd.publish_interaction(getLRC());
+        SimPause.publish_interaction(getLRC());
+        SimResume.publish_interaction(getLRC());
     }
 
     /**
@@ -588,7 +602,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         FederateObject.subscribe_FederateHandle();
         FederateObject.subscribe_FederateType();
         FederateObject.subscribe_FederateHost();
-        FederateObject.subscribe(getLRC());
+        FederateObject.subscribe_object(getLRC());
 
         for (FederateJoinInfo federateInfo : this.experimentConfig.expectedFederates) {
             logger.trace("Waiting for {} federate{} of type \"{}\" to join", federateInfo.count, federateInfo.count <= 1 ? "" : "s", federateInfo.federateType);
@@ -800,16 +814,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if (level > 0) {
             if (level == 1) {
                 logger.debug("Unsusbcribing to High priority logs");
-                HighPrio.unsubscribe(getLRC());
+                HighPrio.unsubscribe_interaction(getLRC());
             } else if (level == 2) {
                 logger.debug("Unsusbcribing to Medium priority logs");
-                MediumPrio.unsubscribe(getLRC());
+                MediumPrio.unsubscribe_interaction(getLRC());
             } else if (level == 3) {
                 logger.debug("Unsusbcribing to Low priority logs");
-                LowPrio.unsubscribe(getLRC());
+                LowPrio.unsubscribe_interaction(getLRC());
             } else if (level == 4) {
                 logger.debug("Unsusbcribing to Very Low priority logs");
-                VeryLowPrio.unsubscribe(getLRC());
+                VeryLowPrio.unsubscribe_interaction(getLRC());
             }
         }
     }
@@ -821,16 +835,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if (level > 0) {
             if (level == 1) {
                 logger.debug("Susbcribing to High priority logs");
-                HighPrio.subscribe(getLRC());
+                HighPrio.subscribe_interaction(getLRC());
             } else if (level == 2) {
                 logger.debug("Susbcribing to Medium priority logs");
-                MediumPrio.subscribe(getLRC());
+                MediumPrio.subscribe_interaction(getLRC());
             } else if (level == 3) {
                 logger.debug("Susbcribing to Low priority logs");
-                LowPrio.subscribe(getLRC());
+                LowPrio.subscribe_interaction(getLRC());
             } else if (level == 4) {
                 logger.debug("Susbcribing to Very Low priority logs");
-                VeryLowPrio.subscribe(getLRC());
+                VeryLowPrio.subscribe_interaction(getLRC());
             }
         }
     }

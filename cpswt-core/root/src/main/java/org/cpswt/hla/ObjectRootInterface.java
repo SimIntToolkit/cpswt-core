@@ -1,11 +1,54 @@
-
 package org.cpswt.hla;
-
 import java.util.*;
-
 import hla.rti.*;
 
-interface ObjectRootInterface {
+public interface ObjectRootInterface {
+
+    //-----------------------------------------------------------------
+    // ClassAndPropertyName CLASS -- USED AS KEY/VALUE FOR MAPS BELOW
+    //-----------------------------------------------------------------
+    static class ClassAndPropertyName implements Comparable<ClassAndPropertyName> {
+        private final String className;
+        private final String propertyName;
+
+        public ClassAndPropertyName(String className, String propertyName) {
+            this.className = className;
+            this.propertyName = propertyName;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return className + ">" + propertyName;
+        }
+
+        @Override
+        public int compareTo(ClassAndPropertyName other) {
+            int compareClassName = -className.compareTo(other.className);
+            if (compareClassName != 0) {
+                return compareClassName;
+            }
+            return propertyName.compareTo(other.propertyName);
+        }
+    }
+
+    //---------------------------------
+    // END ClassAndPropertyName CLASS
+    //---------------------------------
+
+
     int getUniqueID();
 
     /**
@@ -37,7 +80,7 @@ interface ObjectRootInterface {
      * @return set containing the names of all of the attributes of an
      * object class instance
      */
-    Set<String> getAttributeNames();
+    List<ClassAndPropertyName> getAttributeNames();
 
     /**
      * Returns a set containing the names of all of the attributes of an
@@ -46,35 +89,118 @@ interface ObjectRootInterface {
      * @return set containing the names of all of the attributes of an
      * object class instance
      */
-    Set<String> getAllAttributeNames();
+    List<ClassAndPropertyName> getAllAttributeNames();
 
     /**
      * Publishes the object class of this instance of the class for a federate.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void publishObject(RTIambassador rti);
+    void publishObject( RTIambassador rti );
 
     /**
      * Unpublishes the object class of this instance of this class for a federate.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void unpublishObject(RTIambassador rti);
+    void unpublishObject( RTIambassador rti );
 
     /**
      * Subscribes a federate to the object class of this instance of this class.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void subscribeObject(RTIambassador rti);
+    void subscribeObject( RTIambassador rti );
 
     /**
      * Unsubscribes a federate from the object class of this instance of this class.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void unsubscribeObject(RTIambassador rti);
+    void unsubscribeObject( RTIambassador rti );
+
+    /**
+     * Returns the timestamp for this object.  "receive order" objects
+     * should have a timestamp of -1.
+     *
+     * @return timestamp for this object
+     */
+    double getTime();
+
+    /**
+     * Sets the timestamp of this object to "time".
+     *
+     * @param time new timestamp for this object
+     */
+    void setTime( double time );
+
+    /**
+     * Sets the timestamp of this object to "logicalTime".
+     *
+     * @param logicalTime new timestamp for this object
+     */
+    void setTime( LogicalTime logicalTime );
+
+    /**
+     * Returns the value of the attribute named "propertyName" for this
+     * object.
+     *
+     * @param propertyName name of attribute whose value to retrieve
+     * @return the value of the attribute whose name is "propertyName"
+     */
+    Object getAttribute( String propertyName );
+
+    /**
+     * Returns the value of the attribute whose handle is "propertyHandle"
+     * (RTI assigned) for this object.
+     *
+     * @param propertyHandle handle (RTI assigned) of attribute whose
+     * value to retrieve
+     * @return the value of the attribute whose handle is "propertyHandle"
+     */
+    Object getAttribute( int propertyHandle );
+
+    /**
+     * Set the values of the attributes in this object using
+     * "propertyMap".  "propertyMap" is usually acquired as an argument to
+     * an RTI federate callback method such as "receiveInteraction".
+     *
+     * @param propertyMap  contains new values for the attributes of
+     * this object
+     */
+    void setAttributes( ReflectedAttributes propertyMap );
+
+    /*//*
+     * Sets the value of the attribute named "propertyName" to "value"
+     * in this object.  "value" is converted to data type of "propertyName"
+     * if needed.
+     * This action can also be affected by calling the set_&lt;propertyName&gt;( value )
+     * method on the object using a reference to the object's actual
+     * class.
+     *
+     * @param propertyName name of attribute whose value is to be set
+     * to "value"
+     * @param value new value of attribute called "propertyName"
+     */
+    // TODO: Get rid of this method: void setAttribute( String propertyName, String value );
+
+    /**
+     * Sets the value of the attribute named "propertyName" to "value"
+     * in this object.  "value" should have the same data type as that of
+     * the "propertyName" attribute.
+     * This action can also be affected by calling the set_&lt;propertyName&gt;( value )
+     * method on the object using a reference to the object's actual
+     * class.
+     *
+     * @param propertyName name of attribute whose value is to be set
+     * to "value"
+     * @param value new value of attribute called "propertyName"
+     */
+    void setAttribute( String propertyName, Object value );
 
     /**
      * Returns a data structure containing the handles of all attributes for this object
@@ -90,9 +216,10 @@ interface ObjectRootInterface {
      * Requests an attribute update for this object instance from the federate that
      * has modification rights on these attributes.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void requestUpdate(RTIambassador rti);
+    void requestUpdate( RTIambassador rti );
 
     /**
      * Returns the handle (RTI assigned) the corresponds to this object class
@@ -103,94 +230,15 @@ interface ObjectRootInterface {
     int getObjectHandle();
 
     /**
-     * Returns the timestamp for this object.  "receive order" objects
-     * should have a timestamp of -1.
-     *
-     * @return timestamp for this object
-     */
-    double getTime();
-
-    /**
-     * Sets the timestamp of this object to "time".
-     *
-     * @param time new timestamp for this object
-     */
-    void setTime(double time);
-
-    /**
-     * Sets the timestamp of this object to "logicalTime".
-     *
-     * @param logicalTime new timestamp for this object
-     */
-    void setTime(LogicalTime logicalTime);
-
-    /**
-     * Returns the value of the attribute named "datamemberName" for this
-     * object.
-     *
-     * @param datamemberName name of attribute whose value to retrieve
-     * @return the value of the attribute whose name is "datamemberName"
-     */
-    Object getAttribute(String datamemberName);
-
-    /**
-     * Returns the value of the attribute whose handle is "datamemberHandle"
-     * (RTI assigned) for this object.
-     *
-     * @param datamemberHandle handle (RTI assigned) of attribute whose
-     *                         value to retrieve
-     * @return the value of the attribute whose handle is "datamemberHandle"
-     */
-    Object getAttribute(int datamemberHandle);
-
-    /**
-     * Set the values of the attributes in this object using
-     * "datamemberMap".  "datamemberMap" is usually acquired as an argument to
-     * an RTI federate callback method such as "receiveInteraction".
-     *
-     * @param datamemberMap contains new values for the attributes of
-     *                      this object
-     */
-    void setAttributes(ReflectedAttributes datamemberMap);
-
-    /**
-     * Sets the value of the attribute named "datamemberName" to "value"
-     * in this object.  "value" is converted to data type of "datamemberName"
-     * if needed.
-     * This action can also be affected by calling the set_&lt;datamemberName&gt;( value )
-     * method on the object using a reference to the object's actual
-     * class.
-     *
-     * @param datamemberName name of attribute whose value is to be set
-     *                       to "value"
-     * @param value          new value of attribute called "datamemberName"
-     */
-    void setAttribute(String datamemberName, String value);
-
-    /**
-     * Sets the value of the attribute named "datamemberName" to "value"
-     * in this object.  "value" should have the same data type as that of
-     * the "datamemberName" attribute.
-     * This action can also be affected by calling the set_&lt;datamemberName&gt;( value )
-     * method on the object using a reference to the object's actual
-     * class.
-     *
-     * @param datamemberName name of attribute whose value is to be set
-     *                       to "value"
-     * @param value          new value of attribute called "datamemberName"
-     */
-    void setAttribute(String datamemberName, Object value);
-
-
-    /**
      * Registers this object with the RTI.  This method is usually called by a
      * federate who "owns" this object, i.e. the federate that created it and
      * has write-privileges to its attributes (so, it is responsible for updating
      * these attribute and conveying their updated values to the RTI).
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void registerObject(RTIambassador rti);
+    void registerObject( RTIambassador rti );
 
     /**
      * Registers this object with the RTI using the given name.  This method is usually
@@ -198,11 +246,12 @@ interface ObjectRootInterface {
      * has write-privileges to its attributes (so, it is responsible for updating
      * these attribute and conveying their updated values to the RTI).
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      * @param name unique identifier to assign to the object instance
      * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
      */
-    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered;
+    void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered;
 
     /**
      * Unregisters this object with the RTI.  The RTI will destroy all information
@@ -210,50 +259,54 @@ interface ObjectRootInterface {
      * called by a federate who "owns" this object, i.e. the federate that created
      * it and has write-privileges to its attributes.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void unregisterObject(RTIambassador rti);
+    void unregisterObject( RTIambassador rti );
 
     /**
      * Broadcasts the attributes of this object and their values to the RTI, where
      * the values have "time" as their timestamp.  This call should be used for
      * objects whose attributes have "timestamp" ordering.
      *
-     * @param rti   handle to the RTI
-     * @param time  timestamp on attribute values of this object
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
+     * @param time timestamp on attribute values of this object
      * @param force if "false", only the attributes whose values have changed since
-     *              the last call to "updateAttributeValues" will be broadcast to the RTI.  If
-     *              "true", all attributes and their values are broadcast to the RTI.
+     * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
+     * "true", all attributes and their values are broadcast to the RTI.
      */
-    void updateAttributeValues(RTIambassador rti, double time, boolean force);
+    void updateAttributeValues( RTIambassador rti, double time, boolean force );
 
     /**
-     * Like {@link #updateAttributeValues(RTIambassador rti, double time, boolean force)},
+     * Like {@link #updateAttributeValues( RTIambassador rti, double time, boolean force )},
      * except "force" is always false.
      *
-     * @param rti  handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      * @param time timestamp on attribute values of this object
      */
-    void updateAttributeValues(RTIambassador rti, double time);
+    void updateAttributeValues( RTIambassador rti, double time );
 
     /**
      * Broadcasts the attributes of this object and their values to the RTI (with
      * no timestamp).  This call should be used for objects whose attributes have
      * "receive" ordering.
      *
-     * @param rti   handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      * @param force if "false", only the attributes whose values have changed since
-     *              the last call to "updateAttributeValues" will be broadcast to the RTI.  If
-     *              "true", all attributes and their values are broadcast to the RTI.
+     * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
+     * "true", all attributes and their values are broadcast to the RTI.
      */
-    void updateAttributeValues(RTIambassador rti, boolean force);
+    void updateAttributeValues( RTIambassador rti, boolean force );
 
     /**
-     * Like {@link #updateAttributeValues(RTIambassador rti, boolean force)},
+     * Like {@link #updateAttributeValues( RTIambassador rti, boolean force )},
      * except "force" is always false.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     * {@link SynchronizedFederate#getLRC()} call
      */
-    void updateAttributeValues(RTIambassador rti);
-
+    void updateAttributeValues( RTIambassador rti );
 }

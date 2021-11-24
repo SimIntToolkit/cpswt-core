@@ -17,7 +17,7 @@ import org.cpswt.coa.node.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import org.cpswt.hla.InteractionRoot;
-import org.cpswt.hla.SimEnd;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import org.portico.impl.hla13.types.DoubleTime;
 
 import java.lang.reflect.Method;

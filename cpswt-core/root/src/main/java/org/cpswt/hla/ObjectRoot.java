@@ -1,34 +1,48 @@
+
+/* THIS IS THE ROOT CLASS OF EITHER THE INTERACTION OR OBJECT-CLASS HIERARCHY
+(i.e. "InteractionRoot" OR "ObjectRoot") */
+
+/*
+ * Copyright (c) 2016, Institute for Software Integrated Systems, Vanderbilt University
+ * All rights reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose, without fee, and without written agreement is
+ * hereby granted, provided that the above copyright notice, the following
+ * two paragraphs and the author appear in all copies of this software.
+ *
+ * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
+ * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+ * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
+ * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
+ * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
+ * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ *
+ * @author Himanshu Neema
+ */
 package org.cpswt.hla;
 
-import hla.rti.AttributeHandleSet;
-import hla.rti.AttributeNotDefined;
-import hla.rti.AttributeNotOwned;
-import hla.rti.ConcurrentAccessAttempted;
-import hla.rti.DeletePrivilegeNotHeld;
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InvalidFederationTime;
-import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
-import hla.rti.ObjectAlreadyRegistered;
-import hla.rti.ObjectClassNotDefined;
-import hla.rti.ObjectClassNotPublished;
-import hla.rti.ObjectClassNotSubscribed;
-import hla.rti.ObjectNotKnown;
-import hla.rti.RTIambassador;
-import hla.rti.RTIinternalError;
-import hla.rti.ReflectedAttributes;
-import hla.rti.RestoreInProgress;
-import hla.rti.SaveInProgress;
-import hla.rti.SuppliedAttributes;
+import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.utils.CpswtUtils;
+
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**
@@ -36,86 +50,70 @@ import org.portico.impl.hla13.types.DoubleTime;
  * defined in a given federation.  As such, an ObjectRoot
  * variable may refer to any type of interaction defined in the
  * federation.
- *
+ * <p/>
  * This ObjectRoot class provides the following:
  * - methods for constructing any object in the federation, either from
  * data provided by the RTI (for example, see
- * {@link #create_object(int classHandle)} or from a string argument
+ * {@link #create_object( int classHandle )}) or from a string argument
  * specifying the name of object to construct (see
- * {@link #create_object(String className)}.
- * - methods for sending object updates to the RTI (see
- * {@link #updateAttributeValues(RTIambassador rti)} for an example).
- * - methods for publishing/subscribing to any object/object attribute
+ * {@link #create_object( String className )}).
+ * - methods for sendingobject updatesto the RTI (see
+ *{@link#updateAttributeValues( RTIambassador rti )}for an example).
+ * - methods for publishing/subscribing to anyobject/object attribute
  * defined in the federation (see
- * {@link #publish(String className, RTIambassador rti)} for example).
+ * {@link #publish( String className, RTIambassador rti )} for example).
  * - methods for getting/setting any attribute in the object to
  * which a given ObjectRoot variable is referring
- * (see {@link #getAttribute(String datamemberName)} and
- * {@link #setAttribute(String datamemberName, Object value)}
+ * (see {@link #getattribute( String propertyName )} and
+ * {@link #setAttribute( String propertyName, Object value )}
  */
+@SuppressWarnings("unused")
 public class ObjectRoot implements ObjectRootInterface {
-
-    private static final String FACTORY_CLASS_NAME = "org.portico.dlc.HLA13RTIFactory";
-    private static final String OBJECTROOT_CLASS_NAME = "ObjectRoot";
 
     private static final Logger logger = LogManager.getLogger();
 
-    private static int logId = 0;
     private static int _globalUniqueID = 0;
-
     private static int generateUniqueID() {
         return _globalUniqueID++;
     }
 
-    private int _uniqueID;
-
+    private final int _uniqueID;
     public int getUniqueID() {
         return _uniqueID;
     }
 
     protected static RtiFactory _factory;
-
     static {
         boolean factoryNotAcquired = true;
-        while (factoryNotAcquired) {
+        while( factoryNotAcquired ) {
             try {
-                _factory = RtiFactoryFactory.getRtiFactory(FACTORY_CLASS_NAME);
+                _factory = RtiFactoryFactory.getRtiFactory( "org.portico.dlc.HLA13RTIFactory" );
                 factoryNotAcquired = false;
-            } catch (Exception e) {
+            } catch ( Exception e ) {
                 logger.error("failed to acquire factory", e);
                 CpswtUtils.sleep(100);
             }
         }
     }
 
-    protected static Set<String> _classNameSet = new HashSet<String>();
-    protected static Map<String, Class<?>> _classNameClassMap = new HashMap<String, Class<?>>();
-    protected static Map<String, Set<String>> _datamemberClassNameSetMap = new HashMap<String, Set<String>>();
-    protected static Map<String, Set<String>> _allDatamemberClassNameSetMap = new HashMap<String, Set<String>>();
 
-    protected static Map<String, Integer> _classNameHandleMap = new HashMap<String, Integer>();
-    protected static Map<Integer, String> _classHandleNameMap = new HashMap<Integer, String>();
-    protected static Map<Integer, String> _classHandleSimpleNameMap = new HashMap<Integer, String>();
-
-    protected static Map<String, Integer> _datamemberNameHandleMap = new HashMap<String, Integer>();
-    protected static Map<Integer, String> _datamemberHandleNameMap = new HashMap<Integer, String>();
-    protected static Map<String, String> _datamemberTypeMap = new HashMap<String, String>();
-
-    protected static Map<String, Set<String>> _classNamePublishAttributeNameMap = new HashMap<String, Set<String>>();
-    protected static Map<String, Set<String>> _classNameSubscribeAttributeNameMap = new HashMap<String, Set<String>>();
-
-    protected static Map<String, AttributeHandleSet> _classNamePublishedAttributeMap = new HashMap<String, AttributeHandleSet>();
-    protected static Map<String, AttributeHandleSet> _classNameSubscribedAttributeMap = new HashMap<String, AttributeHandleSet>();
-
-    private static Map<Integer, ObjectRoot> _objectMap = new HashMap<Integer, ObjectRoot>();
-
+    //-----------------------------------------------------
+    // Attribute CLASS -- USED BY ObjectRoot AND SUBCLASSES
+    //-----------------------------------------------------
     protected static class Attribute<T> {
         private T _value = null;
         private T _oldValue = null;
         private boolean _oldValueInit = false;
         private double _time = 0;
 
-        public Attribute(T init) {
+        public Attribute(Attribute<T> other) {
+            _value = other._value;
+            _oldValue = other._oldValue;
+            _oldValueInit = other._oldValueInit;
+            _time = other._time;
+        }
+
+        public Attribute( T init ) {
             _value = init;
         }
 
@@ -123,9 +121,8 @@ public class ObjectRoot implements ObjectRootInterface {
             return _value;
         }
 
-        public void setValue(T value) {
-            if (value == null)
-                return;
+        public void setValue( T value ) {
+            if ( value == null ) return;
             _value = value;
         }
 
@@ -133,7 +130,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return _time;
         }
 
-        public void setTime(double time) {
+        public void setTime( double time ) {
             _time = time;
         }
 
@@ -142,115 +139,1491 @@ public class ObjectRoot implements ObjectRootInterface {
             _oldValueInit = true;
         }
 
-        public boolean shouldBeUpdated(boolean force) {
-            return force || !_oldValueInit || !_oldValue.equals(_value);
+        public boolean shouldBeUpdated( boolean force ) {
+            return force || !_oldValueInit || !_oldValue.equals( _value );
+        }
+
+        @Override
+        public String toString() {
+            return _value.toString();
         }
     }
 
-    private static boolean _isInitialized = false;
+    //--------------------
+    // END Attribute CLASS
+    //--------------------
+
+    //------------------------------------------------------
+    // BASIC ObjectRoot CREATION METHODS
+    //------------------------------------------------------
+
+    private static ObjectRoot create_object( Class<?> rtiClass ) {
+        ObjectRoot classRoot = null;
+        try {
+            classRoot = (ObjectRoot)rtiClass.newInstance();
+        } catch( Exception e ) {
+            logger.error( "ObjectRoot:  create_object:  could not create/cast new Object" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+
+        return classRoot;
+    }
+
+    private static ObjectRoot create_object( Class<?> rtiClass, LogicalTime logicalTime ) {
+        ObjectRoot classRoot = create_object( rtiClass );
+        if ( classRoot != null ) classRoot.setTime( logicalTime );
+        return classRoot;
+    }
+
+    private static ObjectRoot create_object( Class<?> rtiClass, ReflectedAttributes propertyMap ) {
+        ObjectRoot classRoot = create_object( rtiClass );
+        classRoot.setAttributes( propertyMap );
+        return classRoot;
+    }
+
+    private static ObjectRoot create_object( Class<?> rtiClass, ReflectedAttributes propertyMap, LogicalTime logicalTime ) {
+        ObjectRoot classRoot = create_object( rtiClass );
+        classRoot.setAttributes( propertyMap );
+        classRoot.setTime( logicalTime );
+        return classRoot;
+    }
+
+    //----------------------------------------------------------
+    // END BASIC ObjectRoot CREATION METHODS
+    //----------------------------------------------------------
+
+
+    //---------------
+    // CLASS-NAME SET
+    //---------------
+    protected static Set<String> _classNameSet = new HashSet<>();
+
+    //--------------------------------
+    // METHODS THAT USE CLASS-NAME-SET
+    //--------------------------------
+    /**
+      * Returns a set of strings containing the names of all of the object
+      * classes in the current federation.
+      *
+      * @return Set<String> containing the names of all object classes
+      * in the current federation
+      */
+    public static Set<String> get_object_names() {
+        return new HashSet<>( _classNameSet );
+    }
+    //-------------------
+    // END CLASS-NAME-SET
+    //-------------------
+
+
+    //----------------------------
+    // CLASS-NAME CLASS-HANDLE MAP
+    //----------------------------
+    protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
+
+    //---------------------------------------------
+    // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
+    //---------------------------------------------
+    /**
+      * Returns the integer handle (RTI defined) of the object class
+      * corresponding to the fully-qualified object class name in className.
+      *
+      * @param className fully-qualified name of object class for which to
+      * retrieve the RTI-defined integer handle
+      * @return the RTI-defined handle of the object class
+      */
+    public static int get_class_handle( String className ) {
+
+        Integer classHandle = _classNameHandleMap.get( className );
+        if ( classHandle == null ) {
+            logger.error( "Bad class name \"{}\" on get_handle.", className );
+            return -1;
+        }
+
+        return classHandle;
+    }
+
+    //--------------------------------
+    // END CLASS-NAME CLASS-HANDLE MAP
+    //--------------------------------
+
+
+    //-----------------------------------
+    // CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //-----------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNamePropertyNameSetMap = new HashMap<>();
+
+    //----------------------------------------------------
+    // METHODS THAT USE CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //----------------------------------------------------
+    /**
+      * Returns a set of strings containing the names of all of the non-hidden attributes
+      * in the object class specified by className.
+      *
+      * @param className name of object class for which to retrieve the
+      * names of all of its attributes
+      * @return Set<String> containing the names of all attributes in the
+      * className object class
+      */
+    public static Set<ClassAndPropertyName> get_attribute_names( String className ) {
+        return new HashSet<>(  _classNamePropertyNameSetMap.get( className )  );
+    }
+
+    //---------------------------------------
+    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //---------------------------------------
+
+
+    //---------------------------------------
+    // CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
+    //---------------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNameAllPropertyNameSetMap = new HashMap<>();
+
+    //--------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
+    //--------------------------------------------------------
+    /**
+      * Returns a set of strings containing the names of all of the attributes
+      * in the object class specified by className.
+      *
+      * @param className name of object class for which to retrieve the
+      * names of all of its attributes
+      * @return Set<String> containing the names of all attributes in the
+      * className object class
+      */
+    public static Set<ClassAndPropertyName> get_all_attribute_names( String className ) {
+        return new HashSet<>(  _classNameAllPropertyNameSetMap.get( className )  );
+    }
+
+    //---------------------------------------
+    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
+    //---------------------------------------
+
+    //-------------------------------------------------
+    // CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
+    //-------------------------------------------------
+    protected static Map<ClassAndPropertyName, Integer> _classAndPropertyNameHandleMap = new HashMap<>();
+
+    //------------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
+    //------------------------------------------------------------------
+
+    public static ClassAndPropertyName findProperty(String className, String propertyName) {
+
+        List<String> classNameComponents = new ArrayList<>(Arrays.asList(className.split("\\.")));
+
+        while(!classNameComponents.isEmpty()) {
+            String localClassName = String.join(".", classNameComponents);
+
+            ClassAndPropertyName key = new ClassAndPropertyName(localClassName, propertyName);
+            if (_classAndPropertyNameHandleMap.containsKey(key)) {
+                return key;
+            }
+
+            classNameComponents.remove(classNameComponents.size() - 1);
+        }
+        return null;
+
+    }
+
+    /**
+      * Returns the handle ofan attribute(RTI assigned) given
+      * its object class name and attribute name
+      *
+      * @param className name of object class
+      * @param propertyName name of attribute
+      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
+      */
+    public static int get_attribute_handle(String className, String propertyName) {
+
+        ClassAndPropertyName key = findProperty(className, propertyName);
+
+        if (key == null) {
+            logger.error(
+                    "Bad parameter \"{}\" for class \"{}\" and super-classes on get_attribute_handle.",
+                    propertyName, className
+            );
+            return -1;
+        }
+
+        return _classAndPropertyNameHandleMap.get(key);
+    }
+
+    //-----------------------------------------------------
+    // END CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
+    //-----------------------------------------------------
+
+
+    //------------------------------------------------
+    // DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //------------------------------------------------
+    protected static Map<Integer, ClassAndPropertyName> _handleClassAndPropertyNameMap = new HashMap<>();
+
+    //-----------------------------------------------------------------
+    // METHODS THAT USE DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //-----------------------------------------------------------------
+    /**
+      * Returns the name ofan attributecorresponding to
+      * its handle (RTI assigned) in propertyHandle.
+      *
+      * @param propertyHandle handle ofattribute(RTI assigned)
+      * for which to return the name
+      * @return the name of theattributecorresponding to propertyHandle
+      */
+    public static ClassAndPropertyName get_class_and_attribute_name( int propertyHandle ) {
+        return _handleClassAndPropertyNameMap.get( propertyHandle );
+    }
+
+    /**
+      * Returns the attribute name associated with the given handle for an object class instance.
+      *
+      * @param propertyHandle a attribute handle assigned by the RTI
+      * @return the attribute name associated with the handle, or null
+      */
+    public ClassAndPropertyName getClassAndAttributeName(int propertyHandle) {
+        return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
+    }
+
+    /**
+      * Returns the full class and attribute names associated with the given handle for an
+      * object class instance.  The full name of a parameter is the full name of the class in which the
+      * parameter is defined and the parameter name, in that order, delimited by a ",".
+      *
+      * @param propertyHandle a attribute handle assigned by the RTI
+      * @return the full attribute name associated with the handle, or null if the handle does not exist.
+      */
+    public String getAttributeName(int propertyHandle) {
+        return _handleClassAndPropertyNameMap.containsKey(propertyHandle) ?
+                 _handleClassAndPropertyNameMap.get(propertyHandle).getPropertyName() : null;
+    }
+
+    //----------------------------------------------------
+    // END DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
+    //----------------------------------------------------
+
+
+    //-----------------------------------
+    // CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //-----------------------------------
+    protected static Map<Integer, String> _classHandleSimpleNameMap = new HashMap<>();
+
+    //----------------------------------------------------
+    // METHODS THAT USE CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //----------------------------------------------------
+    /**
+      * Returns the simple name of the object class corresponding to the
+      * RTI-defined classHandle.  The simple name of an object class is
+      * the last name in its (dot-delimited) fully-qualified name.
+      *
+      * @param classHandle handle (defined by RTI) of object class for which
+      * to retrieve the simple name
+      * @return the simple name of the object class that corresponds to
+      * the RTI-defined classHandle
+      */
+    public static String get_simple_class_name( int classHandle ) {
+        return _classHandleSimpleNameMap.get( classHandle );
+    }
+
+    //---------------------------------------
+    // END CLASS-HANDLE CLASS-SIMPLE-NAME MAP
+    //---------------------------------------
+
+
+    //----------------------------
+    // CLASS-HANDLE CLASS-NAME MAP
+    //----------------------------
+    protected static Map<Integer, String> _classHandleNameMap = new HashMap<>();
+
+    //--------------------------------------------------
+    // METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------
+    /**
+      * Returns the fully-qualified name of the object class corresponding
+      * to the RTI-defined classHandle.
+      *
+      * @param classHandle handle (defined by RTI) of object class for
+      * which to retrieve the fully-qualified name
+      * @return the fully-qualified name of the object class that
+      * corresponds to the RTI-defined classHandle
+      */
+    public static String get_class_name( int classHandle ) {
+        return _classHandleNameMap.get( classHandle );
+    }
+
+    //------------------------------------------------------
+    // END METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------
+
+
+    //---------------------
+    // CLASS-NAME CLASS MAP
+    //---------------------
+    protected static Map<String, Class<?>> _classNameClassMap = new HashMap<>();
+
+    //-------------------------------------------
+    // METHODS THAT USE ONLY CLASS-NAME CLASS MAP
+    //-------------------------------------------
+    /**
+      * Create an object that is in instance of object class
+      * "className". An ObjectRoot reference is returned,
+      * so to refer to the instance using a reference to a "className" interaction,
+      * the returned reference must be cast down the object inheritance
+      * hierarchy.
+      * An instance of the "className" object class may also be created
+      * by using the "new" operator directory on the "className" object
+      * class.  For instance, two ways to create an ObjectRoot
+      * instance are
+      * Object.create_object( "ObjectRoot" ),
+      * and
+      * new ObjectRoot()
+      *
+      * @param className fully-qualified (dot-delimited) name of the object
+      * class for which to create an instance
+      * @return instance of "className" object class
+      */
+    public static ObjectRoot create_object( String className ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass );
+    }
+
+    /**
+     * Like {@link #create_object( String className )}, but object
+     * is created with a timestamp based on "logicalTime".
+     *
+     * @param className fully-qualified (dot-delimited) name of the object
+     * class for which to create an instance
+     * @param logicalTime timestamp to place on the new object class instance
+     * @return instance of "className" object class with "logicalTime" time stamp.
+     */
+    public static ObjectRoot create_object( String className, LogicalTime logicalTime ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass, logicalTime );
+    }
+
+    //-----------------------------------------------
+    // END METHODS THAT USE ONLY CLASS-NAME CLASS MAP
+    //-----------------------------------------------
+
+
+    //---------------------------------------------------------------------------
+    // METHODS THAT USE BOTH CLASS-HANDLE CLASS-NAME MAP AND CLASS-NAME CLASS MAP
+    //---------------------------------------------------------------------------
+    /**
+      * Create an object that is in instance of object class
+      * that corresponds to the "classHandle" handle (RTI assigned). An
+      * ObjectRoot reference is returned, so to refer to the
+      * instance using a reference to a "className" interaction, the returned
+      * reference must be cast down the object inheritance hierarchy.
+      *
+      * @param classHandle handle of object class (RTI assigned) class for
+      * which to create an instance
+      * @return instance of object class corresponding to "classHandle"
+      */
+    public static ObjectRoot create_object( int classHandle ) {
+        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass );
+    }
+
+    /**
+      * Like {@link #create_object( int classHandle )}, but the object
+      * is created with a timestamp based on "logicalTime".
+      *
+      * @param classHandle handle of object class (RTI assigned) class for
+      * which to create an instance
+      * @param logicalTime timestamp to place on the new object class instance
+      * @return instance of object class corresponding to "classHandle" with
+      * "logicalTime" time stamp
+      */
+    public static ObjectRoot create_object( int classHandle, LogicalTime logicalTime ) {
+        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass, logicalTime );
+    }
+
+    /**
+      * Like {@link #create_object( int classHandle )}, but the object's
+      * attributes are initialized using "propertyMap".  The "propertyMap"
+      * is usually acquired as an argument to an RTI callback method of a federate.
+      *
+      * @param classHandle handle of object class (RTI assigned) class for
+      * which to create an instance
+      * @param propertyMap contains initializing values for the attributes
+      * of the object class instance
+      * @return instance of object class corresponding to "classHandle" with
+      * its attributes initialized with the "propertyMap"
+      */
+    public static ObjectRoot create_object( int classHandle, ReflectedAttributes propertyMap ) {
+        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass, propertyMap );
+    }
+
+    /**
+      * Like {@link #create_object( int classHandle, ReflectedAttributes propertyMap )},
+      * but the object is given a timestamp based on "logicalTime".
+      *
+      * @param classHandle handle of object class (RTI assigned) class for
+      * which to create an instance
+      * @param propertyMap initializing values for the attributes of the
+      * object class instance
+      * @param logicalTime timestamp to place on the new object class instance
+      * @return instance of object class corresponding to "classHandle" with
+      * its attributes initialized with the "propertyMap" and with
+      * "logicalTime" timestamp
+      */
+    public static ObjectRoot create_object( int classHandle, ReflectedAttributes propertyMap, LogicalTime logicalTime ) {
+        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
+        if ( rtiClass == null ) return null;
+
+        return create_object( rtiClass, propertyMap, logicalTime );
+    }
+
+    //-------------------------------------------------------------------------------
+    // END METHODS THAT USE BOTH CLASS-HANDLE CLASS-NAME MAP AND CLASS-NAME CLASS MAP
+    //-------------------------------------------------------------------------------
+
+
+    //------------------------
+    // PUB-SUB-ARGUMENTS ARRAY
+    //------------------------
+    private static final Class<?>[] pubsubArguments = new Class<?>[] { RTIambassador.class };
+
+    //----------------------------------------------------------------------
+    // METHODS THAT USE BOTH PUB-SUB-ARGUMENT-ARRAY AND CLASS-NAME CLASS MAP
+    //----------------------------------------------------------------------
+
+    /**
+     * Publishes the object class named by "className" for a federate.
+     * This can also be performed by calling the publish( RTIambassador rti )
+     * method directly on the object class named by "className" (for
+     * example, to publish the ObjectRoot class in particular,
+     * see {@link ObjectRoot#publish( RTIambassador rti )}).
+     *
+     * @param className name of object class to be published for the federate
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public static void publish( String className, RTIambassador rti ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        if ( rtiClass == null ) {
+            logger.error( "Bad class name \"{}\" on publish.", className);
+            return;
+        }
+        try {
+            Method method = rtiClass.getMethod( "publish", pubsubArguments );
+            method.invoke(null, rti);
+        } catch ( Exception e ) {
+            logger.error( "Exception caught on publish!" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+    }
+
+    /**
+     * Unpublishes the object class named by "className" for a federate.
+     * This can also be performed by calling the unpublish( RTIambassador rti )
+     * method directly on the object class named by "className" (for
+     * example, to unpublish the ObjectRoot class in particular,
+     * see {@link ObjectRoot#unpublish( RTIambassador rti )}).
+     *
+     * @param className name of object class to be unpublished for the federate
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public static void unpublish( String className, RTIambassador rti ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        if ( rtiClass == null ) {
+            logger.error( "Bad class name \"{}\" on unpublish.", className );
+            return;
+        }
+        try {
+            Method method = rtiClass.getMethod( "unpublish", pubsubArguments );
+            method.invoke(null, rti);
+        } catch ( Exception e ) {
+            logger.error( "Exception caught on unpublish!" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+    }
+
+    /**
+     * Subscribes federate to the object class names by "className"
+     * This can also be performed by calling the subscribe( RTIambassador rti )
+     * method directly on the object class named by "className" (for
+     * example, to subscribe a federate to the ObjectRoot class
+     * in particular, see {@link ObjectRoot#subscribe( RTIambassador rti )}).
+     *
+     * @param className name of object class to which to subscribe the federate
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public static void subscribe( String className, RTIambassador rti ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        if ( rtiClass == null ) {
+            logger.error( "Bad class name \"{}\" on subscribe.", className );
+            return;
+        }
+        try {
+            Method method = rtiClass.getMethod( "subscribe", pubsubArguments );
+            method.invoke(null, rti);
+        } catch ( Exception e ) {
+            logger.error( "Exception caught on subscribe!" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+    }
+
+    /**
+     * Unsubscribes federate from the object class names by "className"
+     * This can also be performed by calling the unsubscribe( RTIambassador rti )
+     * method directly on the object class named by "className" (for
+     * example, to unsubscribe a federate to the ObjectRoot class
+     * in particular, see {@link ObjectRoot#unsubscribe( RTIambassador rti )}).
+     *
+     * @param className name of object class to which to unsubscribe the federate
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public static void unsubscribe( String className, RTIambassador rti ) {
+        Class<?> rtiClass = _classNameClassMap.get( className );
+        try {
+            Method method = rtiClass.getMethod( "unsubscribe", pubsubArguments );
+            method.invoke(null, rti);
+        } catch ( Exception e ) {
+            logger.error( "Exception caught on unsubscribe!" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // END METHODS THAT USE BOTH PUB-SUB-ARGUMENT-ARRAY AND CLASS-NAME CLASS MAP
+    //--------------------------------------------------------------------------
+
+    //--------------
+    // OBJECT HANDLE
+    //--------------
+    private int _object_handle;
+
+
+    //------------------------------------
+    // METHODS THAT USE ONLY OBJECT HANDLE
+    //------------------------------------
+    /**
+     * Returns the handle (RTI assigned) the corresponds to this object class
+     * instance.  This handle is the instance's unique identifier to the RTI.
+     *
+     * @return the handle (RTI assigned) of this object class instance.
+     */
+    public int getObjectHandle() {
+        return _object_handle;
+    }
+
+    //----------------------------------------
+    // END METHODS THAT USE ONLY OBJECT HANDLE
+    //----------------------------------------
+
+
+    //-----------
+    // OBJECT MAP
+    //-----------
+    private static final Map<Integer, ObjectRoot> _objectMap = new HashMap<>();
+
+    //---------------------------------
+    // METHODS THAT USE ONLY OBJECT MAP
+    //---------------------------------
+    /**
+      * Returns the object instance corresponding to the "object_handle" (RTI
+      * assigned) from a map internal to the ObjectRoot class.
+      * The object instance is referred to, via the return value, using an
+      * an ObjectRoot reference.  To reference to it using a reference of its
+      * actual class, the returned reference must be cast down through the
+      * inhertance hierarchy.
+      *
+      * @param object_handle handle (RTI assigned) of object instance to retrieve
+      * from the map internal to the ObjectRoot class.
+      * @return object instance corresponding to the object_handle (RTI assigned)
+      * in the map that is internal to the ObjectRoot class.
+      */
+    public static ObjectRoot getObject( int object_handle ) {
+        return _objectMap.get( object_handle );
+    }
+
+    /**
+     * Returns the object instance corresponding to the "object_handle" (RTI
+     * assigned) from a map internal to the ObjectRoot class AND REMOVES IT
+     * FROM THIS MAP.
+     * The object instance is referred to, via the return value, using an
+     * an ObjectRoot reference.  To reference to it using a reference of its
+     * actual class, the returned reference must be cast down through the
+     * inhertance hierarchy.
+     *
+     * @param object_handle handle (RTI assigned) of object instance to retrieve
+     * from the map internal to the ObjectRoot class.
+     * @return object instance corresponding to the object_handle (RTI assigned)
+     * in the map that is internal to the ObjectRoot class.
+     */
+    public static ObjectRoot removeObject( int object_handle ) {
+        return _objectMap.remove( object_handle );
+    }
+
+    /**
+     * Retrieves the object instance corresponding to "object_handle" from an
+     * internal table in the ObjectRoot class, updates its attribute values using
+     * "reflectedAttributes", and returns the instance.  Both "object_handle" and
+     * "reflectedAttributes" are usually acquired as arguments of the
+     * "reflectAttributeValues" RTI callback of a federate.
+     * The return value is an ObjectRoot reference to the instance.  So, to refer
+     * to the instance as an instance of its actual class, this reference will
+     * have to be cast down the inheritance hierarchy.
+     *
+     * @param object_handle handle (RTI assigned) of object instance for which the
+     * attributes are to be updated.
+     * @param reflectedAttributes set of updated values for the attributes of the
+     * object instance corresponding to object_handle.
+     * @return the object instance with updated attribute values
+     */
+    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes ) {
+        ObjectRoot objectRoot = _objectMap.get( object_handle );
+        if ( objectRoot == null ) return null;
+        objectRoot.setTime( -1 );
+        objectRoot.setAttributes( reflectedAttributes );
+        return objectRoot;
+    }
+
+    /**
+     * Like {@link #reflect( int object_handle, ReflectedAttributes reflectedAttributes )},
+     * except the updated attributes of the object instance have their timestamps
+     * updated to "logicalTime".
+     *
+     * @param object_handle handle (RTI assigned) of object instance for which the
+     * attributes are to be updated.
+     * @param reflectedAttributes set of updated values for the attributes of the
+     * object instance corresponding to object_handle.
+     * @param logicalTime new time stamp for attributes that are updated
+     * @return the object instance with updated attribute values
+     */
+    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime ) {
+        ObjectRoot objectRoot = _objectMap.get( object_handle );
+        if ( objectRoot == null ) return null;
+        objectRoot.setTime( logicalTime );
+        objectRoot.setAttributes( reflectedAttributes );
+        return objectRoot;
+    }
+
+    /**
+     * Like {@link #reflect( int object_handle, ReflectedAttributes reflectedAttributes )},
+     * except the updated attributes of the object instance have their timestamps
+     * updated to "time".
+     *
+     * @param object_handle handle (RTI assigned) of object instance for which the
+     * attributes are to be updated.
+     * @param reflectedAttributes set of updated values for the attributes of the
+     * object instance corresponding to object_handle.
+     * @param time new time stamp for attributes that are updated
+     * @return the object instance with updated attribute values
+     */
+    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes, double time ) {
+        ObjectRoot objectRoot = _objectMap.get( object_handle );
+        if ( objectRoot == null ) return null;
+        objectRoot.setTime( time );
+        objectRoot.setAttributes( reflectedAttributes );
+        return objectRoot;
+    }
+
+    //-------------------------------------
+    // END METHODS THAT USE ONLY OBJECT MAP
+    //-------------------------------------
+
+    //---------------------------------------------------
+    // METHODS THAT USE BOTH OBJECT MAP AND OBJECT HANDLE
+    //---------------------------------------------------
+    private void setObjectHandle( int object_handle ) {
+        _objectMap.remove( object_handle );
+        _object_handle = object_handle;
+        _objectMap.put( object_handle, this );
+    }
+
+    //-------------------------------------------------------
+    // END METHODS THAT USE BOTH OBJECT MAP AND OBJECT HANDLE
+    //-------------------------------------------------------
+
+
+    //--------------------------------------------------------------------------------------------------
+    // METHODS THAT USE OBJECT MAP, OBJECT HANDLE, CLASS-NAME CLASS MAP, AND CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------------------------------------------------------
+    /**
+     * Creates a new instance of the object class corresponding to "class_handle",
+     * registers it in an map internal to the ObjectRoot class using "object_handle"
+     * as a key, and returns a reference to the instance.  Though the created
+     * instance is of the object class corresponding to "class_handle" (which is
+     * a handle assigned by the RTI), it is referred to, via the return value, by
+     * an ObjectRoot reference.  Thus, to refer to it as an instance of the object
+     * class corresponding to "class_handle", the ObjectRoot reference needs to be
+     * cast down through the inheritance hierarchy.
+     * <p/>
+     * class_handle and object_handle are usually acquired as arguments of the
+     * "discoverObjectInstance" RTI callback method of a federate.
+     *
+     * @param class_handle handle of object class (RTI assigned) for which to create
+     * an instance
+     * @param object_handle handle (also RTI assigned) of this instance as it is
+     * known to the RTI.  Any updates to the instance attributes provided by the
+     * RTI (via a "reflectAttributeValues" federate callback) will be identified
+     * with this object_handle.
+     * @return new instance of the object class corresponding to class_handle
+     */
+    public static ObjectRoot discover( int class_handle, int object_handle ) {
+        Class<?> hlaObjectClass = _classNameClassMap.get(  _classHandleNameMap.get( class_handle )  );
+        ObjectRoot objectRoot = null;
+        try {
+            objectRoot = (ObjectRoot)hlaObjectClass.newInstance();
+            objectRoot.setObjectHandle( object_handle );
+            _objectMap.put( object_handle, objectRoot );
+        } catch( Exception e ) {
+            logger.error( "ObjectRoot:  discover:  could not discover object" );
+            logger.error("{}", CpswtUtils.getStackTrace(e));
+        }
+        return objectRoot;
+    }
+
+    //------------------------------------------------------------------------------------------------------
+    // END METHODS THAT USE OBJECT MAP, OBJECT HANDLE, CLASS-NAME CLASS MAP, AND CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------------------------------------------------------
+
+    //-------------------------
+    // END CLASS-NAME CLASS MAP
+    //-------------------------
+
+    //--------------------------------
+    // END CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------
+
+    //--------------
+    // IS REGISTERED
+    //--------------
+    private boolean _isRegistered = false;
+
+    //--------------------------------------------------------------
+    // METHODS THAT USE OBJECT MAP, OBJECT HANDLE, AND IS REGISTERED
+    //--------------------------------------------------------------
+    /**
+      * Registers this object with the RTI.  This method is usually called by a
+      * federate who "owns" this object, i.e. the federate that created it and
+      * has write-privileges to its attributes (so, it is responsible for updating
+      * these attribute and conveying their updated values to the RTI).
+      *
+      * @param rti handle to the RTI
+      */
+    public void registerObject(RTIambassador rti) {
+        while (!_isRegistered) {
+            try {
+                synchronized (rti) {
+                    _object_handle = rti.registerObjectInstance(getClassHandle());
+                }
+                _isRegistered = true;
+                _objectMap.put(getObjectHandle(), this);
+            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember e) {
+                logger.error("{}", CpswtUtils.getStackTrace(e));
+                return;
+            } catch (Exception e) {
+                CpswtUtils.sleep(500);
+            }
+        }
+    }
+
+    /**
+      * Registers this object with the RTI using the given name.  This method is usually
+      * called by a federate who "owns" this object, i.e. the federate that created it and
+      * has write-privileges to its attributes (so, it is responsible for updating
+      * these attribute and conveying their updated values to the RTI).
+      *
+      * @param rti handle to the RTI
+      * @param name unique identifier to assign to the object instance
+      * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
+      */
+    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered {
+
+        while (!_isRegistered) {
+            try {
+                synchronized (rti) {
+                    _object_handle = rti.registerObjectInstance(getClassHandle(), name);
+                }
+                _isRegistered = true;
+                _objectMap.put(getObjectHandle(), this);
+
+            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember ex) {
+                logger.error("{}", CpswtUtils.getStackTrace(ex));
+                return;
+            } catch (SaveInProgress | RestoreInProgress | RTIinternalError | ConcurrentAccessAttempted e) {
+                CpswtUtils.sleep(500);
+            }
+        }
+    }
+
+    /**
+     * Unregisters this object with the RTI.  The RTI will destroy all information
+     * it contains regarding this object as a result.  This method is usually
+     * called by a federate who "owns" this object, i.e. the federate that created
+     * it and has write-privileges to its attributes.
+     *
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public void unregisterObject( RTIambassador rti ) {
+
+        while( _isRegistered ) {
+            try {
+                synchronized( rti ) {
+                    rti.deleteObjectInstance( _object_handle, null );
+                }
+                _isRegistered = false;
+                _objectMap.remove( getObjectHandle() );
+
+            } catch ( ObjectNotKnown | DeletePrivilegeNotHeld | FederateNotExecutionMember e) {
+                logger.error("{}", CpswtUtils.getStackTrace(e));
+            } catch ( Exception e ) {
+                CpswtUtils.sleep(500);
+            }
+        }
+    }
+    //------------------------------------------------------------------
+    // END METHODS THAT USE OBJECT MAP, OBJECT HANDLE, AND IS REGISTERED
+    //------------------------------------------------------------------
+
+    //------------------
+    // END IS REGISTERED
+    //------------------
+
+    //---------------
+    // END OBJECT MAP
+    //---------------
+
+    //------------------
+    // END OBJECT HANDLE
+    //------------------
+
+    //----------------------------------------
+    // CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //----------------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNamePublishedAttributeNameSetMap = new HashMap<>();
+
+    //---------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //---------------------------------------------------------
+    /**
+      * Publishes the attribute named by "attributeName" of the object class named
+      * by "className" for a federate.  This can also be performed by calling the
+      * publish_<attributeName>() method directly on the object class named by
+      * "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * publication.  The attribute doesn't actually get published until the
+      * "className" object class, of which it is a member, is (re)published.  See
+      * {@link ObjectRoot#publish( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#publish( RTIambassador RTI )} for examples of how to
+      * publish the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be published
+      * @param attributeName name of the attribute to be published
+      */
+    public static void publish_attribute( String className, String attributeName ) {
+        ClassAndPropertyName key = findProperty(className, attributeName);
+        if (key == null) {
+            logger.error(
+                "publish_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
+                className, attributeName, attributeName, className
+            );
+            return;
+        }
+
+        _classNamePublishedAttributeNameSetMap.get(className).add(key);
+    }
+
+    /**
+      * Unpublishes the attribute named by "attributeName" of the object class named
+      * by "className" for a federate.  This can also be performed by calling the
+      * unpublish_<attributeName>() method directly on the object class named by
+      * "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * un-publication. The attribute doesn't actually get unpublished until the
+      * "className" object class, of which it is a member, is (re)published.  See
+      * {@link ObjectRoot#publish( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#publish( RTIambassador RTI )} for examples of how to
+      * publish the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be unpublished (by a federate)
+      * @param attributeName name of the attribute to be unpublished
+      */
+    public static void unpublish_attribute( String className, String attributeName ) {
+        ClassAndPropertyName key = findProperty(className, attributeName);
+        if (key == null) {
+            logger.error(
+                "unpublish_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
+                className, attributeName, attributeName, className
+            );
+            return;
+        }
+
+        _classNamePublishedAttributeNameSetMap.get(className).remove(key);
+    }
+
+    //--------------------------------------------
+    // END CLASS-NAME PUBLISHED-ATTRIBUTE-NAME SET
+    //--------------------------------------------
+
+
+    //-----------------------------------------
+    // CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //-----------------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNameSubscribedAttributeNameSetMap = new HashMap<>();
+
+    //----------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //----------------------------------------------------------
+    /**
+      * Subscribe a federate to the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the subscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * subscription.  The attribute doesn't actually get subscribed to until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void subscribe_attribute( String className, String attributeName ) {
+        ClassAndPropertyName key = findProperty(className, attributeName);
+        if (key == null) {
+            logger.error(
+                "subscribe_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
+                className, attributeName, attributeName, className
+            );
+            return;
+        }
+        _classNameSubscribedAttributeNameSetMap.get(className).add(key);
+    }
+
+    /**
+      * Unsubscribe a federate from the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the unsubscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * unsubscription.  The attribute doesn't actually get unsubscribed from until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void unsubscribe_attribute( String className, String attributeName ) {
+        ClassAndPropertyName key = findProperty(className, attributeName);
+        if (key == null) {
+            logger.error(
+                "unsubscribe_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
+                className, attributeName, attributeName, className
+            );
+            return;
+        }
+        _classNameSubscribedAttributeNameSetMap.get(className).remove(key);
+    }
+
+    //---------------------------------------------
+    // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------
+
+
+    //-------------------------------------------------------------------------------------------------
+    // CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP AND CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //-------------------------------------------------------------------------------------------------
+    protected static Map<String, AttributeHandleSet> _classNamePublishedAttributeHandleSetMap = new HashMap<>();
+    protected static Map<String, AttributeHandleSet> _classNameSubscribedAttributeHandleSetMap = new HashMap<>();
+
+    //-----------------------------------------------------------------------------------------------------
+    // END CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP AND CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //-----------------------------------------------------------------------------------------------------
+
+    /**
+     * Requests an attribute update for this object instance from the federate that
+     * has modification rights on these attributes.
+     *
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     */
+    public void requestUpdate( RTIambassador rti ) {
+        boolean requestNotSubmitted = true;
+        while( requestNotSubmitted ) {
+            try {
+                rti.requestObjectAttributeValueUpdate( getObjectHandle(), getSubscribedAttributeHandleSet() );
+                requestNotSubmitted = false;
+            } catch ( FederateNotExecutionMember f ) {
+                logger.error( "{}: request for update failed:  Federate Not Execution Member", getClassName() );
+                logger.error("{}", CpswtUtils.getStackTrace(f));
+                return;
+            } catch ( ObjectNotKnown o ) {
+                logger.error( "{}: request for update failed:  Object Not Known", getClassName() );
+                logger.error("{}", CpswtUtils.getStackTrace(o));
+                return;
+            } catch ( AttributeNotDefined a ) {
+                logger.error( "{}: request for update failed:  Name Not Found", getClassName() );
+                logger.error("{}", CpswtUtils.getStackTrace(a));
+                return;
+            } catch ( Exception e ) {
+                logger.error("{}", CpswtUtils.getStackTrace(e));
+                CpswtUtils.sleep( 50 );
+            }
+        }
+    }//-----------------------------------------------
+    // CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
+    //-----------------------------------------------
+    protected Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
+
+    //-----------------------------------------------------------------------------------------------------------
+    // DATAMEMBER-CLASS-NAME AND DATAMEMBER-VALUE DATA CLASS
+    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
+    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
+    // DATAMEMBER IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE DATAMEMBER USING THE
+    // CORRECT (CLASS-NAME, DATAMEMBER-NAME) KEY.
+    //-----------------------------------------------------------------------------------------------------------
+    protected static class PropertyClassNameAndValue {
+        String className;
+        Object value;
+
+        public PropertyClassNameAndValue(String className, Object value) {
+            this.className = className;
+            this.value = value;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+        public Object getValue() {
+            return value;
+        }
+    }
+
+    //----------------------------------------------------------------
+    // METHODS THAT USE CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
+    //----------------------------------------------------------------
+    public void setAttribute(String propertyName, Object value) {
+
+        PropertyClassNameAndValue propertyClassNameAndValue =
+          getAttributeAux(getClassName(), propertyName);
+
+        if (propertyClassNameAndValue == null) {
+            logger.error(
+              "setattribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
+              "superclasses.", propertyName, value.getClass().getName(), propertyName, getClassName()
+            );
+            return;
+        }
+
+        // CANNOT SET VALUE TO NULL
+        if (value == null) {
+            logger.warn(
+              "setAttribute(\"{}\", null): attempt to set \"{}\" attribute in " +
+              "\"{}\"  class to null.",
+              propertyName, propertyName, propertyClassNameAndValue.getClassName()
+            );
+            return;
+        }
+
+        Object currentValue =((Attribute<?>)propertyClassNameAndValue.getValue()).getValue();
+
+        // IF value IS A STRING, AND THE TYPE OF THE ATTRIBUTE IS A NUMBER-TYPE, TRY TO SEE IF THE
+        // STRING CAN BE CONVERTED TO A NUMBER.
+        if (value instanceof String && currentValue instanceof Number) {
+            Method method;
+            try {
+                method = currentValue.getClass().getMethod("valueOf", String.class);
+            } catch (NoSuchMethodException noSuchMethodException) {
+                logger.error(
+                  "setAttribute(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
+                  "method of \"Number\" object: cannot set value!",
+                  propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
+                );
+                return;
+            }
+            Object newValue = null;
+            try {
+                newValue = method.invoke(null, value);
+            } catch(Exception e) { }
+
+            if (newValue != null) {
+                value = newValue;
+            }
+        }
+
+        if (currentValue.getClass() != value.getClass()) {
+            logger.error(
+              "setattribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
+              "should be of type \"{}\".",
+              propertyName,
+              value.getClass().getName(),
+              value.getClass().getName(),
+              propertyName,
+              currentValue.getClass().getName()
+            );
+            return;
+        }
+        ((Attribute<Object>)propertyClassNameAndValue.getValue()).setValue(value);
+    }
+
+    public void setAttribute(int propertyHandle, Object value) {
+        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
+        if (classAndPropertyName == null) {
+            logger.error(
+              "setAttribute(int, Object value): propertyHandle {} does not exist.",
+              propertyHandle
+            );
+            return;
+        }
+
+        String propertyName = classAndPropertyName.getPropertyName();
+        Object currentValue = getAttribute(propertyName);
+        if (currentValue == null) {
+            logger.error(
+                "setAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
+                "does not exist in class \"{}\" (it's defined in class\"{}\")",
+                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
+            );
+        }
+
+        setAttribute(propertyName, value);
+    }
+
+    //
+    // getAttributeAux METHODS ARE DEFINED IN SUBCLASSES.
+    //
+
+    /**
+     * Returns the value of the attribute named "propertyName" for this
+     * object.
+     *
+     * @param propertyName name of attribute whose value to retrieve
+     * @return the value of the attribute whose name is "propertyName"
+     */
+    public Object getAttribute(String propertyName) {
+        return ((Attribute<?>)getAttributeAux(getClassName(), propertyName).getValue()).getValue();
+    }
+
+    /**
+     * Returns the value of the attribute whose handle is "propertyHandle"
+     * (RTI assigned) for this object.
+     *
+     * @param propertyHandle handle (RTI assigned) of attribute whose
+     * value to retrieve
+     * @return the value of the attribute whose handle is "propertyHandle"
+     */
+    public Object getAttribute( int propertyHandle ) {
+        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
+        if (classAndPropertyName == null) {
+            logger.error("getAttribute: propertyHandle {} does not exist.", propertyHandle);
+            return null;
+        }
+        String propertyName = classAndPropertyName.getPropertyName();
+        Object value = getAttribute(propertyName);
+        if (value == null) {
+            logger.error(
+                "getAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
+                "does not exist in class \"{}\" (it's defined in class\"{}\")",
+                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
+            );
+        }
+
+        return value;
+    }
+
+    //---------------------------------------------------
+    // END CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
+    //---------------------------------------------------
+
+    //---------------------------
+    // START OF INCLUDED TEMPLATE
+    //---------------------------
+    // ----------------------------------------------------------------------------
+    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of the ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getClassName()}.
+     *
+     * @return the fully-qualified HLA class path for this object class
+     */
+    public static String get_class_name() {
+        return "ObjectRoot";
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Polymorphic equivalent of get_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    @Override
+    public String getClassName() {
+        return get_class_name();
+    }
+
+    /**
+     * Returns the simple name (the last name in the dot-delimited fully-qualified
+     * class name) of the ObjectRoot object class.
+     *
+     * @return the name of this object class
+     */
+    public static String get_simple_class_name() {
+        return "ObjectRoot";
+    }
+
+    /**
+     * Returns the simple name (last name in its fully-qualified dot-delimited name)
+     * of this instance's object class.
+     * Polymorphic equivalent of the get_simple_class_name static method.
+     *
+     * @return the simple name of this instance's object class
+     */
+    @Override
+    public String getSimpleClassName() {
+        return get_simple_class_name();
+    }
+
+    private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
+
+    /**
+     * Returns a set containing the names of all of the non-hidden attributes in the
+     * ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getAttributeNames()}.
+     *
+     * @return a modifiable set of the non-hidden attribute names for this object class
+     */
+    public static List<ClassAndPropertyName> get_attribute_names() {
+        return new ArrayList<>(_classAndPropertyNameList);
+    }
+
+    /**
+     * Returns a set containing the names of all of the non-hiddenattributes of an
+     * object class instance.
+     * Polymorphic equivalent to get_attribute_names static method.
+     *
+     * @return set containing the names of all of the attributes of an
+     * object class instance
+     */
+    @Override
+    public List<ClassAndPropertyName> getAttributeNames() {
+        return get_attribute_names();
+    }
+
+    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameList = new HashSet<>();
+
+    /**
+     * Returns a set containing the names of all of the attributes in the
+     * ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return a set of parameter names pertaining to the reference,
+     * rather than the parameter names of the class for the instance referred to by
+     * the reference.  For the polymorphic version of this method, use
+     * {@link #getAttributeNames()}.
+     *
+     * @return a modifiable set of the attribute names for this object class
+     */
+    public static List<ClassAndPropertyName> get_all_attribute_names() {
+        return new ArrayList<>(_allClassAndPropertyNameList);
+    }
+
+    /**
+     * Returns a set containing the names of all of the attributes of an
+     * object class instance.
+     * Polymorphic equivalent of get_all_attribute_names() static method.
+     *
+     * @return set containing the names of all of the attributes of an
+     * object class instance
+     */
+    @Override
+    public List<ClassAndPropertyName> getAllAttributeNames() {
+        return get_all_attribute_names();
+    }
+
+    private static final Set<ClassAndPropertyName> _publishedAttributeNameSet = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _subscribedAttributeNameSet = new HashSet<>();
+
+
+    /*
+     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     */
+    static {
+        // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
+        _classNameSet.add(get_class_name());
+        
+        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
+        _classNameClassMap.put(get_class_name(), ObjectRoot.class);
+
+        // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
+        // IN ObjectRoot
+        _classNamePropertyNameSetMap.put(get_class_name(), _classAndPropertyNameList);
+
+        // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
+        // IN ObjectRoot
+        _classNameAllPropertyNameSetMap.put(get_class_name(), _allClassAndPropertyNameList);
+
+        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+            "ObjectRoot_p.FederateObject", "FederateHandle"
+        ));
+
+        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+            "ObjectRoot_p.FederateObject", "FederateHost"
+        ));
+
+        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+            "ObjectRoot_p.FederateObject", "FederateType"
+        ));
+
+        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+            "ObjectRoot_p.PingCount", "RunningCount"
+        ));
+
+        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+            "ObjectRoot_p.PingCount", "SinkName"
+        ));
+
+        _classNamePublishedAttributeNameSetMap.put(get_class_name(), _publishedAttributeNameSet);
+        _classNameSubscribedAttributeNameSetMap.put(get_class_name(), _subscribedAttributeNameSet);
+    }
+
+    // --------------------------------------------------------
+    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // --------------------------------------------------------
+
+
+    // ----------------------------------------------------------------------------
+    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
+    // ----------------------------------------------------------------------------
 
     private static int _handle;
 
     /**
      * Returns the handle (RTI assigned) of the ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return the handle of the class pertaining to the reference,\
+     * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
      * For the polymorphic version of this method, use {@link #getClassHandle()}.
-     * 
+     *
      * @return the RTI assigned integer handle that represents this object class
      */
-    public static int get_handle() {
+    public static int get_class_handle() {
         return _handle;
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ObjectRoot
-     * object class.
-     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return the name of the class pertaining to the reference,\
-     * rather than the name of the class for the instance referred to by the reference.
-     * For the polymorphic version of this method, use {@link #getClassName()}.
-     * 
-     * @return the fully-qualified HLA class path for this object class
+     * Returns the handle (RTI assigned) of this instance's object class.
+     * Polymorphic equivalent for get_class_handle static method.
+     *
+     * @return the handle (RTI assigned) if this instance's object class
      */
-    public static String get_class_name() {
-        return OBJECTROOT_CLASS_NAME;
+    public int getClassHandle() {
+        return get_class_handle();
+    }
+
+
+    /*
+     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
+     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
+     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
+     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
+     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
+     * THERE IS NO SUCH DATAMEMBER.
+     *
+     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
+     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
+     *
+     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_attribute_handle(String)" METHOD BELOW, WHICH PROVIDES THE
+     * VALUE FOR THE "className" ARGUMENT.
+     */
+    protected static int get_attribute_handle_aux(String className, String propertyName) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), propertyName);
+        if (_classAndPropertyNameHandleMap.containsKey(key)) {
+            return _classAndPropertyNameHandleMap.get(key);
+        }
+        logger.error(
+          "get_attribute_handle: could not find handle for \"{}\" attribute of class \"{}\" or its " +
+          "superclasses.", propertyName, className
+        );
+        return -1;    
     }
 
     /**
-     * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the ObjectRoot object class.
-     * 
-     * @return the name of this interaction class
+     * Returns the handle of an attribute (RTI assigned) of
+     * this object class (i.e. "ObjectRoot") given the attribute's name.
+     *
+     * @param propertyName name of attribute
+     * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
      */
-    public static String get_simple_class_name() {
-        return OBJECTROOT_CLASS_NAME;
-    }
-
-    private static Set<String> _datamemberNames = new HashSet<String>();
-    private static Set<String> _allDatamemberNames = new HashSet<String>();
-
-    /**
-     * Returns a set containing the names of all of the non-hidden attributes in the
-     * ObjectRoot object class.
-     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,\
-     * rather than the parameter names of the class for the instance referred to by
-     * the reference.  For the polymorphic version of this method, use
-     * {@link #getAttributeNames()}.
-     * 
-     * @return a modifiable set of the non-hidden parameter names for this interaction class
-     */
-    public static Set<String> get_attribute_names() {
-        return new HashSet<String>(_datamemberNames);
+    public static int get_attribute_handle(String propertyName) {
+        return get_attribute_handle_aux(get_class_name(), propertyName);
     }
 
     /**
-     * Returns a set containing the names of all of the attributes in the
-     * ObjectRoot object class.
-     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,\
-     * rather than the parameter names of the class for the instance referred to by
-     * the reference.  For the polymorphic version of this method, use
-     * {@link #getAttributeNames()}.
-     * 
-     * @return a modifiable set of the parameter names for this interaction class
+     * Returns the handle associated with the given attribute name for an object class instance
+     * Polymorphic equivalent of get_attribute_handle static method.
+     *
+     * @param propertyName the name of a attribute that belongs to this object class
+     * @return the RTI handle associated with the attribute name, or -1 if not found
      */
-    public static Set<String> get_all_attribute_names() {
-        return new HashSet<String>(_allDatamemberNames);
+    public int getAttributeHandle(String propertyName) {
+        return get_attribute_handle(propertyName);
     }
-
-    private static AttributeHandleSet _publishedAttributeHandleSet;
-    private static Set<String> _publishAttributeNameSet = new HashSet<String>();
-
-    private static AttributeHandleSet _subscribedAttributeHandleSet;
-    private static Set<String> _subscribeAttributeNameSet = new HashSet<String>();
+    private static final AttributeHandleSet _publishedAttributeHandleSet;
+    private static final AttributeHandleSet _subscribedAttributeHandleSet;
 
     static {
-        _classNameSet.add(OBJECTROOT_CLASS_NAME);
-        _classNameClassMap.put(OBJECTROOT_CLASS_NAME, ObjectRoot.class);
-
-        _datamemberClassNameSetMap.put(OBJECTROOT_CLASS_NAME, _datamemberNames);
-        _allDatamemberClassNameSetMap.put(OBJECTROOT_CLASS_NAME, _allDatamemberNames);
-
-        _classNamePublishAttributeNameMap.put(OBJECTROOT_CLASS_NAME, _publishAttributeNameSet);
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNamePublishedAttributeMap.put(OBJECTROOT_CLASS_NAME, _publishedAttributeHandleSet);
+        _classNamePublishedAttributeHandleSetMap.put(get_class_name(), _publishedAttributeHandleSet);
 
-        _classNameSubscribeAttributeNameMap.put(OBJECTROOT_CLASS_NAME, _subscribeAttributeNameSet);
         _subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNameSubscribedAttributeMap.put(OBJECTROOT_CLASS_NAME, _subscribedAttributeHandleSet);
+        _classNameSubscribedAttributeHandleSetMap.put(get_class_name(), _subscribedAttributeHandleSet);
     }
 
+    private static boolean _isInitialized = false;
+
+    /*
+     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS OBJECT CLASS
+     * IT NEEDS THE RTI TO DO SO.
+     */
     protected static void init(RTIambassador rti) {
         if (_isInitialized) return;
         _isInitialized = true;
 
         boolean isNotInitialized = true;
-        while (isNotInitialized) {
+        while(isNotInitialized) {
             try {
-                _handle = rti.getObjectClassHandle(OBJECTROOT_CLASS_NAME);
+                _handle = rti.getObjectClassHandle(get_class_name());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember e) {
                 logger.error("could not initialize: Federate Not Execution Member", e);
@@ -264,37 +1637,48 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _classNameHandleMap.put(OBJECTROOT_CLASS_NAME, get_handle());
-        _classHandleNameMap.put(get_handle(), OBJECTROOT_CLASS_NAME);
-        _classHandleSimpleNameMap.put(get_handle(), OBJECTROOT_CLASS_NAME);
+        _classNameHandleMap.put(get_class_name(), get_class_handle());
+        _classHandleNameMap.put(get_class_handle(), get_class_name());
+        _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
     }
+
+    // ----------------------------------------------------------
+    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // ----------------------------------------------------------
+
+
+    //-------------------------------------------------
+    // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-------------------------------------------------
 
     private static boolean _isPublished = false;
 
     /**
      * Publishes the ObjectRoot object class for a federate.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component
      */
-    public static void publish(RTIambassador rti) {
+    public static void publish_object(RTIambassador rti) {
         if (_isPublished) return;
+        _isPublished = true;
 
         init(rti);
 
         _publishedAttributeHandleSet.empty();
-        for (String attributeName : _publishAttributeNameSet) {
+        for(ClassAndPropertyName key : _publishedAttributeNameSet) {
             try {
-                _publishedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot." + attributeName));
+                _publishedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
+                logger.trace("publish {}:{}", get_class_name(), key.toString());
             } catch (Exception e) {
-                logger.error("could not publish \"" + attributeName + "\" attribute.", e);
+                logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
             }
         }
 
-        synchronized (rti) {
+        synchronized(rti) {
             boolean isNotPublished = true;
-            while (isNotPublished) {
+            while(isNotPublished) {
                 try {
-                    rti.publishObjectClass(get_handle(), _publishedAttributeHandleSet);
+                    rti.publishObjectClass(get_class_handle(), _publishedAttributeHandleSet);
                     isNotPublished = false;
                 } catch (FederateNotExecutionMember e) {
                     logger.error("could not publish: Federate Not Execution Member", e);
@@ -309,25 +1693,38 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _isPublished = true;
-        logger.debug("publish {}", get_class_name());
+        logger.debug("publish: {}", get_class_name());
     }
+
+    /**
+     * Publishes the object class of this instance of the class for a federate.
+     * Polymorphic equalivalent of publish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void publishObject(RTIambassador rti) {
+        publish_object(rti);
+    }
+
 
     /**
      * Unpublishes the ObjectRoot object class for a federate.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component, usu. obtained through the
+     *            {@link SynchronizedFederate#getLRC()} call
      */
-    public static void unpublish(RTIambassador rti) {
+    public static void unpublish_object(RTIambassador rti) {
         if (!_isPublished) return;
+        _isPublished = false;
 
         init(rti);
-        
-        synchronized (rti) {
+
+        synchronized(rti) {
             boolean isNotUnpublished = true;
-            while (isNotUnpublished) {
+            while(isNotUnpublished) {
                 try {
-                    rti.unpublishObjectClass(get_handle());
+                    rti.unpublishObjectClass(get_class_handle());
                     isNotUnpublished = false;
                 } catch (FederateNotExecutionMember e) {
                     logger.error("could not unpublish: Federate Not Execution Member", e);
@@ -345,8 +1742,18 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _isPublished = false;
-        logger.debug("unpublish {}", get_class_name());
+        logger.debug("unpublish: {}", get_class_name());
+    }
+
+    /**
+     * Unpublishes the object class of this instance of this class for a federate.
+     * Polymorphic equivalent of unpublish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void unpublishObject(RTIambassador rti) {
+        unpublish_object(rti);
     }
 
     private static boolean _isSubscribed = false;
@@ -354,27 +1761,28 @@ public class ObjectRoot implements ObjectRootInterface {
     /**
      * Subscribes a federate to the ObjectRoot object class.
      *
-     * @param lrc handle to the RTI
+     * @param rti handle to the Local RTI Component
      */
-    public static void subscribe(RTIambassador lrc) {
+    public static void subscribe_object(RTIambassador rti) {
         if (_isSubscribed) return;
 
-        init(lrc);
+        init(rti);
 
         _subscribedAttributeHandleSet.empty();
-        for (String attributeName : _subscribeAttributeNameSet) {
+        for(ClassAndPropertyName key : _subscribedAttributeNameSet) {
             try {
-                _subscribedAttributeHandleSet.add(_datamemberNameHandleMap.get("ObjectRoot." + attributeName));
+                _subscribedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
+                logger.trace("subscribe {}:{}", get_class_name(), key.toString());
             } catch (Exception e) {
-                logger.error("could not subscribe to \"" + attributeName + "\" attribute.", e);
+                logger.error("could not subscribe to \"" + key + "\" attribute.", e);
             }
         }
 
-        synchronized (lrc) {
+        synchronized(rti) {
             boolean isNotSubscribed = true;
-            while (isNotSubscribed) {
+            while(isNotSubscribed) {
                 try {
-                    lrc.subscribeObjectClassAttributes(get_handle(), _subscribedAttributeHandleSet);
+                    rti.subscribeObjectClassAttributes(get_class_handle(), _subscribedAttributeHandleSet);
                     isNotSubscribed = false;
                 } catch (FederateNotExecutionMember e) {
                     logger.error("could not subscribe: Federate Not Execution Member", e);
@@ -390,24 +1798,35 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
         _isSubscribed = true;
-        logger.debug("subscribe {}", get_class_name());
+        logger.debug("subscribe: {}", get_class_name());
+    }
+
+    /**
+     * Subscribes a federate to the object class of this instance of this class.
+     * Polymorphic equivalent of subscribe_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void subscribeObject(RTIambassador rti) {
+        subscribe_object(rti);
     }
 
     /**
      * Unsubscribes a federate from the ObjectRoot object class.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the Local RTI Component
      */
-    public static void unsubscribe(RTIambassador rti) {
+    public static void unsubscribe_object(RTIambassador rti) {
         if (!_isSubscribed) return;
 
         init(rti);
-        
-        synchronized (rti) {
+
+        synchronized(rti) {
             boolean isNotUnsubscribed = true;
-            while (isNotUnsubscribed) {
+            while(isNotUnsubscribed) {
                 try {
-                    rti.unsubscribeObjectClass(get_handle());
+                    rti.unsubscribeObjectClass(get_class_handle());
                     isNotUnsubscribed = false;
                 } catch (FederateNotExecutionMember e) {
                     logger.error("could not unsubscribe: Federate Not Execution Member", e);
@@ -426,126 +1845,34 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
         _isSubscribed = false;
-        logger.debug("unsubscribe {}", get_class_name());
+        logger.debug("unsubscribe: {}", get_class_name());
     }
+
+    /**
+     * Unsubscribes a federate from the object class of this instance of this class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void unsubscribeObject(RTIambassador rti) {
+        unsubscribe_object(rti);
+    }
+
+    //-----------------------------------------------------
+    // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
+    //-----------------------------------------------------
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
      * (that is, the ObjectRoot object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     *               this class (the ObjectRoot object class).
+     * this class (the ObjectRoot object class).
      * @return "true" if "handle" matches the value of the handle of this class
      * (that is, the ObjectRoot object class).
      */
     public static boolean match(int handle) {
-        return handle == get_handle();
-    }
-
-    /**
-     * Returns the handle (RTI assigned) of this instance's object class .
-     *
-     * @return the handle (RTI assigned) if this instance's object class
-     */
-    public int getClassHandle() {
-        return get_handle();
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
-     */
-    public String getClassName() {
-        return get_class_name();
-    }
-
-    /**
-     * Returns the simple name (last name in its fully-qualified dot-delimited name)
-     * of this instance's object class.
-     *
-     * @return the simple name of this instance's object class
-     */
-    public String getSimpleClassName() {
-        return get_simple_class_name();
-    }
-
-    /**
-     * Returns a set containing the names of all of the non-hiddenattributes of an
-     * object class instance.
-     *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
-     */
-    public Set<String> getAttributeNames() {
-        return get_attribute_names();
-    }
-
-    /**
-     * Returns a set containing the names of all of the attributes of an
-     * object class instance.
-     *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
-     */
-    public Set<String> getAllAttributeNames() {
-        return get_all_attribute_names();
-    }
-
-    /**
-     * Returns the attribute name associated with the given handle for an object class instance.
-     * 
-     * @param datamemberHandle an attribute handle assigned by the RTI
-     * @return the attribute name associated with the handle, or null
-     */
-    public String getAttributeName(int datamemberHandle) {
-        return null;
-    }
-    
-    /**
-     * Returns the handle associated with the given attribute name for an object class instance
-     * 
-     * @param datamemberName the name of an attribute that belongs to this object class
-     * @return the RTI handle associated with the attribute name, or -1 if not found
-     */
-    public int getAttributeHandle(String datamemberName) {
-        return get_attribute_handle(getClassName(), datamemberName);
-    }
-
-    /**
-     * Publishes the object class of this instance of the class for a federate.
-     *
-     * @param rti handle to the RTI
-     */
-    public void publishObject(RTIambassador rti) {
-        publish(rti);
-    }
-
-    /**
-     * Unpublishes the object class of this instance of this class for a federate.
-     *
-     * @param rti handle to the RTI
-     */
-    public void unpublishObject(RTIambassador rti) {
-        unpublish(rti);
-    }
-
-    /**
-     * Subscribes a federate to the object class of this instance of this class.
-     *
-     * @param rti handle to the RTI
-     */
-    public void subscribeObject(RTIambassador rti) {
-        subscribe(rti);
-    }
-
-    /**
-     * Unsubscribes a federate from the object class of this instance of this class.
-     *
-     * @param rti handle to the RTI
-     */
-    public void unsubscribeObject(RTIambassador rti) {
-        unsubscribe(rti);
+        return handle == get_class_handle();
     }
 
     /**
@@ -560,651 +1887,35 @@ public class ObjectRoot implements ObjectRootInterface {
         return _subscribedAttributeHandleSet;
     }
 
-    public String toString() {
-        return getClass().getName() + "()";
-    }
-
-    /**
-     * Returns a set of strings containing the names of all of the object
-     * classes in the current federation.
-     *
-     * @return Set&lt; String &gt; containing the names of all object classes
-     * in the current federation
-     */
-    public static Set<String> get_object_names() {
-        return new HashSet<String>(_classNameSet);
-    }
-
-    /**
-     * Returns a set of strings containing the names of all of the non-hidden attributes
-     * in the object class specified by className.
-     *
-     * @param className name of object class for which to retrieve the
-     *                  names of all of its attributes
-     * @return Set&lt; String &gt; containing the names of all attributes in the
-     * className object class
-     */
-    public static Set<String> get_attribute_names(String className) {
-        return new HashSet<String>(_datamemberClassNameSetMap.get(className));
-    }
-
-    /**
-     * Returns a set of strings containing the names of all of the attributes
-     * in the object class specified by className.
-     *
-     * @param className name of object class for which to retrieve the
-     *                  names of all of its attributes
-     * @return Set&lt; String &gt; containing the names of all attributes in the
-     * className object class
-     */
-    public static Set<String> get_all_attribute_names(String className) {
-        return new HashSet<String>(_allDatamemberClassNameSetMap.get(className));
-    }
-
-    /**
-     * Returns the fully-qualified name of the object class corresponding
-     * to the RTI-defined classHandle.
-     *
-     * @param classHandle handle (defined by RTI) of object class for
-     *                    which to retrieve the fully-qualified name
-     * @return the fully-qualified name of the object class that
-     * corresponds to the RTI-defined classHandle
-     */
-    public static String get_class_name(int classHandle) {
-        return _classHandleNameMap.get(classHandle);
-    }
-
-    /**
-     * Returns the simple name of the object class corresponding to the
-     * RTI-defined classHandle.  The simple name of an object class is
-     * the last name in its (dot-delimited) fully-qualified name.
-     *
-     * @param classHandle handle (defined by RTI) of object class for which
-     *                    to retrieve the simple name
-     * @return the simple name of the object class that corresponds to
-     * the RTI-defined classHandle
-     */
-    public static String get_simple_class_name(int classHandle) {
-        return _classHandleSimpleNameMap.get(classHandle);
-    }
-
-    /**
-     * Returns the integer handle (RTI defined) of the object class
-     * corresponding to the fully-qualified object class name in className.
-     *
-     * @param className fully-qualified name of object class for which to
-     *                  retrieve the RTI-defined integer handle
-     * @return the RTI-defined handle of the object class
-     */
-    public static int get_handle(String className) {
-        Integer classHandle = _classNameHandleMap.get(className);
-
-        if (classHandle == null) {
-            logger.error("Bad class name \"{}\" on get_handle.", className);
-            return -1;
-        }
-        return classHandle;
-    }
-
-    /**
-     * Returns the name of an attribute corresponding to
-     * its handle (RTI assigned) in datamemberHandle.
-     *
-     * @param datamemberHandle handle of attribute (RTI assigned)
-     *                         for which to return the name
-     * @return the name of the attribute corresponding to datamemberHandle
-     */
-    public static String get_attribute_name(int datamemberHandle) {
-        return _datamemberHandleNameMap.get(datamemberHandle);
-    }
-
-    /**
-     * Returns the handle of an attribute (RTI assigned) given
-     * its object class name and attribute name
-     *
-     * @param className      name of object class
-     * @param datamemberName name of attribute
-     * @return the handle (RTI assigned) of the attribute "datamemberName" of object class "className"
-     */
-    public static int get_attribute_handle(String className, String datamemberName) {
-        List<String> classNameComponents = new ArrayList<>(Arrays.asList(className.split("\\.")));
-        Integer datamemberHandle = null;
-        while(!classNameComponents.isEmpty() && datamemberHandle == null) {
-            String localClassName = String.join(".", classNameComponents);
-            datamemberHandle = _datamemberNameHandleMap.get(localClassName + "." + datamemberName);
-
-            classNameComponents.remove(classNameComponents.size() - 1);
+    //--------------------------------
+    // DATAMEMBER MANIPULATION METHODS
+    //--------------------------------
+    protected PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), "");
+        if (classAndPropertyNameValueMap.containsKey(key)) {
+            Object value = classAndPropertyNameValueMap.get(key);
+            return new PropertyClassNameAndValue(get_class_name(), value);
         }
 
-        if (datamemberHandle == null) {
-            logger.error(
-                    "Bad attribute \"{}\" for class \"{}\" and super-classes on get_attribute_handle.",
-                    datamemberName, className
-            );
-            return -1;
-        }
-        return datamemberHandle;
+        logger.error(
+          "getattribute(\"{}\"): could not find value for \"{}\" attribute of class \"{}\" or " +
+          "its superclasses.", propertyName, propertyName, className
+        );
+
+        return null;
     }
 
-    private static Class<?>[] pubsubArguments = new Class<?>[]{RTIambassador.class};
+    //------------------------------------
+    // END DATAMEMBER MANIPULATION METHODS
+    //------------------------------------
 
-    /**
-     * Publishes the object class named by "className" for a federate.
-     * This can also be performed by calling the publish( RTIambassador rti )
-     * method directly on the object class named by "className" (for
-     * example, to publish the ObjectRoot class in particular,
-     * see {@link ObjectRoot#publish(RTIambassador rti)}).
-     *
-     * @param className name of object class to be published for the federate
-     * @param rti       handle to the RTI
-     */
-    public static void publish(String className, RTIambassador rti) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        if (rtiClass == null) {
-            logger.error("Bad class name \"{}\" on publish.", className);
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod("publish", pubsubArguments);
-            method.invoke(null, new Object[]{rti});
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
-    /**
-     * Unpublishes the object class named by "className" for a federate.
-     * This can also be performed by calling the unpublish( RTIambassador rti )
-     * method directly on the object class named by "className" (for
-     * example, to unpublish the ObjectRoot class in particular,
-     * see {@link ObjectRoot#unpublish(RTIambassador rti)}).
-     *
-     * @param className name of object class to be unpublished for the federate
-     * @param rti       handle to the RTI
-     */
-    public static void unpublish(String className, RTIambassador rti) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        if (rtiClass == null) {
-            logger.error("Bad class name \"{}\" on unpublish.", className);
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod("unpublish", pubsubArguments);
-            method.invoke(null, new Object[]{rti});
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
-    /**
-     * Subscribes federate to the object class names by "className"
-     * This can also be performed by calling the subscribe( RTIambassador rti )
-     * method directly on the object class named by "className" (for
-     * example, to subscribe a federate to the ObjectRoot class
-     * in particular, see {@link ObjectRoot#subscribe(RTIambassador rti)}).
-     *
-     * @param className name of object class to which to subscribe the federate
-     * @param rti       handle to the RTI
-     */
-    public static void subscribe(String className, RTIambassador rti) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        if (rtiClass == null) {
-            logger.error("Bad class name \"{}\" on subscribe.", className);
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod("subscribe", pubsubArguments);
-            method.invoke(null, new Object[]{rti});
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
-    /**
-     * Unsubscribes federate from the object class names by "className"
-     * This can also be performed by calling the unsubscribe( RTIambassador rti )
-     * method directly on the object class named by "className" (for
-     * example, to unsubscribe a federate to the ObjectRoot class
-     * in particular, see {@link ObjectRoot#unsubscribe(RTIambassador rti)}).
-     *
-     * @param className name of object class to which to unsubscribe the federate
-     * @param rti       handle to the RTI
-     */
-    public static void unsubscribe(String className, RTIambassador rti) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        try {
-            Method method = rtiClass.getMethod("unsubscribe", pubsubArguments);
-            method.invoke(null, new Object[]{rti});
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
-    /**
-     * Publishes the attribute named by "attributeName" of the object class named
-     * by "className" for a federate.  This can also be performed by calling the
-     * publish_&lt;attributeName&gt;() method directly on the object class named by
-     * "className".
-     * <p>
-     * Note:  This method only marks the attribute named by "attributeName" for
-     * publication.  The attribute doesn't actually get published until the
-     * "className" object class, of which it is a member, is (re)published.  See
-     * {@link ObjectRoot#publish(String className, RTIambassador RTI)} and
-     * {@link ObjectRoot#publish(RTIambassador RTI)} for examples of how to
-     * publish the object class.
-     *
-     * @param className     name of object class for which the attribute named by
-     *                      "attributeName" is to be published
-     * @param attributeName name of the attribute to be published
-     */
-    public static void publish(String className, String attributeName) {
-        try {
-            _classNamePublishAttributeNameMap.get(className).add(attributeName);
-        } catch (Exception e) {
-            logger.error("could not publish class \"" + className + "\" \"" + attributeName + "\" attribute.", e);
-        }
-    }
-
-    /**
-     * Unpublishes the attribute named by "attributeName" of the object class named
-     * by "className" for a federate.  This can also be performed by calling the
-     * unpublish_&lt;attributeName&gt;() method directly on the object class named by
-     * "className".
-     * <p>
-     * Note:  This method only marks the attribute named by "attributeName" for
-     * un-publication. The attribute doesn't actually get unpublished until the
-     * "className" object class, of which it is a member, is (re)published.  See
-     * {@link ObjectRoot#publish(String className, RTIambassador RTI)} and
-     * {@link ObjectRoot#publish(RTIambassador RTI)} for examples of how to
-     * publish the object class.
-     *
-     * @param className     name of object class for which the attribute named by
-     *                      "attributeName" is to be unpublished (by a federate)
-     * @param attributeName name of the attribute to be unpublished
-     */
-    public static void unpublish(String className, String attributeName) {
-        try {
-            _classNamePublishAttributeNameMap.get(className).remove(attributeName);
-        } catch (Exception e) {
-            logger.error("could not unpublish class \"" + className + "\" \"" + attributeName + "\" attribute.", e);
-        }
-    }
-
-    /**
-     * Subscribe a federate to the attribute named by "attributeName" of the
-     * object class named by "className".  This can also be performed by calling
-     * the subscribe_&lt;attributeName&gt;() method directly on the object class named
-     * by "className".
-     * <p>
-     * Note:  This method only marks the attribute named by "attributeName" for
-     * subscription.  The attribute doesn't actually get subscribed to until the
-     * "className" object class, of which it is a member, is (re)subscribed to.
-     * See {@link ObjectRoot#subscribe(String className, RTIambassador RTI)} and
-     * {@link ObjectRoot#subscribe(RTIambassador RTI)} for examples of how to
-     * subscribe to the object class.
-     *
-     * @param className     name of object class for which the attribute named by
-     *                      "attributeName" is to be subcribed
-     * @param attributeName name of the attribute to be published
-     */
-    public static void subscribe(String className, String attributeName) {
-        try {
-            _classNameSubscribeAttributeNameMap.get(className).add(attributeName);
-        } catch (Exception e) {
-            logger.error("could not subscribe to class \"" + className + "\" \"" + attributeName + "\" attribute.", e);
-        }
-    }
-
-    /**
-     * Unsubscribe a federate from the attribute named by "attributeName" of the
-     * object class named by "className".  This can also be performed by calling
-     * the unsubscribe_&lt;attributeName&gt;() method directly on the object class named
-     * by "className".
-     * <p>
-     * Note:  This method only marks the attribute named by "attributeName" for
-     * unsubscription.  The attribute doesn't actually get unsubscribed from until the
-     * "className" object class, of which it is a member, is (re)subscribed to.
-     * See {@link ObjectRoot#subscribe(String className, RTIambassador RTI)} and
-     * {@link ObjectRoot#subscribe(RTIambassador RTI)} for examples of how to
-     * subscribe to the object class.
-     *
-     * @param className     name of object class for which the attribute named by
-     *                      "attributeName" is to be subcribed
-     * @param attributeName name of the attribute to be published
-     */
-    public static void unsubscribe(String className, String attributeName) {
-        try {
-            _classNameSubscribeAttributeNameMap.get(className).remove(attributeName);
-        } catch (Exception e) {
-            logger.error("could not unsubscribe class \"" + className + "\" \"" + attributeName + "\" attribute.", e);
-        }
-    }
-
-    private static ObjectRoot create_object(Class<?> rtiClass) {
-        ObjectRoot classRoot = null;
-        try {
-            classRoot = (ObjectRoot) rtiClass.newInstance();
-        } catch (Exception e) {
-            logger.error("could not create/cast new Object", e);
-        }
-
-        return classRoot;
-    }
-
-    private static ObjectRoot create_object(Class<?> rtiClass, LogicalTime logicalTime) {
-        ObjectRoot classRoot = create_object(rtiClass);
-        if (classRoot != null) classRoot.setTime(logicalTime);
-        return classRoot;
-    }
-
-    private static ObjectRoot create_object(Class<?> rtiClass, ReflectedAttributes datamemberMap) {
-        ObjectRoot classRoot = create_object(rtiClass);
-        classRoot.setAttributes(datamemberMap);
-        return classRoot;
-    }
-
-    private static ObjectRoot create_object(Class<?> rtiClass, ReflectedAttributes datamemberMap, LogicalTime logicalTime) {
-        ObjectRoot classRoot = create_object(rtiClass);
-        classRoot.setAttributes(datamemberMap);
-        classRoot.setTime(logicalTime);
-        return classRoot;
-    }
-
-    /**
-     * Create an object that is in instance of object class
-     * "className". An ObjectRoot reference is returned,
-     * so to refer to the instance using a reference to a "className" interaction,
-     * the returned reference must be cast down the object inheritance
-     * hierarchy.
-     * An instance of the "className" object class may also be created
-     * by using the "new" operator directory on the "className" object
-     * class.  For instance, two ways to create an ObjectRoot
-     * instance are
-     * Object.create_object( "ObjectRoot" ),
-     * and
-     * new ObjectRoot()
-     *
-     * @param className fully-qualified (dot-delimited) name of the object
-     *                  class for which to create an instance
-     * @return instance of "className" object class
-     */
-    public static ObjectRoot create_object(String className) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass);
-    }
-
-    /**
-     * Like {@link #create_object(String className)}, but object
-     * is created with a timestamp based on "logicalTime".
-     *
-     * @param className   fully-qualified (dot-delimited) name of the object
-     *                    class for which to create an instance
-     * @param logicalTime timestamp to place on the new object class instance
-     * @return instance of "className" object class with "logicalTime" time stamp.
-     */
-    public static ObjectRoot create_object(String className, LogicalTime logicalTime) {
-        Class<?> rtiClass = _classNameClassMap.get(className);
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass, logicalTime);
-    }
-
-    /**
-     * Create an object that is in instance of object class
-     * that corresponds to the "classHandle" handle (RTI assigned). An
-     * ObjectRoot reference is returned, so to refer to the
-     * instance using a reference to a "className" interaction, the returned
-     * reference must be cast down the object inheritance hierarchy.
-     *
-     * @param classHandle handle of object class (RTI assigned) class for
-     *                    which to create an instance
-     * @return instance of object class corresponding to "classHandle"
-     */
-    public static ObjectRoot create_object(int classHandle) {
-        Class<?> rtiClass = _classNameClassMap.get(_classHandleNameMap.get(classHandle));
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass);
-    }
-
-    /**
-     * Like {@link #create_object(int classHandle)}, but the object
-     * is created with a timestamp based on "logicalTime".
-     *
-     * @param classHandle handle of object class (RTI assigned) class for
-     *                    which to create an instance
-     * @param logicalTime timestamp to place on the new object class instance
-     * @return instance of object class corresponding to "classHandle" with
-     * "logicalTime" time stamp
-     */
-    public static ObjectRoot create_object(int classHandle, LogicalTime logicalTime) {
-        Class<?> rtiClass = _classNameClassMap.get(_classHandleNameMap.get(classHandle));
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass, logicalTime);
-    }
-
-    /**
-     * Like {@link #create_object(int classHandle)}, but the object's
-     * attributes are initialized using "datamemberMap".  The "datamemberMap"
-     * is usually acquired as an argument to an RTI callback method of a federate.
-     *
-     * @param classHandle   handle of object class (RTI assigned) class for
-     *                      which to create an instance
-     * @param datamemberMap contains initializing values for the attributes
-     *                      of the object class instance
-     * @return instance of object class corresponding to "classHandle" with
-     * its attributes initialized with the "datamemberMap"
-     */
-    public static ObjectRoot create_object(int classHandle, ReflectedAttributes datamemberMap) {
-        Class<?> rtiClass = _classNameClassMap.get(_classHandleNameMap.get(classHandle));
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass, datamemberMap);
-    }
-
-    /**
-     * Like {@link #create_object(int classHandle, ReflectedAttributes datamemberMap)},
-     * but the object is given a timestamp based on "logicalTime".
-     *
-     * @param classHandle   handle of object class (RTI assigned) class for
-     *                      which to create an instance
-     * @param datamemberMap initializing values for the attributes of the
-     *                      object class instance
-     * @param logicalTime   timestamp to place on the new object class instance
-     * @return instance of object class corresponding to "classHandle" with
-     * its attributes initialized with the "datamemberMap" and with
-     * "logicalTime" timestamp
-     */
-    public static ObjectRoot create_object(int classHandle, ReflectedAttributes datamemberMap, LogicalTime logicalTime) {
-        Class<?> rtiClass = _classNameClassMap.get(_classHandleNameMap.get(classHandle));
-        if (rtiClass == null) return null;
-
-        return create_object(rtiClass, datamemberMap, logicalTime);
-    }
-
-    /**
-     * Creates a new instance of the object class corresponding to "objectClassHandle",
-     * registers it in an map internal to the ObjectRoot class using "objectClassHandle"
-     * as a key, and returns a reference to the instance.  Though the created
-     * instance is of the object class corresponding to "objectClassHandle" (which is
-     * a handle assigned by the RTI), it is referred to, via the return value, by
-     * an ObjectRoot reference.  Thus, to refer to it as an instance of the object
-     * class corresponding to "objectClassHandle", the ObjectRoot reference needs to be
-     * cast down through the inheritance hierarchy.
-     *
-     * objectClassHandle and objectHandle are usually acquired as arguments of the
-     * "discoverObjectInstance" RTI callback method of a federate.
-     *
-     * @param objectClassHandle  handle of object class (RTI assigned) for which to create
-     *                      an instance
-     * @param objectHandle handle (also RTI assigned) of this instance as it is
-     *                      known to the RTI.  Any updates to the instance attributes provided by the
-     *                      RTI (via a "reflectAttributeValues" federate callback) will be identified
-     *                      with this objectHandle.
-     * @return new instance of the object class corresponding to objectClassHandle
-     */
-    public static ObjectRoot discover(int objectClassHandle, int objectHandle) {
-        Class<?> hlaObjectClass = _classNameClassMap.get(_classHandleNameMap.get(objectClassHandle));
-        ObjectRoot objectRoot = null;
-        try {
-            objectRoot = (ObjectRoot) hlaObjectClass.newInstance();
-            objectRoot.setObjectHandle(objectHandle);
-            _objectMap.put(objectHandle, objectRoot);
-        } catch (Exception e) {
-            logger.error("could not discover object", e);
-        }
-        return objectRoot;
-    }
-
-    /**
-     * Retrieves the object instance corresponding to "objectHandle" from an
-     * internal table in the ObjectRoot class, updates its attribute values using
-     * "reflectedAttributes", and returns the instance.  Both "objectHandle" and
-     * "reflectedAttributes" are usually acquired as arguments of the
-     * "reflectAttributeValues" RTI callback of a federate.
-     * The return value is an ObjectRoot reference to the instance.  So, to refer
-     * to the instance as an instance of its actual class, this reference will
-     * have to be cast down the inheritance hierarchy.
-     *
-     * @param objectHandle       handle (RTI assigned) of object instance for which the
-     *                            attributes are to be updated.
-     * @param reflectedAttributes set of updated values for the attributes of the
-     *                            object instance corresponding to objectHandle.
-     * @return the object instance with updated attribute values
-     */
-    public static ObjectRoot reflect(int objectHandle, ReflectedAttributes reflectedAttributes) {
-        ObjectRoot objectRoot = _objectMap.get(objectHandle);
-        if (objectRoot == null) return null;
-        objectRoot.setTime(-1);
-        objectRoot.setAttributes(reflectedAttributes);
-        return objectRoot;
-    }
-
-    /**
-     * Like {@link #reflect(int objectHandle, ReflectedAttributes reflectedAttributes)},
-     * except the updated attributes of the object instance have their timestamps
-     * updated to "logicalTime".
-     *
-     * @param objectHandle       handle (RTI assigned) of object instance for which the
-     *                            attributes are to be updated.
-     * @param reflectedAttributes set of updated values for the attributes of the
-     *                            object instance corresponding to objectHandle.
-     * @param logicalTime         new time stamp for attributes that are updated
-     * @return the object instance with updated attribute values
-     */
-    public static ObjectRoot reflect(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
-        ObjectRoot objectRoot = _objectMap.get(objectHandle);
-        if (objectRoot == null) return null;
-        objectRoot.setTime(logicalTime);
-        objectRoot.setAttributes(reflectedAttributes);
-        return objectRoot;
-    }
-
-    /**
-     * Like {@link #reflect(int objectHandle, ReflectedAttributes reflectedAttributes)},
-     * except the updated attributes of the object instance have their timestamps
-     * updated to "time".
-     *
-     * @param objectHandle       handle (RTI assigned) of object instance for which the
-     *                            attributes are to be updated.
-     * @param reflectedAttributes set of updated values for the attributes of the
-     *                            object instance corresponding to objectHandle.
-     * @param time                new time stamp for attributes that are updated
-     * @return the object instance with updated attribute values
-     */
-    public static ObjectRoot reflect(int objectHandle, ReflectedAttributes reflectedAttributes, double time) {
-        ObjectRoot objectRoot = _objectMap.get(objectHandle);
-        if (objectRoot == null) return null;
-        objectRoot.setTime(time);
-        objectRoot.setAttributes(reflectedAttributes);
-        return objectRoot;
-    }
-
-    /**
-     * Requests an attribute update for this object instance from the federate that
-     * has modification rights on these attributes.
-     *
-     * @param rti handle to the RTI
-     */
-    public void requestUpdate(RTIambassador rti) {
-        boolean requestNotSubmitted = true;
-        while (requestNotSubmitted) {
-            try {
-                // TODO: LOG HERE
-                rti.requestObjectAttributeValueUpdate(getObjectHandle(), getSubscribedAttributeHandleSet());
-                requestNotSubmitted = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("request for update failed: Federate Not Execution Member", e);
-                return;
-            } catch (ObjectNotKnown e) {
-                logger.error("request for update failed: Object Not Known", e);
-                return;
-            } catch (AttributeNotDefined e) {
-                logger.error("request for update failed: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
-    }
-
-    /**
-     * Returns the object instance corresponding to the "objectHandle" (RTI
-     * assigned) from a map internal to the ObjectRoot class.
-     * The object instance is referred to, via the return value, using an
-     * an ObjectRoot reference.  To reference to it using a reference of its
-     * actual class, the returned reference must be cast down through the
-     * inhertance hierarchy.
-     *
-     * @param objectHandle handle (RTI assigned) of object instance to retrieve
-     *                      from the map internal to the ObjectRoot class.
-     * @return object instance corresponding to the objectHandle (RTI assigned)
-     * in the map that is internal to the ObjectRoot class.
-     */
-    public static ObjectRoot getObject(int objectHandle) {
-        return _objectMap.get(objectHandle);
-    }
-
-    /**
-     * Returns the object instance corresponding to the "objectHandle" (RTI
-     * assigned) from a map internal to the ObjectRoot class AND REMOVES IT
-     * FROM THIS MAP.
-     * The object instance is referred to, via the return value, using an
-     * an ObjectRoot reference.  To reference to it using a reference of its
-     * actual class, the returned reference must be cast down through the
-     * inhertance hierarchy.
-     *
-     * @param objectHandle handle (RTI assigned) of object instance to retrieve
-     *                      from the map internal to the ObjectRoot class.
-     * @return object instance corresponding to the objectHandle (RTI assigned)
-     * in the map that is internal to the ObjectRoot class.
-     */
-    public static ObjectRoot removeObject(int objectHandle) {
-        return _objectMap.remove(objectHandle);
-    }
-
-    private int _objectHandle;
-
-    private void setObjectHandle(int objectHandle) {
-        _objectMap.remove(objectHandle);
-        _objectHandle = objectHandle;
-        _objectMap.put(objectHandle, this);
-    }
-
-    /**
-     * Returns the handle (RTI assigned) the corresponds to this object class
-     * instance.  This handle is the instance's unique identifier to the RTI.
-     *
-     * @return the handle (RTI assigned) of this object class instance.
-     */
-    public int getObjectHandle() {
-        return _objectHandle;
-    }
-
+    //-------------------------
+    // END OF INCLUDED TEMPLATE
+    //-------------------------
+    
+    //-------------
+    // TIME SET/GET
+    //-------------
     private double _time = -1;
 
     /**
@@ -1222,7 +1933,7 @@ public class ObjectRoot implements ObjectRootInterface {
      *
      * @param time new timestamp for this object
      */
-    public void setTime(double time) {
+    public void setTime( double time ) {
         _time = time;
     }
 
@@ -1231,11 +1942,20 @@ public class ObjectRoot implements ObjectRootInterface {
      *
      * @param logicalTime new timestamp for this object
      */
-    public void setTime(LogicalTime logicalTime) {
+    public void setTime( LogicalTime logicalTime ) {
         DoubleTime doubleTime = new DoubleTime();
-        doubleTime.setTo(logicalTime);
-        setTime(doubleTime.getTime());
+        doubleTime.setTo( logicalTime );
+        setTime( doubleTime.getTime() );
     }
+
+    //-----------------
+    // END TIME SET/GET
+    //-----------------
+
+
+    //-------------
+    // CONSTRUCTORS
+    //-------------
 
     /**
      * Creates a new ObjectRoot instance.
@@ -1248,246 +1968,120 @@ public class ObjectRoot implements ObjectRootInterface {
      * Creates a copy of an ObjectRoot instance.  As an
      * ObjectRoot instance contains no attributes,
      * this has the same effect as the default constructor.
-     * 
+     *
      * @param objectRoot the object instance to copy
      */
-    public ObjectRoot(ObjectRoot objectRoot) {
+    public ObjectRoot( ObjectRoot other ) {
         this();
+        _time = other._time;
+        for(ClassAndPropertyName key: classAndPropertyNameValueMap.keySet()) {
+            classAndPropertyNameValueMap.put(
+                key, new Attribute<>((Attribute<Object>)classAndPropertyNameValueMap.get(key))
+            );
+        }
+
     }
 
-    protected ObjectRoot(ReflectedAttributes datamemberMap, boolean initFlag) {
+    protected ObjectRoot( ReflectedAttributes propertyMap, boolean initFlag ) {
         this();
-        if (initFlag) setAttributes(datamemberMap);
+        if ( initFlag ) setAttributes( propertyMap );
     }
 
-    protected ObjectRoot(ReflectedAttributes datamemberMap, LogicalTime logicalTime, boolean initFlag) {
+    protected ObjectRoot( ReflectedAttributes propertyMap, LogicalTime logicalTime, boolean initFlag ) {
         this();
-        setTime(logicalTime);
-        if (initFlag) setAttributes(datamemberMap);
+        setTime( logicalTime );
+        if ( initFlag ) setAttributes( propertyMap );
     }
+
 
     /**
      * Creates a new object instance and initializes its attributes
-     * using the "datamemberMap" -- this constructor is usually called as a
+     * using the "propertyMap" -- this constructor is usually called as a
      * super-class constructor to create and initialize an instance of an
-     * object further down in the inheritance hierarchy.  "datamemberMap"
+     * object further down in the inheritance hierarchy.  "propertyMap"
      * is usually acquired as an argument to an RTI federate callback method, such
      * as "receiveInteraction".
      *
-     * @param datamemberMap contains attribute values for the newly created
-     *                      object
+     * @param propertyMap contains attribute values for the newly created
+     * object
      */
-    public ObjectRoot(ReflectedAttributes datamemberMap) {
-        this(datamemberMap, true);
+    public ObjectRoot( ReflectedAttributes propertyMap ) {
+        this( propertyMap, true );
     }
 
     /**
-     * Like {@link #ObjectRoot(ReflectedAttributes datamemberMap)},
+     * Like {@link #ObjectRoot( ReflectedAttributes propertyMap )},
      * except the new instance has an initial timestamp of "logicalTime".
      *
-     * @param datamemberMap contains attribute values for the newly created
-     *                      object
-     * @param logicalTime   initial timestamp for newly created object instance
+     * @param propertyMap contains attribute values for the newly created
+     * object
+     * @param logicalTime initial timestamp for newly created object instance
      */
-    public ObjectRoot(ReflectedAttributes datamemberMap, LogicalTime logicalTime) {
-        this(datamemberMap, logicalTime, true);
+    public ObjectRoot( ReflectedAttributes propertyMap, LogicalTime logicalTime ) {
+        this( propertyMap, logicalTime, true );
     }
 
-    /**
-     * Returns the value of the attribute named "datamemberName" for this
-     * object.
-     *
-     * @param datamemberName name of attribute whose value to retrieve
-     * @return the value of the attribute whose name is "datamemberName"
-     */
-    public Object getAttribute(String datamemberName) {
-        return null;
-    }
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
 
-    /**
-     * Returns the value of the attribute whose handle is "datamemberHandle"
-     * (RTI assigned) for this object.
-     *
-     * @param datamemberHandle handle (RTI assigned) of attribute whose
-     *                         value to retrieve
-     * @return the value of the attribute whose handle is "datamemberHandle"
-     */
-    public Object getAttribute(int datamemberHandle) {
-        String datamemberName = getAttributeName(datamemberHandle);
-        if (datamemberName == null) {
-            return null;
+    public void copyFrom( Object object ) {
+        if ( object instanceof ObjectRoot ) {
+            ObjectRoot messagingRoot = (ObjectRoot)object;
+            for(ClassAndPropertyName key: messagingRoot.classAndPropertyNameValueMap.keySet()) {
+                if (classAndPropertyNameValueMap.containsKey(key)) {
+                    classAndPropertyNameValueMap.put(
+                        key, new Attribute<>((Attribute<Object>)messagingRoot.classAndPropertyNameValueMap.get(key)));
+                }
+            }
         }
-        return getAttribute(datamemberName);
     }
 
     /**
      * Set the values of the attributes in this object using
-     * "datamemberMap".  "datamemberMap" is usually acquired as an argument to
+     * "propertyMap".  "propertyMap" is usually acquired as an argument to
      * an RTI federate callback method such as "receiveInteraction".
      *
-     * @param datamemberMap contains new values for the attributes of
-     *                      this object
+     * @param propertyMap  contains new values for the attributes of
+     * this object
      */
-    public void setAttributes(ReflectedAttributes datamemberMap) {
-        int size = datamemberMap.size();
-        for (int ix = 0; ix < size; ++ix) {
+    public void setAttributes( ReflectedAttributes propertyMap ) {
+        int size = propertyMap.size();
+        for( int ix = 0 ; ix < size ; ++ix ) {
             try {
-                setAttribute(datamemberMap.getAttributeHandle(ix), datamemberMap.getValue(ix));
-            } catch (Exception e) {
-                logger.error(e);
+                setAttribute(  propertyMap.getAttributeHandle( ix ), propertyMap.getValue( ix )  );
+            } catch ( Exception e ) {
+                logger.error( "setAttributes: Exception caught!" );
+                logger.error("{}", CpswtUtils.getStackTrace(e));
             }
         }
     }
 
-    private void setAttribute(int handle, byte[] val) {
-        if (val == null) {
-            logger.error("set: attempt to set null value");
+    private void setAttribute( int handle, byte[] value ) {
+        if ( value == null ) {
+            logger.error( "set:  Attempt to set null value  class \"{}\"", getClass().getName());
+            return;
         }
-        String valAsString = new String( val, 0, val.length );
-        if (valAsString != null && valAsString.length() > 0 && valAsString.charAt(valAsString.length() - 1) == '\0') {
-            valAsString = valAsString.substring(0, valAsString.length() - 1);
+        String valueAsString = new String( value, 0, value.length );
+        if (valueAsString.length() > 0 && valueAsString.charAt(valueAsString.length() - 1) == '\0') {
+            valueAsString = valueAsString.substring(0, valueAsString.length() - 1);
         }
-
-        if (!setAttributeAux(handle, valAsString)) {
-            logger.error("set: bad attribute handle");
-        }
+        setAttribute(handle, valueAsString);
     }
 
-    /**
-     * Sets the value of the attribute named "datamemberName" to "value"
-     * in this object.  "value" is converted to data type of "datamemberName"
-     * if needed.
-     * This action can also be affected by calling the set_&lt;datamemberName&gt;( value )
-     * method on the object using a reference to the object's actual
-     * class.
-     *
-     * @param datamemberName name of attribute whose value is to be set
-     *                       to "value"
-     * @param value          new value of attribute called "datamemberName"
-     */
-    public void setAttribute(String datamemberName, String value) {
-        if (!setAttributeAux(datamemberName, value)) {
-            logger.error("invalid attribute \"{}\"", datamemberName);
+    protected static Map<ClassAndPropertyName, String> _classAndPropertyNameTypeMap = new HashMap<>();
+
+    protected SuppliedAttributes createSuppliedAttributes(boolean force) {
+        SuppliedAttributes suppliedAttributes = _factory.createSuppliedAttributes();
+
+        for(ClassAndPropertyName key: _publishedAttributeNameSet) {
+            int handle = _classAndPropertyNameHandleMap.get(key);
+            Attribute<?> value = (Attribute<?>)classAndPropertyNameValueMap.get(key);
+                suppliedAttributes.add(handle, value.toString().getBytes() );
+            value.setHasBeenUpdated();
         }
-    }
 
-    /**
-     * Sets the value of the attribute named "datamemberName" to "value"
-     * in this object.  "value" should have the same data type as that of
-     * the "datamemberName" attribute.
-     * This action can also be affected by calling the set_&lt;datamemberName&gt;( value )
-     * method on the object using a reference to the object's actual
-     * class.
-     *
-     * @param datamemberName name of attribute whose value is to be set
-     *                       to "value"
-     * @param value          new value of attribute called "datamemberName"
-     */
-    public void setAttribute(String datamemberName, Object value) {
-        if (!setAttributeAux(datamemberName, value)) {
-            logger.error("invalid attribute \"{}\"", datamemberName);
-        }
-    }
-
-    protected boolean setAttributeAux(int datamemberHandle, String val) {
-        String datamemberName = getAttributeName(datamemberHandle);
-        if (datamemberName == null) {
-            return false;
-        }
-        return setAttributeAux(datamemberName, val);
-    }
-
-    protected boolean setAttributeAux(String datamemberName, String value) {
-        return false;
-    }
-
-    protected boolean setAttributeAux(String datamemberName, Object value) {
-        return false;
-    }
-
-    protected SuppliedAttributes createSuppliedDatamembers(boolean force) {
-        return _factory.createSuppliedAttributes();
-    }
-
-    private boolean _isRegistered = false;
-
-    /**
-     * Registers this object with the RTI.  This method is usually called by a
-     * federate who "owns" this object, i.e. the federate that created it and
-     * has write-privileges to its attributes (so, it is responsible for updating
-     * these attribute and conveying their updated values to the RTI).
-     *
-     * @param rti handle to the RTI
-     */
-    public void registerObject(RTIambassador rti) {
-        while (!_isRegistered) {
-            try {
-                synchronized (rti) {
-                    _objectHandle = rti.registerObjectInstance(getClassHandle());
-                }
-                _isRegistered = true;
-                _objectMap.put(getObjectHandle(), this);
-            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember e) {
-                logger.error(e);
-                return;
-            } catch (Exception e) {
-                CpswtUtils.sleep(500);
-            }
-        }
-    }
-
-    /**
-     * Registers this object with the RTI using the given name.  This method is usually
-     * called by a federate who "owns" this object, i.e. the federate that created it and
-     * has write-privileges to its attributes (so, it is responsible for updating
-     * these attribute and conveying their updated values to the RTI).
-     *
-     * @param rti handle to the RTI
-     * @param name unique identifier to assign to the object instance
-     * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
-     */
-    public void registerObject(RTIambassador rti, String name) throws ObjectAlreadyRegistered {
-
-        while (!_isRegistered) {
-            try {
-                synchronized (rti) {
-                    _objectHandle = rti.registerObjectInstance(getClassHandle(), name);
-                }
-                _isRegistered = true;
-                _objectMap.put(getObjectHandle(), this);
-
-            } catch (ObjectClassNotDefined | ObjectClassNotPublished | FederateNotExecutionMember ex) {
-                logger.error(ex);
-                return;
-            } catch (SaveInProgress | RestoreInProgress | RTIinternalError | ConcurrentAccessAttempted e) {
-                CpswtUtils.sleep(500);
-            }
-        }
-    }
-
-    /**
-     * Unregisters this object with the RTI.  The RTI will destroy all information
-     * it contains regarding this object as a result.  This method is usually
-     * called by a federate who "owns" this object, i.e. the federate that created
-     * it and has write-privileges to its attributes.
-     *
-     * @param rti handle to the RTI
-     */
-    public void unregisterObject(RTIambassador rti) {
-        while (_isRegistered) {
-            try {
-                synchronized (rti) {
-                    rti.deleteObjectInstance(_objectHandle, null);
-                }
-                _isRegistered = false;
-                _objectMap.remove(getObjectHandle());
-            } catch (ObjectNotKnown | DeletePrivilegeNotHeld | FederateNotExecutionMember e) {
-                logger.error(e);
-                return;
-            } catch (Exception e) {
-                CpswtUtils.sleepDefault();
-            }
-        }
+        return suppliedAttributes;
     }
 
     /**
@@ -1495,52 +2089,56 @@ public class ObjectRoot implements ObjectRootInterface {
      * the values have "time" as their timestamp.  This call should be used for
      * objects whose attributes have "timestamp" ordering.
      *
-     * @param rti   handle to the RTI
-     * @param time  timestamp on attribute values of this object
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
+     * @param time timestamp on attribute values of this object
      * @param force if "false", only the attributes whose values have changed since
-     *              the last call to "updateAttributeValues" will be broadcast to the RTI.  If
-     *              "true", all attributes and their values are broadcast to the RTI.
+     * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
+     * "true", all attributes and their values are broadcast to the RTI.
      */
-    public void updateAttributeValues(RTIambassador rti, double time, boolean force) {
-        SuppliedAttributes suppliedAttributes = createSuppliedDatamembers(force);
-        if (suppliedAttributes.size() == 0) return;
+    public void updateAttributeValues( RTIambassador rti, double time, boolean force ) {
 
-        synchronized (rti) {
+        SuppliedAttributes suppliedAttributes = createSuppliedAttributes( force );
+        if ( suppliedAttributes.size() == 0 ) return;
+
+        synchronized( rti ) {
             try {
-                rti.updateAttributeValues(getObjectHandle(), suppliedAttributes, null, new DoubleTime(time));
-            } catch (ObjectNotKnown e) {
-                logger.error("could not update attributes:  Object Not Known", e);
-                return;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not update attributes:  Federate Not Execution Member", e);
-                return;
-            } catch (AttributeNotDefined e) {
-                logger.error("could not update attributes:  Attribute Not Defined", e);
-                return;
-            } catch (AttributeNotOwned e) {
-                logger.error("could not update attributes:  Attribute Not Owned", e);
-                return;
-            } catch (ConcurrentAccessAttempted e) {
-                logger.error("could not update attributes:  Concurrent Access Attempted", e);
-                return;
-            } catch (InvalidFederationTime e) {
-                logger.error("could not update attributes:  Invalid Federation Time", e);
-                return;
-            } catch (Exception e) {
-                logger.error("could not update attributes", e);
+                rti.updateAttributeValues(  getObjectHandle(), suppliedAttributes, null, new DoubleTime( time )  );
+            } catch ( ObjectNotKnown o ) {
+                logger.error( "{}:  could not update attributes:  Object Not Known", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(o));
+            } catch ( FederateNotExecutionMember f ) {
+                logger.error( "{}:  could not update attributes:  Federate Not Execution Member", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(f));
+            } catch ( AttributeNotDefined a ) {
+                logger.error( "{}:  could not update attributes:  Attribute Not Defined", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(a));
+            } catch ( AttributeNotOwned a ) {
+                logger.error( "{}:  could not update attributes:  Attribute Not Owned", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(a));
+            } catch ( ConcurrentAccessAttempted c ) {
+                logger.error( "{}:  could not update attributes:  Concurrent Access Attempted", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(c));
+            } catch ( InvalidFederationTime i ) {
+                logger.error( "{}:  could not update attributes:  Invalid Federation Time", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(i));
+            } catch ( Exception e ) {
+                logger.error( "{}:  could not update attributes", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(e));
             }
         }
     }
 
     /**
-     * Like {@link #updateAttributeValues(RTIambassador rti, double time, boolean force)},
+     * Like {@link #updateAttributeValues( RTIambassador rti, double time, boolean force )},
      * except "force" is always false.
      *
-     * @param rti  handle to the RTI
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
      * @param time timestamp on attribute values of this object
      */
-    public void updateAttributeValues(RTIambassador rti, double time) {
-        updateAttributeValues(rti, time, false);
+    public void updateAttributeValues( RTIambassador rti, double time ) {
+        updateAttributeValues( rti, time, false );
     }
 
     /**
@@ -1548,52 +2146,56 @@ public class ObjectRoot implements ObjectRootInterface {
      * no timestamp).  This call should be used for objects whose attributes have
      * "receive" ordering.
      *
-     * @param rti   handle to the RTI
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
      * @param force if "false", only the attributes whose values have changed since
-     *              the last call to "updateAttributeValues" will be broadcast to the RTI.  If
-     *              "true", all attributes and their values are broadcast to the RTI.
+     * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
+     * "true", all attributes and their values are broadcast to the RTI.
      */
-    public void updateAttributeValues(RTIambassador rti, boolean force) {
-        SuppliedAttributes suppliedAttributes = createSuppliedDatamembers(force);
-        if (suppliedAttributes.size() == 0) return;
+    public void updateAttributeValues( RTIambassador rti, boolean force ) {
 
-        synchronized (rti) {
+        SuppliedAttributes suppliedAttributes = createSuppliedAttributes( force );
+        if ( suppliedAttributes.size() == 0 ) return;
+
+        synchronized( rti ) {
             try {
-                rti.updateAttributeValues(getObjectHandle(), suppliedAttributes, null);
-            } catch (ObjectNotKnown e) {
-                logger.error("could not update attributes:  Object Not Known", e);
-                return;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not update attributes:  Federate Not Execution Member", e);
-                return;
-            } catch (AttributeNotDefined e) {
-                logger.error("could not update attributes:  Attribute Not Defined", e);
-                return;
-            } catch (AttributeNotOwned e) {
-                logger.error("could not update attributes:  Attribute Not Owned", e);
-                return;
-            } catch (ConcurrentAccessAttempted e) {
-                logger.error("could not update attributes:  Concurrent Access Attempted", e);
-                return;
-            } catch (Exception e) {
-                logger.error("could not update attributes", e);
+                rti.updateAttributeValues( getObjectHandle(), suppliedAttributes, null );
+            } catch ( ObjectNotKnown o ) {
+                logger.error( "{}:  could not update attributes:  Object Not Known", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(o));
+            } catch ( FederateNotExecutionMember f ) {
+                logger.error( "{}:  could not update attributes:  Federate Not Execution Member", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(f));
+            } catch ( AttributeNotDefined a ) {
+                logger.error( "{}:  could not update attributes:  Attribute Not Defined", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(a));
+            } catch ( AttributeNotOwned a ) {
+                logger.error( "{}:  could not update attributes:  Attribute Not Owned", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(a));
+            } catch ( ConcurrentAccessAttempted c ) {
+                logger.error( "{}:  could not update attributes:  Concurrent Access Attempted", getClass().getName() );
+                logger.error("{}", CpswtUtils.getStackTrace(c));
+            } catch ( Exception e ) {
+                logger.error("{}:  could not update attributes", getClass().getName());
+                logger.error("{}", CpswtUtils.getStackTrace(e));
             }
         }
     }
 
     /**
-     * Like {@link #updateAttributeValues(RTIambassador rti, boolean force)},
+     * Like {@link #updateAttributeValues( RTIambassador rti, boolean force )},
      * except "force" is always false.
      *
-     * @param rti handle to the RTI
+     * @param rti handle to the RTI, usu. obtained through the
+     * {@link SynchronizedFederate#getRTI()} call
      */
-    public void updateAttributeValues(RTIambassador rti) {
-        updateAttributeValues(rti, false);
+    public void updateAttributeValues( RTIambassador rti ) {
+        updateAttributeValues( rti, false );
     }
 
     protected static String _fedName = null;
-    protected static Map<String, String> _pubAttributeLogMap = new HashMap<String, String>();
-    protected static Map<String, String> _subAttributeLogMap = new HashMap<String, String>();
+    protected static Map<String, String> _pubAttributeLogMap = new HashMap<>();
+    protected static Map<String, String> _subAttributeLogMap = new HashMap<>();
 
     /**
      * For use with the melding API -- this method is used to cast
@@ -1601,10 +2203,10 @@ public class ObjectRoot implements ObjectRootInterface {
      * ObjectRootInterface interface.
      *
      * @param rootInstance ObjectRoot instance reference to be
-     *                     cast into the ObjectRootInterface interface
+     * cast into the ObjectRootInterface interface
      * @return ObjectRootInterface reference to the instance
      */
-    public ObjectRootInterface cast(ObjectRoot rootInstance) {
+    public ObjectRootInterface cast( ObjectRoot rootInstance ) {
         return rootInstance;
     }
 
@@ -1620,6 +2222,17 @@ public class ObjectRoot implements ObjectRootInterface {
         return new ObjectRoot();
     }
 
-    public void copyFrom(Object object) {
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean first = true;
+        for(ClassAndPropertyName classAndPropertyName: getAllAttributeNames()) {
+            if (first) first = false;
+            else stringBuilder.append(",");
+            stringBuilder.append(classAndPropertyName).append("=").
+              append(classAndPropertyNameValueMap.get(classAndPropertyName));
+        }
+        return getClassName() + "(" + stringBuilder + ")";
     }
+
 }

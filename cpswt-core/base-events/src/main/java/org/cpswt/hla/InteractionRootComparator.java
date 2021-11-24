@@ -1,6 +1,7 @@
 package org.cpswt.hla;
 
 import java.util.Comparator;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 
 public class InteractionRootComparator implements Comparator<InteractionRoot> {
     public int compare(InteractionRoot interactionRoot1, InteractionRoot interactionRoot2) {
