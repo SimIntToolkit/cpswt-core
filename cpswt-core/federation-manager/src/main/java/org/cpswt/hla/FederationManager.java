@@ -652,7 +652,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 for (InteractionRoot interactionRoot : interactionRootList) {
                     if (notFirst) interactionClassList += ", ";
                     notFirst = true;
-                    interactionClassList += interactionRoot.getClassName();
+                    interactionClassList += interactionRoot.getHlaClassName();
                 }
                 logger.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList);
             } else if (intrtime >= tmin && intrtime < tmin + super.getStepSize()) {
