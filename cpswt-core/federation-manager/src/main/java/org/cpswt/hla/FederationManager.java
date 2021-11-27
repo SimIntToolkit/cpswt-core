@@ -84,11 +84,11 @@ import org.cpswt.hla.ObjectRoot_p.FederateObject;
  */
 public class FederationManager extends SynchronizedFederate implements COAExecutorEventListener {
 
-    private static Logger logger = LogManager.getLogger(FederationManager.class);
+    private static final Logger logger = LogManager.getLogger(FederationManager.class);
 
-    private Set<String> _synchronizationLabels = new HashSet<>();
+    private final Set<String> _synchronizationLabels = new HashSet<>();
 
-    private FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
+    private final FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
     private IC2WFederationEventsHandler _federationEventsHandler = null;
 
     /*
@@ -104,7 +104,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * The name of the Federation.
      */
-    private String federationId;
+    private final String federationId;
 
     /**
      * Indicates if real time mode is on.

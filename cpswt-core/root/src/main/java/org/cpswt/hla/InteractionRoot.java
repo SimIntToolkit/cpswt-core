@@ -30,6 +30,7 @@ import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,8 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.json.JSONObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -389,7 +392,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return the fully-qualified name of the interaction class that
       * corresponds to the RTI-defined classHandle
       */
-    public static String get_class_name( int classHandle ) {
+    public static String get_hla_class_name( int classHandle ) {
         return _classHandleNameMap.get( classHandle );
     }
 
@@ -684,12 +687,12 @@ public class InteractionRoot implements InteractionRootInterface {
     public void setParameter(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
-          getParameterAux(getClassName(), propertyName);
+          getParameterAux(getHlaClassName(), propertyName);
 
         if (propertyClassNameAndValue == null) {
             logger.error(
               "setparameter(\"{}\", {} value): could not find \"{}\" parameter of class \"{}\" or its " +
-              "superclasses.", propertyName, value.getClass().getName(), propertyName, getClassName()
+              "superclasses.", propertyName, value.getClass().getName(), propertyName, getHlaClassName()
             );
             return;
         }
@@ -782,7 +785,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the value of the parameter whose name is "propertyName"
      */
     public Object getParameter(String propertyName) {
-        return getParameterAux(getClassName(), propertyName).getValue();
+        return getParameterAux(getHlaClassName(), propertyName).getValue();
     }
 
     /**
@@ -829,23 +832,23 @@ public class InteractionRoot implements InteractionRootInterface {
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
-     * For the polymorphic version of this method, use {@link #getClassName()}.
+     * For the polymorphic version of this method, use {@link #getJavaClassName()}.
      *
-     * @return the fully-qualified HLA class path for this interaction class
+     * @return the fully-qualified Java class name for this interaction class
      */
-    public static String get_class_name() {
+    public static String get_java_class_name() {
         return "InteractionRoot";
     }
 
     /**
      * Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
-     * Polymorphic equivalent of get_class_name static method.
+     * Polymorphic equivalent of get_java_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's interaction class
      */
     @Override
-    public String getClassName() {
-        return get_class_name();
+    public String getJavaClassName() {
+        return get_java_class_name();
     }
 
     /**
@@ -868,6 +871,30 @@ public class InteractionRoot implements InteractionRootInterface {
     @Override
     public String getSimpleClassName() {
         return get_simple_class_name();
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) federation name of the InteractionRoot interaction class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the federation name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getHlaClassName()}.
+     *
+     * @return the fully-qualified federation (HLA) class name for this interaction class
+     */
+    public static String get_hla_class_name() {
+        return "InteractionRoot";
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
+     */
+    @Override
+    public String getHlaClassName() {
+        return get_hla_class_name();
     }
 
     private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
@@ -936,218 +963,18 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     static {
         // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-        _classNameSet.add(get_class_name());
-        
+        _classNameSet.add(get_hla_class_name());
+
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_class_name(), InteractionRoot.class);
+        _classNameClassMap.put(get_hla_class_name(), InteractionRoot.class);
 
         // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNamePropertyNameSetMap.put(get_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
 
         // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNameAllPropertyNameSetMap.put(get_class_name(), _allClassAndPropertyNameList);
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.ActionBase", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.ActionBase", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction", "FederateId"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction", "FederateType"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction", "IsLateJoiner"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateId"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateType"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "IsLateJoiner"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.Ping", "Count"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimInput", "data"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog", "Comment"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog", "FedName"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog", "Time"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio", "Comment"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio", "FedName"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio", "Time"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio", "Comment"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio", "FedName"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio", "Time"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio", "Comment"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio", "FedName"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio", "Time"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio", "Comment"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio", "FedName"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio", "Time"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimOutput", "data"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause", "sourceFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume", "originFed"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume", "sourceFed"
-        ));
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
     }
 
     // --------------------------------------------------------
@@ -1201,7 +1028,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * VALUE FOR THE "className" ARGUMENT.
      */
     protected static int get_parameter_handle_aux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), propertyName);
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
         if (_classAndPropertyNameHandleMap.containsKey(key)) {
             return _classAndPropertyNameHandleMap.get(key);
         }
@@ -1220,7 +1047,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
      */
     public static int get_parameter_handle(String propertyName) {
-        return get_parameter_handle_aux(get_class_name(), propertyName);
+        return get_parameter_handle_aux(get_hla_class_name(), propertyName);
     }
 
     /**
@@ -1247,7 +1074,7 @@ public class InteractionRoot implements InteractionRootInterface {
         boolean isNotInitialized = true;
         while(isNotInitialized) {
             try {
-                _handle = rti.getInteractionClassHandle(get_class_name());
+                _handle = rti.getInteractionClassHandle(get_hla_class_name());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember e) {
                 logger.error("could not initialize: Federate Not Execution Member", e);
@@ -1261,8 +1088,8 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        _classNameHandleMap.put(get_class_name(), get_class_handle());
-        _classHandleNameMap.put(get_class_handle(), get_class_name());
+        _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
+        _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
         _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
     }
 
@@ -1307,7 +1134,7 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        logger.debug("publish: {}", get_class_name());
+        logger.debug("publish: {}", get_hla_class_name());
     }
 
     /**
@@ -1356,7 +1183,7 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        logger.debug("unpublish: {}", get_class_name());
+        logger.debug("unpublish: {}", get_hla_class_name());
     }
 
     /**
@@ -1402,7 +1229,7 @@ public class InteractionRoot implements InteractionRootInterface {
         }
 
         _isSubscribed = true;
-        logger.debug("subscribe: {}", get_class_name());
+        logger.debug("subscribe: {}", get_hla_class_name());
     }
 
     /**
@@ -1449,7 +1276,7 @@ public class InteractionRoot implements InteractionRootInterface {
         }
 
         _isSubscribed = false;
-        logger.debug("unsubscribe: {}", get_class_name());
+        logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
     /**
@@ -1483,10 +1310,10 @@ public class InteractionRoot implements InteractionRootInterface {
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
     protected PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), "");
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "");
         if (classAndPropertyNameValueMap.containsKey(key)) {
             Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(get_class_name(), value);
+            return new PropertyClassNameAndValue(get_hla_class_name(), value);
         }
 
         logger.error(
@@ -1657,7 +1484,7 @@ public class InteractionRoot implements InteractionRootInterface {
         setParameter(handle, valueAsString);
     }
 
-    protected static Map<ClassAndPropertyName, String> _classAndPropertyNameTypeMap = new HashMap<>();
+    protected static Map<ClassAndPropertyName, Class> _classAndPropertyNameTypeMap = new HashMap<>();
 
     private SuppliedParameters createSuppliedParameters() {
         SuppliedParameters suppliedParameters = _factory.createSuppliedParameters();
@@ -1680,7 +1507,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * less than the current federation time + the LOOKAHEAD value of the federate
      * sending this interaction.
      */
-    public void sendInteraction( RTIambassador rti, double time ) {
+    public void sendInteraction( RTIambassador rti, double time ) throws Exception {
         synchronized( rti ) {
             try {
                 SuppliedParameters suppliedParameters = createSuppliedParameters();
@@ -1703,7 +1530,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public void sendInteraction( RTIambassador rti ) {
+    public void sendInteraction( RTIambassador rti ) throws Exception {
         synchronized( rti ) {
             try {
                 SuppliedParameters suppliedParameters = createSuppliedParameters();
@@ -1749,6 +1576,54 @@ public class InteractionRoot implements InteractionRootInterface {
         return new InteractionRoot();
     }
 
+    private static Object castNumber(Object object, Class<?> desiredType) {
+        if (!desiredType.isInstance(object) && object instanceof Number && Number.class.isAssignableFrom(desiredType)) {
+            String desiredTypeName = desiredType.getSimpleName().toLowerCase();
+            Method conversionMethod;
+            try {
+                conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
+                return conversionMethod.invoke(object);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
+        }
+        return object;
+    }
+
+    public String toJson() {
+        JSONObject topLevelJSONObject = new JSONObject();
+        topLevelJSONObject.put("messaging_type", "interaction");
+        topLevelJSONObject.put("messaging_name", getHlaClassName());
+
+        JSONObject propertyJSONObject = new JSONObject();
+        topLevelJSONObject.put("properties", propertyJSONObject);
+        for(ClassAndPropertyName key : classAndPropertyNameValueMap.keySet()) {
+            Object value = classAndPropertyNameValueMap.get(key);
+            propertyJSONObject.put(key.toString(), value);
+        }
+        return topLevelJSONObject.toString(4);
+    }
+
+    public static InteractionRoot fromJson(String jsonString) {
+        JSONObject jsonObject = new JSONObject(jsonString);
+        String className = jsonObject.getString("messaging_name");
+        InteractionRoot interactionRoot = create_interaction(className);
+        if (interactionRoot == null) {
+            logger.error("InteractionRoot:  fromJson(String):  no such interaction class \"{}\"", className);
+            return null;
+        }
+
+        JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
+        for (String key : propertyJSONObject.keySet()) {
+            ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
+
+            Class<?> desiredType = _classAndPropertyNameTypeMap.get(classAndPropertyName);
+            Object object = castNumber(propertyJSONObject.get(key), desiredType);
+            interactionRoot.classAndPropertyNameValueMap.put(classAndPropertyName, object);
+        }
+
+        return interactionRoot;
+    }
+
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -1759,7 +1634,7 @@ public class InteractionRoot implements InteractionRootInterface {
             stringBuilder.append(classAndPropertyName).append("=").
               append(classAndPropertyNameValueMap.get(classAndPropertyName));
         }
-        return getClassName() + "(" + stringBuilder + ")";
+        return getHlaClassName() + "(" + stringBuilder + ")";
     }
 
 }

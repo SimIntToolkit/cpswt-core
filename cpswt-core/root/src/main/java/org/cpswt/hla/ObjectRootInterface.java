@@ -7,13 +7,21 @@ public interface ObjectRootInterface {
     //-----------------------------------------------------------------
     // ClassAndPropertyName CLASS -- USED AS KEY/VALUE FOR MAPS BELOW
     //-----------------------------------------------------------------
-    static class ClassAndPropertyName implements Comparable<ClassAndPropertyName> {
+    class ClassAndPropertyName implements Comparable<ClassAndPropertyName> {
+        private static final String separatorChar = ">";
+
         private final String className;
         private final String propertyName;
 
         public ClassAndPropertyName(String className, String propertyName) {
             this.className = className;
             this.propertyName = propertyName;
+        }
+
+        public ClassAndPropertyName(String classAndPropertyNameString) {
+            String[] classAndPropertyNameArray = classAndPropertyNameString.split(separatorChar);
+            this.className = classAndPropertyNameArray[0];
+            this.propertyName = classAndPropertyNameArray[1];
         }
 
         public String getClassName() {
@@ -30,8 +38,18 @@ public interface ObjectRootInterface {
         }
 
         @Override
+        public boolean equals(Object object) {
+            if (!(object instanceof ClassAndPropertyName)) {
+                return false;
+            }
+            ClassAndPropertyName other = (ClassAndPropertyName)object;
+
+            return className.equals(other.className) && propertyName.equals(other.propertyName);
+        }
+
+        @Override
         public String toString() {
-            return className + ">" + propertyName;
+            return className + separatorChar + propertyName;
         }
 
         @Override
@@ -59,11 +77,11 @@ public interface ObjectRootInterface {
     int getClassHandle();
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Returns the fully-qualified (dot-delimited) Java class name of this instance's object class.
      *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     * @return the fully-qualified (dot-delimited) Java class name of this instance's object class
      */
-    String getClassName();
+    String getJavaClassName();
 
     /**
      * Returns the simple name (last name in its fully-qualified dot-delimited name)
@@ -72,6 +90,13 @@ public interface ObjectRootInterface {
      * @return the simple name of this instance's object class
      */
     String getSimpleClassName();
+
+    /**
+     * Returns the fully-qualified (dot-delimited) HLA name of this instance's object class.
+     *
+     * @return the fully-qualified (dot-delimited) HLA class name of this instance's object class
+     */
+    String getHlaClassName();
 
     /**
      * Returns a set containing the names of all of the non-hiddenattributes of an

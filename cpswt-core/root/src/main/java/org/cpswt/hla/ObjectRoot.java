@@ -30,6 +30,7 @@ import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,8 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.json.JSONObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -446,7 +449,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return the fully-qualified name of the object class that
       * corresponds to the RTI-defined classHandle
       */
-    public static String get_class_name( int classHandle ) {
+    public static String get_hla_class_name( int classHandle ) {
         return _classHandleNameMap.get( classHandle );
     }
 
@@ -1175,15 +1178,15 @@ public class ObjectRoot implements ObjectRootInterface {
                 rti.requestObjectAttributeValueUpdate( getObjectHandle(), getSubscribedAttributeHandleSet() );
                 requestNotSubmitted = false;
             } catch ( FederateNotExecutionMember f ) {
-                logger.error( "{}: request for update failed:  Federate Not Execution Member", getClassName() );
+                logger.error( "{}: request for update failed:  Federate Not Execution Member", getHlaClassName() );
                 logger.error("{}", CpswtUtils.getStackTrace(f));
                 return;
             } catch ( ObjectNotKnown o ) {
-                logger.error( "{}: request for update failed:  Object Not Known", getClassName() );
+                logger.error( "{}: request for update failed:  Object Not Known", getHlaClassName() );
                 logger.error("{}", CpswtUtils.getStackTrace(o));
                 return;
             } catch ( AttributeNotDefined a ) {
-                logger.error( "{}: request for update failed:  Name Not Found", getClassName() );
+                logger.error( "{}: request for update failed:  Name Not Found", getHlaClassName() );
                 logger.error("{}", CpswtUtils.getStackTrace(a));
                 return;
             } catch ( Exception e ) {
@@ -1226,12 +1229,12 @@ public class ObjectRoot implements ObjectRootInterface {
     public void setAttribute(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
-          getAttributeAux(getClassName(), propertyName);
+          getAttributeAux(getHlaClassName(), propertyName);
 
         if (propertyClassNameAndValue == null) {
             logger.error(
               "setattribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
-              "superclasses.", propertyName, value.getClass().getName(), propertyName, getClassName()
+              "superclasses.", propertyName, value.getClass().getName(), propertyName, getHlaClassName()
             );
             return;
         }
@@ -1322,7 +1325,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the value of the attribute whose name is "propertyName"
      */
     public Object getAttribute(String propertyName) {
-        return ((Attribute<?>)getAttributeAux(getClassName(), propertyName).getValue()).getValue();
+        return ((Attribute<?>)getAttributeAux(getHlaClassName(), propertyName).getValue()).getValue();
     }
 
     /**
@@ -1369,23 +1372,23 @@ public class ObjectRoot implements ObjectRootInterface {
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
-     * For the polymorphic version of this method, use {@link #getClassName()}.
+     * For the polymorphic version of this method, use {@link #getJavaClassName()}.
      *
-     * @return the fully-qualified HLA class path for this object class
+     * @return the fully-qualified Java class name for this object class
      */
-    public static String get_class_name() {
+    public static String get_java_class_name() {
         return "ObjectRoot";
     }
 
     /**
      * Returns the fully-qualified (dot-delimited) name of this instance's object class.
-     * Polymorphic equivalent of get_class_name static method.
+     * Polymorphic equivalent of get_java_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's object class
      */
     @Override
-    public String getClassName() {
-        return get_class_name();
+    public String getJavaClassName() {
+        return get_java_class_name();
     }
 
     /**
@@ -1408,6 +1411,30 @@ public class ObjectRoot implements ObjectRootInterface {
     @Override
     public String getSimpleClassName() {
         return get_simple_class_name();
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) federation name of the ObjectRoot object class.
+     * Note: As this is a static method, it is NOT polymorphic, and so, if called on
+     * a reference will return the federation name of the class pertaining to the reference,
+     * rather than the name of the class for the instance referred to by the reference.
+     * For the polymorphic version of this method, use {@link #getHlaClassName()}.
+     *
+     * @return the fully-qualified federation (HLA) class name for this object class
+     */
+    public static String get_hla_class_name() {
+        return "ObjectRoot";
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    @Override
+    public String getHlaClassName() {
+        return get_hla_class_name();
     }
 
     private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
@@ -1473,47 +1500,43 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final Set<ClassAndPropertyName> _publishedAttributeNameSet = new HashSet<>();
     private static final Set<ClassAndPropertyName> _subscribedAttributeNameSet = new HashSet<>();
 
+    protected Set<ClassAndPropertyName> get_published_attribute_name_set() {
+        return _publishedAttributeNameSet;
+    }
+
+    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+        return _subscribedAttributeNameSet;
+    }
+
+    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
+        return get_published_attribute_name_set();
+    }
+
+    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
+        return get_subscribed_attribute_name_set();
+    }
+
 
     /*
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
         // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-        _classNameSet.add(get_class_name());
-        
+        _classNameSet.add(get_hla_class_name());
+
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
-        _classNameClassMap.put(get_class_name(), ObjectRoot.class);
+        _classNameClassMap.put(get_hla_class_name(), ObjectRoot.class);
 
         // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNamePropertyNameSetMap.put(get_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
 
         // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNameAllPropertyNameSetMap.put(get_class_name(), _allClassAndPropertyNameList);
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHandle"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHost"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateType"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "ObjectRoot_p.PingCount", "RunningCount"
-        ));
-
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
-            "ObjectRoot_p.PingCount", "SinkName"
-        ));
-
-        _classNamePublishedAttributeNameSetMap.put(get_class_name(), _publishedAttributeNameSet);
-        _classNameSubscribedAttributeNameSetMap.put(get_class_name(), _subscribedAttributeNameSet);
+        _classNamePublishedAttributeNameSetMap.put(get_hla_class_name(), _publishedAttributeNameSet);
+        _classNameSubscribedAttributeNameSetMap.put(get_hla_class_name(), _subscribedAttributeNameSet);
     }
 
     // --------------------------------------------------------
@@ -1567,7 +1590,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * VALUE FOR THE "className" ARGUMENT.
      */
     protected static int get_attribute_handle_aux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), propertyName);
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
         if (_classAndPropertyNameHandleMap.containsKey(key)) {
             return _classAndPropertyNameHandleMap.get(key);
         }
@@ -1586,7 +1609,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
      */
     public static int get_attribute_handle(String propertyName) {
-        return get_attribute_handle_aux(get_class_name(), propertyName);
+        return get_attribute_handle_aux(get_hla_class_name(), propertyName);
     }
 
     /**
@@ -1604,10 +1627,10 @@ public class ObjectRoot implements ObjectRootInterface {
 
     static {
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNamePublishedAttributeHandleSetMap.put(get_class_name(), _publishedAttributeHandleSet);
+        _classNamePublishedAttributeHandleSetMap.put(get_hla_class_name(), _publishedAttributeHandleSet);
 
         _subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNameSubscribedAttributeHandleSetMap.put(get_class_name(), _subscribedAttributeHandleSet);
+        _classNameSubscribedAttributeHandleSetMap.put(get_hla_class_name(), _subscribedAttributeHandleSet);
     }
 
     private static boolean _isInitialized = false;
@@ -1623,7 +1646,7 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean isNotInitialized = true;
         while(isNotInitialized) {
             try {
-                _handle = rti.getObjectClassHandle(get_class_name());
+                _handle = rti.getObjectClassHandle(get_hla_class_name());
                 isNotInitialized = false;
             } catch (FederateNotExecutionMember e) {
                 logger.error("could not initialize: Federate Not Execution Member", e);
@@ -1637,8 +1660,8 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _classNameHandleMap.put(get_class_name(), get_class_handle());
-        _classHandleNameMap.put(get_class_handle(), get_class_name());
+        _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
+        _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
         _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
     }
 
@@ -1668,7 +1691,7 @@ public class ObjectRoot implements ObjectRootInterface {
         for(ClassAndPropertyName key : _publishedAttributeNameSet) {
             try {
                 _publishedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
-                logger.trace("publish {}:{}", get_class_name(), key.toString());
+                logger.trace("publish {}:{}", get_hla_class_name(), key.toString());
             } catch (Exception e) {
                 logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
             }
@@ -1693,7 +1716,7 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        logger.debug("publish: {}", get_class_name());
+        logger.debug("publish: {}", get_hla_class_name());
     }
 
     /**
@@ -1742,7 +1765,7 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        logger.debug("unpublish: {}", get_class_name());
+        logger.debug("unpublish: {}", get_hla_class_name());
     }
 
     /**
@@ -1772,7 +1795,7 @@ public class ObjectRoot implements ObjectRootInterface {
         for(ClassAndPropertyName key : _subscribedAttributeNameSet) {
             try {
                 _subscribedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
-                logger.trace("subscribe {}:{}", get_class_name(), key.toString());
+                logger.trace("subscribe {}:{}", get_hla_class_name(), key.toString());
             } catch (Exception e) {
                 logger.error("could not subscribe to \"" + key + "\" attribute.", e);
             }
@@ -1798,7 +1821,7 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
         _isSubscribed = true;
-        logger.debug("subscribe: {}", get_class_name());
+        logger.debug("subscribe: {}", get_hla_class_name());
     }
 
     /**
@@ -1845,7 +1868,7 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
         _isSubscribed = false;
-        logger.debug("unsubscribe: {}", get_class_name());
+        logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
     /**
@@ -1891,10 +1914,10 @@ public class ObjectRoot implements ObjectRootInterface {
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
     protected PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_class_name(), "");
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "");
         if (classAndPropertyNameValueMap.containsKey(key)) {
             Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(get_class_name(), value);
+            return new PropertyClassNameAndValue(get_hla_class_name(), value);
         }
 
         logger.error(
@@ -2069,7 +2092,7 @@ public class ObjectRoot implements ObjectRootInterface {
         setAttribute(handle, valueAsString);
     }
 
-    protected static Map<ClassAndPropertyName, String> _classAndPropertyNameTypeMap = new HashMap<>();
+    protected static Map<ClassAndPropertyName, Class> _classAndPropertyNameTypeMap = new HashMap<>();
 
     protected SuppliedAttributes createSuppliedAttributes(boolean force) {
         SuppliedAttributes suppliedAttributes = _factory.createSuppliedAttributes();
@@ -2222,6 +2245,59 @@ public class ObjectRoot implements ObjectRootInterface {
         return new ObjectRoot();
     }
 
+    private static Object castNumber(Object object, Class<?> desiredType) {
+        if (!desiredType.isInstance(object) && object instanceof Number && Number.class.isAssignableFrom(desiredType)) {
+            String desiredTypeName = desiredType.getSimpleName().toLowerCase();
+            Method conversionMethod;
+            try {
+                conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
+                return conversionMethod.invoke(object);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
+        }
+        return object;
+    }
+
+    public String toJson() {
+        JSONObject topLevelJSONObject = new JSONObject();
+        topLevelJSONObject.put("messaging_type", "object");
+        topLevelJSONObject.put("object_handle", getObjectHandle());
+
+        JSONObject propertyJSONObject = new JSONObject();
+        topLevelJSONObject.put("properties", propertyJSONObject);
+        for(ClassAndPropertyName key : getPublishedAttributeNameSet()) {
+            Attribute<Object> value = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+            propertyJSONObject.put(key.toString(), value.getValue());
+        }
+        return topLevelJSONObject.toString(4);
+    }
+
+    public static void fromJson(String jsonString) {
+        JSONObject jsonObject = new JSONObject(jsonString);
+        int objectHandle = jsonObject.getInt("object_handle");
+        ObjectRoot objectRoot = _objectMap.getOrDefault(objectHandle, null);
+        if (objectRoot == null) {
+            logger.error(
+                    "ObjectRoot:  fromJson:  no registered object exists with recieved object-handle ({})",
+                    objectHandle
+            );
+            return;
+        }
+
+        Set<ClassAndPropertyName> subscribedAttributeNameSet = objectRoot.getSubscribedAttributeNameSet();
+
+        JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
+        for (String key : propertyJSONObject.keySet()) {
+            ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
+            if (subscribedAttributeNameSet.contains(classAndPropertyName)) {
+
+                Class<?> desiredType = _classAndPropertyNameTypeMap.get(classAndPropertyName);
+                Object object = castNumber(propertyJSONObject.get(key), desiredType);
+                ((Attribute<Object>)objectRoot.classAndPropertyNameValueMap.get(classAndPropertyName)).setValue(object);
+            }
+        }
+    }
+
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -2232,7 +2308,7 @@ public class ObjectRoot implements ObjectRootInterface {
             stringBuilder.append(classAndPropertyName).append("=").
               append(classAndPropertyNameValueMap.get(classAndPropertyName));
         }
-        return getClassName() + "(" + stringBuilder + ")";
+        return getHlaClassName() + "(" + stringBuilder + ")";
     }
 
 }

@@ -12,12 +12,23 @@ val archivaHostId: String by project
 val archivaPort: String by project
 
 
+repositories {
+    mavenCentral()
+    maven {
+            isAllowInsecureProtocol = true
+        url = uri("http://$archivaHostId:$archivaPort/repository/snapshots")
+    }
+}
+
 dependencies {
     implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
+    implementation(group="org.json", name="json", version="20210307")
     implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
+
+
 }
 
 publishing {
