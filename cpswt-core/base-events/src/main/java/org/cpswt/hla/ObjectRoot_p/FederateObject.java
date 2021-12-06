@@ -1,3 +1,4 @@
+
 package org.cpswt.hla.ObjectRoot_p;
 
 import java.util.HashMap;
@@ -5,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +25,7 @@ import hla.rti.SuppliedAttributes;
 
 
 /**
- * Implements ObjectRoot_p.FederateObject
+ * Implements org.cpswt.hla.ObjectRoot_p.FederateObject
  */
 @SuppressWarnings("unused")
 public class FederateObject extends org.cpswt.hla.ObjectRoot {
@@ -39,7 +41,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ObjectRoot_p.FederateObject object class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -48,7 +50,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @return the fully-qualified Java class name for this object class
      */
     public static String get_java_class_name() {
-        return "ObjectRoot_p.FederateObject";
+        return "org.cpswt.hla.ObjectRoot_p.FederateObject";
     }
 
     /**
@@ -64,7 +66,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the ObjectRoot_p.FederateObject object class.
+     * class name) of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @return the name of this object class
      */
@@ -85,7 +87,8 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) federation name of the ObjectRoot.FederateObject object class.
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * ObjectRoot.FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -98,7 +101,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
      * Polymorphic equivalent of get_hla_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's object class
@@ -108,60 +111,76 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the non-hidden attributes in the
-     * ObjectRoot_p.FederateObject object class.
+     * Returns a sorted list containing the names of all of the non-hidden attributes in the
+     * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getAttributeNames()}.
      *
-     * @return a modifiable set of the non-hidden attribute names for this object class
+     * @return a sorted list of the non-hidden attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_attribute_names() {
-        return new ArrayList<>(_classAndPropertyNameList);
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the non-hiddenattributes of an
+     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
      * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent to get_attribute_names static method.
      *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAttributeNames() {
         return get_attribute_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the attributes in the
-     * ObjectRoot_p.FederateObject object class.
+     * Returns a sorted list containing the names of all of the attributes in the
+     * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return a set of parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getAttributeNames()}.
      *
-     * @return a modifiable set of the attribute names for this object class
+     * @return a sorted list of the attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_attribute_names() {
-        return new ArrayList<>(_allClassAndPropertyNameList);
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the attributes of an
+     * Returns a sorted list containing the names of all of the attributes of an
      * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent of get_all_attribute_names() static method.
      *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAllAttributeNames() {
@@ -175,12 +194,12 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return _publishedAttributeNameSet;
     }
 
-    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
-        return _subscribedAttributeNameSet;
-    }
-
     protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
         return get_published_attribute_name_set();
+    }
+
+    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+        return _subscribedAttributeNameSet;
     }
 
     protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
@@ -198,20 +217,20 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
         _classNameClassMap.put(get_hla_class_name(), FederateObject.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
-        _classAndPropertyNameList.add(new ClassAndPropertyName(
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateHandle"
         ));
-        _classAndPropertyNameList.add(new ClassAndPropertyName(
+        _classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateHost"
         ));
-        _classAndPropertyNameList.add(new ClassAndPropertyName(
+        _classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateType"
         ));
 
@@ -226,15 +245,15 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
         _classAndPropertyNameTypeMap.put(key, String.class);
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateHandle"
         ));
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateHost"
         ));
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot_p.FederateObject", "FederateType"
         ));
 
@@ -255,7 +274,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     private static int _handle;
 
     /**
-     * Returns the handle (RTI assigned) of the ObjectRoot_p.FederateObject object class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -302,7 +321,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "ObjectRoot_p.FederateObject") given the attribute's name.
+     * this object class (i.e. "org.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
@@ -372,18 +391,18 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         while(isNotInitialized) {
             try {
 
-                propertyHandle = rti.getAttributeHandle("{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateHandle'}", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateHandle'}");
+                propertyHandle = rti.getAttributeHandle("FederateHandle", get_class_handle());
+                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateHandle");
                 _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
                 _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
 
-                propertyHandle = rti.getAttributeHandle("{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateHost'}", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateHost'}");
+                propertyHandle = rti.getAttributeHandle("FederateHost", get_class_handle());
+                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateHost");
                 _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
                 _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
 
-                propertyHandle = rti.getAttributeHandle("{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateType'}", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "{'class_name': 'ObjectRoot_p.FederateObject', 'property_name': 'FederateType'}");
+                propertyHandle = rti.getAttributeHandle("FederateType", get_class_handle());
+                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
                 _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
                 _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
 
@@ -416,7 +435,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     private static boolean _isPublished = false;
 
     /**
-     * Publishes the ObjectRoot_p.FederateObject object class for a federate.
+     * Publishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -471,7 +490,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
 
     /**
-     * Unpublishes the ObjectRoot_p.FederateObject object class for a federate.
+     * Unpublishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -521,7 +540,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     private static boolean _isSubscribed = false;
 
     /**
-     * Subscribes a federate to the ObjectRoot_p.FederateObject object class.
+     * Subscribes a federate to the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -575,7 +594,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Unsubscribes a federate from the ObjectRoot_p.FederateObject object class.
+     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -626,12 +645,12 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the ObjectRoot_p.FederateObject object class).
+     * (that is, the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the ObjectRoot_p.FederateObject object class).
+     * this class (the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the ObjectRoot_p.FederateObject object class).
+     * (that is, the org.cpswt.hla.ObjectRoot_p.FederateObject object class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -788,9 +807,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHandle" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_FederateHandle() {
+    public static void publish_FederateHandle_attribute() {
         _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
     }
 
@@ -800,9 +819,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHandle" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_FederateHandle() {
+    public static void unpublish_FederateHandle_attribute() {
         _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
     }
 
@@ -812,9 +831,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHandle" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_FederateHandle() {
+    public static void subscribe_FederateHandle_attribute() {
         _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
     }
 
@@ -824,9 +843,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHandle" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_FederateHandle() {
+    public static void unsubscribe_FederateHandle_attribute() {
         _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
     }
 
@@ -836,9 +855,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHost" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_FederateHost() {
+    public static void publish_FederateHost_attribute() {
         _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
     }
 
@@ -848,9 +867,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHost" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_FederateHost() {
+    public static void unpublish_FederateHost_attribute() {
         _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
     }
 
@@ -860,9 +879,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHost" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_FederateHost() {
+    public static void subscribe_FederateHost_attribute() {
         _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
     }
 
@@ -872,9 +891,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateHost" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_FederateHost() {
+    public static void unsubscribe_FederateHost_attribute() {
         _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
     }
 
@@ -884,9 +903,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateType" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_FederateType() {
+    public static void publish_FederateType_attribute() {
         _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
     }
 
@@ -896,9 +915,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateType" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
-    * (using <objectClassName>.publish( RTIambassador rti ) ).
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_FederateType() {
+    public static void unpublish_FederateType_attribute() {
         _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
     }
 
@@ -908,9 +927,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateType" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_FederateType() {
+    public static void subscribe_FederateType_attribute() {
         _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
     }
 
@@ -920,9 +939,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * Note:  This method only marks the "FederateType" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
-    * (using <objectClassName>.subscribe( RTIambassador rti ) ).
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_FederateType() {
+    public static void unsubscribe_FederateType_attribute() {
         _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
     }
 
@@ -976,9 +995,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
 
         // DEEP(ER) COPY FOR OBJECTS
-        for(ClassAndPropertyName key: classAndPropertyNameValueMap.keySet()) {
-            classAndPropertyNameValueMap.put(key, new Attribute<Object>(classAndPropertyNameValueMap.get(key)));
-        }
+        classAndPropertyNameValueMap.replaceAll((k, v) -> new Attribute<>(classAndPropertyNameValueMap.get(k)));
 
     }
 }

@@ -44,13 +44,13 @@ public class JsonTest {
 
         FederateObject.publish_object(rtiambassador);
 
-        FederateObject.publish_FederateType();
-        FederateObject.publish_FederateHost();
-        FederateObject.publish_FederateHandle();
+        FederateObject.publish_FederateType_attribute();
+        FederateObject.publish_FederateHost_attribute();
+        FederateObject.publish_FederateHandle_attribute();
 
-        FederateObject.subscribe_FederateType();
-        FederateObject.subscribe_FederateHost();
-        FederateObject.subscribe_FederateHandle();
+        FederateObject.subscribe_FederateType_attribute();
+        FederateObject.subscribe_FederateHost_attribute();
+        FederateObject.subscribe_FederateHandle_attribute();
 
         FederateObject federateObject1 = new FederateObject();
 

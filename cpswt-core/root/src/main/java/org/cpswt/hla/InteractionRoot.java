@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.json.JSONObject;
 
@@ -828,7 +829,7 @@ public class InteractionRoot implements InteractionRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the InteractionRoot interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -837,7 +838,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "InteractionRoot";
+        return "org.cpswt.hla.InteractionRoot";
     }
 
     /**
@@ -853,7 +854,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the InteractionRoot interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot interaction class.
      *
      * @return the name of this interaction class
      */
@@ -874,7 +875,8 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) federation name of the InteractionRoot interaction class.
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -887,7 +889,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
      * Polymorphic equivalent of get_hla_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's interaction class
@@ -897,60 +899,76 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the non-hidden parameters in the
-     * InteractionRoot interaction class.
+     * Returns a sorted list containing the names of all of the non-hidden parameters in the
+     * org.cpswt.hla.InteractionRoot interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getParameterNames()}.
      *
-     * @return a modifiable set of the non-hidden parameter names for this interaction class
+     * @return a sorted list of the non-hidden parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_parameter_names() {
-        return new ArrayList<>(_classAndPropertyNameList);
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the non-hiddenparameters of an
+     * Returns a sorted list containing the names of all of the non-hiddenparameters of an
      * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent to get_parameter_names static method.
      *
-     * @return set containing the names of all of the parameters of an
-     * interaction class instance
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getParameterNames() {
         return get_parameter_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the parameters in the
-     * InteractionRoot interaction class.
+     * Returns a sorted list containing the names of all of the parameters in the
+     * org.cpswt.hla.InteractionRoot interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return a set of parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getParameterNames()}.
      *
-     * @return a modifiable set of the parameter names for this interaction class
+     * @return a sorted list of the parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_parameter_names() {
-        return new ArrayList<>(_allClassAndPropertyNameList);
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the parameters of an
+     * Returns a sorted list containing the names of all of the parameters of an
      * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent of get_all_parameter_names() static method.
      *
-     * @return set containing the names of all of the parameters of an
-     * interaction class instance
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAllParameterNames() {
@@ -968,13 +986,13 @@ public class InteractionRoot implements InteractionRootInterface {
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), InteractionRoot.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
     }
 
     // --------------------------------------------------------
@@ -990,7 +1008,7 @@ public class InteractionRoot implements InteractionRootInterface {
     private static int _handle;
 
     /**
-     * Returns the handle (RTI assigned) of the InteractionRoot interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -1041,7 +1059,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "InteractionRoot") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -1105,7 +1123,7 @@ public class InteractionRoot implements InteractionRootInterface {
     private static boolean _isPublished = false;
 
     /**
-     * Publishes the InteractionRoot interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1150,7 +1168,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
 
     /**
-     * Unpublishes the InteractionRoot interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -1200,7 +1218,7 @@ public class InteractionRoot implements InteractionRootInterface {
     private static boolean _isSubscribed = false;
 
     /**
-     * Subscribes a federate to the InteractionRoot interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1244,7 +1262,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Unsubscribes a federate from the InteractionRoot interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1295,12 +1313,12 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the InteractionRoot interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the InteractionRoot interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the InteractionRoot interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -1484,7 +1502,7 @@ public class InteractionRoot implements InteractionRootInterface {
         setParameter(handle, valueAsString);
     }
 
-    protected static Map<ClassAndPropertyName, Class> _classAndPropertyNameTypeMap = new HashMap<>();
+    protected static Map<ClassAndPropertyName, Class<?>> _classAndPropertyNameTypeMap = new HashMap<>();
 
     private SuppliedParameters createSuppliedParameters() {
         SuppliedParameters suppliedParameters = _factory.createSuppliedParameters();

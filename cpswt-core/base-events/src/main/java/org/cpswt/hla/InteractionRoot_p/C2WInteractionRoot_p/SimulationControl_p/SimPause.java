@@ -1,3 +1,4 @@
+
 package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p;
 
 import java.util.HashMap;
@@ -5,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +23,7 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause
+ * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause
  */
 @SuppressWarnings("unused")
 public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl {
@@ -37,7 +39,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -46,7 +48,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause";
+        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause";
     }
 
     /**
@@ -62,7 +64,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
      *
      * @return the name of this interaction class
      */
@@ -83,7 +85,8 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) federation name of the InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause interaction class.
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -96,7 +99,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's interaction class.
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
      * Polymorphic equivalent of get_hla_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's interaction class
@@ -106,60 +109,76 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the non-hidden parameters in the
-     * InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Returns a sorted list containing the names of all of the non-hidden parameters in the
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getParameterNames()}.
      *
-     * @return a modifiable set of the non-hidden parameter names for this interaction class
+     * @return a sorted list of the non-hidden parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_parameter_names() {
-        return new ArrayList<>(_classAndPropertyNameList);
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the non-hiddenparameters of an
+     * Returns a sorted list containing the names of all of the non-hiddenparameters of an
      * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent to get_parameter_names static method.
      *
-     * @return set containing the names of all of the parameters of an
-     * interaction class instance
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getParameterNames() {
         return get_parameter_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the parameters in the
-     * InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Returns a sorted list containing the names of all of the parameters in the
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return a set of parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getParameterNames()}.
      *
-     * @return a modifiable set of the parameter names for this interaction class
+     * @return a sorted list of the parameter names for this interaction class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_parameter_names() {
-        return new ArrayList<>(_allClassAndPropertyNameList);
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the parameters of an
+     * Returns a sorted list containing the names of all of the parameters of an
      * interaction class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent of get_all_parameter_names() static method.
      *
-     * @return set containing the names of all of the parameters of an
-     * interaction class instance
+     * @return sorted list containing the names of all of the parameters of an
+     * interaction class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAllParameterNames() {
@@ -177,27 +196,27 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), SimPause.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
         ));
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot_p.C2WInteractionRoot", "originFed"
         ));
 
-        _allClassAndPropertyNameList.add(new ClassAndPropertyName(
+        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
         ));
     }
@@ -215,7 +234,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     private static int _handle;
 
     /**
-     * Returns the handle (RTI assigned) of the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -262,7 +281,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -328,7 +347,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     private static boolean _isPublished = false;
 
     /**
-     * Publishes the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -373,7 +392,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
 
 
     /**
-     * Unpublishes the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -423,7 +442,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     private static boolean _isSubscribed = false;
 
     /**
-     * Subscribes a federate to the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -467,7 +486,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     }
 
     /**
-     * Unsubscribes a federate from the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -518,12 +537,12 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();

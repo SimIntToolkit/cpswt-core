@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.json.JSONObject;
 
@@ -1368,7 +1369,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the ObjectRoot object class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -1377,7 +1378,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the fully-qualified Java class name for this object class
      */
     public static String get_java_class_name() {
-        return "ObjectRoot";
+        return "org.cpswt.hla.ObjectRoot";
     }
 
     /**
@@ -1393,7 +1394,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the ObjectRoot object class.
+     * class name) of the org.cpswt.hla.ObjectRoot object class.
      *
      * @return the name of this object class
      */
@@ -1414,7 +1415,8 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) federation name of the ObjectRoot object class.
+     * Returns the fully-qualified (dot-delimited) hla class name of the
+     * ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -1427,7 +1429,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of this instance's object class.
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
      * Polymorphic equivalent of get_hla_class_name static method.
      *
      * @return the fully-qualified (dot-delimited) name of this instance's object class
@@ -1437,60 +1439,76 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the non-hidden attributes in the
-     * ObjectRoot object class.
+     * Returns a sorted list containing the names of all of the non-hidden attributes in the
+     * org.cpswt.hla.ObjectRoot object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
-     * a reference will return a set of parameter names pertaining to the reference,
+     * a reference will return a set of class-and0parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getAttributeNames()}.
      *
-     * @return a modifiable set of the non-hidden attribute names for this object class
+     * @return a sorted list of the non-hidden attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_attribute_names() {
-        return new ArrayList<>(_classAndPropertyNameList);
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the non-hiddenattributes of an
+     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
      * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent to get_attribute_names static method.
      *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAttributeNames() {
         return get_attribute_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameList = new HashSet<>();
+    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
 
     /**
-     * Returns a set containing the names of all of the attributes in the
-     * ObjectRoot object class.
+     * Returns a sorted list containing the names of all of the attributes in the
+     * org.cpswt.hla.ObjectRoot object class.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return a set of parameter names pertaining to the reference,
      * rather than the parameter names of the class for the instance referred to by
      * the reference.  For the polymorphic version of this method, use
      * {@link #getAttributeNames()}.
      *
-     * @return a modifiable set of the attribute names for this object class
+     * @return a sorted list of the attribute names for this object class
+     * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_attribute_names() {
-        return new ArrayList<>(_allClassAndPropertyNameList);
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     /**
-     * Returns a set containing the names of all of the attributes of an
+     * Returns a sorted list containing the names of all of the attributes of an
      * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      * Polymorphic equivalent of get_all_attribute_names() static method.
      *
-     * @return set containing the names of all of the attributes of an
-     * object class instance
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
      */
     @Override
     public List<ClassAndPropertyName> getAllAttributeNames() {
@@ -1504,12 +1522,12 @@ public class ObjectRoot implements ObjectRootInterface {
         return _publishedAttributeNameSet;
     }
 
-    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
-        return _subscribedAttributeNameSet;
-    }
-
     protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
         return get_published_attribute_name_set();
+    }
+
+    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+        return _subscribedAttributeNameSet;
     }
 
     protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
@@ -1527,13 +1545,13 @@ public class ObjectRoot implements ObjectRootInterface {
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
         _classNameClassMap.put(get_hla_class_name(), ObjectRoot.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameList TO _classNamePropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameList);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameList TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameList);
+        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
 
         _classNamePublishedAttributeNameSetMap.put(get_hla_class_name(), _publishedAttributeNameSet);
         _classNameSubscribedAttributeNameSetMap.put(get_hla_class_name(), _subscribedAttributeNameSet);
@@ -1552,7 +1570,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static int _handle;
 
     /**
-     * Returns the handle (RTI assigned) of the ObjectRoot object class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -1603,7 +1621,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "ObjectRoot") given the attribute's name.
+     * this object class (i.e. "org.cpswt.hla.ObjectRoot") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
@@ -1677,7 +1695,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static boolean _isPublished = false;
 
     /**
-     * Publishes the ObjectRoot object class for a federate.
+     * Publishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1732,7 +1750,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
 
     /**
-     * Unpublishes the ObjectRoot object class for a federate.
+     * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -1782,7 +1800,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static boolean _isSubscribed = false;
 
     /**
-     * Subscribes a federate to the ObjectRoot object class.
+     * Subscribes a federate to the org.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1836,7 +1854,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Unsubscribes a federate from the ObjectRoot object class.
+     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1887,12 +1905,12 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the ObjectRoot object class).
+     * (that is, the org.cpswt.hla.ObjectRoot object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the ObjectRoot object class).
+     * this class (the org.cpswt.hla.ObjectRoot object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the ObjectRoot object class).
+     * (that is, the org.cpswt.hla.ObjectRoot object class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -2092,7 +2110,7 @@ public class ObjectRoot implements ObjectRootInterface {
         setAttribute(handle, valueAsString);
     }
 
-    protected static Map<ClassAndPropertyName, Class> _classAndPropertyNameTypeMap = new HashMap<>();
+    protected static Map<ClassAndPropertyName, Class<?>> _classAndPropertyNameTypeMap = new HashMap<>();
 
     protected SuppliedAttributes createSuppliedAttributes(boolean force) {
         SuppliedAttributes suppliedAttributes = _factory.createSuppliedAttributes();

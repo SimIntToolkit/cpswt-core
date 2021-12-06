@@ -4,6 +4,7 @@ import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 
 import java.util.TreeMap;
 
+@SuppressWarnings("unused")
 public class SubscribedInteractionFilter {
 
     public enum OriginFedFilter { ORIGIN_FILTER_DISABLED, SELF, NON_SELF }
@@ -31,9 +32,9 @@ public class SubscribedInteractionFilter {
         SourceFedFilter getSourceFedFilter() {
         	return _sourceFedFilter;
         }
-    };
+    }
 
-    private TreeMap< Integer, Filter > _handleFilterMap = new TreeMap< Integer, Filter >();
+    private final TreeMap< Integer, Filter > _handleFilterMap = new TreeMap<>();
 
     public void setOriginFedFilter( Integer handle, OriginFedFilter originFedFilter ) {
     	Filter filter = _handleFilterMap.get( handle );
@@ -73,7 +74,7 @@ public class SubscribedInteractionFilter {
         }
 
         boolean isSourceMapper = c2wInteractionRoot.get_sourceFed().endsWith( "Mapper" );
-        boolean isFromSelf = c2wInteractionRoot.get_originFed() == federateId;
+        boolean isFromSelf = c2wInteractionRoot.get_originFed().equals(federateId);
 
         return
          ( filter.getSourceFedFilter() == SourceFedFilter.MAPPER && !isSourceMapper ) ||
@@ -84,4 +85,4 @@ public class SubscribedInteractionFilter {
 
     }
 
-};
+}
