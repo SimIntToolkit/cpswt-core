@@ -1304,16 +1304,6 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
-        if (currentValue == null) {
-            logger.error(
-                "setAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
-                "does not exist in class \"{}\" (it's defined in class\"{}\")",
-                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-            );
-            return;
-        }
-
         setAttribute(classAndPropertyName.getPropertyName(), value);
     }
 
@@ -1811,7 +1801,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static void subscribe_object(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

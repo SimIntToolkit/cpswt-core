@@ -462,7 +462,7 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

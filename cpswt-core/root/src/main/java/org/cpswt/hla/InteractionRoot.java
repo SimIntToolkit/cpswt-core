@@ -764,16 +764,6 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
-        if (currentValue == null) {
-            logger.error(
-                "setParameter: propertyHandle {} corresponds to property of name \"{}\", which " +
-                "does not exist in class \"{}\" (it's defined in class\"{}\")",
-                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-            );
-            return;
-        }
-
         setParameter(classAndPropertyName.getPropertyName(), value);
     }
 
@@ -1229,7 +1219,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

@@ -519,7 +519,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

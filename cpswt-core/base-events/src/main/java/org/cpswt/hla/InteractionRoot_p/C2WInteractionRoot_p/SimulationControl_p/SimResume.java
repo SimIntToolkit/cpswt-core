@@ -450,7 +450,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

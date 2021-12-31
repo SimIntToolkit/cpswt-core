@@ -520,7 +520,7 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

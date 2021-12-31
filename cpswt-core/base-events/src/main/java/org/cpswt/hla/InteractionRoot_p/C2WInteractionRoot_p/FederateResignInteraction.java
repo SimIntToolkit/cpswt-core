@@ -520,7 +520,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 

@@ -548,7 +548,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      */
     public static void subscribe_object(RTIambassador rti) {
         if (_isSubscribed) return;
-        _isSubScribed= true;
+        _isSubscribed= true;
 
         init(rti);
 
