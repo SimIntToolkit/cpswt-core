@@ -33,7 +33,9 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     /**
     * Creates an instance of the Interaction class with default parameter values.
     */
-    public C2WInteractionRoot() {}// ----------------------------------------------------------------------------
+    public C2WInteractionRoot() {}
+
+    // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
@@ -204,16 +206,16 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         // IN InteractionRoot
         _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "originFed"
+            "InteractionRoot.C2WInteractionRoot", "originFed"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
         ));
 
         ClassAndPropertyName key;
@@ -231,19 +233,19 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         _classAndPropertyNameTypeMap.put(key, String.class);
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "originFed"
+            "InteractionRoot.C2WInteractionRoot", "originFed"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
         ));
     }
 
@@ -517,6 +519,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -539,7 +542,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -561,6 +563,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -586,7 +589,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 

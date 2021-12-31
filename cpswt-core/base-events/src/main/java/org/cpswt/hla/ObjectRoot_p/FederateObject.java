@@ -35,7 +35,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     /**
     * Creates an instance of the Object class with default attribute values.
     */
-    public FederateObject() {}// ----------------------------------------------------------------------------
+    public FederateObject() {}
+
+    // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
@@ -190,7 +192,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     private static final Set<ClassAndPropertyName> _publishedAttributeNameSet = new HashSet<>();
     private static final Set<ClassAndPropertyName> _subscribedAttributeNameSet = new HashSet<>();
 
-    protected Set<ClassAndPropertyName> get_published_attribute_name_set() {
+    protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
         return _publishedAttributeNameSet;
     }
 
@@ -198,7 +200,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_published_attribute_name_set();
     }
 
-    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+    protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
         return _subscribedAttributeNameSet;
     }
 
@@ -225,13 +227,13 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         // IN ObjectRoot
         _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHandle"
+            "ObjectRoot.FederateObject", "FederateHandle"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHost"
+            "ObjectRoot.FederateObject", "FederateHost"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateType"
+            "ObjectRoot.FederateObject", "FederateType"
         ));
 
         ClassAndPropertyName key;
@@ -246,15 +248,15 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         _classAndPropertyNameTypeMap.put(key, String.class);
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHandle"
+            "ObjectRoot.FederateObject", "FederateHandle"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateHost"
+            "ObjectRoot.FederateObject", "FederateHost"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot_p.FederateObject", "FederateType"
+            "ObjectRoot.FederateObject", "FederateType"
         ));
 
         _classNamePublishedAttributeNameSetMap.put(get_hla_class_name(), _publishedAttributeNameSet);
@@ -546,6 +548,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      */
     public static void subscribe_object(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -578,7 +581,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -600,6 +602,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      */
     public static void unsubscribe_object(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -625,7 +628,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
@@ -995,7 +997,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
 
         // DEEP(ER) COPY FOR OBJECTS
-        classAndPropertyNameValueMap.replaceAll((k, v) -> new Attribute<>(classAndPropertyNameValueMap.get(k)));
+        for(ClassAndPropertyName key: classAndPropertyNameValueMap.keySet()) {
+            classAndPropertyNameValueMap.put(key, new Attribute<>(classAndPropertyNameValueMap.get(key)));
+        }
 
     }
 }

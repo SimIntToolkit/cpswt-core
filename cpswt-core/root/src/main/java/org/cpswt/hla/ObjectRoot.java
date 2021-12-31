@@ -299,13 +299,13 @@ public class ObjectRoot implements ObjectRootInterface {
         return new HashSet<>(  _classNameAllPropertyNameSetMap.get( className )  );
     }
 
-    //---------------------------------------
-    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
-    //---------------------------------------
+    //-------------------------------------------
+    // END CLASS-NAME All-DATAMEMBER-NAME-SET MAP
+    //-------------------------------------------
 
-    //-------------------------------------------------
-    // CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
-    //-------------------------------------------------
+    //--------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------
     protected static Map<ClassAndPropertyName, Integer> _classAndPropertyNameHandleMap = new HashMap<>();
 
     //------------------------------------------------------------------
@@ -375,7 +375,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return the name of theattributecorresponding to propertyHandle
       */
     public static ClassAndPropertyName get_class_and_attribute_name( int propertyHandle ) {
-        return _handleClassAndPropertyNameMap.get( propertyHandle );
+        return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
     }
 
     /**
@@ -385,7 +385,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return the attribute name associated with the handle, or null
       */
     public ClassAndPropertyName getClassAndAttributeName(int propertyHandle) {
-        return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
+        return get_class_and_attribute_name(propertyHandle);
     }
 
     /**
@@ -397,6 +397,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return the full attribute name associated with the handle, or null if the handle does not exist.
       */
     public String getAttributeName(int propertyHandle) {
+
         return _handleClassAndPropertyNameMap.containsKey(propertyHandle) ?
                  _handleClassAndPropertyNameMap.get(propertyHandle).getPropertyName() : null;
     }
@@ -425,7 +426,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * the RTI-defined classHandle
       */
     public static String get_simple_class_name( int classHandle ) {
-        return _classHandleSimpleNameMap.get( classHandle );
+        return _classHandleSimpleNameMap.getOrDefault(classHandle, "");
     }
 
     //---------------------------------------
@@ -451,7 +452,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * corresponds to the RTI-defined classHandle
       */
     public static String get_hla_class_name( int classHandle ) {
-        return _classHandleNameMap.get( classHandle );
+        return _classHandleNameMap.getOrDefault(classHandle, null);
     }
 
     //------------------------------------------------------
@@ -615,7 +616,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void publish( String className, RTIambassador rti ) {
+    public static void publish_object( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on publish.", className);
@@ -641,7 +642,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void unpublish( String className, RTIambassador rti ) {
+    public static void unpublish_object( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on unpublish.", className );
@@ -667,7 +668,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void subscribe( String className, RTIambassador rti ) {
+    public static void subscribe_object( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on subscribe.", className );
@@ -693,7 +694,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void unsubscribe( String className, RTIambassador rti ) {
+    public static void unsubscribe_object( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         try {
             Method method = rtiClass.getMethod( "unsubscribe", pubsubArguments );
@@ -753,7 +754,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return object instance corresponding to the object_handle (RTI assigned)
       * in the map that is internal to the ObjectRoot class.
       */
-    public static ObjectRoot getObject( int object_handle ) {
+    public static ObjectRoot get_object( int object_handle ) {
         return _objectMap.get( object_handle );
     }
 
@@ -1195,21 +1196,23 @@ public class ObjectRoot implements ObjectRootInterface {
                 CpswtUtils.sleep( 50 );
             }
         }
-    }//-----------------------------------------------
-    // CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
-    //-----------------------------------------------
+    }
+
+    //-------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //-------------------------------------------
     protected Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
 
     //-----------------------------------------------------------------------------------------------------------
-    // DATAMEMBER-CLASS-NAME AND DATAMEMBER-VALUE DATA CLASS
+    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
     // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
     // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // DATAMEMBER IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE DATAMEMBER USING THE
-    // CORRECT (CLASS-NAME, DATAMEMBER-NAME) KEY.
+    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
+    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
     //-----------------------------------------------------------------------------------------------------------
     protected static class PropertyClassNameAndValue {
-        String className;
-        Object value;
+        private String className;
+        private Object value;
 
         public PropertyClassNameAndValue(String className, Object value) {
             this.className = className;
@@ -1224,9 +1227,9 @@ public class ObjectRoot implements ObjectRootInterface {
         }
     }
 
-    //----------------------------------------------------------------
-    // METHODS THAT USE CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
-    //----------------------------------------------------------------
+    //------------------------------------------------------------
+    // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //------------------------------------------------------------
     public void setAttribute(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
@@ -1301,17 +1304,17 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        String propertyName = classAndPropertyName.getPropertyName();
-        Object currentValue = getAttribute(propertyName);
+        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
         if (currentValue == null) {
             logger.error(
                 "setAttribute: propertyHandle {} corresponds to property of name \"{}\", which " +
                 "does not exist in class \"{}\" (it's defined in class\"{}\")",
                 propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
             );
+            return;
         }
 
-        setAttribute(propertyName, value);
+        setAttribute(classAndPropertyName.getPropertyName(), value);
     }
 
     //
@@ -1357,12 +1360,14 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     //---------------------------------------------------
-    // END CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //---------------------------------------------------
 
     //---------------------------
     // START OF INCLUDED TEMPLATE
     //---------------------------
+
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -1518,7 +1523,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final Set<ClassAndPropertyName> _publishedAttributeNameSet = new HashSet<>();
     private static final Set<ClassAndPropertyName> _subscribedAttributeNameSet = new HashSet<>();
 
-    protected Set<ClassAndPropertyName> get_published_attribute_name_set() {
+    protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
         return _publishedAttributeNameSet;
     }
 
@@ -1526,7 +1531,7 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_published_attribute_name_set();
     }
 
-    protected Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+    protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
         return _subscribedAttributeNameSet;
     }
 
@@ -1806,6 +1811,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static void subscribe_object(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -1838,7 +1844,6 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -1860,6 +1865,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static void unsubscribe_object(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -1885,7 +1891,6 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
@@ -1954,6 +1959,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // END OF INCLUDED TEMPLATE
     //-------------------------
     
+
     //-------------
     // TIME SET/GET
     //-------------

@@ -242,13 +242,13 @@ public class InteractionRoot implements InteractionRootInterface {
         return new HashSet<>(  _classNameAllPropertyNameSetMap.get( className )  );
     }
 
-    //---------------------------------------
-    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
-    //---------------------------------------
+    //-------------------------------------------
+    // END CLASS-NAME All-DATAMEMBER-NAME-SET MAP
+    //-------------------------------------------
 
-    //-------------------------------------------------
-    // CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
-    //-------------------------------------------------
+    //--------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------
     protected static Map<ClassAndPropertyName, Integer> _classAndPropertyNameHandleMap = new HashMap<>();
 
     //------------------------------------------------------------------
@@ -318,7 +318,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return the name of theparametercorresponding to propertyHandle
       */
     public static ClassAndPropertyName get_class_and_parameter_name( int propertyHandle ) {
-        return _handleClassAndPropertyNameMap.get( propertyHandle );
+        return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
     }
 
     /**
@@ -328,7 +328,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return the parameter name associated with the handle, or null
       */
     public ClassAndPropertyName getClassAndParameterName(int propertyHandle) {
-        return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
+        return get_class_and_parameter_name(propertyHandle);
     }
 
     /**
@@ -340,6 +340,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return the full parameter name associated with the handle, or null if the handle does not exist.
       */
     public String getParameterName(int propertyHandle) {
+
         return _handleClassAndPropertyNameMap.containsKey(propertyHandle) ?
                  _handleClassAndPropertyNameMap.get(propertyHandle).getPropertyName() : null;
     }
@@ -368,7 +369,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * the RTI-defined classHandle
       */
     public static String get_simple_class_name( int classHandle ) {
-        return _classHandleSimpleNameMap.get( classHandle );
+        return _classHandleSimpleNameMap.getOrDefault(classHandle, "");
     }
 
     //---------------------------------------
@@ -394,7 +395,7 @@ public class InteractionRoot implements InteractionRootInterface {
       * corresponds to the RTI-defined classHandle
       */
     public static String get_hla_class_name( int classHandle ) {
-        return _classHandleNameMap.get( classHandle );
+        return _classHandleNameMap.getOrDefault(classHandle, null);
     }
 
     //------------------------------------------------------
@@ -562,7 +563,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void publish( String className, RTIambassador rti ) {
+    public static void publish_interaction( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on publish.", className);
@@ -588,7 +589,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void unpublish( String className, RTIambassador rti ) {
+    public static void unpublish_interaction( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on unpublish.", className );
@@ -614,7 +615,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void subscribe( String className, RTIambassador rti ) {
+    public static void subscribe_interaction( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         if ( rtiClass == null ) {
             logger.error( "Bad class name \"{}\" on subscribe.", className );
@@ -640,7 +641,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the RTI, usu. obtained through the
      * {@link SynchronizedFederate#getRTI()} call
      */
-    public static void unsubscribe( String className, RTIambassador rti ) {
+    public static void unsubscribe_interaction( String className, RTIambassador rti ) {
         Class<?> rtiClass = _classNameClassMap.get( className );
         try {
             Method method = rtiClass.getMethod( "unsubscribe", pubsubArguments );
@@ -653,21 +654,23 @@ public class InteractionRoot implements InteractionRootInterface {
 
     //--------------------------------------------------------------------------
     // END METHODS THAT USE BOTH PUB-SUB-ARGUMENT-ARRAY AND CLASS-NAME CLASS MAP
-    //--------------------------------------------------------------------------//-----------------------------------------------
-    // CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
-    //-----------------------------------------------
+    //--------------------------------------------------------------------------
+
+    //-------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //-------------------------------------------
     protected Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
 
     //-----------------------------------------------------------------------------------------------------------
-    // DATAMEMBER-CLASS-NAME AND DATAMEMBER-VALUE DATA CLASS
+    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
     // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
     // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // DATAMEMBER IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE DATAMEMBER USING THE
-    // CORRECT (CLASS-NAME, DATAMEMBER-NAME) KEY.
+    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
+    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
     //-----------------------------------------------------------------------------------------------------------
     protected static class PropertyClassNameAndValue {
-        String className;
-        Object value;
+        private String className;
+        private Object value;
 
         public PropertyClassNameAndValue(String className, Object value) {
             this.className = className;
@@ -682,9 +685,9 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    //----------------------------------------------------------------
-    // METHODS THAT USE CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
-    //----------------------------------------------------------------
+    //------------------------------------------------------------
+    // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //------------------------------------------------------------
     public void setParameter(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
@@ -761,17 +764,17 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        String propertyName = classAndPropertyName.getPropertyName();
-        Object currentValue = getParameter(propertyName);
+        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
         if (currentValue == null) {
             logger.error(
                 "setParameter: propertyHandle {} corresponds to property of name \"{}\", which " +
                 "does not exist in class \"{}\" (it's defined in class\"{}\")",
                 propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
             );
+            return;
         }
 
-        setParameter(propertyName, value);
+        setParameter(classAndPropertyName.getPropertyName(), value);
     }
 
     //
@@ -817,12 +820,14 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     //---------------------------------------------------
-    // END CLASS-AND-DATAMEMBER-NAME DATAMEMBER-VALUE MAP
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //---------------------------------------------------
 
     //---------------------------
     // START OF INCLUDED TEMPLATE
     //---------------------------
+
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -1224,6 +1229,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -1246,7 +1252,6 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -1268,6 +1273,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -1293,7 +1299,6 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
@@ -1350,6 +1355,7 @@ public class InteractionRoot implements InteractionRootInterface {
     // END OF INCLUDED TEMPLATE
     //-------------------------
     
+
     //-------------
     // TIME SET/GET
     //-------------

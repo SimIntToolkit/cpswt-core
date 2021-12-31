@@ -15,7 +15,7 @@ val archivaPort: String by project
 repositories {
     mavenCentral()
     maven {
-            isAllowInsecureProtocol = true
+        isAllowInsecureProtocol = true
         url = uri("http://$archivaHostId:$archivaPort/repository/snapshots")
     }
 }

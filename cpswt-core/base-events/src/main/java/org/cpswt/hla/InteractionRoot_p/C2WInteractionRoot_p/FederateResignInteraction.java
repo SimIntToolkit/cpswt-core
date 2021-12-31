@@ -33,7 +33,9 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     /**
     * Creates an instance of the Interaction class with default parameter values.
     */
-    public FederateResignInteraction() {}// ----------------------------------------------------------------------------
+    public FederateResignInteraction() {}
+
+    // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
@@ -204,13 +206,13 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
         // IN InteractionRoot
         _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateId"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateType"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"
         ));
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "IsLateJoiner"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"
         ));
 
         ClassAndPropertyName key;
@@ -225,31 +227,31 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
         _classAndPropertyNameTypeMap.put(key, Boolean.class);
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateId"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "FederateType"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction", "IsLateJoiner"
+            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "originFed"
+            "InteractionRoot.C2WInteractionRoot", "originFed"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
         ));
     }
 
@@ -518,6 +520,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -540,7 +543,6 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -562,6 +564,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -587,7 +590,6 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 

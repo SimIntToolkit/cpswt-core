@@ -33,7 +33,9 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     /**
     * Creates an instance of the Interaction class with default parameter values.
     */
-    public SimulationControl() {}// ----------------------------------------------------------------------------
+    public SimulationControl() {}
+
+    // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
@@ -205,19 +207,19 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "actualLogicalGenerationTime"
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "federateFilter"
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "originFed"
+            "InteractionRoot.C2WInteractionRoot", "originFed"
         ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot_p.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
         ));
     }
 
@@ -448,6 +450,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
      */
     public static void subscribe_interaction(RTIambassador rti) {
         if (_isSubscribed) return;
+        _isSubScribed= true;
 
         init(rti);
 
@@ -470,7 +473,6 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
             }
         }
 
-        _isSubscribed = true;
         logger.debug("subscribe: {}", get_hla_class_name());
     }
 
@@ -492,6 +494,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
         if (!_isSubscribed) return;
+        _isSubscribed = false;
 
         init(rti);
 
@@ -517,7 +520,6 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
             }
         }
 
-        _isSubscribed = false;
         logger.debug("unsubscribe: {}", get_hla_class_name());
     }
 
