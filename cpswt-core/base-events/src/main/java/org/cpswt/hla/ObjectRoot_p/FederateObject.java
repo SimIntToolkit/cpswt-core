@@ -346,6 +346,18 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     private static final AttributeHandleSet _publishedAttributeHandleSet;
     private static final AttributeHandleSet _subscribedAttributeHandleSet;
 
+    /**
+     * Returns a data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription.  To actually subscribe to these
+     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
+     *
+     * @return data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription
+     */
+    private static AttributeHandleSet get_subscribed_attribute_handle_set() {
+        return _subscribedAttributeHandleSet;
+    }
+
     static {
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
         _classNamePublishedAttributeHandleSetMap.put(get_hla_class_name(), _publishedAttributeHandleSet);
@@ -658,18 +670,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return handle == get_class_handle();
     }
 
-    /**
-     * Returns a data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription.  To actually subscribe to these
-     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
-     *
-     * @return data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription
-     */
-    public AttributeHandleSet getSubscribedAttributeHandleSet() {
-        return _subscribedAttributeHandleSet;
-    }
-
     //--------------------------------
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
@@ -790,7 +790,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
     @Override
     protected PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "");
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
         if (classAndPropertyNameValueMap.containsKey(key)) {
             Object value = classAndPropertyNameValueMap.get(key);
             return new PropertyClassNameAndValue(get_hla_class_name(), value);

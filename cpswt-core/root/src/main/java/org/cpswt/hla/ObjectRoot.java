@@ -1047,7 +1047,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        _classNamePublishedAttributeNameSetMap.get(className).add(key);
+        _classNamePublishedAttributeNameSetMap.get(key.getClassName()).add(key);
     }
 
     /**
@@ -1077,7 +1077,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        _classNamePublishedAttributeNameSetMap.get(className).remove(key);
+        _classNamePublishedAttributeNameSetMap.get(key.getClassName()).remove(key);
     }
 
     //--------------------------------------------
@@ -1119,7 +1119,7 @@ public class ObjectRoot implements ObjectRootInterface {
             );
             return;
         }
-        _classNameSubscribedAttributeNameSetMap.get(className).add(key);
+        _classNameSubscribedAttributeNameSetMap.get(key.getClassName()).add(key);
     }
 
     /**
@@ -1148,7 +1148,7 @@ public class ObjectRoot implements ObjectRootInterface {
             );
             return;
         }
-        _classNameSubscribedAttributeNameSetMap.get(className).remove(key);
+        _classNameSubscribedAttributeNameSetMap.get(key.getClassName()).remove(key);
     }
 
     //---------------------------------------------
@@ -1177,7 +1177,7 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean requestNotSubmitted = true;
         while( requestNotSubmitted ) {
             try {
-                rti.requestObjectAttributeValueUpdate( getObjectHandle(), getSubscribedAttributeHandleSet() );
+                rti.requestObjectAttributeValueUpdate( getObjectHandle(), get_subscribed_attribute_handle_set() );
                 requestNotSubmitted = false;
             } catch ( FederateNotExecutionMember f ) {
                 logger.error( "{}: request for update failed:  Federate Not Execution Member", getHlaClassName() );
@@ -1638,6 +1638,18 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final AttributeHandleSet _publishedAttributeHandleSet;
     private static final AttributeHandleSet _subscribedAttributeHandleSet;
 
+    /**
+     * Returns a data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription.  To actually subscribe to these
+     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
+     *
+     * @return data structure containing the handles of all attributes for this object
+     * class that are currently marked for subscription
+     */
+    private static AttributeHandleSet get_subscribed_attribute_handle_set() {
+        return _subscribedAttributeHandleSet;
+    }
+
     static {
         _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
         _classNamePublishedAttributeHandleSetMap.put(get_hla_class_name(), _publishedAttributeHandleSet);
@@ -1911,23 +1923,11 @@ public class ObjectRoot implements ObjectRootInterface {
         return handle == get_class_handle();
     }
 
-    /**
-     * Returns a data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription.  To actually subscribe to these
-     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
-     *
-     * @return data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription
-     */
-    public AttributeHandleSet getSubscribedAttributeHandleSet() {
-        return _subscribedAttributeHandleSet;
-    }
-
     //--------------------------------
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
     protected PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "");
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
         if (classAndPropertyNameValueMap.containsKey(key)) {
             Object value = classAndPropertyNameValueMap.get(key);
             return new PropertyClassNameAndValue(get_hla_class_name(), value);
@@ -2114,7 +2114,9 @@ public class ObjectRoot implements ObjectRootInterface {
         for(ClassAndPropertyName key: _publishedAttributeNameSet) {
             int handle = _classAndPropertyNameHandleMap.get(key);
             Attribute<?> value = (Attribute<?>)classAndPropertyNameValueMap.get(key);
+            if (value.shouldBeUpdated(force)) {
                 suppliedAttributes.add(handle, value.toString().getBytes() );
+            }
             value.setHasBeenUpdated();
         }
 

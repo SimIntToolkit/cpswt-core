@@ -227,15 +227,15 @@ public interface ObjectRootInterface {
      */
     void setAttribute( String propertyName, Object value );
 
-    /**
-     * Returns a data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription.  To actually subscribe to these
-     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
-     *
-     * @return data structure containing the handles of all attributes for this object
-     * class that are currently marked for subscription
-     */
-    AttributeHandleSet getSubscribedAttributeHandleSet();
+//    /**
+//     * Returns a data structure containing the handles of all attributes for this object
+//     * class that are currently marked for subscription.  To actually subscribe to these
+//     * attributes, a federate must call &lt;objectclassname&gt;.subscribe( RTIambassador rti ).
+//     *
+//     * @return data structure containing the handles of all attributes for this object
+//     * class that are currently marked for subscription
+//     */
+//    AttributeHandleSet getSubscribedAttributeHandleSet();
 
     /**
      * Requests an attribute update for this object instance from the federate that

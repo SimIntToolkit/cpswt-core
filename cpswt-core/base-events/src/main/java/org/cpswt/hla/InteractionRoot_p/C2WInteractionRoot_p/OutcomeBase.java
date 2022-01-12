@@ -23,17 +23,17 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction
+ * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase
  */
 @SuppressWarnings("unused")
-public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
+public class OutcomeBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
     /**
     * Creates an instance of the Interaction class with default parameter values.
     */
-    public FederateResignInteraction() {}
+    public OutcomeBase() {}
 
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
@@ -41,7 +41,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -50,7 +50,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction";
+        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase";
     }
 
     /**
@@ -66,12 +66,12 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      *
      * @return the name of this interaction class
      */
     public static String get_simple_class_name() {
-        return "FederateResignInteraction";
+        return "OutcomeBase";
     }
 
     /**
@@ -88,7 +88,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.FederateResignInteraction interaction class.
+     * InteractionRoot.C2WInteractionRoot.OutcomeBase interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -97,7 +97,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     public static String get_hla_class_name() {
-        return "InteractionRoot.C2WInteractionRoot.FederateResignInteraction";
+        return "InteractionRoot.C2WInteractionRoot.OutcomeBase";
     }
 
     /**
@@ -115,7 +115,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -153,7 +153,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -196,7 +196,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
         _classNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), FederateResignInteraction.class);
+        _classNameClassMap.put(get_hla_class_name(), OutcomeBase.class);
 
         // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
@@ -205,38 +205,6 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
         // IN InteractionRoot
         _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"
-        ));
-
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        _classAndPropertyNameTypeMap.put(key, String.class);
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        _classAndPropertyNameTypeMap.put(key, String.class);
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        _classAndPropertyNameTypeMap.put(key, Boolean.class);
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"
-        ));
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"
-        ));
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"
-        ));
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
@@ -268,7 +236,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     private static int _handle;
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -315,7 +283,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -367,44 +335,6 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
         _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
         _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
         _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
-
-        ClassAndPropertyName classAndPropertyName;
-
-        isNotInitialized = true;
-        int propertyHandle;
-        while(isNotInitialized) {
-            try {
-
-                propertyHandle = rti.getParameterHandle("FederateId", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getParameterHandle("FederateType", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getParameterHandle("IsLateJoiner", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (InteractionClassNotDefined e) {
-                logger.error("could not initialize: Interaction Class Not Defined", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
     }
 
     // ----------------------------------------------------------
@@ -419,7 +349,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     private static boolean _isPublished = false;
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -464,7 +394,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -514,7 +444,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     private static boolean _isSubscribed = false;
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -558,7 +488,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -609,12 +539,12 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.OutcomeBase interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -623,81 +553,6 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     //--------------------------------
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
-    {
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        classAndPropertyNameValueMap.put(key, false);
-    }
-
-
-    /**
-     * Set the value of the "FederateType" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "FederateType" parameter
-     */
-    public void set_FederateType(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "FederateType" parameter of this interaction.
-     *
-     * @return the value of the "FederateType" parameter
-     */
-    public String get_FederateType() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "FederateId" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "FederateId" parameter
-     */
-    public void set_FederateId(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "FederateId" parameter of this interaction.
-     *
-     * @return the value of the "FederateId" parameter
-     */
-    public String get_FederateId() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "IsLateJoiner" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "IsLateJoiner" parameter
-     */
-    public void set_IsLateJoiner(Boolean value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "IsLateJoiner" parameter of this interaction.
-     *
-     * @return the value of the "IsLateJoiner" parameter
-     */
-    public Boolean get_IsLateJoiner() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        return (Boolean)classAndPropertyNameValueMap.get(key);
-    }
 
     @Override
     protected PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
@@ -714,51 +569,51 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     // END DATAMEMBER MANIPULATION METHODS
     //------------------------------------
 
-    protected FederateResignInteraction( ReceivedInteraction datamemberMap, boolean initFlag ) {
+    protected OutcomeBase( ReceivedInteraction datamemberMap, boolean initFlag ) {
         super( datamemberMap, false );
         if ( initFlag ) setParameters( datamemberMap );
     }
 
-    protected FederateResignInteraction( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
+    protected OutcomeBase( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
         super( datamemberMap, logicalTime, false );
         if ( initFlag ) setParameters( datamemberMap );
     }
 
     /**
-    * Creates an instance of the FederateResignInteraction interaction class, using
+    * Creates an instance of the OutcomeBase interaction class, using
     * "datamemberMap" to initialize its parameter values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new FederateResignInteraction interaction class instance
+    * parameters of this new OutcomeBase interaction class instance
     */
-    public FederateResignInteraction( ReceivedInteraction datamemberMap ) {
+    public OutcomeBase( ReceivedInteraction datamemberMap ) {
         this( datamemberMap, true );
     }
 
     /**
-    * Like {@link #FederateResignInteraction( ReceivedInteraction datamemberMap )}, except this
-    * new FederateResignInteraction parameter class instance is given a timestamp of
+    * Like {@link #OutcomeBase( ReceivedInteraction datamemberMap )}, except this
+    * new OutcomeBase parameter class instance is given a timestamp of
     * "logicalTime".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new FederateResignInteraction interaction class instance
-    * @param logicalTime timestamp for this new FederateResignInteraction interaction class instance
+    * parameters of this new OutcomeBase interaction class instance
+    * @param logicalTime timestamp for this new OutcomeBase interaction class instance
     */
-    public FederateResignInteraction( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
+    public OutcomeBase( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
         this( datamemberMap, logicalTime, true );
     }
 
     /**
-    * Creates a new FederateResignInteraction interaction class instance that is a duplicate
+    * Creates a new OutcomeBase interaction class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var FederateResignInteraction interaction class instance of which
-    * this newly created FederateResignInteraction interaction class instance will be a
+    * @param messaging_var OutcomeBase interaction class instance of which
+    * this newly created OutcomeBase interaction class instance will be a
     * duplicate
     */
-    public FederateResignInteraction(FederateResignInteraction messaging_var) {
+    public OutcomeBase(OutcomeBase messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);

@@ -724,7 +724,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     @Override
     protected PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "");
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
         if (classAndPropertyNameValueMap.containsKey(key)) {
             Object value = classAndPropertyNameValueMap.get(key);
             return new PropertyClassNameAndValue(get_hla_class_name(), value);
