@@ -1,4 +1,38 @@
 
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ *
+ * @author Himanshu Neema
+ * @author Harmon Nine
+ */
+
+
 package org.cpswt.hla.InteractionRoot_p;
 
 import java.util.HashMap;
@@ -220,16 +254,16 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
         ClassAndPropertyName key;
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        _classAndPropertyNameTypeMap.put(key, String.class);
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        _classAndPropertyNameTypeMap.put(key, String.class);
-
         key = new ClassAndPropertyName(get_hla_class_name(), "actualLogicalGenerationTime");
         _classAndPropertyNameTypeMap.put(key, Double.class);
 
         key = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
+        _classAndPropertyNameTypeMap.put(key, String.class);
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
+        _classAndPropertyNameTypeMap.put(key, String.class);
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
         _classAndPropertyNameTypeMap.put(key, String.class);
 
         _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -625,59 +659,17 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     {
         ClassAndPropertyName key;
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        classAndPropertyNameValueMap.put(key, "");
-
         key = new ClassAndPropertyName(get_hla_class_name(), "actualLogicalGenerationTime");
         classAndPropertyNameValueMap.put(key, 0);
 
         key = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
         classAndPropertyNameValueMap.put(key, "");
-    }
 
+        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
+        classAndPropertyNameValueMap.put(key, "");
 
-    /**
-     * Set the value of the "originFed" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "originFed" parameter
-     */
-    public void set_originFed(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "originFed" parameter of this interaction.
-     *
-     * @return the value of the "originFed" parameter
-     */
-    public String get_originFed() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "sourceFed" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "sourceFed" parameter
-     */
-    public void set_sourceFed(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "sourceFed" parameter of this interaction.
-     *
-     * @return the value of the "sourceFed" parameter
-     */
-    public String get_sourceFed() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        return (String)classAndPropertyNameValueMap.get(key);
+        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
+        classAndPropertyNameValueMap.put(key, "");
     }
 
 
@@ -719,6 +711,48 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      */
     public String get_federateFilter() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
+        return (String)classAndPropertyNameValueMap.get(key);
+    }
+
+
+    /**
+     * Set the value of the "originFed" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "originFed" parameter
+     */
+    public void set_originFed(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
+        classAndPropertyNameValueMap.put(key, value);
+    }
+
+    /**
+     * Returns the value of the "originFed" parameter of this interaction.
+     *
+     * @return the value of the "originFed" parameter
+     */
+    public String get_originFed() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
+        return (String)classAndPropertyNameValueMap.get(key);
+    }
+
+
+    /**
+     * Set the value of the "sourceFed" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "sourceFed" parameter
+     */
+    public void set_sourceFed(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
+        classAndPropertyNameValueMap.put(key, value);
+    }
+
+    /**
+     * Returns the value of the "sourceFed" parameter of this interaction.
+     *
+     * @return the value of the "sourceFed" parameter
+     */
+    public String get_sourceFed() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
         return (String)classAndPropertyNameValueMap.get(key);
     }
 
