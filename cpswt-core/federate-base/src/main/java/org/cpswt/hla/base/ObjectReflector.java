@@ -88,7 +88,7 @@ public class ObjectReflector {
      * @return the object class instance contained by the ObjectReflector object.
      */
     public ObjectRoot getObjectRoot() {
-        return ObjectRoot.getObject(this.objectHandle);
+        return ObjectRoot.get_object(this.objectHandle);
     }
 
     public double getTime() {

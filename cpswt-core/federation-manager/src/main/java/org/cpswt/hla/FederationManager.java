@@ -599,9 +599,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     private void waitExpectedFederatesToJoin() throws Exception {
-        FederateObject.subscribe_FederateHandle();
-        FederateObject.subscribe_FederateType();
-        FederateObject.subscribe_FederateHost();
+        FederateObject.subscribe_FederateHandle_attribute();
+        FederateObject.subscribe_FederateType_attribute();
+        FederateObject.subscribe_FederateHost_attribute();
         FederateObject.subscribe_object(getLRC());
 
         for (FederateJoinInfo federateInfo : this.experimentConfig.expectedFederates) {
@@ -925,7 +925,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public void reflectAttributeValues(int objectHandle, ReflectedAttributes reflectedAttributes, byte[] theTag) {
 
         // check if current objectHandle has been already discovered by the RTI
-        ObjectRoot o = ObjectRoot.getObject(objectHandle);
+        ObjectRoot o = ObjectRoot.get_object(objectHandle);
 
 //        if (!this.rtiDiscoveredFederateObjects.contains(o) && !this.rtiDiscoveredCpswtFederateInfoObjects.contains(o))
 //            return;
