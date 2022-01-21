@@ -1241,6 +1241,10 @@ public class ObjectRoot implements ObjectRootInterface {
     //------------------------------------------------------------
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
+    public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
+        return new HashMap<>(classAndPropertyNameValueMap);
+    }
+
     public void setAttribute(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =

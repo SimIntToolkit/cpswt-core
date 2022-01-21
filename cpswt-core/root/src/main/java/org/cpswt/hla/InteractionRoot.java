@@ -699,6 +699,10 @@ public class InteractionRoot implements InteractionRootInterface {
     //------------------------------------------------------------
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
+    public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
+        return new HashMap<>(classAndPropertyNameValueMap);
+    }
+
     public void setParameter(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
