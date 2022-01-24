@@ -76,10 +76,10 @@ import org.portico.impl.hla13.types.DoubleTime;
  *{@link#updateAttributeValues( RTIambassador rti )}for an example).
  * - methods for publishing/subscribing to anyobject/object attribute
  * defined in the federation (see
- * {@link #publish( String className, RTIambassador rti )} for example).
+ * {@link #publish_object( String className, RTIambassador rti )} for example).
  * - methods for getting/setting any attribute in the object to
  * which a given ObjectRoot variable is referring
- * (see {@link #getattribute( String propertyName )} and
+ * (see {@link #getAttribute( String propertyName )} and
  * {@link #setAttribute( String propertyName, Object value )}
  */
 @SuppressWarnings("unused")
@@ -211,7 +211,7 @@ public class ObjectRoot implements ObjectRootInterface {
     //---------------
     // CLASS-NAME SET
     //---------------
-    protected static Set<String> _classNameSet = new HashSet<>();
+    protected static Set<String> _hlaClassNameSet = new HashSet<>();
 
     //--------------------------------
     // METHODS THAT USE CLASS-NAME-SET
@@ -223,8 +223,8 @@ public class ObjectRoot implements ObjectRootInterface {
       * @return Set<String> containing the names of all object classes
       * in the current federation
       */
-    public static Set<String> get_object_names() {
-        return new HashSet<>( _classNameSet );
+    public static Set<String> get_object_hla_class_name_set() {
+        return new HashSet<>( _hlaClassNameSet );
     }
     //-------------------
     // END CLASS-NAME-SET
@@ -275,13 +275,17 @@ public class ObjectRoot implements ObjectRootInterface {
       * Returns a set of strings containing the names of all of the non-hidden attributes
       * in the object class specified by className.
       *
-      * @param className name of object class for which to retrieve the
+      * @param hlaClassName name of object class for which to retrieve the
       * names of all of its attributes
       * @return Set<String> containing the names of all attributes in the
       * className object class
       */
-    public static Set<ClassAndPropertyName> get_attribute_names( String className ) {
-        return new HashSet<>(  _classNamePropertyNameSetMap.get( className )  );
+    public static List<ClassAndPropertyName> get_attribute_names( String hlaClassName ) {
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(
+          _classNamePropertyNameSetMap.get( hlaClassName )
+        );
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     //---------------------------------------
@@ -292,7 +296,7 @@ public class ObjectRoot implements ObjectRootInterface {
     //---------------------------------------
     // CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
     //---------------------------------------
-    protected static Map<String, Set<ClassAndPropertyName>> _classNameAllPropertyNameSetMap = new HashMap<>();
+    protected static Map<String, Set<ClassAndPropertyName>> _allClassNamePropertyNameSetMap = new HashMap<>();
 
     //--------------------------------------------------------
     // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
@@ -301,13 +305,17 @@ public class ObjectRoot implements ObjectRootInterface {
       * Returns a set of strings containing the names of all of the attributes
       * in the object class specified by className.
       *
-      * @param className name of object class for which to retrieve the
+      * @param hlaClassName name of object class for which to retrieve the
       * names of all of its attributes
       * @return Set<String> containing the names of all attributes in the
       * className object class
       */
-    public static Set<ClassAndPropertyName> get_all_attribute_names( String className ) {
-        return new HashSet<>(  _classNameAllPropertyNameSetMap.get( className )  );
+    public static List<ClassAndPropertyName> get_all_attribute_names( String hlaClassName ) {
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(
+          _allClassNamePropertyNameSetMap.get( hlaClassName )
+        );
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     //-------------------------------------------
@@ -621,7 +629,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * This can also be performed by calling the publish( RTIambassador rti )
      * method directly on the object class named by "className" (for
      * example, to publish the ObjectRoot class in particular,
-     * see {@link ObjectRoot#publish( RTIambassador rti )}).
+     * see {@link ObjectRoot#publish_object( RTIambassador rti )}).
      *
      * @param className name of object class to be published for the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -647,7 +655,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * This can also be performed by calling the unpublish( RTIambassador rti )
      * method directly on the object class named by "className" (for
      * example, to unpublish the ObjectRoot class in particular,
-     * see {@link ObjectRoot#unpublish( RTIambassador rti )}).
+     * see {@link ObjectRoot#unpublish_object( RTIambassador rti )}).
      *
      * @param className name of object class to be unpublished for the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -673,7 +681,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * This can also be performed by calling the subscribe( RTIambassador rti )
      * method directly on the object class named by "className" (for
      * example, to subscribe a federate to the ObjectRoot class
-     * in particular, see {@link ObjectRoot#subscribe( RTIambassador rti )}).
+     * in particular, see {@link ObjectRoot#subscribe_object( RTIambassador rti )}).
      *
      * @param className name of object class to which to subscribe the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -699,7 +707,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * This can also be performed by calling the unsubscribe( RTIambassador rti )
      * method directly on the object class named by "className" (for
      * example, to unsubscribe a federate to the ObjectRoot class
-     * in particular, see {@link ObjectRoot#unsubscribe( RTIambassador rti )}).
+     * in particular, see {@link ObjectRoot#unsubscribe_object( RTIambassador rti )}).
      *
      * @param className name of object class to which to unsubscribe the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -1040,8 +1048,8 @@ public class ObjectRoot implements ObjectRootInterface {
       * Note:  This method only marks the attribute named by "attributeName" for
       * publication.  The attribute doesn't actually get published until the
       * "className" object class, of which it is a member, is (re)published.  See
-      * {@link ObjectRoot#publish( String className, RTIambassador RTI )} and
-      * {@link ObjectRoot#publish( RTIambassador RTI )} for examples of how to
+      * {@link ObjectRoot#publish_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#publish_object( RTIambassador RTI )} for examples of how to
       * publish the object class.
       *
       * @param className name of object class for which the attribute named by
@@ -1070,8 +1078,8 @@ public class ObjectRoot implements ObjectRootInterface {
       * Note:  This method only marks the attribute named by "attributeName" for
       * un-publication. The attribute doesn't actually get unpublished until the
       * "className" object class, of which it is a member, is (re)published.  See
-      * {@link ObjectRoot#publish( String className, RTIambassador RTI )} and
-      * {@link ObjectRoot#publish( RTIambassador RTI )} for examples of how to
+      * {@link ObjectRoot#publish_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#publish_object( RTIambassador RTI )} for examples of how to
       * publish the object class.
       *
       * @param className name of object class for which the attribute named by
@@ -1113,8 +1121,8 @@ public class ObjectRoot implements ObjectRootInterface {
       * Note:  This method only marks the attribute named by "attributeName" for
       * subscription.  The attribute doesn't actually get subscribed to until the
       * "className" object class, of which it is a member, is (re)subscribed to.
-      * See {@link ObjectRoot#subscribe( String className, RTIambassador RTI )} and
-      * {@link ObjectRoot#subscribe( RTIambassador RTI )} for examples of how to
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
       * subscribe to the object class.
       *
       * @param className name of object class for which the attribute named by
@@ -1142,8 +1150,8 @@ public class ObjectRoot implements ObjectRootInterface {
       * Note:  This method only marks the attribute named by "attributeName" for
       * unsubscription.  The attribute doesn't actually get unsubscribed from until the
       * "className" object class, of which it is a member, is (re)subscribed to.
-      * See {@link ObjectRoot#subscribe( String className, RTIambassador RTI )} and
-      * {@link ObjectRoot#subscribe( RTIambassador RTI )} for examples of how to
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
       * subscribe to the object class.
       *
       * @param className name of object class for which the attribute named by
@@ -1549,8 +1557,8 @@ public class ObjectRoot implements ObjectRootInterface {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-        _classNameSet.add(get_hla_class_name());
+        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN ObjectRoot
+        _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
         _classNameClassMap.put(get_hla_class_name(), ObjectRoot.class);
@@ -1559,9 +1567,9 @@ public class ObjectRoot implements ObjectRootInterface {
         // IN ObjectRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
 
         _classNamePublishedAttributeNameSetMap.put(get_hla_class_name(), _publishedAttributeNameSet);
         _classNameSubscribedAttributeNameSetMap.put(get_hla_class_name(), _subscribedAttributeNameSet);
@@ -2021,7 +2029,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * ObjectRoot instance contains no attributes,
      * this has the same effect as the default constructor.
      *
-     * @param objectRoot the object instance to copy
+     * @param other the object instance to copy
      */
     public ObjectRoot( ObjectRoot other ) {
         this();

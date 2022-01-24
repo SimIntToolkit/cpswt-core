@@ -226,8 +226,8 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-        _classNameSet.add(get_hla_class_name());
+        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN InteractionRoot
+        _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), C2WInteractionRoot.class);
@@ -236,9 +236,9 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
         ));

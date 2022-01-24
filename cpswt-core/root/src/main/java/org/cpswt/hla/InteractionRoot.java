@@ -76,10 +76,10 @@ import org.portico.impl.hla13.types.DoubleTime;
  *{@link#sendInteraction( RTIambassador rti )}for an example).
  * - methods for publishing/subscribing to anyinteraction
  * defined in the federation (see
- * {@link #publish( String className, RTIambassador rti )} for example).
+ * {@link #publish_interaction( String className, RTIambassador rti )} for example).
  * - methods for getting/setting any parameter in the interaction to
  * which a given InteractionRoot variable is referring
- * (see {@link #getparameter( String propertyName )} and
+ * (see {@link #getParameter( String propertyName )} and
  * {@link #setParameter( String propertyName, Object value )}
  */
 @SuppressWarnings("unused")
@@ -154,7 +154,7 @@ public class InteractionRoot implements InteractionRootInterface {
     //---------------
     // CLASS-NAME SET
     //---------------
-    protected static Set<String> _classNameSet = new HashSet<>();
+    protected static Set<String> _hlaClassNameSet = new HashSet<>();
 
     //--------------------------------
     // METHODS THAT USE CLASS-NAME-SET
@@ -166,8 +166,8 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return Set<String> containing the names of all interaction classes
       * in the current federation
       */
-    public static Set<String> get_interaction_names() {
-        return new HashSet<>( _classNameSet );
+    public static Set<String> get_interaction_hla_class_name_set() {
+        return new HashSet<>( _hlaClassNameSet );
     }
     //-------------------
     // END CLASS-NAME-SET
@@ -218,13 +218,17 @@ public class InteractionRoot implements InteractionRootInterface {
       * Returns a set of strings containing the names of all of the non-hidden parameters
       * in the interaction class specified by className.
       *
-      * @param className name of interaction class for which to retrieve the
+      * @param hlaClassName name of interaction class for which to retrieve the
       * names of all of its parameters
       * @return Set<String> containing the names of all parameters in the
       * className interaction class
       */
-    public static Set<ClassAndPropertyName> get_parameter_names( String className ) {
-        return new HashSet<>(  _classNamePropertyNameSetMap.get( className )  );
+    public static List<ClassAndPropertyName> get_parameter_names( String hlaClassName ) {
+        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(
+          _classNamePropertyNameSetMap.get( hlaClassName )
+        );
+        Collections.sort(classAndPropertyNameList);
+        return classAndPropertyNameList;
     }
 
     //---------------------------------------
@@ -235,7 +239,7 @@ public class InteractionRoot implements InteractionRootInterface {
     //---------------------------------------
     // CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
     //---------------------------------------
-    protected static Map<String, Set<ClassAndPropertyName>> _classNameAllPropertyNameSetMap = new HashMap<>();
+    protected static Map<String, Set<ClassAndPropertyName>> _allClassNamePropertyNameSetMap = new HashMap<>();
 
     //--------------------------------------------------------
     // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
@@ -244,13 +248,17 @@ public class InteractionRoot implements InteractionRootInterface {
       * Returns a set of strings containing the names of all of the parameters
       * in the interaction class specified by className.
       *
-      * @param className name of interaction class for which to retrieve the
+      * @param hlaClassName name of interaction class for which to retrieve the
       * names of all of its parameters
       * @return Set<String> containing the names of all parameters in the
       * className interaction class
       */
-    public static Set<ClassAndPropertyName> get_all_parameter_names( String className ) {
-        return new HashSet<>(  _classNameAllPropertyNameSetMap.get( className )  );
+    public static List<ClassAndPropertyName> get_all_parameter_names( String hlaClassName ) {
+        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(
+          _allClassNamePropertyNameSetMap.get( hlaClassName )
+        );
+        Collections.sort(allClassAndPropertyNameList);
+        return allClassAndPropertyNameList;
     }
 
     //-------------------------------------------
@@ -568,7 +576,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * This can also be performed by calling the publish( RTIambassador rti )
      * method directly on the interaction class named by "className" (for
      * example, to publish the InteractionRoot class in particular,
-     * see {@link InteractionRoot#publish( RTIambassador rti )}).
+     * see {@link InteractionRoot#publish_interaction( RTIambassador rti )}).
      *
      * @param className name of interaction class to be published for the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -594,7 +602,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * This can also be performed by calling the unpublish( RTIambassador rti )
      * method directly on the interaction class named by "className" (for
      * example, to unpublish the InteractionRoot class in particular,
-     * see {@link InteractionRoot#unpublish( RTIambassador rti )}).
+     * see {@link InteractionRoot#unpublish_interaction( RTIambassador rti )}).
      *
      * @param className name of interaction class to be unpublished for the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -620,7 +628,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * This can also be performed by calling the subscribe( RTIambassador rti )
      * method directly on the interaction class named by "className" (for
      * example, to subscribe a federate to the InteractionRoot class
-     * in particular, see {@link InteractionRoot#subscribe( RTIambassador rti )}).
+     * in particular, see {@link InteractionRoot#subscribe_interaction( RTIambassador rti )}).
      *
      * @param className name of interaction class to which to subscribe the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -646,7 +654,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * This can also be performed by calling the unsubscribe( RTIambassador rti )
      * method directly on the interaction class named by "className" (for
      * example, to unsubscribe a federate to the InteractionRoot class
-     * in particular, see {@link InteractionRoot#unsubscribe( RTIambassador rti )}).
+     * in particular, see {@link InteractionRoot#unsubscribe_interaction( RTIambassador rti )}).
      *
      * @param className name of interaction class to which to unsubscribe the federate
      * @param rti handle to the RTI, usu. obtained through the
@@ -990,8 +998,8 @@ public class InteractionRoot implements InteractionRootInterface {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _classNameSet DEFINED IN InteractionRoot
-        _classNameSet.add(get_hla_class_name());
+        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN InteractionRoot
+        _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), InteractionRoot.class);
@@ -1000,9 +1008,9 @@ public class InteractionRoot implements InteractionRootInterface {
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
     }
 
     // --------------------------------------------------------
@@ -1417,7 +1425,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * InteractionRoot instance contains no parameters,
      * this has the same effect as the default constructor.
      *
-     * @param interactionRoot the interaction instance to copy
+     * @param other the interaction instance to copy
      */
     public InteractionRoot( InteractionRoot other ) {
         this();

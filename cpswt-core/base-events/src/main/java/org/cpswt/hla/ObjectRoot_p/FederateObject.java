@@ -247,8 +247,8 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _classNameSet DEFINED IN ObjectRoot
-        _classNameSet.add(get_hla_class_name());
+        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN ObjectRoot
+        _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
         _classNameClassMap.put(get_hla_class_name(), FederateObject.class);
@@ -257,9 +257,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         // IN ObjectRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
 
-        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _classNameAllPropertyNameSetMap DEFINED
+        // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNameAllPropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
         _classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.FederateObject", "FederateHandle"
         ));
