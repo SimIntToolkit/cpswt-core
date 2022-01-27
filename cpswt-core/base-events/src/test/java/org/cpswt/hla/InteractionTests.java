@@ -24,12 +24,81 @@ public class InteractionTests {
 
     static HashMap<String, Integer> classNameHandleMap = new HashMap<>();
     static {
-        classNameHandleMap.put("InteractionRoot", 0);
-        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot", 1);
-        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog", 2);
-        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", 3);
-        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl", 4);
-        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd", 5);
+        int value = 0;
+        classNameHandleMap.put("InteractionRoot", value++);
+        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot", value++);
+        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog", value++);
+        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", value++);
+        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl", value++);
+        classNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd", value);
+    }
+
+    static HashMap<ClassAndPropertyName, Integer> interactionClassAndPropertyNameHandleMap = new HashMap<>();
+    static HashMap<ObjectRootInterface.ClassAndPropertyName, Integer> objectClassAndPropertyNameHandleMap =
+            new HashMap<>();
+    static {
+        int value = 0;
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateFilter"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "sourceFed"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Comment"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Time"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"),
+                value++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"),
+                value++
+        );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle"), value++
+        );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"), value++
+        );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType"), value
+        );
     }
 
     @Test
@@ -65,8 +134,8 @@ public class InteractionTests {
         RTIambassador rtiambassador = mock(RTIambassador.class);
         try {
             when(rtiambassador.getInteractionClassHandle(anyString())).thenAnswer(
-                    (InvocationOnMock invokcationOnMock) ->
-                            classNameHandleMap.get((String)invokcationOnMock.getArgument(0))
+                    (InvocationOnMock invocationOnMock) ->
+                            classNameHandleMap.get((String)invocationOnMock.getArgument(0))
             );
         } catch(Exception e) {}
 
@@ -238,5 +307,35 @@ public class InteractionTests {
                         "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
                 )
         );
+    }
+
+    @Test
+    public void parameterHandleTest() {
+        RTIambassador rtiambassador = mock(RTIambassador.class);
+        try {
+            when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) -> {
+                        String parameterName = invocationOnMock.getArgument(0);
+                        int classHandle = invocationOnMock.getArgument(1);
+                        String className = InteractionRoot.get_hla_class_name(classHandle);
+                        ClassAndPropertyName key = new ClassAndPropertyName(className, parameterName);
+                        return interactionClassAndPropertyNameHandleMap.get(key);
+                    }
+            );
+        } catch(Exception e) {}
+
+        HighPrio.publish_interaction(rtiambassador);
+
+        int expectedValue = interactionClassAndPropertyNameHandleMap.get(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed"));
+
+        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("originFed"));
+        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("originFed"));
+        Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("originFed"));
+
+        expectedValue = interactionClassAndPropertyNameHandleMap.get(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
+        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
+        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
     }
 }
