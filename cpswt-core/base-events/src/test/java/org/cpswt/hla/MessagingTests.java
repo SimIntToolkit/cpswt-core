@@ -20,7 +20,7 @@ import org.mockito.invocation.InvocationOnMock;
 import java.util.*;
 
 
-public class InteractionTests {
+public class MessagingTests {
 
     static HashMap<String, Integer> classNameHandleMap = new HashMap<>();
     static {
@@ -310,7 +310,7 @@ public class InteractionTests {
     }
 
     @Test
-    public void parameterHandleTest() {
+    public void propertyHandleTest() {
         RTIambassador rtiambassador = mock(RTIambassador.class);
         try {
             when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
@@ -320,6 +320,16 @@ public class InteractionTests {
                         String className = InteractionRoot.get_hla_class_name(classHandle);
                         ClassAndPropertyName key = new ClassAndPropertyName(className, parameterName);
                         return interactionClassAndPropertyNameHandleMap.get(key);
+                    }
+            );
+            when(rtiambassador.getAttributeHandle(anyString(), anyInt())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) -> {
+                        String attributeName = invocationOnMock.getArgument(0);
+                        int classHandle = invocationOnMock.getArgument(1);
+                        String className = ObjectRoot.get_hla_class_name(classHandle);
+                        ObjectRootInterface.ClassAndPropertyName key =
+                                new ObjectRootInterface.ClassAndPropertyName(className, attributeName);
+                        return objectClassAndPropertyNameHandleMap.get(key);
                     }
             );
         } catch(Exception e) {}
@@ -337,5 +347,11 @@ public class InteractionTests {
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
         Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
         Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
+
+        FederateObject.publish_object(rtiambassador);
+
+        expectedValue = objectClassAndPropertyNameHandleMap.get(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));
+        Assert.assertEquals(expectedValue, FederateObject.get_attribute_handle("FederateHost"));
     }
 }
