@@ -738,7 +738,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
         // IF value IS A STRING, AND THE TYPE OF THE PARAMETER IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
-        if (value instanceof String && currentValue instanceof Number) {
+        if (value instanceof String && (currentValue instanceof Number || currentValue instanceof Boolean)) {
             Method method;
             try {
                 method = currentValue.getClass().getMethod("valueOf", String.class);
