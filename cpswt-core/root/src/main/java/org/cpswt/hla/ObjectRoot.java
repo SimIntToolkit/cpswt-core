@@ -2316,7 +2316,7 @@ public class ObjectRoot implements ObjectRootInterface {
         ObjectRoot objectRoot = _objectMap.getOrDefault(objectHandle, null);
         if (objectRoot == null) {
             logger.error(
-                    "ObjectRoot:  fromJson:  no registered object exists with recieved object-handle ({})",
+                    "ObjectRoot:  fromJson:  no registered object exists with received object-handle ({})",
                     objectHandle
             );
             return;

@@ -771,6 +771,27 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // END DATAMEMBER MANIPULATION METHODS
     //------------------------------------
 
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
+    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+    @Override
+    public void sendInteraction( RTIambassador rti, double time ) throws Exception {
+        if (  get_sourceFed() == null || "".equals( get_sourceFed() ) || get_originFed() == null || "".equals( get_originFed() )  ) {
+            throw new Exception( "source and/or origin federate not specified." );
+        }
+        super.sendInteraction( rti, time );
+    }
+
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
+    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+    @Override
+    public void sendInteraction( RTIambassador rti ) throws Exception {
+        if (  get_sourceFed() == null || "".equals( get_sourceFed() ) || get_originFed() == null || "".equals( get_originFed() )  ) {
+            throw new Exception( "source and/or origin federate not specified." );
+        }
+        super.sendInteraction( rti );
+    }
+
+
     protected C2WInteractionRoot( ReceivedInteraction datamemberMap, boolean initFlag ) {
         super( datamemberMap, false );
         if ( initFlag ) setParameters( datamemberMap );

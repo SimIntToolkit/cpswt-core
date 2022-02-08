@@ -36,6 +36,9 @@ public class MessagingTests {
     static HashMap<ClassAndPropertyName, Integer> interactionClassAndPropertyNameHandleMap = new HashMap<>();
     static HashMap<ObjectRootInterface.ClassAndPropertyName, Integer> objectClassAndPropertyNameHandleMap =
             new HashMap<>();
+
+    static RTIambassador rtiambassador;
+
     static {
         int value = 0;
         interactionClassAndPropertyNameHandleMap.put(
@@ -99,6 +102,34 @@ public class MessagingTests {
         objectClassAndPropertyNameHandleMap.put(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType"), value
         );
+
+        rtiambassador = mock(RTIambassador.class);
+        try {
+            when(rtiambassador.getInteractionClassHandle(anyString())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) ->
+                            classNameHandleMap.get((String)invocationOnMock.getArgument(0))
+            );
+            when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) -> {
+                        String parameterName = invocationOnMock.getArgument(0);
+                        int classHandle = invocationOnMock.getArgument(1);
+                        String className = InteractionRoot.get_hla_class_name(classHandle);
+                        ClassAndPropertyName key = new ClassAndPropertyName(className, parameterName);
+                        return interactionClassAndPropertyNameHandleMap.get(key);
+                    }
+            );
+            when(rtiambassador.getAttributeHandle(anyString(), anyInt())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) -> {
+                        String attributeName = invocationOnMock.getArgument(0);
+                        int classHandle = invocationOnMock.getArgument(1);
+                        String className = ObjectRoot.get_hla_class_name(classHandle);
+                        ObjectRootInterface.ClassAndPropertyName key =
+                                new ObjectRootInterface.ClassAndPropertyName(className, attributeName);
+                        return objectClassAndPropertyNameHandleMap.get(key);
+                    }
+            );
+        } catch(Exception e) {}
+
     }
 
     @Test
@@ -131,13 +162,6 @@ public class MessagingTests {
 
     @Test
     public void classHandleTest() {
-        RTIambassador rtiambassador = mock(RTIambassador.class);
-        try {
-            when(rtiambassador.getInteractionClassHandle(anyString())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) ->
-                            classNameHandleMap.get((String)invocationOnMock.getArgument(0))
-            );
-        } catch(Exception e) {}
 
         InteractionRoot.publish_interaction(rtiambassador);
         C2WInteractionRoot.publish_interaction(rtiambassador);
@@ -311,28 +335,6 @@ public class MessagingTests {
 
     @Test
     public void propertyHandleTest() {
-        RTIambassador rtiambassador = mock(RTIambassador.class);
-        try {
-            when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) -> {
-                        String parameterName = invocationOnMock.getArgument(0);
-                        int classHandle = invocationOnMock.getArgument(1);
-                        String className = InteractionRoot.get_hla_class_name(classHandle);
-                        ClassAndPropertyName key = new ClassAndPropertyName(className, parameterName);
-                        return interactionClassAndPropertyNameHandleMap.get(key);
-                    }
-            );
-            when(rtiambassador.getAttributeHandle(anyString(), anyInt())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) -> {
-                        String attributeName = invocationOnMock.getArgument(0);
-                        int classHandle = invocationOnMock.getArgument(1);
-                        String className = ObjectRoot.get_hla_class_name(classHandle);
-                        ObjectRootInterface.ClassAndPropertyName key =
-                                new ObjectRootInterface.ClassAndPropertyName(className, attributeName);
-                        return objectClassAndPropertyNameHandleMap.get(key);
-                    }
-            );
-        } catch(Exception e) {}
 
         HighPrio.publish_interaction(rtiambassador);
 
