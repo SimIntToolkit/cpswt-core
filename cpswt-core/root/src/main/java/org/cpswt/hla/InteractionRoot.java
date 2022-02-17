@@ -52,7 +52,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
+
 import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONTokener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -111,6 +117,88 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
+    private static boolean _isInitialized = false;
+    public static void init(RTIambassador rtiAmbassador) {
+        if (_isInitialized) {
+            return;
+        }
+        _isInitialized = true;
+
+        for(String hlaClassName: _hlaClassNameSet) {
+
+            boolean isNotInitialized = true;
+            int classHandle = 0;
+            while(isNotInitialized) {
+                try {
+                    classHandle = rtiAmbassador.getInteractionClassHandle(hlaClassName);
+                    _classNameHandleMap.put(hlaClassName, classHandle);
+                    _classHandleNameMap.put(classHandle, hlaClassName);
+                    isNotInitialized = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not initialize: Federate Not Execution Member", e);
+                    return;
+                } catch (NameNotFound e) {
+                    logger.error("could not initialize: Name Not Found", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+
+
+            Set<ClassAndPropertyName> classAndPropertyNameSet = _classNamePropertyNameSetMap.get(hlaClassName);
+            for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameSet) {
+                isNotInitialized = true;
+                while(isNotInitialized) {
+                    try {
+                        int propertyHandle = rtiAmbassador.getParameterHandle(classAndPropertyName.getPropertyName(), classHandle);
+                        _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
+                        _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
+                        isNotInitialized = false;
+                    } catch (FederateNotExecutionMember e) {
+                        logger.error("could not initialize: Federate Not Execution Member", e);
+                        return;
+                    } catch (InteractionClassNotDefined e) {
+                        logger.error("could not initialize: Interaction Class Not Defined", e);
+                        return;
+                    } catch (NameNotFound e) {
+                        logger.error("could not initialize: Name Not Found", e);
+                        return;
+                    } catch (Exception e) {
+                        logger.error(e);
+                        CpswtUtils.sleepDefault();
+                    }
+                }
+            }
+
+            _classNamePublishStatusMap.put(hlaClassName, false);
+            _classNameSubscribeStatusMap.put(hlaClassName, false);
+        }
+    }
+
+    private String _instanceHlaClassName = null;
+
+    public String getInstanceHlaClassName() {
+        return _instanceHlaClassName;
+    }
+
+    protected void setInstanceHlaClassName(String instanceHlaClassName) {
+        _instanceHlaClassName = instanceHlaClassName;
+    }
+
+    public static String get_simple_class_name(String hlaClassName) {
+        int position = hlaClassName.lastIndexOf(".");
+        return position >= 0 ? hlaClassName.substring(position + 1) : hlaClassName;
+    }
+
+    {
+        // GENERALLY CONSIDERED POOR FORM TO CALL A POLYMORPHIC FUNCTION FROM A CONSTRUCTOR
+        // (OR, MORE ACCURATELY AN INSTANCE INITIALIZATION BLOCK), BUT THE POLYMORPHIC FUNCTION
+        // USED (getHlaClassName) DOES NOT DEPEND ON OBJECT STATE.
+        setInstanceHlaClassName(getHlaClassName());
+    }
+
     //------------------------------------------------------
     // BASIC InteractionRoot CREATION METHODS
     //------------------------------------------------------
@@ -140,8 +228,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     private static InteractionRoot create_interaction( Class<?> rtiClass, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        InteractionRoot classRoot = create_interaction( rtiClass );
-        classRoot.setParameters( propertyMap );
+        InteractionRoot classRoot = create_interaction( rtiClass, propertyMap );
         classRoot.setTime( logicalTime );
         return classRoot;
     }
@@ -174,46 +261,14 @@ public class InteractionRoot implements InteractionRootInterface {
     //-------------------
 
 
-    //----------------------------
-    // CLASS-NAME CLASS-HANDLE MAP
-    //----------------------------
-    protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
-
-    //---------------------------------------------
-    // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
-    //---------------------------------------------
-    /**
-      * Returns the integer handle (RTI defined) of the interaction class
-      * corresponding to the fully-qualified interaction class name in className.
-      *
-      * @param className fully-qualified name of interaction class for which to
-      * retrieve the RTI-defined integer handle
-      * @return the RTI-defined handle of the interaction class
-      */
-    public static int get_class_handle( String className ) {
-
-        Integer classHandle = _classNameHandleMap.get( className );
-        if ( classHandle == null ) {
-            logger.error( "Bad class name \"{}\" on get_handle.", className );
-            return -1;
-        }
-
-        return classHandle;
-    }
-
-    //--------------------------------
-    // END CLASS-NAME CLASS-HANDLE MAP
-    //--------------------------------
-
-
-    //-----------------------------------
-    // CLASS-NAME DATAMEMBER-NAME-SET MAP
-    //-----------------------------------
+    //---------------------------------
+    // CLASS-NAME PROPERTY-NAME-SET MAP
+    //---------------------------------
     protected static Map<String, Set<ClassAndPropertyName>> _classNamePropertyNameSetMap = new HashMap<>();
 
-    //----------------------------------------------------
-    // METHODS THAT USE CLASS-NAME DATAMEMBER-NAME-SET MAP
-    //----------------------------------------------------
+    //--------------------------------------------------
+    // METHODS THAT USE CLASS-NAME PROPERTY-NAME-SET MAP
+    //--------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the non-hidden parameters
       * in the interaction class specified by className.
@@ -231,19 +286,19 @@ public class InteractionRoot implements InteractionRootInterface {
         return classAndPropertyNameList;
     }
 
-    //---------------------------------------
-    // END CLASS-NAME DATAMEMBER-NAME-SET MAP
-    //---------------------------------------
+    //-------------------------------------
+    // END CLASS-NAME PROPERTY-NAME-SET MAP
+    //-------------------------------------
 
 
-    //---------------------------------------
-    // CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
-    //---------------------------------------
+    //-------------------------------------
+    // CLASS-NAME ALL-PROPERTY-NAME-SET MAP
+    //-------------------------------------
     protected static Map<String, Set<ClassAndPropertyName>> _allClassNamePropertyNameSetMap = new HashMap<>();
 
-    //--------------------------------------------------------
-    // METHODS THAT USE CLASS-NAME ALL-DATAMEMBER-NAME-SET MAP
-    //--------------------------------------------------------
+    //------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME ALL-PROPERTY-NAME-SET MAP
+    //------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the parameters
       * in the interaction class specified by className.
@@ -262,17 +317,48 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     //-------------------------------------------
-    // END CLASS-NAME All-DATAMEMBER-NAME-SET MAP
+    // END CLASS-NAME All-PROPERTY-NAME-SET MAP
     //-------------------------------------------
+
+    //----------------------------
+    // CLASS-NAME CLASS-HANDLE MAP
+    //----------------------------
+    protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
+
+    //---------------------------------------------
+    // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
+    //---------------------------------------------
+    /**
+      * Returns the integer handle (RTI defined) of the interaction class
+      * corresponding to the fully-qualified interaction class name in className.
+      *
+      * @param hlaClassName fully-qualified name of interaction class for which to
+      * retrieve the RTI-defined integer handle
+      * @return the RTI-defined handle of the interaction class
+      */
+    public static int get_class_handle( String hlaClassName ) {
+
+        Integer classHandle = _classNameHandleMap.get( hlaClassName );
+        if ( classHandle == null ) {
+            logger.error( "Bad HLA class name \"{}\" on get_class_handle.", hlaClassName );
+            return -1;
+        }
+
+        return classHandle;
+    }
+
+    //--------------------------------
+    // END CLASS-NAME CLASS-HANDLE MAP
+    //--------------------------------
 
     //--------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
     //--------------------------------------------
     protected static Map<ClassAndPropertyName, Integer> _classAndPropertyNameHandleMap = new HashMap<>();
 
-    //------------------------------------------------------------------
-    // METHODS THAT USE CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
-    //------------------------------------------------------------------
+    //--------------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //--------------------------------------------------------------
 
     public static ClassAndPropertyName findProperty(String className, String propertyName) {
 
@@ -289,25 +375,24 @@ public class InteractionRoot implements InteractionRootInterface {
             classNameComponents.remove(classNameComponents.size() - 1);
         }
         return null;
-
     }
 
     /**
       * Returns the handle ofa parameter(RTI assigned) given
       * its interaction class name and parameter name
       *
-      * @param className name of interaction class
+      * @param hlaClassName name of interaction class
       * @param propertyName name of parameter
-      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
+      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "hlaClassName"
       */
-    public static int get_parameter_handle(String className, String propertyName) {
+    public static int get_parameter_handle(String hlaClassName, String propertyName) {
 
-        ClassAndPropertyName key = findProperty(className, propertyName);
+        ClassAndPropertyName key = findProperty(hlaClassName, propertyName);
 
         if (key == null) {
             logger.error(
                     "Bad parameter \"{}\" for class \"{}\" and super-classes on get_parameter_handle.",
-                    propertyName, className
+                    propertyName, hlaClassName
             );
             return -1;
         }
@@ -315,19 +400,19 @@ public class InteractionRoot implements InteractionRootInterface {
         return _classAndPropertyNameHandleMap.get(key);
     }
 
-    //-----------------------------------------------------
-    // END CLASS-NAME-DATAMEMBER-NAME DATAMEMBER-HANDLE MAP
-    //-----------------------------------------------------
+    //-------------------------------------------------
+    // END CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //-------------------------------------------------
 
 
-    //------------------------------------------------
-    // DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
-    //------------------------------------------------
+    //--------------------------------------------
+    // PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
+    //--------------------------------------------
     protected static Map<Integer, ClassAndPropertyName> _handleClassAndPropertyNameMap = new HashMap<>();
 
-    //-----------------------------------------------------------------
-    // METHODS THAT USE DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
-    //-----------------------------------------------------------------
+    //-------------------------------------------------------------
+    // METHODS THAT USE PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
+    //-------------------------------------------------------------
     /**
       * Returns the name ofa parametercorresponding to
       * its handle (RTI assigned) in propertyHandle.
@@ -364,9 +449,9 @@ public class InteractionRoot implements InteractionRootInterface {
                  _handleClassAndPropertyNameMap.get(propertyHandle).getPropertyName() : null;
     }
 
-    //----------------------------------------------------
-    // END DATAMEMBER-HANDLE CLASS-AND-DATAMEMBER-NAME MAP
-    //----------------------------------------------------
+    //------------------------------------------------
+    // END PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
+    //------------------------------------------------
 
 
     //-----------------------------------
@@ -444,13 +529,16 @@ public class InteractionRoot implements InteractionRootInterface {
       * and
       * new InteractionRoot()
       *
-      * @param className fully-qualified (dot-delimited) name of the interaction
+      * @param hlaClassName fully-qualified (dot-delimited) name of the interaction
       * class for which to create an instance
       * @return instance of "className" interaction class
       */
-    public static InteractionRoot create_interaction( String className ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        if ( rtiClass == null ) return null;
+    public static InteractionRoot create_interaction( String hlaClassName ) {
+
+        Class<?> rtiClass = _classNameClassMap.getOrDefault(hlaClassName, null);
+        if (rtiClass == null) {
+            return _hlaClassNameSet.contains(hlaClassName) ? new InteractionRoot(hlaClassName) : null;
+        }
 
         return create_interaction( rtiClass );
     }
@@ -459,22 +547,227 @@ public class InteractionRoot implements InteractionRootInterface {
      * Like {@link #create_interaction( String className )}, but interaction
      * is created with a timestamp based on "logicalTime".
      *
-     * @param className fully-qualified (dot-delimited) name of the interaction
+     * @param hlaClassName fully-qualified (dot-delimited) name of the interaction
      * class for which to create an instance
      * @param logicalTime timestamp to place on the new interaction class instance
      * @return instance of "className" interaction class with "logicalTime" time stamp.
      */
-    public static InteractionRoot create_interaction( String className, LogicalTime logicalTime ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        if ( rtiClass == null ) return null;
+    public static InteractionRoot create_interaction( String hlaClassName, LogicalTime logicalTime ) {
+        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
+        if ( rtiClass == null ) {
+            return _hlaClassNameSet.contains(hlaClassName) ?
+              new InteractionRoot(hlaClassName, logicalTime) : null;
+        }
 
         return create_interaction( rtiClass, logicalTime );
     }
+
+    public static InteractionRoot create_interaction( String hlaClassName, ReceivedInteraction propertyMap ) {
+        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
+        if ( rtiClass == null ) {
+            return _hlaClassNameSet.contains(hlaClassName) ?
+              new InteractionRoot(hlaClassName, propertyMap) : null;
+        }
+
+        return create_interaction( rtiClass, propertyMap );
+    }
+
+    public static InteractionRoot create_interaction( String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
+        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
+        if ( rtiClass == null ) {
+            return _hlaClassNameSet.contains(hlaClassName) ?
+              new InteractionRoot(hlaClassName, propertyMap, logicalTime) : null;
+        }
+
+        return create_interaction( rtiClass, propertyMap, logicalTime );
+    }
+
 
     //-----------------------------------------------
     // END METHODS THAT USE ONLY CLASS-NAME CLASS MAP
     //-----------------------------------------------
 
+    //------------------------------
+    // CLASS-NAME PUBLISH-STATUS MAP
+    //------------------------------
+    protected static HashMap<String, Boolean> _classNamePublishStatusMap = new HashMap<>();
+
+    //-----------------------------------------------
+    // METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
+    //-----------------------------------------------
+    public static Boolean get_is_published(String hlaClassName) {
+        return _classNamePublishStatusMap.getOrDefault(hlaClassName, null);
+    }
+
+    private static void set_is_published(String hlaClassName, boolean publishStatus) {
+        if (_classNamePublishStatusMap.containsKey(hlaClassName)) {
+            _classNamePublishStatusMap.put(hlaClassName, publishStatus);
+        }
+        logger.warn(
+          "set_is_published: Could not set publish-status of class \"{}\" to \"{}\":  class not defined.",
+          hlaClassName, publishStatus
+        );
+    }
+
+    public static void publish_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (get_is_published(hlaClassName)) {
+            return;
+        }
+
+        int classHandle = _classNameHandleMap.get(hlaClassName);
+        synchronized(rti) {
+            boolean isNotPublished = true;
+            while(isNotPublished) {
+                try {
+                    rti.publishInteractionClass(classHandle);
+                    isNotPublished = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not publish: Federate Not Execution Member", e);
+                    return;
+                } catch (InteractionClassNotDefined e) {
+                    logger.error("could not publish: Interaction Class Not Defined", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+        }
+
+        logger.debug("publish: {}", hlaClassName);
+
+        set_is_published(hlaClassName, true);
+    }
+
+    public static void unpublish_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (!get_is_published(hlaClassName)) {
+            return;
+        }
+
+        int classHandle = _classNameHandleMap.get(hlaClassName);
+        synchronized(rti) {
+            boolean isNotUnpublished = true;
+            while(isNotUnpublished) {
+                try {
+                    rti.unpublishInteractionClass(classHandle);
+                    isNotUnpublished = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not unpublish: Federate Not Execution Member", e);
+                    return;
+                } catch (InteractionClassNotDefined e) {
+                    logger.error("could not unpublish: Interaction Class Not Defined", e);
+                    return;
+                } catch (InteractionClassNotPublished e) {
+                    logger.error("could not unpublish: Interaction Class Not Published", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+        }
+
+        logger.debug("unpublish: {}", hlaClassName);
+
+        set_is_published(hlaClassName, false);
+    }
+
+    //---------------------------------------------------
+    // END METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
+    //---------------------------------------------------
+
+    //--------------------------------
+    // CLASS-NAME SUBSCRIBE-STATUS MAP
+    //--------------------------------
+    protected static HashMap<String, Boolean> _classNameSubscribeStatusMap = new HashMap<>();
+
+    //-------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
+    //-------------------------------------------------
+    public static Boolean get_is_subscribed(String className) {
+        return _classNameSubscribeStatusMap.getOrDefault(className, null);
+    }
+
+    private static void set_is_subscribed(String className, boolean subscribeStatus) {
+        if (_classNameSubscribeStatusMap.containsKey(className)) {
+            _classNameSubscribeStatusMap.put(className, subscribeStatus);
+        }
+        logger.warn(
+          "setIsSubscribeed: Could not set subscribe-status of class \"{}\" to \"{}\":  class not defined.",
+          className, subscribeStatus
+        );
+    }
+
+    public static void subscribe_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (get_is_subscribed(hlaClassName)) {
+            return;
+        }
+
+        int classHandle = _classNameHandleMap.get(hlaClassName);
+        synchronized(rti) {
+            boolean isNotSubscribed = true;
+            while(isNotSubscribed) {
+                try {
+                    rti.subscribeInteractionClass(classHandle);
+                    isNotSubscribed = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not publish: Federate Not Execution Member", e);
+                    return;
+                } catch (InteractionClassNotDefined e) {
+                    logger.error("could not publish: Interaction Class Not Defined", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+        }
+
+        logger.debug("subscribe: {}", hlaClassName);
+
+        set_is_subscribed(hlaClassName, true);
+    }
+
+    public static void unsubscribe_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (!get_is_subscribed(hlaClassName)) {
+            return;
+        }
+
+        int classHandle = _classNameHandleMap.get(hlaClassName);
+        synchronized(rti) {
+            boolean isNotUnsubscribed = true;
+            while(isNotUnsubscribed) {
+                try {
+                    rti.unsubscribeInteractionClass(classHandle);
+                    isNotUnsubscribed = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not unpublish: Federate Not Execution Member", e);
+                    return;
+                } catch (InteractionClassNotDefined e) {
+                    logger.error("could not unpublish: Interaction Class Not Defined", e);
+                    return;
+                } catch (InteractionClassNotSubscribed e) {
+                    logger.error("could not unpublish: Interaction Class Not Published", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+        }
+
+        logger.debug("unsubscribe: {}", hlaClassName);
+
+        set_is_subscribed(hlaClassName, false);
+    }
+
+    //-----------------------------------------------------
+    // END METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
+    //-----------------------------------------------------
 
     //---------------------------------------------------------------------------
     // METHODS THAT USE BOTH CLASS-HANDLE CLASS-NAME MAP AND CLASS-NAME CLASS MAP
@@ -491,10 +784,8 @@ public class InteractionRoot implements InteractionRootInterface {
       * @return instance of interaction class corresponding to "classHandle"
       */
     public static InteractionRoot create_interaction( int classHandle ) {
-        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
-        if ( rtiClass == null ) return null;
-
-        return create_interaction( rtiClass );
+        String className = _classHandleNameMap.get( classHandle );
+        return create_interaction( className );
     }
 
     /**
@@ -508,10 +799,8 @@ public class InteractionRoot implements InteractionRootInterface {
       * "logicalTime" time stamp
       */
     public static InteractionRoot create_interaction( int classHandle, LogicalTime logicalTime ) {
-        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
-        if ( rtiClass == null ) return null;
-
-        return create_interaction( rtiClass, logicalTime );
+        String className = _classHandleNameMap.get( classHandle );
+        return create_interaction( className, logicalTime );
     }
 
     /**
@@ -527,10 +816,8 @@ public class InteractionRoot implements InteractionRootInterface {
       * its parameters initialized with the "propertyMap"
       */
     public static InteractionRoot create_interaction( int classHandle, ReceivedInteraction propertyMap ) {
-        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
-        if ( rtiClass == null ) return null;
-
-        return create_interaction( rtiClass, propertyMap );
+        String hlaClassName = _classHandleNameMap.get( classHandle );
+        return create_interaction(hlaClassName, propertyMap);
     }
 
     /**
@@ -547,10 +834,8 @@ public class InteractionRoot implements InteractionRootInterface {
       * "logicalTime" timestamp
       */
     public static InteractionRoot create_interaction( int classHandle, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        Class<?> rtiClass = _classNameClassMap.get(  _classHandleNameMap.get( classHandle )  );
-        if ( rtiClass == null ) return null;
-
-        return create_interaction( rtiClass, propertyMap, logicalTime );
+        String hlaClassName = _classHandleNameMap.get( classHandle );
+        return create_interaction(hlaClassName, propertyMap, logicalTime);
     }
 
     //-------------------------------------------------------------------------------
@@ -560,120 +845,6 @@ public class InteractionRoot implements InteractionRootInterface {
     //--------------------------------
     // END CLASS-HANDLE CLASS-NAME MAP
     //--------------------------------
-
-
-    //------------------------
-    // PUB-SUB-ARGUMENTS ARRAY
-    //------------------------
-    private static final Class<?>[] pubsubArguments = new Class<?>[] { RTIambassador.class };
-
-    //----------------------------------------------------------------------
-    // METHODS THAT USE BOTH PUB-SUB-ARGUMENT-ARRAY AND CLASS-NAME CLASS MAP
-    //----------------------------------------------------------------------
-
-    /**
-     * Publishes the interaction class named by "className" for a federate.
-     * This can also be performed by calling the publish( RTIambassador rti )
-     * method directly on the interaction class named by "className" (for
-     * example, to publish the InteractionRoot class in particular,
-     * see {@link InteractionRoot#publish_interaction( RTIambassador rti )}).
-     *
-     * @param className name of interaction class to be published for the federate
-     * @param rti handle to the RTI, usu. obtained through the
-     * {@link SynchronizedFederate#getRTI()} call
-     */
-    public static void publish_interaction( String className, RTIambassador rti ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        if ( rtiClass == null ) {
-            logger.error( "Bad class name \"{}\" on publish.", className);
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod( "publish", pubsubArguments );
-            method.invoke(null, rti);
-        } catch ( Exception e ) {
-            logger.error( "Exception caught on publish!" );
-            logger.error("{}", CpswtUtils.getStackTrace(e));
-        }
-    }
-
-    /**
-     * Unpublishes the interaction class named by "className" for a federate.
-     * This can also be performed by calling the unpublish( RTIambassador rti )
-     * method directly on the interaction class named by "className" (for
-     * example, to unpublish the InteractionRoot class in particular,
-     * see {@link InteractionRoot#unpublish_interaction( RTIambassador rti )}).
-     *
-     * @param className name of interaction class to be unpublished for the federate
-     * @param rti handle to the RTI, usu. obtained through the
-     * {@link SynchronizedFederate#getRTI()} call
-     */
-    public static void unpublish_interaction( String className, RTIambassador rti ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        if ( rtiClass == null ) {
-            logger.error( "Bad class name \"{}\" on unpublish.", className );
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod( "unpublish", pubsubArguments );
-            method.invoke(null, rti);
-        } catch ( Exception e ) {
-            logger.error( "Exception caught on unpublish!" );
-            logger.error("{}", CpswtUtils.getStackTrace(e));
-        }
-    }
-
-    /**
-     * Subscribes federate to the interaction class names by "className"
-     * This can also be performed by calling the subscribe( RTIambassador rti )
-     * method directly on the interaction class named by "className" (for
-     * example, to subscribe a federate to the InteractionRoot class
-     * in particular, see {@link InteractionRoot#subscribe_interaction( RTIambassador rti )}).
-     *
-     * @param className name of interaction class to which to subscribe the federate
-     * @param rti handle to the RTI, usu. obtained through the
-     * {@link SynchronizedFederate#getRTI()} call
-     */
-    public static void subscribe_interaction( String className, RTIambassador rti ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        if ( rtiClass == null ) {
-            logger.error( "Bad class name \"{}\" on subscribe.", className );
-            return;
-        }
-        try {
-            Method method = rtiClass.getMethod( "subscribe", pubsubArguments );
-            method.invoke(null, rti);
-        } catch ( Exception e ) {
-            logger.error( "Exception caught on subscribe!" );
-            logger.error("{}", CpswtUtils.getStackTrace(e));
-        }
-    }
-
-    /**
-     * Unsubscribes federate from the interaction class names by "className"
-     * This can also be performed by calling the unsubscribe( RTIambassador rti )
-     * method directly on the interaction class named by "className" (for
-     * example, to unsubscribe a federate to the InteractionRoot class
-     * in particular, see {@link InteractionRoot#unsubscribe_interaction( RTIambassador rti )}).
-     *
-     * @param className name of interaction class to which to unsubscribe the federate
-     * @param rti handle to the RTI, usu. obtained through the
-     * {@link SynchronizedFederate#getRTI()} call
-     */
-    public static void unsubscribe_interaction( String className, RTIambassador rti ) {
-        Class<?> rtiClass = _classNameClassMap.get( className );
-        try {
-            Method method = rtiClass.getMethod( "unsubscribe", pubsubArguments );
-            method.invoke(null, rti);
-        } catch ( Exception e ) {
-            logger.error( "Exception caught on unsubscribe!" );
-            logger.error("{}", CpswtUtils.getStackTrace(e));
-        }
-    }
-
-    //--------------------------------------------------------------------------
-    // END METHODS THAT USE BOTH PUB-SUB-ARGUMENT-ARRAY AND CLASS-NAME CLASS MAP
-    //--------------------------------------------------------------------------
 
     //-------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
@@ -688,8 +859,8 @@ public class InteractionRoot implements InteractionRootInterface {
     // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
     //-----------------------------------------------------------------------------------------------------------
     protected static class PropertyClassNameAndValue {
-        private String className;
-        private Object value;
+        private final String className;
+        private final Object value;
 
         public PropertyClassNameAndValue(String className, Object value) {
             this.className = className;
@@ -714,12 +885,12 @@ public class InteractionRoot implements InteractionRootInterface {
     public void setParameter(String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
-          getParameterAux(getHlaClassName(), propertyName);
+          getParameterAux(getInstanceHlaClassName(), propertyName);
 
         if (propertyClassNameAndValue == null) {
             logger.error(
               "setparameter(\"{}\", {} value): could not find \"{}\" parameter of class \"{}\" or its " +
-              "superclasses.", propertyName, value.getClass().getName(), propertyName, getHlaClassName()
+              "superclasses.", propertyName, value.getClass().getName(), propertyName, getInstanceHlaClassName()
             );
             return;
         }
@@ -734,7 +905,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        Object currentValue =propertyClassNameAndValue.getValue();
+        Object currentValue = propertyClassNameAndValue.getValue();
 
         // IF value IS A STRING, AND THE TYPE OF THE PARAMETER IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
@@ -752,7 +923,15 @@ public class InteractionRoot implements InteractionRootInterface {
             }
             Object newValue = null;
             try {
-                newValue = method.invoke(null, value);
+                // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
+                String intermediateValue = (String)value;
+                if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
+                    int dotPosition = intermediateValue.indexOf(".");
+                    if (dotPosition > 0) {
+                        intermediateValue = intermediateValue.substring(0, dotPosition);
+                    }
+                }
+                newValue = method.invoke(null, intermediateValue);
             } catch(Exception e) { }
 
             if (newValue != null) {
@@ -790,9 +969,15 @@ public class InteractionRoot implements InteractionRootInterface {
         setParameter(classAndPropertyName.getPropertyName(), value);
     }
 
-    //
-    // getParameterAux METHODS ARE DEFINED IN SUBCLASSES.
-    //
+    private PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
+        ClassAndPropertyName key = findProperty(className, propertyName);
+        if (key != null) {
+            Object value = classAndPropertyNameValueMap.get(key);
+            return new PropertyClassNameAndValue(key.getClassName(), value);
+        }
+
+        return null;
+    }
 
     /**
      * Returns the value of the parameter named "propertyName" for this
@@ -802,7 +987,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the value of the parameter whose name is "propertyName"
      */
     public Object getParameter(String propertyName) {
-        return getParameterAux(getHlaClassName(), propertyName).getValue();
+        return getParameterAux(getInstanceHlaClassName(), propertyName).getValue();
     }
 
     /**
@@ -832,14 +1017,17 @@ public class InteractionRoot implements InteractionRootInterface {
         return value;
     }
 
-    //---------------------------------------------------
+    //-----------------------------------------------
     // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
-    //---------------------------------------------------
+    //-----------------------------------------------
 
     //---------------------------
     // START OF INCLUDED TEMPLATE
     //---------------------------
 
+
+    // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
+    public static void load() { }
 
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
@@ -877,7 +1065,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the name of this interaction class
      */
     public static String get_simple_class_name() {
-        return "InteractionRoot";
+        return get_simple_class_name(get_hla_class_name());
     }
 
     /**
@@ -917,8 +1105,6 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
      * org.cpswt.hla.InteractionRoot interaction class.
@@ -934,9 +1120,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_parameter_names() {
-        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
-        Collections.sort(classAndPropertyNameList);
-        return classAndPropertyNameList;
+        return get_parameter_names(get_hla_class_name());
     }
 
     /**
@@ -955,8 +1139,6 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_parameter_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the parameters in the
      * org.cpswt.hla.InteractionRoot interaction class.
@@ -972,9 +1154,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_parameter_names() {
-        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
-        Collections.sort(allClassAndPropertyNameList);
-        return allClassAndPropertyNameList;
+        return get_all_parameter_names(get_hla_class_name());
     }
 
     /**
@@ -998,19 +1178,34 @@ public class InteractionRoot implements InteractionRootInterface {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN InteractionRoot
         _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), InteractionRoot.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
+        Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
+
+        // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
+
+
+        Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
+
 
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        logger.info(
+          "Class \"{}\" (hla class \"{}\") loaded",
+          InteractionRoot.class.getName(), get_hla_class_name()
+        );
+
+        System.err.println(
+          "Class \"" + InteractionRoot.class.getName() + "\" (hla class \"" +
+          get_hla_class_name() + "\") loaded"
+        );
     }
 
     // --------------------------------------------------------
@@ -1023,8 +1218,6 @@ public class InteractionRoot implements InteractionRootInterface {
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
-    private static int _handle;
-
     /**
      * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1035,7 +1228,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the RTI assigned integer handle that represents this interaction class
      */
     public static int get_class_handle() {
-        return _handle;
+        return _classNameHandleMap.get(get_hla_class_name());
     }
 
     /**
@@ -1049,32 +1242,6 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
 
-    /*
-     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
-     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
-     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
-     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
-     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
-     * THERE IS NO SUCH DATAMEMBER.
-     *
-     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
-     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
-     *
-     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_parameter_handle(String)" METHOD BELOW, WHICH PROVIDES THE
-     * VALUE FOR THE "className" ARGUMENT.
-     */
-    protected static int get_parameter_handle_aux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (_classAndPropertyNameHandleMap.containsKey(key)) {
-            return _classAndPropertyNameHandleMap.get(key);
-        }
-        logger.error(
-          "get_parameter_handle: could not find handle for \"{}\" parameter of class \"{}\" or its " +
-          "superclasses.", propertyName, className
-        );
-        return -1;    
-    }
-
     /**
      * Returns the handle of an parameter (RTI assigned) of
      * this interaction class (i.e. "org.cpswt.hla.InteractionRoot") given the parameter's name.
@@ -1083,7 +1250,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
      */
     public static int get_parameter_handle(String propertyName) {
-        return get_parameter_handle_aux(get_hla_class_name(), propertyName);
+        return get_parameter_handle(get_hla_class_name(), propertyName);
     }
 
     /**
@@ -1097,38 +1264,6 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_parameter_handle(propertyName);
     }
 
-    private static boolean _isInitialized = false;
-
-    /*
-     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS INTERACTION CLASS
-     * IT NEEDS THE RTI TO DO SO.
-     */
-    protected static void init(RTIambassador rti) {
-        if (_isInitialized) return;
-        _isInitialized = true;
-
-        boolean isNotInitialized = true;
-        while(isNotInitialized) {
-            try {
-                _handle = rti.getInteractionClassHandle(get_hla_class_name());
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
-
-        _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
-        _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
-        _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
-    }
-
     // ----------------------------------------------------------
     // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
@@ -1138,39 +1273,13 @@ public class InteractionRoot implements InteractionRootInterface {
     // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-------------------------------------------------
 
-    private static boolean _isPublished = false;
-
     /**
      * Publishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void publish_interaction(RTIambassador rti) {
-        if (_isPublished) return;
-        _isPublished = true;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotPublished = true;
-            while(isNotPublished) {
-                try {
-                    rti.publishInteractionClass(get_class_handle());
-                    isNotPublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not publish: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not publish: Interaction Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("publish: {}", get_hla_class_name());
+        publish_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -1192,34 +1301,7 @@ public class InteractionRoot implements InteractionRootInterface {
      *            {@link SynchronizedFederate#getLRC()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
-        if (!_isPublished) return;
-        _isPublished = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnpublished = true;
-            while(isNotUnpublished) {
-                try {
-                    rti.unpublishInteractionClass(get_class_handle());
-                    isNotUnpublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unpublish: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not unpublish: Interaction Class Not Defined", e);
-                    return;
-                } catch (InteractionClassNotPublished e) {
-                    logger.error("could not unpublish: Interaction Class Not Published", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unpublish: {}", get_hla_class_name());
+        unpublish_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -1233,39 +1315,13 @@ public class InteractionRoot implements InteractionRootInterface {
         unpublish_interaction(rti);
     }
 
-    private static boolean _isSubscribed = false;
-
     /**
      * Subscribes a federate to the org.cpswt.hla.InteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void subscribe_interaction(RTIambassador rti) {
-        if (_isSubscribed) return;
-        _isSubscribed= true;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotSubscribed = true;
-            while(isNotSubscribed) {
-                try {
-                    rti.subscribeInteractionClass(get_class_handle());
-                    isNotSubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not subscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not subscribe: Interaction Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("subscribe: {}", get_hla_class_name());
+        subscribe_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -1285,34 +1341,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param rti handle to the Local RTI Component
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
-        if (!_isSubscribed) return;
-        _isSubscribed = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnsubscribed = true;
-            while(isNotUnsubscribed) {
-                try {
-                    rti.unsubscribeInteractionClass(get_class_handle());
-                    isNotUnsubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unsubscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not unsubscribe: Interaction Class Not Defined", e);
-                    return;
-                } catch (InteractionClassNotSubscribed e) {
-                    logger.error("could not unsubscribe: Interaction Class Not Subscribed", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unsubscribe: {}", get_hla_class_name());
+        unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -1345,20 +1374,6 @@ public class InteractionRoot implements InteractionRootInterface {
     //--------------------------------
     // DATAMEMBER MANIPULATION METHODS
     //--------------------------------
-    protected PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (classAndPropertyNameValueMap.containsKey(key)) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(get_hla_class_name(), value);
-        }
-
-        logger.error(
-          "getparameter(\"{}\"): could not find value for \"{}\" parameter of class \"{}\" or " +
-          "its superclasses.", propertyName, propertyName, className
-        );
-
-        return null;
-    }
 
     //------------------------------------
     // END DATAMEMBER MANIPULATION METHODS
@@ -1471,6 +1486,33 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public InteractionRoot( ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
         this( propertyMap, logicalTime, true );
+    }
+
+    public InteractionRoot( String hlaClassName ) {
+        this();
+        setInstanceHlaClassName(hlaClassName);
+
+        Set<ClassAndPropertyName> allClassNamePropertyNameSet = _allClassNamePropertyNameSetMap.get(hlaClassName);
+        for(ClassAndPropertyName classAndPropertyName: allClassNamePropertyNameSet) {
+            Class<?> propertyType = _classAndPropertyNameTypeMap.get(classAndPropertyName);
+            Object initialValue = _classToInitialValueMap.get(propertyType);
+            classAndPropertyNameValueMap.put(classAndPropertyName, initialValue);
+        }
+    }
+
+    public InteractionRoot( String hlaClassName, LogicalTime logicalTime ) {
+        this(hlaClassName);
+        setTime( logicalTime );
+    }
+
+    public InteractionRoot( String hlaClassName, ReceivedInteraction propertyMap ) {
+        this(hlaClassName);
+        setParameters( propertyMap );
+    }
+
+    public InteractionRoot( String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
+        this(hlaClassName, propertyMap);
+        setTime( logicalTime );
     }
 
     //-----------------
@@ -1604,7 +1646,7 @@ public class InteractionRoot implements InteractionRootInterface {
     /**
      * For use with the melding API -- this method creates a new
      * InteractionRoot instance and returns a
-     * InteractionRootInterface reference to it.
+     * InteractionRootInterface reference to it.get
      *
      * @return InteractionRootInterface reference to a newly created
      * InteractionRoot instance
@@ -1628,7 +1670,7 @@ public class InteractionRoot implements InteractionRootInterface {
     public String toJson() {
         JSONObject topLevelJSONObject = new JSONObject();
         topLevelJSONObject.put("messaging_type", "interaction");
-        topLevelJSONObject.put("messaging_name", getHlaClassName());
+        topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
 
         JSONObject propertyJSONObject = new JSONObject();
         topLevelJSONObject.put("properties", propertyJSONObject);
@@ -1659,7 +1701,132 @@ public class InteractionRoot implements InteractionRootInterface {
 
         return interactionRoot;
     }
+    private static JSONObject federationJson = null;
 
+    public static void readFederationJson(File federationJsonFile) {
+        try (
+            FileReader fileReader = new FileReader(federationJsonFile)
+        ) {
+            readFederationJson(fileReader);
+        } catch(Exception e) {
+            logger.error(
+              "readFederationJson: \"{}\" exception on file \"{}\"",
+              e.getClass().getSimpleName(),
+              federationJsonFile.getAbsolutePath()
+            );
+        }
+    }
+
+    public static void readFederationJson(Reader reader) {
+        federationJson = new JSONObject( new JSONTokener(reader) );
+    }
+
+    private static final Map<String, Class<?>> _typeToClassMap = new HashMap<>();
+    static {
+        _typeToClassMap.put("boolean", Boolean.class);
+        _typeToClassMap.put("byte", Byte.class);
+        _typeToClassMap.put("char", Character.class);
+        _typeToClassMap.put("double", Double.class);
+        _typeToClassMap.put("float", Float.class);
+        _typeToClassMap.put("int", Integer.class);
+        _typeToClassMap.put("long", Long.class);
+        _typeToClassMap.put("short", Short.class);
+        _typeToClassMap.put("String", String.class);
+    }
+
+    private static final Map<Class<?>, Object> _classToInitialValueMap = new HashMap<>();
+    static {
+        _classToInitialValueMap.put(Boolean.class, false);
+        _classToInitialValueMap.put(Byte.class, (byte)0);
+        _classToInitialValueMap.put(Character.class, (char)0);
+        _classToInitialValueMap.put(Double.class, (double)0);
+        _classToInitialValueMap.put(Float.class, (float)0);
+        _classToInitialValueMap.put(Integer.class, 0);
+        _classToInitialValueMap.put(Long.class, (long)0);
+        _classToInitialValueMap.put(Short.class, (short)0);
+        _classToInitialValueMap.put(String.class, "");
+    }
+
+    public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {
+        try (
+            FileReader fileReader = new FileReader(dynamicMessageTypesJsonFile)
+        ) {
+            readFederateDynamicMessageClasses(fileReader);
+        } catch(Exception e) {
+            logger.error(
+              "readFederateDynamicMessageClasses: \"{}\" exception on file \"{}\"",
+              e.getClass().getSimpleName(),
+              dynamicMessageTypesJsonFile.getAbsolutePath()
+            );
+        }
+    }
+
+    public static void readFederateDynamicMessageClasses(Reader reader) {
+
+        JSONObject dynamicMessageTypes = new JSONObject( new JSONTokener(reader) );
+        JSONObject federationMessaging = federationJson.getJSONObject("interactions");
+
+        Set<String> localHlaClassNameSet = new HashSet<>();
+
+        JSONArray dynamicHlaClassNames = dynamicMessageTypes.getJSONArray("interactions");
+        for(Object object: dynamicHlaClassNames) {
+            String hlaClassName = (String)object;
+            List<String> hlaClassNameComponents = new ArrayList<>(Arrays.asList(hlaClassName.split("\\.")));
+            while(!hlaClassNameComponents.isEmpty()) {
+                String localHlaClassName = String.join(".", hlaClassNameComponents);
+                localHlaClassNameSet.add(localHlaClassName);
+                hlaClassNameComponents.remove(hlaClassNameComponents.size() - 1);
+            }
+        }
+
+        for(String hlaClassName: localHlaClassNameSet) {
+
+            _hlaClassNameSet.add(hlaClassName);
+
+            Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
+
+            JSONObject messagingPropertyDataMap = federationMessaging.getJSONObject(hlaClassName);
+            for(String propertyName: messagingPropertyDataMap.keySet()) {
+                ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(hlaClassName, propertyName);
+                classAndPropertyNameSet.add(classAndPropertyName);
+
+                JSONObject typeDataMap = messagingPropertyDataMap.getJSONObject(propertyName);
+                if (!typeDataMap.getBoolean("Hidden")) {
+                    String propertyTypeString = typeDataMap.getString("ParameterType");
+                    Class<?> parameterClass = _typeToClassMap.get(propertyTypeString);
+                    _classAndPropertyNameTypeMap.put(classAndPropertyName, parameterClass);
+                }
+            }
+
+            _classNamePropertyNameSetMap.put(hlaClassName, classAndPropertyNameSet);
+        }
+
+        for(String hlaClassName: localHlaClassNameSet) {
+
+            Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
+
+            List<String> hlaClassNameComponents = new ArrayList<>(Arrays.asList(hlaClassName.split("\\.")));
+            while(!hlaClassNameComponents.isEmpty()) {
+                String localHlaClassName = String.join(".", hlaClassNameComponents);
+                allClassAndPropertyNameSet.addAll(_classNamePropertyNameSetMap.get(localHlaClassName));
+                hlaClassNameComponents.remove(hlaClassNameComponents.size() - 1);
+            }
+
+            _allClassNamePropertyNameSetMap.put(hlaClassName, allClassAndPropertyNameSet);
+        }
+    }
+
+    public static void loadDynamicClassFederationData(
+      Reader federationJsonReader, Reader federateDynamicMessageClassesReader
+    ) {
+        readFederationJson(federationJsonReader);
+        readFederateDynamicMessageClasses(federateDynamicMessageClassesReader);
+    }
+
+    public static void loadDynamicClassFederationData(File federationJsonFile, File federateDynamicMessageClassesFile) {
+        readFederationJson(federationJsonFile);
+        readFederateDynamicMessageClasses(federateDynamicMessageClassesFile);
+    }
 
     @Override
     public String toString() {
@@ -1671,7 +1838,7 @@ public class InteractionRoot implements InteractionRootInterface {
             stringBuilder.append(classAndPropertyName).append("=").
               append(classAndPropertyNameValueMap.get(classAndPropertyName));
         }
-        return getHlaClassName() + "(" + stringBuilder + ")";
+        return getInstanceHlaClassName() + "(" + stringBuilder + ")";
     }
 
 }

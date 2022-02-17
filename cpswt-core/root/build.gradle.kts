@@ -62,6 +62,8 @@ dependencies {
     implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
 
 
+    testImplementation(group="junit", name="junit", version="4.13.2")
+    testImplementation(group="org.mockito", name="mockito-core", version="4.1.0")
 }
 
 publishing {

@@ -36,7 +36,6 @@ public class MessagingTests {
     static HashMap<ClassAndPropertyName, Integer> interactionClassAndPropertyNameHandleMap = new HashMap<>();
     static HashMap<ObjectRootInterface.ClassAndPropertyName, Integer> objectClassAndPropertyNameHandleMap =
             new HashMap<>();
-
     static RTIambassador rtiambassador;
 
     static {
@@ -130,13 +129,15 @@ public class MessagingTests {
             );
         } catch(Exception e) {}
 
+        HighPrio.load();
+        SimEnd.load();
+        FederateObject.load();
+        InteractionRoot.init(rtiambassador);
+        ObjectRoot.init(rtiambassador);
     }
 
     @Test
     public void messagingNamesTest() {
-
-        new HighPrio();
-        new SimEnd();
 
         Set<String> expectedInteractionClassNameSet = new HashSet<>();
         expectedInteractionClassNameSet.add("InteractionRoot");
@@ -162,13 +163,6 @@ public class MessagingTests {
 
     @Test
     public void classHandleTest() {
-
-        InteractionRoot.publish_interaction(rtiambassador);
-        C2WInteractionRoot.publish_interaction(rtiambassador);
-        SimLog.publish_interaction(rtiambassador);
-        HighPrio.publish_interaction(rtiambassador);
-        SimulationControl.publish_interaction(rtiambassador);
-        SimEnd.publish_interaction(rtiambassador);
 
         Assert.assertEquals((int)classNameHandleMap.get("InteractionRoot"), InteractionRoot.get_class_handle());
         Assert.assertEquals(
@@ -336,8 +330,6 @@ public class MessagingTests {
     @Test
     public void propertyHandleTest() {
 
-        HighPrio.publish_interaction(rtiambassador);
-
         int expectedValue = interactionClassAndPropertyNameHandleMap.get(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed"));
 
@@ -349,8 +341,6 @@ public class MessagingTests {
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
         Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
         Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
-
-        FederateObject.publish_object(rtiambassador);
 
         expectedValue = objectClassAndPropertyNameHandleMap.get(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));

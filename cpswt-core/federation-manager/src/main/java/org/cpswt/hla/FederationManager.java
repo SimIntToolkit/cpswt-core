@@ -1126,6 +1126,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         } catch (Exception e) {
             logger.error("Error while parsing the logger interaction");
             logger.error(e);
+            e.printStackTrace();
         }
     }
 

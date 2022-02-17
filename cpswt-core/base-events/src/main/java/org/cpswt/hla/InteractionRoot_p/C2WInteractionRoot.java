@@ -69,6 +69,9 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     */
     public C2WInteractionRoot() {}
 
+    // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
+    public static void load() { }
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -105,7 +108,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * @return the name of this interaction class
      */
     public static String get_simple_class_name() {
-        return "C2WInteractionRoot";
+        return get_simple_class_name(get_hla_class_name());
     }
 
     /**
@@ -145,8 +148,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
@@ -162,9 +163,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_parameter_names() {
-        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
-        Collections.sort(classAndPropertyNameList);
-        return classAndPropertyNameList;
+        return get_parameter_names(get_hla_class_name());
     }
 
     /**
@@ -183,8 +182,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_parameter_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
@@ -200,9 +197,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_parameter_names() {
-        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
-        Collections.sort(allClassAndPropertyNameList);
-        return allClassAndPropertyNameList;
+        return get_all_parameter_names(get_hla_class_name());
     }
 
     /**
@@ -226,31 +221,52 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN InteractionRoot
         _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
         _classNameClassMap.put(get_hla_class_name(), C2WInteractionRoot.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
+        Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "originFed"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+        ));
+
+        // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
+
+
+        Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "federateFilter"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "originFed"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+        ));
+
 
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
-        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "federateFilter"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
-        ));
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         ClassAndPropertyName key;
 
@@ -266,21 +282,15 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
         _classAndPropertyNameTypeMap.put(key, String.class);
 
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"
-        ));
+        logger.info(
+          "Class \"{}\" (hla class \"{}\") loaded",
+          C2WInteractionRoot.class.getName(), get_hla_class_name()
+        );
 
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "federateFilter"
-        ));
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
-        ));
+        System.err.println(
+          "Class \"" + C2WInteractionRoot.class.getName() + "\" (hla class \"" +
+          get_hla_class_name() + "\") loaded"
+        );
     }
 
     // --------------------------------------------------------
@@ -293,8 +303,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
-    private static int _handle;
-
     /**
      * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -305,7 +313,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * @return the RTI assigned integer handle that represents this interaction class
      */
     public static int get_class_handle() {
-        return _handle;
+        return _classNameHandleMap.get(get_hla_class_name());
     }
 
     /**
@@ -319,28 +327,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     }
 
 
-    /*
-     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
-     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
-     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
-     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
-     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
-     * THERE IS NO SUCH DATAMEMBER.
-     *
-     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
-     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
-     *
-     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_parameter_handle(String)" METHOD BELOW, WHICH PROVIDES THE
-     * VALUE FOR THE "className" ARGUMENT.
-     */
-    protected static int get_parameter_handle_aux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (_classAndPropertyNameHandleMap.containsKey(key)) {
-            return _classAndPropertyNameHandleMap.get(key);
-        }
-        return org.cpswt.hla.InteractionRoot.get_parameter_handle_aux(className, propertyName);    
-    }
-
     /**
      * Returns the handle of an parameter (RTI assigned) of
      * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot") given the parameter's name.
@@ -349,7 +335,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
      */
     public static int get_parameter_handle(String propertyName) {
-        return get_parameter_handle_aux(get_hla_class_name(), propertyName);
+        return get_parameter_handle(get_hla_class_name(), propertyName);
     }
 
     /**
@@ -364,82 +350,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_parameter_handle(propertyName);
     }
 
-    private static boolean _isInitialized = false;
-
-    /*
-     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS INTERACTION CLASS
-     * IT NEEDS THE RTI TO DO SO.
-     */
-    protected static void init(RTIambassador rti) {
-        if (_isInitialized) return;
-        _isInitialized = true;
-        org.cpswt.hla.InteractionRoot.init(rti);
-
-        boolean isNotInitialized = true;
-        while(isNotInitialized) {
-            try {
-                _handle = rti.getInteractionClassHandle(get_hla_class_name());
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
-
-        _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
-        _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
-        _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
-
-        ClassAndPropertyName classAndPropertyName;
-
-        isNotInitialized = true;
-        int propertyHandle;
-        while(isNotInitialized) {
-            try {
-
-                propertyHandle = rti.getParameterHandle("actualLogicalGenerationTime", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "actualLogicalGenerationTime");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getParameterHandle("federateFilter", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getParameterHandle("originFed", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getParameterHandle("sourceFed", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (InteractionClassNotDefined e) {
-                logger.error("could not initialize: Interaction Class Not Defined", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
-    }
-
     // ----------------------------------------------------------
     // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
@@ -449,39 +359,13 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-------------------------------------------------
 
-    private static boolean _isPublished = false;
-
     /**
      * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void publish_interaction(RTIambassador rti) {
-        if (_isPublished) return;
-        _isPublished = true;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotPublished = true;
-            while(isNotPublished) {
-                try {
-                    rti.publishInteractionClass(get_class_handle());
-                    isNotPublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not publish: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not publish: Interaction Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("publish: {}", get_hla_class_name());
+        publish_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -503,34 +387,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      *            {@link SynchronizedFederate#getLRC()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
-        if (!_isPublished) return;
-        _isPublished = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnpublished = true;
-            while(isNotUnpublished) {
-                try {
-                    rti.unpublishInteractionClass(get_class_handle());
-                    isNotUnpublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unpublish: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not unpublish: Interaction Class Not Defined", e);
-                    return;
-                } catch (InteractionClassNotPublished e) {
-                    logger.error("could not unpublish: Interaction Class Not Published", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unpublish: {}", get_hla_class_name());
+        unpublish_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -544,39 +401,13 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         unpublish_interaction(rti);
     }
 
-    private static boolean _isSubscribed = false;
-
     /**
      * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void subscribe_interaction(RTIambassador rti) {
-        if (_isSubscribed) return;
-        _isSubscribed= true;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotSubscribed = true;
-            while(isNotSubscribed) {
-                try {
-                    rti.subscribeInteractionClass(get_class_handle());
-                    isNotSubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not subscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not subscribe: Interaction Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("subscribe: {}", get_hla_class_name());
+        subscribe_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -596,34 +427,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * @param rti handle to the Local RTI Component
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
-        if (!_isSubscribed) return;
-        _isSubscribed = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnsubscribed = true;
-            while(isNotUnsubscribed) {
-                try {
-                    rti.unsubscribeInteractionClass(get_class_handle());
-                    isNotUnsubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unsubscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not unsubscribe: Interaction Class Not Defined", e);
-                    return;
-                } catch (InteractionClassNotSubscribed e) {
-                    logger.error("could not unsubscribe: Interaction Class Not Subscribed", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unsubscribe: {}", get_hla_class_name());
+        unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
     /**
@@ -754,17 +558,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     public String get_sourceFed() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
         return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-    @Override
-    protected PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (classAndPropertyNameValueMap.containsKey(key)) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(get_hla_class_name(), value);
-        }
-
-        return super.getParameterAux(className, propertyName);
     }
 
     //------------------------------------

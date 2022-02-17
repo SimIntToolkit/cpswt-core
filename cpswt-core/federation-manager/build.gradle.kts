@@ -32,7 +32,7 @@ dependencies {
 
 tasks.named<JavaExec>("run") {
     mainClass.set("org.cpswt.hla.FederationManager")
-//    args = listOf("--configFile", "/home/vagrant/cpswt/cpswt-cpp/Docker/Federation/federateManagerConfig.json")
+    args = listOf("-configFile", "federationManagerConfig.json")
 }
 
 publishing {

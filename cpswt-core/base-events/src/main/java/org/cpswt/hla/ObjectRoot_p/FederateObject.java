@@ -71,6 +71,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     */
     public FederateObject() {}
 
+    // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
+    public static void load() { }
+
     // ----------------------------------------------------------------------------
     // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
@@ -107,7 +110,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @return the name of this object class
      */
     public static String get_simple_class_name() {
-        return "FederateObject";
+        return get_simple_class_name(get_hla_class_name());
     }
 
     /**
@@ -147,8 +150,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_hla_class_name();
     }
 
-    private static final Set<ClassAndPropertyName> _classAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
      * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
@@ -164,9 +165,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_attribute_names() {
-        List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(_classAndPropertyNameSet);
-        Collections.sort(classAndPropertyNameList);
-        return classAndPropertyNameList;
+        return get_attribute_names(get_hla_class_name());
     }
 
     /**
@@ -185,8 +184,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_attribute_names();
     }
 
-    private static final Set<ClassAndPropertyName> _allClassAndPropertyNameSet = new HashSet<>();
-
     /**
      * Returns a sorted list containing the names of all of the attributes in the
      * org.cpswt.hla.ObjectRoot_p.FederateObject object class.
@@ -202,9 +199,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * paired with name of the hla class in which they are defined in a ClassAndPropertyName POJO.
      */
     public static List<ClassAndPropertyName> get_all_attribute_names() {
-        List<ClassAndPropertyName> allClassAndPropertyNameList = new ArrayList<>(_allClassAndPropertyNameSet);
-        Collections.sort(allClassAndPropertyNameList);
-        return allClassAndPropertyNameList;
+        return get_all_attribute_names(get_hla_class_name());
     }
 
     /**
@@ -223,11 +218,8 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_all_attribute_names();
     }
 
-    private static final Set<ClassAndPropertyName> _publishedAttributeNameSet = new HashSet<>();
-    private static final Set<ClassAndPropertyName> _subscribedAttributeNameSet = new HashSet<>();
-
     protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
-        return _publishedAttributeNameSet;
+        return _classNamePublishedAttributeNameSetMap.get(get_hla_class_name());
     }
 
     protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
@@ -235,7 +227,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
-        return _subscribedAttributeNameSet;
+        return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
     protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
@@ -247,28 +239,45 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
      */
     static {
-        // ADD THIS CLASS TO THE _hlaClassNameSet DEFINED IN ObjectRoot
         _hlaClassNameSet.add(get_hla_class_name());
 
         // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
         _classNameClassMap.put(get_hla_class_name(), FederateObject.class);
 
-        // ADD THIS CLASS'S _classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
+        Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateHandle"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateHost"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateType"
+        ));
+
+        // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _classNamePropertyNameSetMap.put(get_hla_class_name(), _classAndPropertyNameSet);
+        _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
+
+
+        Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateHandle"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateHost"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.FederateObject", "FederateType"
+        ));
+
 
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
-        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), _allClassAndPropertyNameSet);
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateHandle"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateHost"
-        ));
-        _classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateType"
-        ));
+        _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         ClassAndPropertyName key;
 
@@ -281,20 +290,15 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
         _classAndPropertyNameTypeMap.put(key, String.class);
 
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateHandle"
-        ));
+        logger.info(
+          "Class \"{}\" (hla class \"{}\") loaded",
+          FederateObject.class.getName(), get_hla_class_name()
+        );
 
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateHost"
-        ));
-
-        _allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.FederateObject", "FederateType"
-        ));
-
-        _classNamePublishedAttributeNameSetMap.put(get_hla_class_name(), _publishedAttributeNameSet);
-        _classNameSubscribedAttributeNameSetMap.put(get_hla_class_name(), _subscribedAttributeNameSet);
+        System.err.println(
+          "Class \"" + FederateObject.class.getName() + "\" (hla class \"" +
+          get_hla_class_name() + "\") loaded"
+        );
     }
 
     // --------------------------------------------------------
@@ -307,8 +311,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
-    private static int _handle;
-
     /**
      * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -319,7 +321,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @return the RTI assigned integer handle that represents this object class
      */
     public static int get_class_handle() {
-        return _handle;
+        return _classNameHandleMap.get(get_hla_class_name());
     }
 
     /**
@@ -333,28 +335,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
 
-    /*
-     * THIS IS A PROTECTED METHOD THAT WILL (TRY TO) RETURN THE HANDLE OF A GIVEN DATAMEMBER, GIVEN THE DATAMEMBER'S NAME.
-     * FOR A GIVEN CLASS, IT WILL ATTEMPT TO FIND THE ENTRY IN THE _classAndPropertyNameHandleMap USING AS A KEY
-     * A ClassAndPropertyName POJO, ClassAndPropertyName(A, B), WHERE "A" IS THE FULL CLASS NAME OF THIS CLASS,
-     * AND "B" IS THE NAME OF THE DATAMEMBER. IF THERE IS NO SUCH ENTRY, THIS METHOD CALLS THE SAME METHOD IN ITS
-     * SUPER CLASS.  THIS METHOD CHAIN BOTTOMS OUT IN THE "InteractionRoot" CLASS, WHERE AN ERROR IS RAISED INDICATING
-     * THERE IS NO SUCH DATAMEMBER.
-     *
-     * THE "className" ARGUMENT IS THE FULL NAME OF THE CLASS FOR WHICH THIS METHOD WAS ORIGINALLY CALLED, I.E. THE NAME
-     * OF THE CLASS AT THE TOP OF THE CALL-CHAIN.  IT IS INCLUDED FOR ERROR REPORTING IN THE "InteractionRoot" CLASS.
-     *
-     * THIS METHOD IS INDIRECTLY CALLED VIA THE "get_attribute_handle(String)" METHOD BELOW, WHICH PROVIDES THE
-     * VALUE FOR THE "className" ARGUMENT.
-     */
-    protected static int get_attribute_handle_aux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (_classAndPropertyNameHandleMap.containsKey(key)) {
-            return _classAndPropertyNameHandleMap.get(key);
-        }
-        return org.cpswt.hla.ObjectRoot.get_attribute_handle_aux(className, propertyName);    
-    }
-
     /**
      * Returns the handle of an attribute (RTI assigned) of
      * this object class (i.e. "org.cpswt.hla.ObjectRoot_p.FederateObject") given the attribute's name.
@@ -363,7 +343,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
      */
     public static int get_attribute_handle(String propertyName) {
-        return get_attribute_handle_aux(get_hla_class_name(), propertyName);
+        return get_attribute_handle(get_hla_class_name(), propertyName);
     }
 
     /**
@@ -377,9 +357,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     public int getAttributeHandle(String propertyName) {
         return get_attribute_handle(propertyName);
     }
-    private static final AttributeHandleSet _publishedAttributeHandleSet;
-    private static final AttributeHandleSet _subscribedAttributeHandleSet;
-
     /**
      * Returns a data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription.  To actually subscribe to these
@@ -389,86 +366,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * class that are currently marked for subscription
      */
     private static AttributeHandleSet get_subscribed_attribute_handle_set() {
-        return _subscribedAttributeHandleSet;
-    }
-
-    static {
-        _publishedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNamePublishedAttributeHandleSetMap.put(get_hla_class_name(), _publishedAttributeHandleSet);
-
-        _subscribedAttributeHandleSet = _factory.createAttributeHandleSet();
-        _classNameSubscribedAttributeHandleSetMap.put(get_hla_class_name(), _subscribedAttributeHandleSet);
-    }
-
-    private static boolean _isInitialized = false;
-
-    /*
-     * THIS FUNCTION INITIALIZES ALL OF THE HANDLES ASSOCIATED WITH THIS OBJECT CLASS
-     * IT NEEDS THE RTI TO DO SO.
-     */
-    protected static void init(RTIambassador rti) {
-        if (_isInitialized) return;
-        _isInitialized = true;
-        org.cpswt.hla.ObjectRoot.init(rti);
-
-        boolean isNotInitialized = true;
-        while(isNotInitialized) {
-            try {
-                _handle = rti.getObjectClassHandle(get_hla_class_name());
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
-
-        _classNameHandleMap.put(get_hla_class_name(), get_class_handle());
-        _classHandleNameMap.put(get_class_handle(), get_hla_class_name());
-        _classHandleSimpleNameMap.put(get_class_handle(), get_simple_class_name());
-
-        ClassAndPropertyName classAndPropertyName;
-
-        isNotInitialized = true;
-        int propertyHandle;
-        while(isNotInitialized) {
-            try {
-
-                propertyHandle = rti.getAttributeHandle("FederateHandle", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateHandle");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getAttributeHandle("FederateHost", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateHost");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                propertyHandle = rti.getAttributeHandle("FederateType", get_class_handle());
-                classAndPropertyName = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-                _classAndPropertyNameHandleMap.put(classAndPropertyName, propertyHandle);
-                _handleClassAndPropertyNameMap.put(propertyHandle, classAndPropertyName);
-
-                isNotInitialized = false;
-            } catch (FederateNotExecutionMember e) {
-                logger.error("could not initialize: Federate Not Execution Member", e);
-                return;
-            } catch (ObjectClassNotDefined e) {
-                logger.error("could not initialize: Object Class Not Defined", e);
-                return;
-            } catch (NameNotFound e) {
-                logger.error("could not initialize: Name Not Found", e);
-                return;
-            } catch (Exception e) {
-                logger.error(e);
-                CpswtUtils.sleepDefault();
-            }
-        }
+        return _classNamePublishedAttributeHandleSetMap.get( get_hla_class_name() );
     }
 
     // ----------------------------------------------------------
@@ -480,49 +378,13 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     // METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-------------------------------------------------
 
-    private static boolean _isPublished = false;
-
     /**
      * Publishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void publish_object(RTIambassador rti) {
-        if (_isPublished) return;
-        _isPublished = true;
-
-        init(rti);
-
-        _publishedAttributeHandleSet.empty();
-        for(ClassAndPropertyName key : _publishedAttributeNameSet) {
-            try {
-                _publishedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
-                logger.trace("publish {}:{}", get_hla_class_name(), key.toString());
-            } catch (Exception e) {
-                logger.error("could not publish \"" + key.toString() + "\" attribute.", e);
-            }
-        }
-
-        synchronized(rti) {
-            boolean isNotPublished = true;
-            while(isNotPublished) {
-                try {
-                    rti.publishObjectClass(get_class_handle(), _publishedAttributeHandleSet);
-                    isNotPublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not publish: Federate Not Execution Member", e);
-                    return;
-                } catch (ObjectClassNotDefined e) {
-                    logger.error("could not publish: Object Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("publish: {}", get_hla_class_name());
+        publish_object(get_hla_class_name(), rti);
     }
 
     /**
@@ -544,34 +406,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      *            {@link SynchronizedFederate#getLRC()} call
      */
     public static void unpublish_object(RTIambassador rti) {
-        if (!_isPublished) return;
-        _isPublished = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnpublished = true;
-            while(isNotUnpublished) {
-                try {
-                    rti.unpublishObjectClass(get_class_handle());
-                    isNotUnpublished = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unpublish: Federate Not Execution Member", e);
-                    return;
-                } catch (ObjectClassNotDefined e) {
-                    logger.error("could not unpublish: Object Class Not Defined", e);
-                    return;
-                } catch (ObjectClassNotPublished e) {
-                    logger.error("could not unpublish: Object Class Not Published", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unpublish: {}", get_hla_class_name());
+        unpublish_object(get_hla_class_name(), rti);
     }
 
     /**
@@ -585,49 +420,13 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         unpublish_object(rti);
     }
 
-    private static boolean _isSubscribed = false;
-
     /**
      * Subscribes a federate to the org.cpswt.hla.ObjectRoot_p.FederateObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void subscribe_object(RTIambassador rti) {
-        if (_isSubscribed) return;
-        _isSubscribed= true;
-
-        init(rti);
-
-        _subscribedAttributeHandleSet.empty();
-        for(ClassAndPropertyName key : _subscribedAttributeNameSet) {
-            try {
-                _subscribedAttributeHandleSet.add(_classAndPropertyNameHandleMap.get(key));
-                logger.trace("subscribe {}:{}", get_hla_class_name(), key.toString());
-            } catch (Exception e) {
-                logger.error("could not subscribe to \"" + key + "\" attribute.", e);
-            }
-        }
-
-        synchronized(rti) {
-            boolean isNotSubscribed = true;
-            while(isNotSubscribed) {
-                try {
-                    rti.subscribeObjectClassAttributes(get_class_handle(), _subscribedAttributeHandleSet);
-                    isNotSubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not subscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (ObjectClassNotDefined e) {
-                    logger.error("could not subscribe: Object Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("subscribe: {}", get_hla_class_name());
+        subscribe_object(get_hla_class_name(), rti);
     }
 
     /**
@@ -647,34 +446,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @param rti handle to the Local RTI Component
      */
     public static void unsubscribe_object(RTIambassador rti) {
-        if (!_isSubscribed) return;
-        _isSubscribed = false;
-
-        init(rti);
-
-        synchronized(rti) {
-            boolean isNotUnsubscribed = true;
-            while(isNotUnsubscribed) {
-                try {
-                    rti.unsubscribeObjectClass(get_class_handle());
-                    isNotUnsubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not unsubscribe: Federate Not Execution Member", e);
-                    return;
-                } catch (ObjectClassNotDefined e) {
-                    logger.error("could not unsubscribe: Object Class Not Defined", e);
-                    return;
-                } catch (ObjectClassNotSubscribed e) {
-                    logger.error("could not unsubscribe: Object Class Not Subscribed", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("unsubscribe: {}", get_hla_class_name());
+        unsubscribe_object(get_hla_class_name(), rti);
     }
 
     /**
@@ -822,17 +594,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         )).getTime();
     }
 
-    @Override
-    protected PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), propertyName);
-        if (classAndPropertyNameValueMap.containsKey(key)) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(get_hla_class_name(), value);
-        }
-
-        return super.getAttributeAux(className, propertyName);
-    }
-
     //------------------------------------
     // END DATAMEMBER MANIPULATION METHODS
     //------------------------------------
@@ -846,7 +607,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void publish_FederateHandle_attribute() {
-        _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
+        publish_attribute(get_hla_class_name(), "FederateHandle");
     }
 
     /**
@@ -858,7 +619,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void unpublish_FederateHandle_attribute() {
-        _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
+        unpublish_attribute(get_hla_class_name(), "FederateHandle");
     }
 
     /**
@@ -870,7 +631,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void subscribe_FederateHandle_attribute() {
-        _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
+        subscribe_attribute(get_hla_class_name(), "FederateHandle");
     }
 
     /**
@@ -882,7 +643,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void unsubscribe_FederateHandle_attribute() {
-        _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHandle"));
+        unsubscribe_attribute(get_hla_class_name(), "FederateHandle");
     }
 
     /**
@@ -894,7 +655,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void publish_FederateHost_attribute() {
-        _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
+        publish_attribute(get_hla_class_name(), "FederateHost");
     }
 
     /**
@@ -906,7 +667,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void unpublish_FederateHost_attribute() {
-        _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
+        unpublish_attribute(get_hla_class_name(), "FederateHost");
     }
 
     /**
@@ -918,7 +679,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void subscribe_FederateHost_attribute() {
-        _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
+        subscribe_attribute(get_hla_class_name(), "FederateHost");
     }
 
     /**
@@ -930,7 +691,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void unsubscribe_FederateHost_attribute() {
-        _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateHost"));
+        unsubscribe_attribute(get_hla_class_name(), "FederateHost");
     }
 
     /**
@@ -942,7 +703,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void publish_FederateType_attribute() {
-        _publishedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
+        publish_attribute(get_hla_class_name(), "FederateType");
     }
 
     /**
@@ -954,7 +715,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
     public static void unpublish_FederateType_attribute() {
-        _publishedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
+        unpublish_attribute(get_hla_class_name(), "FederateType");
     }
 
     /**
@@ -966,7 +727,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void subscribe_FederateType_attribute() {
-        _subscribedAttributeNameSet.add(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
+        subscribe_attribute(get_hla_class_name(), "FederateType");
     }
 
     /**
@@ -978,7 +739,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
     public static void unsubscribe_FederateType_attribute() {
-        _subscribedAttributeNameSet.remove(new ClassAndPropertyName(get_hla_class_name(), "FederateType"));
+        unsubscribe_attribute(get_hla_class_name(), "FederateType");
     }
 
     protected FederateObject( ReflectedAttributes datamemberMap, boolean initFlag ) {
