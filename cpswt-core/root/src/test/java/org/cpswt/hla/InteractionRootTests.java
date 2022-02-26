@@ -113,8 +113,8 @@ public class InteractionRootTests {
         }
     }
 
-    private static RTIambassador getRtiambassador() {
-        RTIambassador rtiambassador;
+    private static final RTIambassador rtiambassador;
+    static {
         rtiambassador = mock(RTIambassador.class);
         try {
             when(rtiambassador.getInteractionClassHandle(anyString())).thenAnswer(
@@ -131,13 +131,15 @@ public class InteractionRootTests {
                     }
             );
         } catch (Exception e) { }
+    }
 
+    private static RTIambassador get_rti_ambassador() {
         return rtiambassador;
     }
 
     @Test
     public void valueTest() {
-        RTIambassador rtiambassador = getRtiambassador();
+        RTIambassador rtiambassador = get_rti_ambassador();
 
         InteractionRoot.init(rtiambassador);
 
@@ -166,7 +168,7 @@ public class InteractionRootTests {
     public void publishInteractionTest() {
         Set<String> publishedHlaClassNameSet = new HashSet<>();
 
-        RTIambassador rtiambassador = getRtiambassador();
+        RTIambassador rtiambassador = get_rti_ambassador();
         try {
             doAnswer(invocationOnMock -> {
                 int classHandle = invocationOnMock.getArgument(0);
@@ -192,7 +194,7 @@ public class InteractionRootTests {
     public void subscribeInteractionTest() {
         Set<String> subscribedHlaClassNameSet = new HashSet<>();
 
-        RTIambassador rtiambassador = getRtiambassador();
+        RTIambassador rtiambassador = get_rti_ambassador();
         try {
             doAnswer(invocationOnMock -> {
                 int classHandle = invocationOnMock.getArgument(0);

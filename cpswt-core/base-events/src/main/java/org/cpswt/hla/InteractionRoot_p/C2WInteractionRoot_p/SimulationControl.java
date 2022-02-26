@@ -39,19 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotPublished;
-import hla.rti.InteractionClassNotSubscribed;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
 
@@ -64,16 +56,11 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Interaction class with default parameter values.
-    */
-    public SimulationControl() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -216,15 +203,16 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), SimulationControl.class);
+        SimulationControl instance = new SimulationControl();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
 
@@ -257,23 +245,22 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          SimulationControl.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + SimulationControl.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -325,7 +312,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -414,6 +401,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -431,23 +419,80 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
-
-    protected SimulationControl( ReceivedInteraction datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public SimulationControl() {
+        this(get_hla_class_name());
     }
 
-    protected SimulationControl( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public SimulationControl(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
     }
+
+    public SimulationControl(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public SimulationControl(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static SimulationControl create_interaction() {
+        return new SimulationControl();
+    }
+
+    public SimulationControl createInteraction() {
+        return create_interaction();
+    }
+
+    public static SimulationControl create_interaction(LogicalTime logicalTime) {
+        return new SimulationControl(logicalTime);
+    }
+
+    public SimulationControl createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static SimulationControl create_interaction(ReceivedInteraction propertyMap) {
+        return new SimulationControl(propertyMap);
+    }
+
+    public SimulationControl createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static SimulationControl create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new SimulationControl(propertyMap, logicalTime);
+    }
+
+    public SimulationControl createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
+
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Creates an instance of the SimulationControl interaction class, using
@@ -458,21 +503,8 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     * @param datamemberMap data structure containing initial values for the
     * parameters of this new SimulationControl interaction class instance
     */
-    public SimulationControl( ReceivedInteraction datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #SimulationControl( ReceivedInteraction datamemberMap )}, except this
-    * new SimulationControl parameter class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * parameters of this new SimulationControl interaction class instance
-    * @param logicalTime timestamp for this new SimulationControl interaction class instance
-    */
-    public SimulationControl( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected SimulationControl( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

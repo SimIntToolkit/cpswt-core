@@ -39,19 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotPublished;
-import hla.rti.InteractionClassNotSubscribed;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
 
@@ -64,16 +56,11 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Interaction class with default parameter values.
-    */
-    public MediumPrio() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -216,15 +203,16 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), MediumPrio.class);
+        MediumPrio instance = new MediumPrio();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
 
@@ -269,23 +257,22 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          MediumPrio.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + MediumPrio.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -337,7 +324,7 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -426,6 +413,7 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -443,23 +431,80 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
-
-    protected MediumPrio( ReceivedInteraction datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public MediumPrio() {
+        this(get_hla_class_name());
     }
 
-    protected MediumPrio( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public MediumPrio(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
     }
+
+    public MediumPrio(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public MediumPrio(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static MediumPrio create_interaction() {
+        return new MediumPrio();
+    }
+
+    public MediumPrio createInteraction() {
+        return create_interaction();
+    }
+
+    public static MediumPrio create_interaction(LogicalTime logicalTime) {
+        return new MediumPrio(logicalTime);
+    }
+
+    public MediumPrio createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static MediumPrio create_interaction(ReceivedInteraction propertyMap) {
+        return new MediumPrio(propertyMap);
+    }
+
+    public MediumPrio createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static MediumPrio create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new MediumPrio(propertyMap, logicalTime);
+    }
+
+    public MediumPrio createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
+
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Creates an instance of the MediumPrio interaction class, using
@@ -470,21 +515,8 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     * @param datamemberMap data structure containing initial values for the
     * parameters of this new MediumPrio interaction class instance
     */
-    public MediumPrio( ReceivedInteraction datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #MediumPrio( ReceivedInteraction datamemberMap )}, except this
-    * new MediumPrio parameter class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * parameters of this new MediumPrio interaction class instance
-    * @param logicalTime timestamp for this new MediumPrio interaction class instance
-    */
-    public MediumPrio( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected MediumPrio( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

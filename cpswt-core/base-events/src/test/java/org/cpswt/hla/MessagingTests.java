@@ -346,4 +346,51 @@ public class MessagingTests {
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));
         Assert.assertEquals(expectedValue, FederateObject.get_attribute_handle("FederateHost"));
     }
+
+    @Test
+    public void dynamicMessagingTest() {
+        InteractionRoot dynamicSimLogInteraction = new InteractionRoot(SimLog.get_hla_class_name());
+
+        Assert.assertFalse(dynamicSimLogInteraction instanceof SimLog);
+        Assert.assertEquals(SimLog.get_hla_class_name(), dynamicSimLogInteraction.getInstanceHlaClassName());
+
+        String string1 = "string1";
+        double doubleValue1 = 3.4;
+
+        dynamicSimLogInteraction.setParameter("originFed", string1);
+        dynamicSimLogInteraction.setParameter("Time", doubleValue1);
+
+        Assert.assertEquals(string1, dynamicSimLogInteraction.getParameter("originFed"));
+        Assert.assertEquals(doubleValue1, dynamicSimLogInteraction.getParameter("Time"));
+
+
+        InteractionRoot staticSimLogInteraction1 = InteractionRoot.create_interaction(SimLog.get_hla_class_name());
+        Assert.assertTrue(staticSimLogInteraction1 instanceof SimLog);
+        Assert.assertEquals(SimLog.get_hla_class_name(), staticSimLogInteraction1.getInstanceHlaClassName());
+
+        String string2 = "string2";
+        double doubleValue2 = 5.6;
+
+        SimLog simLogInteraction = (SimLog)staticSimLogInteraction1;
+        simLogInteraction.setParameter("originFed", string2);
+        simLogInteraction.setParameter("Time", doubleValue2);
+
+        Assert.assertEquals(string2, simLogInteraction.getParameter("originFed"));
+        Assert.assertEquals(doubleValue2, simLogInteraction.getParameter("Time"));
+
+        Assert.assertEquals(string2, simLogInteraction.get_originFed());
+        Assert.assertEquals(doubleValue2, simLogInteraction.get_Time(), 0.01);
+
+        String string3 = "string3";
+        double doubleValue3 = 17.3;
+
+        simLogInteraction.set_originFed(string3);
+        simLogInteraction.set_Time(doubleValue3);
+
+        Assert.assertEquals(string3, simLogInteraction.getParameter("originFed"));
+        Assert.assertEquals(doubleValue3, simLogInteraction.getParameter("Time"));
+
+        Assert.assertEquals(string3, simLogInteraction.get_originFed());
+        Assert.assertEquals(doubleValue3, simLogInteraction.get_Time(), 0.01);
+    }
 }

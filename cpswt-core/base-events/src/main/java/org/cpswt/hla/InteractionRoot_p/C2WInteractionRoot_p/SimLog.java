@@ -39,19 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotPublished;
-import hla.rti.InteractionClassNotSubscribed;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
 
@@ -64,16 +56,11 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Interaction class with default parameter values.
-    */
-    public SimLog() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -216,15 +203,16 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), SimLog.class);
+        SimLog instance = new SimLog();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -280,32 +268,31 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
         ClassAndPropertyName key;
 
         key = new ClassAndPropertyName(get_hla_class_name(), "Comment");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FedName");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "Time");
-        _classAndPropertyNameTypeMap.put(key, Double.class);
+        _classAndPropertyNameInitialValueMap.put(key, (double)0);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          SimLog.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + SimLog.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -357,7 +344,7 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -446,6 +433,7 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -463,9 +451,9 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
     {
         ClassAndPropertyName key;
 
@@ -476,8 +464,75 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
         classAndPropertyNameValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "Time");
-        classAndPropertyNameValueMap.put(key, 0);
+        classAndPropertyNameValueMap.put(key, (double)0);
     }
+
+    public SimLog() {
+        this(get_hla_class_name());
+    }
+
+    public SimLog(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
+    }
+
+    public SimLog(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public SimLog(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static SimLog create_interaction() {
+        return new SimLog();
+    }
+
+    public SimLog createInteraction() {
+        return create_interaction();
+    }
+
+    public static SimLog create_interaction(LogicalTime logicalTime) {
+        return new SimLog(logicalTime);
+    }
+
+    public SimLog createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static SimLog create_interaction(ReceivedInteraction propertyMap) {
+        return new SimLog(propertyMap);
+    }
+
+    public SimLog createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static SimLog create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new SimLog(propertyMap, logicalTime);
+    }
+
+    public SimLog createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
 
 
     /**
@@ -537,24 +592,14 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
      *
      * @return the value of the "Time" parameter
      */
-    public Double get_Time() {
+    public double get_Time() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "Time");
-        return (Double)classAndPropertyNameValueMap.get(key);
+        return (double)classAndPropertyNameValueMap.get(key);
     }
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
-
-    protected SimLog( ReceivedInteraction datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setParameters( datamemberMap );
-    }
-
-    protected SimLog( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setParameters( datamemberMap );
-    }
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Creates an instance of the SimLog interaction class, using
@@ -565,21 +610,8 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
     * @param datamemberMap data structure containing initial values for the
     * parameters of this new SimLog interaction class instance
     */
-    public SimLog( ReceivedInteraction datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #SimLog( ReceivedInteraction datamemberMap )}, except this
-    * new SimLog parameter class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * parameters of this new SimLog interaction class instance
-    * @param logicalTime timestamp for this new SimLog interaction class instance
-    */
-    public SimLog( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected SimLog( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

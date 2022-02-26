@@ -39,19 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotPublished;
-import hla.rti.InteractionClassNotSubscribed;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
 
@@ -64,16 +56,11 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Interaction class with default parameter values.
-    */
-    public SimPause() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -216,15 +203,16 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), SimPause.class);
+        SimPause instance = new SimPause();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
 
@@ -257,23 +245,22 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          SimPause.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + SimPause.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -325,7 +312,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -414,6 +401,7 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -431,23 +419,80 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
-
-    protected SimPause( ReceivedInteraction datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public SimPause() {
+        this(get_hla_class_name());
     }
 
-    protected SimPause( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setParameters( datamemberMap );
+    public SimPause(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
     }
+
+    public SimPause(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public SimPause(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static SimPause create_interaction() {
+        return new SimPause();
+    }
+
+    public SimPause createInteraction() {
+        return create_interaction();
+    }
+
+    public static SimPause create_interaction(LogicalTime logicalTime) {
+        return new SimPause(logicalTime);
+    }
+
+    public SimPause createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static SimPause create_interaction(ReceivedInteraction propertyMap) {
+        return new SimPause(propertyMap);
+    }
+
+    public SimPause createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static SimPause create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new SimPause(propertyMap, logicalTime);
+    }
+
+    public SimPause createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
+
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Creates an instance of the SimPause interaction class, using
@@ -458,21 +503,8 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     * @param datamemberMap data structure containing initial values for the
     * parameters of this new SimPause interaction class instance
     */
-    public SimPause( ReceivedInteraction datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #SimPause( ReceivedInteraction datamemberMap )}, except this
-    * new SimPause parameter class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * parameters of this new SimPause interaction class instance
-    * @param logicalTime timestamp for this new SimPause interaction class instance
-    */
-    public SimPause( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected SimPause( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

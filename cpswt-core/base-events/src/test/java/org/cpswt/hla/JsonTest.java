@@ -43,6 +43,30 @@ import hla.rti.RTIambassador;
 
 public class JsonTest {
 
+    private static final int classHandle = 42;
+    private static final int objectHandle = 50;
+
+
+    private static final RTIambassador rtiambassador;
+    static {
+        rtiambassador = mock(RTIambassador.class);
+        try {
+            when(rtiambassador.registerObjectInstance(anyInt(), anyString())).thenReturn(objectHandle);
+            when(rtiambassador.getObjectClassHandle(anyString())).thenReturn(classHandle);
+        } catch(Exception e) {}
+    }
+
+    private static RTIambassador get_rti_ambassador() {
+        return rtiambassador;
+    }
+
+    static {
+        SimEnd.load();
+        FederateObject.load();
+        InteractionRoot.init(get_rti_ambassador());
+        ObjectRoot.init(get_rti_ambassador());
+    }
+
     @Test
     public void interactionJsonTest() {
 
@@ -65,14 +89,7 @@ public class JsonTest {
     @Test
     public void objectJsonTest() {
 
-        int classHandle = 42;
-        int objectHandle = 50;
-
-        RTIambassador rtiambassador = mock(RTIambassador.class);
-        try {
-            when(rtiambassador.registerObjectInstance(anyInt(), anyString())).thenReturn(objectHandle);
-            when(rtiambassador.getObjectClassHandle(anyString())).thenReturn(classHandle);
-        } catch(Exception e) {}
+        RTIambassador rtiambassador = get_rti_ambassador();
 
         FederateObject.publish_object(rtiambassador);
 

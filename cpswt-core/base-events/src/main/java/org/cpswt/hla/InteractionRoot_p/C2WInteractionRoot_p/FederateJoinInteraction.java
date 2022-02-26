@@ -39,19 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
-import hla.rti.FederateNotExecutionMember;
-import hla.rti.InteractionClassNotDefined;
-import hla.rti.InteractionClassNotPublished;
-import hla.rti.InteractionClassNotSubscribed;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
 
@@ -64,16 +56,11 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Interaction class with default parameter values.
-    */
-    public FederateJoinInteraction() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -216,15 +203,16 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), FederateJoinInteraction.class);
+        FederateJoinInteraction instance = new FederateJoinInteraction();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -280,32 +268,31 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         ClassAndPropertyName key;
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        _classAndPropertyNameTypeMap.put(key, Boolean.class);
+        _classAndPropertyNameInitialValueMap.put(key, false);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          FederateJoinInteraction.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + FederateJoinInteraction.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -357,7 +344,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -446,6 +433,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -463,9 +451,9 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
     {
         ClassAndPropertyName key;
 
@@ -478,6 +466,73 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
         classAndPropertyNameValueMap.put(key, false);
     }
+
+    public FederateJoinInteraction() {
+        this(get_hla_class_name());
+    }
+
+    public FederateJoinInteraction(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
+    }
+
+    public FederateJoinInteraction(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public FederateJoinInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static FederateJoinInteraction create_interaction() {
+        return new FederateJoinInteraction();
+    }
+
+    public FederateJoinInteraction createInteraction() {
+        return create_interaction();
+    }
+
+    public static FederateJoinInteraction create_interaction(LogicalTime logicalTime) {
+        return new FederateJoinInteraction(logicalTime);
+    }
+
+    public FederateJoinInteraction createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static FederateJoinInteraction create_interaction(ReceivedInteraction propertyMap) {
+        return new FederateJoinInteraction(propertyMap);
+    }
+
+    public FederateJoinInteraction createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static FederateJoinInteraction create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new FederateJoinInteraction(propertyMap, logicalTime);
+    }
+
+    public FederateJoinInteraction createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
 
 
     /**
@@ -537,24 +592,14 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
      *
      * @return the value of the "IsLateJoiner" parameter
      */
-    public Boolean get_IsLateJoiner() {
+    public boolean get_IsLateJoiner() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        return (Boolean)classAndPropertyNameValueMap.get(key);
+        return (boolean)classAndPropertyNameValueMap.get(key);
     }
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
-
-    protected FederateJoinInteraction( ReceivedInteraction datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setParameters( datamemberMap );
-    }
-
-    protected FederateJoinInteraction( ReceivedInteraction datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setParameters( datamemberMap );
-    }
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Creates an instance of the FederateJoinInteraction interaction class, using
@@ -565,21 +610,8 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     * @param datamemberMap data structure containing initial values for the
     * parameters of this new FederateJoinInteraction interaction class instance
     */
-    public FederateJoinInteraction( ReceivedInteraction datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #FederateJoinInteraction( ReceivedInteraction datamemberMap )}, except this
-    * new FederateJoinInteraction parameter class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * parameters of this new FederateJoinInteraction interaction class instance
-    * @param logicalTime timestamp for this new FederateJoinInteraction interaction class instance
-    */
-    public FederateJoinInteraction( ReceivedInteraction datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected FederateJoinInteraction( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

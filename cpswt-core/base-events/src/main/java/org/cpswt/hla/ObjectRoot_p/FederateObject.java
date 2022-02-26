@@ -39,23 +39,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
 
 import hla.rti.AttributeHandleSet;
-import hla.rti.FederateNotExecutionMember;
 import hla.rti.LogicalTime;
-import hla.rti.NameNotFound;
-import hla.rti.ObjectClassNotDefined;
-import hla.rti.ObjectClassNotPublished;
-import hla.rti.ObjectClassNotSubscribed;
 import hla.rti.RTIambassador;
 import hla.rti.ReflectedAttributes;
-import hla.rti.SuppliedAttributes;
 
 
 /**
@@ -66,16 +57,11 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
-    /**
-    * Creates an instance of the Object class with default attribute values.
-    */
-    public FederateObject() {}
-
     // DUMMY STATIC METHOD TO ALLOW ACTIVE LOADING OF CLASS
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -218,31 +204,16 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return get_all_attribute_names();
     }
 
-    protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
-        return _classNamePublishedAttributeNameSetMap.get(get_hla_class_name());
-    }
-
-    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
-        return get_published_attribute_name_set();
-    }
-
-    protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
-        return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
-    }
-
-    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
-        return get_subscribed_attribute_name_set();
-    }
-
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN ObjectRoot
-        _classNameClassMap.put(get_hla_class_name(), FederateObject.class);
+        FederateObject instance = new FederateObject();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -282,32 +253,31 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         ClassAndPropertyName key;
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateHandle");
-        _classAndPropertyNameTypeMap.put(key, Integer.class);
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(0));
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateHost");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(""));
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        _classAndPropertyNameTypeMap.put(key, String.class);
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(""));
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          FederateObject.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.ObjectRoot_p.FederateObject\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + FederateObject.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.ObjectRoot_p.FederateObject\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -370,7 +340,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -459,6 +429,23 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         unsubscribe_object(rti);
     }
 
+    protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
+        return _classNamePublishedAttributeNameSetMap.get(get_hla_class_name());
+    }
+
+    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
+        return get_published_attribute_name_set();
+    }
+
+    protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+        return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
+    }
+
+    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
+        return get_subscribed_attribute_name_set();
+    }
+
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -476,9 +463,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
     {
         ClassAndPropertyName key;
 
@@ -491,6 +478,73 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
         classAndPropertyNameValueMap.put(key, new Attribute<>(""));
     }
+
+    public FederateObject() {
+        this(get_hla_class_name());
+    }
+
+    public FederateObject(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
+    }
+
+    public FederateObject(ReflectedAttributes propertyMap) {
+        this();
+        setAttributes( propertyMap );
+    }
+
+    public FederateObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static FederateObject create_object() {
+        return new FederateObject();
+    }
+
+    public FederateObject createObject() {
+        return create_object();
+    }
+
+    public static FederateObject create_object(LogicalTime logicalTime) {
+        return new FederateObject(logicalTime);
+    }
+
+    public FederateObject createObject(LogicalTime logicalTime) {
+        return create_object(logicalTime);
+    }
+
+    public static FederateObject create_object(ReflectedAttributes propertyMap) {
+        return new FederateObject(propertyMap);
+    }
+
+    public FederateObject createObject(ReflectedAttributes propertyMap) {
+        return create_object(propertyMap);
+    }
+
+    public static FederateObject create_object(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+        return new FederateObject(propertyMap, logicalTime);
+    }
+
+    public FederateObject createObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+        return create_object(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
 
 
     /**
@@ -510,9 +564,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      *
      * @return the value of the "FederateHandle" parameter
      */
-    public Integer get_FederateHandle() {
+    public int get_FederateHandle() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateHandle");
-        return (Integer)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+        return (int)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
     }
 
     /**
@@ -594,9 +648,9 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         )).getTime();
     }
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     /**
     * Publishes the "FederateHandle" attribute of the attribute's containing object
@@ -742,16 +796,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
         unsubscribe_attribute(get_hla_class_name(), "FederateType");
     }
 
-    protected FederateObject( ReflectedAttributes datamemberMap, boolean initFlag ) {
-        super( datamemberMap, false );
-        if ( initFlag ) setAttributes( datamemberMap );
-    }
-
-    protected FederateObject( ReflectedAttributes datamemberMap, LogicalTime logicalTime, boolean initFlag ) {
-        super( datamemberMap, logicalTime, false );
-        if ( initFlag ) setAttributes( datamemberMap );
-    }
-
     /**
     * Creates an instance of the FederateObject object class, using
     * "datamemberMap" to initialize its attribute values.
@@ -761,21 +805,8 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     * @param datamemberMap data structure containing initial values for the
     * attributes of this new FederateObject object class instance
     */
-    public FederateObject( ReflectedAttributes datamemberMap ) {
-        this( datamemberMap, true );
-    }
-
-    /**
-    * Like {@link #FederateObject( ReflectedAttributes datamemberMap )}, except this
-    * new FederateObject attribute class instance is given a timestamp of
-    * "logicalTime".
-    *
-    * @param datamemberMap data structure containing initial values for the
-    * attributes of this new FederateObject object class instance
-    * @param logicalTime timestamp for this new FederateObject object class instance
-    */
-    public FederateObject( ReflectedAttributes datamemberMap, LogicalTime logicalTime ) {
-        this( datamemberMap, logicalTime, true );
+    protected FederateObject( String hlaClassName ) {
+        super( hlaClassName );
     }
 
     /**

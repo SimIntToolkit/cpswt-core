@@ -103,12 +103,17 @@ public class InteractionRoot implements InteractionRootInterface {
         return _uniqueID;
     }
 
-    protected static RtiFactory _factory;
+    //-------------------------------
+    // _rtiFactory IS USED TO CREATE:
+    // - ATTRIBUTE HANDLE SETS
+    // - SUPPLIED PARAMETERS
+    //-------------------------------
+    protected static RtiFactory _rtiFactory;
     static {
         boolean factoryNotAcquired = true;
         while( factoryNotAcquired ) {
             try {
-                _factory = RtiFactoryFactory.getRtiFactory( "org.portico.dlc.HLA13RTIFactory" );
+                _rtiFactory = RtiFactoryFactory.getRtiFactory( "org.portico.dlc.HLA13RTIFactory" );
                 factoryNotAcquired = false;
             } catch ( Exception e ) {
                 logger.error("failed to acquire factory", e);
@@ -124,8 +129,18 @@ public class InteractionRoot implements InteractionRootInterface {
         }
         _isInitialized = true;
 
+        //-------------------------------------------------------------------------
+        // _hlaClassNameSet IS POPULATED BY
+        // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+        // - THE DYNAMIC-MESSAGE-CLASSES FILE
+        //-------------------------------------------------------------------------
         for(String hlaClassName: _hlaClassNameSet) {
 
+            //------------------------------------------
+            // GET HANDLE FOR hlaClassName TO INITIALIZE
+            // - _classNameHandleMap
+            // - _classHandleNameMap
+            //------------------------------------------
             boolean isNotInitialized = true;
             int classHandle = 0;
             while(isNotInitialized) {
@@ -146,7 +161,14 @@ public class InteractionRoot implements InteractionRootInterface {
                 }
             }
 
-
+            //-------------------------------------------------------------------------------------------
+            // _classAndPropertyNameSetMap MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
+            // DEFINED *DIRECTLY* IN THE hlaClassName
+            //
+            // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
+            // - _classAndPropertyNameHandleMap
+            // - _handleClassAndPropertyNameMap
+            //-------------------------------------------------------------------------------------------
             Set<ClassAndPropertyName> classAndPropertyNameSet = _classNamePropertyNameSetMap.get(hlaClassName);
             for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameSet) {
                 isNotInitialized = true;
@@ -172,11 +194,19 @@ public class InteractionRoot implements InteractionRootInterface {
                 }
             }
 
+            //-------------------------------------------------------
+            // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+            //-------------------------------------------------------
             _classNamePublishStatusMap.put(hlaClassName, false);
             _classNameSubscribeStatusMap.put(hlaClassName, false);
         }
     }
 
+    //-------------------------------------------------------------------------------------------
+    // _instanceHlaClassName IS THE HLA CLASS NAME OF THIS MESSAGING OBJECT JAVA INSTANCE.
+    // FOR DYNAMIC MESSAGING IN PARTICULAR, JAVA-CLASS OF MESSAGING OBJECT DOES NOT DETERMINE THE
+    // MESSAGING CLASS OF THE OBJECT.  _instanceHlaClassName DOES.
+    //-------------------------------------------------------------------------------------------
     private String _instanceHlaClassName = null;
 
     public String getInstanceHlaClassName() {
@@ -188,10 +218,16 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     public static String get_simple_class_name(String hlaClassName) {
+        if (hlaClassName == null) {
+            return null;
+        }
         int position = hlaClassName.lastIndexOf(".");
         return position >= 0 ? hlaClassName.substring(position + 1) : hlaClassName;
     }
 
+    //-----------------------------------------------------------------------------------------
+    // THIS JAVA-INSTANCE INITIALIZATION BLOCK SETS THE INITIAL VALUE FOR _instanceHlaClassName
+    //-----------------------------------------------------------------------------------------
     {
         // GENERALLY CONSIDERED POOR FORM TO CALL A POLYMORPHIC FUNCTION FROM A CONSTRUCTOR
         // (OR, MORE ACCURATELY AN INSTANCE INITIALIZATION BLOCK), BUT THE POLYMORPHIC FUNCTION
@@ -199,53 +235,23 @@ public class InteractionRoot implements InteractionRootInterface {
         setInstanceHlaClassName(getHlaClassName());
     }
 
-    //------------------------------------------------------
-    // BASIC InteractionRoot CREATION METHODS
-    //------------------------------------------------------
-
-    private static InteractionRoot create_interaction( Class<?> rtiClass ) {
-        InteractionRoot classRoot = null;
-        try {
-            classRoot = (InteractionRoot)rtiClass.newInstance();
-        } catch( Exception e ) {
-            logger.error( "InteractionRoot:  create_interaction:  could not create/cast new Interaction" );
-            logger.error("{}", CpswtUtils.getStackTrace(e));
-        }
-
-        return classRoot;
-    }
-
-    private static InteractionRoot create_interaction( Class<?> rtiClass, LogicalTime logicalTime ) {
-        InteractionRoot classRoot = create_interaction( rtiClass );
-        if ( classRoot != null ) classRoot.setTime( logicalTime );
-        return classRoot;
-    }
-
-    private static InteractionRoot create_interaction( Class<?> rtiClass, ReceivedInteraction propertyMap ) {
-        InteractionRoot classRoot = create_interaction( rtiClass );
-        classRoot.setParameters( propertyMap );
-        return classRoot;
-    }
-
-    private static InteractionRoot create_interaction( Class<?> rtiClass, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        InteractionRoot classRoot = create_interaction( rtiClass, propertyMap );
-        classRoot.setTime( logicalTime );
-        return classRoot;
-    }
-
-    //----------------------------------------------------------
-    // END BASIC InteractionRoot CREATION METHODS
-    //----------------------------------------------------------
-
-
-    //---------------
-    // CLASS-NAME SET
-    //---------------
+    //-------------------------------------------------------------------------
+    // HLA CLASS-NAME SET
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
 
-    //--------------------------------
-    // METHODS THAT USE CLASS-NAME-SET
-    //--------------------------------
+    //----------------------------------------------------------------------------
+    // METHODS THAT USE HLA CLASS-NAME-SET
+    //
+    // ALSO USED BY:
+    // - init(RTIambassador) ABOVE
+    // - InteractionRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //----------------------------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the interaction
       * classes in the current federation.
@@ -256,19 +262,27 @@ public class InteractionRoot implements InteractionRootInterface {
     public static Set<String> get_interaction_hla_class_name_set() {
         return new HashSet<>( _hlaClassNameSet );
     }
-    //-------------------
-    // END CLASS-NAME-SET
-    //-------------------
 
+    //-----------------------
+    // END HLA CLASS-NAME-SET
+    //-----------------------
 
-    //---------------------------------
+    //-------------------------------------------------------------------------
     // CLASS-NAME PROPERTY-NAME-SET MAP
-    //---------------------------------
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
     protected static Map<String, Set<ClassAndPropertyName>> _classNamePropertyNameSetMap = new HashMap<>();
 
-    //--------------------------------------------------
+    //---------------------------------------------------------
     // METHODS THAT USE CLASS-NAME PROPERTY-NAME-SET MAP
-    //--------------------------------------------------
+    //
+    // ALSO USED BY:
+    // - init(RTIambassador) ABOVE
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //---------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the non-hidden parameters
       * in the interaction class specified by className.
@@ -290,15 +304,22 @@ public class InteractionRoot implements InteractionRootInterface {
     // END CLASS-NAME PROPERTY-NAME-SET MAP
     //-------------------------------------
 
-
-    //-------------------------------------
+    //-------------------------------------------------------------------------
     // CLASS-NAME ALL-PROPERTY-NAME-SET MAP
-    //-------------------------------------
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    // - THE DYNAMIC-MESSAGE-CLASSES FILE
+    //-------------------------------------------------------------------------
     protected static Map<String, Set<ClassAndPropertyName>> _allClassNamePropertyNameSetMap = new HashMap<>();
 
-    //------------------------------------------------------
+    //----------------------------------------------------------------------------
     // METHODS THAT USE CLASS-NAME ALL-PROPERTY-NAME-SET MAP
-    //------------------------------------------------------
+    //
+    // ALSO USED BY:
+    // - InteractionRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //----------------------------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the parameters
       * in the interaction class specified by className.
@@ -322,12 +343,15 @@ public class InteractionRoot implements InteractionRootInterface {
 
     //----------------------------
     // CLASS-NAME CLASS-HANDLE MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
     //----------------------------
     protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
 
-    //---------------------------------------------
+    //-------------------------------------------------------------
     // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
-    //---------------------------------------------
+    //-------------------------------------------------------------
     /**
       * Returns the integer handle (RTI defined) of the interaction class
       * corresponding to the fully-qualified interaction class name in className.
@@ -338,7 +362,7 @@ public class InteractionRoot implements InteractionRootInterface {
       */
     public static int get_class_handle( String hlaClassName ) {
 
-        Integer classHandle = _classNameHandleMap.get( hlaClassName );
+        Integer classHandle = _classNameHandleMap.getOrDefault( hlaClassName, null );
         if ( classHandle == null ) {
             logger.error( "Bad HLA class name \"{}\" on get_class_handle.", hlaClassName );
             return -1;
@@ -351,8 +375,226 @@ public class InteractionRoot implements InteractionRootInterface {
     // END CLASS-NAME CLASS-HANDLE MAP
     //--------------------------------
 
+    //----------------------------
+    // CLASS-HANDLE CLASS-NAME MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //----------------------------
+    protected static Map<Integer, String> _classHandleNameMap = new HashMap<>();
+
+    //--------------------------------------------------
+    // METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //--------------------------------------------------
+    /**
+      * Returns the fully-qualified name of the interaction class corresponding
+      * to the RTI-defined classHandle.
+      *
+      * @param classHandle handle (defined by RTI) of interaction class for
+      * which to retrieve the fully-qualified name
+      * @return the fully-qualified name of the interaction class that
+      * corresponds to the RTI-defined classHandle
+      */
+    public static String get_hla_class_name( int classHandle ) {
+        return _classHandleNameMap.getOrDefault(classHandle, null);
+    }
+
+    /**
+      * Returns the simple name of the interaction class corresponding to the
+      * RTI-defined classHandle.  The simple name of an interaction class is
+      * the last name in its (dot-delimited) fully-qualified name.
+      *
+      * @param classHandle handle (defined by RTI) of interaction class for which
+      * to retrieve the simple name
+      * @return the simple name of the interaction class that corresponds to
+      * the RTI-defined classHandle
+      */
+    public static String get_simple_class_name( int classHandle ) {
+        String hlaClassName = _classHandleNameMap.getOrDefault(classHandle, null);
+        return get_simple_class_name( hlaClassName );
+    }
+
+    /**
+      * Create an interaction that is in instance of interaction class
+      * that corresponds to the "classHandle" handle (RTI assigned). An
+      * InteractionRoot reference is returned, so to refer to the
+      * instance using a reference to a "className" interaction, the returned
+      * reference must be cast down the interaction inheritance hierarchy.
+      *
+      * @param classHandle handle of interaction class (RTI assigned) class for
+      * which to create an instance
+      * @return instance of interaction class corresponding to "classHandle"
+      */
+    public static InteractionRoot create_interaction( int classHandle ) {
+        String className = _classHandleNameMap.get( classHandle );
+        return create_interaction( className );
+    }
+
+    /**
+      * Like {@link #create_interaction( int classHandle )}, but the interaction
+      * is created with a timestamp based on "logicalTime".
+      *
+      * @param classHandle handle of interaction class (RTI assigned) class for
+      * which to create an instance
+      * @param logicalTime timestamp to place on the new interaction class instance
+      * @return instance of interaction class corresponding to "classHandle" with
+      * "logicalTime" time stamp
+      */
+    public static InteractionRoot create_interaction( int classHandle, LogicalTime logicalTime ) {
+        String className = _classHandleNameMap.get( classHandle );
+        return create_interaction( className, logicalTime );
+    }
+
+    /**
+      * Like {@link #create_interaction( int classHandle )}, but the interaction's
+      * parameters are initialized using "propertyMap".  The "propertyMap"
+      * is usually acquired as an argument to an RTI callback method of a federate.
+      *
+      * @param classHandle handle of interaction class (RTI assigned) class for
+      * which to create an instance
+      * @param propertyMap contains initializing values for the parameters
+      * of the interaction class instance
+      * @return instance of interaction class corresponding to "classHandle" with
+      * its parameters initialized with the "propertyMap"
+      */
+    public static InteractionRoot create_interaction(
+      int classHandle, ReceivedInteraction propertyMap
+    ) {
+        String hlaClassName = _classHandleNameMap.get( classHandle );
+        return create_interaction(hlaClassName, propertyMap);
+    }
+
+    /**
+      * Like {@link #create_interaction( int classHandle, ReceivedInteraction propertyMap )},
+      * but the interaction is given a timestamp based on "logicalTime".
+      *
+      * @param classHandle handle of interaction class (RTI assigned) class for
+      * which to create an instance
+      * @param propertyMap initializing values for the parameters of the
+      * interaction class instance
+      * @param logicalTime timestamp to place on the new interaction class instance
+      * @return instance of interaction class corresponding to "classHandle" with
+      * its parameters initialized with the "propertyMap" and with
+      * "logicalTime" timestamp
+      */
+    public static InteractionRoot create_interaction(
+      int classHandle, ReceivedInteraction propertyMap, LogicalTime logicalTime
+    ) {
+        String hlaClassName = _classHandleNameMap.get( classHandle );
+        return create_interaction(hlaClassName, propertyMap, logicalTime);
+    }
+
+    //------------------------------------------------------
+    // END METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
+    //------------------------------------------------------
+
+    //-------------------------------------------------------------------------
+    // CLASS-NAME INSTANCE MAP
+    //
+    // POPULATED BY:
+    // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
+    //-------------------------------------------------------------------------
+    protected static Map<String, InteractionRoot> _hlaClassNameInstanceMap = new HashMap<>();
+
+    //-----------------------------------------
+    // METHODS THAT USE CLASS-NAME INSTANCE MAP
+    //-----------------------------------------
+
+    public static InteractionRoot create_interaction(String hlaClassName) {
+        InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
+        return instance == null ? new InteractionRoot( hlaClassName )
+          : instance.createInteraction();
+    }
+
+    public static InteractionRoot create_interaction(String hlaClassName, LogicalTime logicalTime) {
+        InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
+        return instance == null ? new InteractionRoot( hlaClassName, logicalTime )
+          : instance.createInteraction( logicalTime );
+    }
+
+    public static InteractionRoot create_interaction(String hlaClassName, ReceivedInteraction propertyMap) {
+        InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
+        return instance == null ? new InteractionRoot( hlaClassName, propertyMap )
+          : instance.createInteraction( propertyMap );
+    }
+
+    public static InteractionRoot create_interaction(
+      String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime
+    ) {
+        InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
+        return instance == null ? new InteractionRoot( hlaClassName, propertyMap, logicalTime )
+          : instance.createInteraction( propertyMap, logicalTime );
+    }
+
+    //----------------------------
+    // END CLASS-NAME INSTANCE MAP
+    //----------------------------
+
+    //------------------------------
+    // CLASS-NAME PUBLISH-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //------------------------------
+    protected static HashMap<String, Boolean> _classNamePublishStatusMap = new HashMap<>();
+
+    //-----------------------------------------------
+    // METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
+    //-----------------------------------------------
+    public static Boolean get_is_published(String hlaClassName) {
+        return _classNamePublishStatusMap.getOrDefault(hlaClassName, null);
+    }
+
+    private static void set_is_published(String hlaClassName, boolean publishStatus) {
+        if (_classNamePublishStatusMap.containsKey(hlaClassName)) {
+            _classNamePublishStatusMap.put(hlaClassName, publishStatus);
+            return;
+        }
+        logger.warn(
+          "set_is_published: Could not set publish-status of class \"{}\" to \"{}\":  class not defined.",
+          hlaClassName, publishStatus
+        );
+    }
+
+    //----------------------------------
+    // END CLASS-NAME PUBLISH-STATUS MAP
+    //----------------------------------
+
+    //--------------------------------
+    // CLASS-NAME SUBSCRIBE-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //--------------------------------
+    protected static HashMap<String, Boolean> _classNameSubscribeStatusMap = new HashMap<>();
+
+    //-------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
+    //-------------------------------------------------
+    public static Boolean get_is_subscribed(String className) {
+        return _classNameSubscribeStatusMap.getOrDefault(className, null);
+    }
+
+    private static void set_is_subscribed(String className, boolean subscribeStatus) {
+        if (_classNameSubscribeStatusMap.containsKey(className)) {
+            _classNameSubscribeStatusMap.put(className, subscribeStatus);
+            return;
+        }
+        logger.warn(
+          "setIsSubscribeed: Could not set subscribe-status of class \"{}\" to \"{}\":  class not defined.",
+          className, subscribeStatus
+        );
+    }
+
+    //------------------------------------
+    // END CLASS-NAME SUBSCRIBE-STATUS MAP
+    //------------------------------------
+
     //--------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
     //--------------------------------------------
     protected static Map<ClassAndPropertyName, Integer> _classAndPropertyNameHandleMap = new HashMap<>();
 
@@ -399,14 +641,25 @@ public class InteractionRoot implements InteractionRootInterface {
 
         return _classAndPropertyNameHandleMap.get(key);
     }
+    private SuppliedParameters createSuppliedParameters() {
+        SuppliedParameters suppliedParameters = _rtiFactory.createSuppliedParameters();
+        for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameValueMap.keySet()) {
+            int handle = _classAndPropertyNameHandleMap.get(classAndPropertyName);
+            byte[] value = classAndPropertyNameValueMap.get(classAndPropertyName).toString().getBytes();
+            suppliedParameters.add(handle, value);
+        }
+        return suppliedParameters;
+    }
 
     //-------------------------------------------------
     // END CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
     //-------------------------------------------------
 
-
     //--------------------------------------------
     // PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
     //--------------------------------------------
     protected static Map<Integer, ClassAndPropertyName> _handleClassAndPropertyNameMap = new HashMap<>();
 
@@ -426,16 +679,6 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-      * Returns the parameter name associated with the given handle for an interaction class instance.
-      *
-      * @param propertyHandle a parameter handle assigned by the RTI
-      * @return the parameter name associated with the handle, or null
-      */
-    public ClassAndPropertyName getClassAndParameterName(int propertyHandle) {
-        return get_class_and_parameter_name(propertyHandle);
-    }
-
-    /**
       * Returns the full class and parameter names associated with the given handle for an
       * interaction class instance.  The full name of a parameter is the full name of the class in which the
       * parameter is defined and the parameter name, in that order, delimited by a ",".
@@ -443,171 +686,55 @@ public class InteractionRoot implements InteractionRootInterface {
       * @param propertyHandle a parameter handle assigned by the RTI
       * @return the full parameter name associated with the handle, or null if the handle does not exist.
       */
-    public String getParameterName(int propertyHandle) {
+    public static String get_parameter_name(int propertyHandle) {
 
         return _handleClassAndPropertyNameMap.containsKey(propertyHandle) ?
                  _handleClassAndPropertyNameMap.get(propertyHandle).getPropertyName() : null;
     }
 
+    public void setParameter(int propertyHandle, Object value) {
+        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
+        if (classAndPropertyName == null) {
+            logger.error(
+              "setParameter(int, Object value): propertyHandle {} does not exist.",
+              propertyHandle
+            );
+            return;
+        }
+
+        setParameter(classAndPropertyName.getPropertyName(), value);
+    }
+
+    /**
+     * Returns the value of the parameter whose handle is "propertyHandle"
+     * (RTI assigned) for this interaction.
+     *
+     * @param propertyHandle handle (RTI assigned) of parameter whose
+     * value to retrieve
+     * @return the value of the parameter whose handle is "propertyHandle"
+     */
+    public Object getParameter( int propertyHandle ) {
+        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
+        if (classAndPropertyName == null) {
+            logger.error("getParameter: propertyHandle {} does not exist.", propertyHandle);
+            return null;
+        }
+        String propertyName = classAndPropertyName.getPropertyName();
+        Object value = getParameter(propertyName);
+        if (value == null) {
+            logger.error(
+                "getParameter: propertyHandle {} corresponds to property of name \"{}\", which " +
+                "does not exist in class \"{}\" (it's defined in class\"{}\")",
+                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
+            );
+        }
+
+        return value;
+    }
+
     //------------------------------------------------
     // END PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
     //------------------------------------------------
-
-
-    //-----------------------------------
-    // CLASS-HANDLE CLASS-SIMPLE-NAME MAP
-    //-----------------------------------
-    protected static Map<Integer, String> _classHandleSimpleNameMap = new HashMap<>();
-
-    //----------------------------------------------------
-    // METHODS THAT USE CLASS-HANDLE CLASS-SIMPLE-NAME MAP
-    //----------------------------------------------------
-    /**
-      * Returns the simple name of the interaction class corresponding to the
-      * RTI-defined classHandle.  The simple name of an interaction class is
-      * the last name in its (dot-delimited) fully-qualified name.
-      *
-      * @param classHandle handle (defined by RTI) of interaction class for which
-      * to retrieve the simple name
-      * @return the simple name of the interaction class that corresponds to
-      * the RTI-defined classHandle
-      */
-    public static String get_simple_class_name( int classHandle ) {
-        return _classHandleSimpleNameMap.getOrDefault(classHandle, "");
-    }
-
-    //---------------------------------------
-    // END CLASS-HANDLE CLASS-SIMPLE-NAME MAP
-    //---------------------------------------
-
-
-    //----------------------------
-    // CLASS-HANDLE CLASS-NAME MAP
-    //----------------------------
-    protected static Map<Integer, String> _classHandleNameMap = new HashMap<>();
-
-    //--------------------------------------------------
-    // METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
-    //--------------------------------------------------
-    /**
-      * Returns the fully-qualified name of the interaction class corresponding
-      * to the RTI-defined classHandle.
-      *
-      * @param classHandle handle (defined by RTI) of interaction class for
-      * which to retrieve the fully-qualified name
-      * @return the fully-qualified name of the interaction class that
-      * corresponds to the RTI-defined classHandle
-      */
-    public static String get_hla_class_name( int classHandle ) {
-        return _classHandleNameMap.getOrDefault(classHandle, null);
-    }
-
-    //------------------------------------------------------
-    // END METHODS THAT USE ONLY CLASS-HANDLE CLASS-NAME MAP
-    //------------------------------------------------------
-
-
-    //---------------------
-    // CLASS-NAME CLASS MAP
-    //---------------------
-    protected static Map<String, Class<?>> _classNameClassMap = new HashMap<>();
-
-    //-------------------------------------------
-    // METHODS THAT USE ONLY CLASS-NAME CLASS MAP
-    //-------------------------------------------
-    /**
-      * Create an interaction that is in instance of interaction class
-      * "className". An InteractionRoot reference is returned,
-      * so to refer to the instance using a reference to a "className" interaction,
-      * the returned reference must be cast down the interaction inheritance
-      * hierarchy.
-      * An instance of the "className" interaction class may also be created
-      * by using the "new" operator directory on the "className" interaction
-      * class.  For instance, two ways to create an InteractionRoot
-      * instance are
-      * Interaction.create_interaction( "InteractionRoot" ),
-      * and
-      * new InteractionRoot()
-      *
-      * @param hlaClassName fully-qualified (dot-delimited) name of the interaction
-      * class for which to create an instance
-      * @return instance of "className" interaction class
-      */
-    public static InteractionRoot create_interaction( String hlaClassName ) {
-
-        Class<?> rtiClass = _classNameClassMap.getOrDefault(hlaClassName, null);
-        if (rtiClass == null) {
-            return _hlaClassNameSet.contains(hlaClassName) ? new InteractionRoot(hlaClassName) : null;
-        }
-
-        return create_interaction( rtiClass );
-    }
-
-    /**
-     * Like {@link #create_interaction( String className )}, but interaction
-     * is created with a timestamp based on "logicalTime".
-     *
-     * @param hlaClassName fully-qualified (dot-delimited) name of the interaction
-     * class for which to create an instance
-     * @param logicalTime timestamp to place on the new interaction class instance
-     * @return instance of "className" interaction class with "logicalTime" time stamp.
-     */
-    public static InteractionRoot create_interaction( String hlaClassName, LogicalTime logicalTime ) {
-        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
-        if ( rtiClass == null ) {
-            return _hlaClassNameSet.contains(hlaClassName) ?
-              new InteractionRoot(hlaClassName, logicalTime) : null;
-        }
-
-        return create_interaction( rtiClass, logicalTime );
-    }
-
-    public static InteractionRoot create_interaction( String hlaClassName, ReceivedInteraction propertyMap ) {
-        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
-        if ( rtiClass == null ) {
-            return _hlaClassNameSet.contains(hlaClassName) ?
-              new InteractionRoot(hlaClassName, propertyMap) : null;
-        }
-
-        return create_interaction( rtiClass, propertyMap );
-    }
-
-    public static InteractionRoot create_interaction( String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        Class<?> rtiClass = _classNameClassMap.getOrDefault( hlaClassName, null );
-        if ( rtiClass == null ) {
-            return _hlaClassNameSet.contains(hlaClassName) ?
-              new InteractionRoot(hlaClassName, propertyMap, logicalTime) : null;
-        }
-
-        return create_interaction( rtiClass, propertyMap, logicalTime );
-    }
-
-
-    //-----------------------------------------------
-    // END METHODS THAT USE ONLY CLASS-NAME CLASS MAP
-    //-----------------------------------------------
-
-    //------------------------------
-    // CLASS-NAME PUBLISH-STATUS MAP
-    //------------------------------
-    protected static HashMap<String, Boolean> _classNamePublishStatusMap = new HashMap<>();
-
-    //-----------------------------------------------
-    // METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
-    //-----------------------------------------------
-    public static Boolean get_is_published(String hlaClassName) {
-        return _classNamePublishStatusMap.getOrDefault(hlaClassName, null);
-    }
-
-    private static void set_is_published(String hlaClassName, boolean publishStatus) {
-        if (_classNamePublishStatusMap.containsKey(hlaClassName)) {
-            _classNamePublishStatusMap.put(hlaClassName, publishStatus);
-        }
-        logger.warn(
-          "set_is_published: Could not set publish-status of class \"{}\" to \"{}\":  class not defined.",
-          hlaClassName, publishStatus
-        );
-    }
 
     public static void publish_interaction(String hlaClassName, RTIambassador rti) {
 
@@ -615,7 +742,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        int classHandle = _classNameHandleMap.get(hlaClassName);
+        int classHandle = get_class_handle(hlaClassName);
         synchronized(rti) {
             boolean isNotPublished = true;
             while(isNotPublished) {
@@ -640,13 +767,44 @@ public class InteractionRoot implements InteractionRootInterface {
         set_is_published(hlaClassName, true);
     }
 
+    public static void subscribe_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (get_is_subscribed(hlaClassName)) {
+            return;
+        }
+
+        int classHandle = get_class_handle(hlaClassName);
+        synchronized(rti) {
+            boolean isNotSubscribed = true;
+            while(isNotSubscribed) {
+                try {
+                    rti.subscribeInteractionClass(classHandle);
+                    isNotSubscribed = false;
+                } catch (FederateNotExecutionMember e) {
+                    logger.error("could not publish: Federate Not Execution Member", e);
+                    return;
+                } catch (InteractionClassNotDefined e) {
+                    logger.error("could not publish: Interaction Class Not Defined", e);
+                    return;
+                } catch (Exception e) {
+                    logger.error(e);
+                    CpswtUtils.sleepDefault();
+                }
+            }
+        }
+
+        logger.debug("subscribe: {}", hlaClassName);
+
+        set_is_subscribed(hlaClassName, true);
+    }
+
     public static void unpublish_interaction(String hlaClassName, RTIambassador rti) {
 
         if (!get_is_published(hlaClassName)) {
             return;
         }
 
-        int classHandle = _classNameHandleMap.get(hlaClassName);
+        int classHandle = get_class_handle(hlaClassName);
         synchronized(rti) {
             boolean isNotUnpublished = true;
             while(isNotUnpublished) {
@@ -674,70 +832,13 @@ public class InteractionRoot implements InteractionRootInterface {
         set_is_published(hlaClassName, false);
     }
 
-    //---------------------------------------------------
-    // END METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
-    //---------------------------------------------------
-
-    //--------------------------------
-    // CLASS-NAME SUBSCRIBE-STATUS MAP
-    //--------------------------------
-    protected static HashMap<String, Boolean> _classNameSubscribeStatusMap = new HashMap<>();
-
-    //-------------------------------------------------
-    // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
-    //-------------------------------------------------
-    public static Boolean get_is_subscribed(String className) {
-        return _classNameSubscribeStatusMap.getOrDefault(className, null);
-    }
-
-    private static void set_is_subscribed(String className, boolean subscribeStatus) {
-        if (_classNameSubscribeStatusMap.containsKey(className)) {
-            _classNameSubscribeStatusMap.put(className, subscribeStatus);
-        }
-        logger.warn(
-          "setIsSubscribeed: Could not set subscribe-status of class \"{}\" to \"{}\":  class not defined.",
-          className, subscribeStatus
-        );
-    }
-
-    public static void subscribe_interaction(String hlaClassName, RTIambassador rti) {
-
-        if (get_is_subscribed(hlaClassName)) {
-            return;
-        }
-
-        int classHandle = _classNameHandleMap.get(hlaClassName);
-        synchronized(rti) {
-            boolean isNotSubscribed = true;
-            while(isNotSubscribed) {
-                try {
-                    rti.subscribeInteractionClass(classHandle);
-                    isNotSubscribed = false;
-                } catch (FederateNotExecutionMember e) {
-                    logger.error("could not publish: Federate Not Execution Member", e);
-                    return;
-                } catch (InteractionClassNotDefined e) {
-                    logger.error("could not publish: Interaction Class Not Defined", e);
-                    return;
-                } catch (Exception e) {
-                    logger.error(e);
-                    CpswtUtils.sleepDefault();
-                }
-            }
-        }
-
-        logger.debug("subscribe: {}", hlaClassName);
-
-        set_is_subscribed(hlaClassName, true);
-    }
-
     public static void unsubscribe_interaction(String hlaClassName, RTIambassador rti) {
 
         if (!get_is_subscribed(hlaClassName)) {
             return;
         }
 
-        int classHandle = _classNameHandleMap.get(hlaClassName);
+        int classHandle = get_class_handle(hlaClassName);
         synchronized(rti) {
             boolean isNotUnsubscribed = true;
             while(isNotUnsubscribed) {
@@ -765,92 +866,6 @@ public class InteractionRoot implements InteractionRootInterface {
         set_is_subscribed(hlaClassName, false);
     }
 
-    //-----------------------------------------------------
-    // END METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
-    //-----------------------------------------------------
-
-    //---------------------------------------------------------------------------
-    // METHODS THAT USE BOTH CLASS-HANDLE CLASS-NAME MAP AND CLASS-NAME CLASS MAP
-    //---------------------------------------------------------------------------
-    /**
-      * Create an interaction that is in instance of interaction class
-      * that corresponds to the "classHandle" handle (RTI assigned). An
-      * InteractionRoot reference is returned, so to refer to the
-      * instance using a reference to a "className" interaction, the returned
-      * reference must be cast down the interaction inheritance hierarchy.
-      *
-      * @param classHandle handle of interaction class (RTI assigned) class for
-      * which to create an instance
-      * @return instance of interaction class corresponding to "classHandle"
-      */
-    public static InteractionRoot create_interaction( int classHandle ) {
-        String className = _classHandleNameMap.get( classHandle );
-        return create_interaction( className );
-    }
-
-    /**
-      * Like {@link #create_interaction( int classHandle )}, but the interaction
-      * is created with a timestamp based on "logicalTime".
-      *
-      * @param classHandle handle of interaction class (RTI assigned) class for
-      * which to create an instance
-      * @param logicalTime timestamp to place on the new interaction class instance
-      * @return instance of interaction class corresponding to "classHandle" with
-      * "logicalTime" time stamp
-      */
-    public static InteractionRoot create_interaction( int classHandle, LogicalTime logicalTime ) {
-        String className = _classHandleNameMap.get( classHandle );
-        return create_interaction( className, logicalTime );
-    }
-
-    /**
-      * Like {@link #create_interaction( int classHandle )}, but the interaction's
-      * parameters are initialized using "propertyMap".  The "propertyMap"
-      * is usually acquired as an argument to an RTI callback method of a federate.
-      *
-      * @param classHandle handle of interaction class (RTI assigned) class for
-      * which to create an instance
-      * @param propertyMap contains initializing values for the parameters
-      * of the interaction class instance
-      * @return instance of interaction class corresponding to "classHandle" with
-      * its parameters initialized with the "propertyMap"
-      */
-    public static InteractionRoot create_interaction( int classHandle, ReceivedInteraction propertyMap ) {
-        String hlaClassName = _classHandleNameMap.get( classHandle );
-        return create_interaction(hlaClassName, propertyMap);
-    }
-
-    /**
-      * Like {@link #create_interaction( int classHandle, ReceivedInteraction propertyMap )},
-      * but the interaction is given a timestamp based on "logicalTime".
-      *
-      * @param classHandle handle of interaction class (RTI assigned) class for
-      * which to create an instance
-      * @param propertyMap initializing values for the parameters of the
-      * interaction class instance
-      * @param logicalTime timestamp to place on the new interaction class instance
-      * @return instance of interaction class corresponding to "classHandle" with
-      * its parameters initialized with the "propertyMap" and with
-      * "logicalTime" timestamp
-      */
-    public static InteractionRoot create_interaction( int classHandle, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        String hlaClassName = _classHandleNameMap.get( classHandle );
-        return create_interaction(hlaClassName, propertyMap, logicalTime);
-    }
-
-    //-------------------------------------------------------------------------------
-    // END METHODS THAT USE BOTH CLASS-HANDLE CLASS-NAME MAP AND CLASS-NAME CLASS MAP
-    //-------------------------------------------------------------------------------
-
-    //--------------------------------
-    // END CLASS-HANDLE CLASS-NAME MAP
-    //--------------------------------
-
-    //-------------------------------------------
-    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
-    //-------------------------------------------
-    protected Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
-
     //-----------------------------------------------------------------------------------------------------------
     // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
     // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
@@ -874,6 +889,11 @@ public class InteractionRoot implements InteractionRootInterface {
             return value;
         }
     }
+
+    //-------------------------------------------
+    // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
+    //-------------------------------------------
+    protected Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
 
     //------------------------------------------------------------
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
@@ -956,19 +976,6 @@ public class InteractionRoot implements InteractionRootInterface {
         classAndPropertyNameValueMap.put(key, value);
     }
 
-    public void setParameter(int propertyHandle, Object value) {
-        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
-        if (classAndPropertyName == null) {
-            logger.error(
-              "setParameter(int, Object value): propertyHandle {} does not exist.",
-              propertyHandle
-            );
-            return;
-        }
-
-        setParameter(classAndPropertyName.getPropertyName(), value);
-    }
-
     private PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
         ClassAndPropertyName key = findProperty(className, propertyName);
         if (key != null) {
@@ -987,34 +994,9 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the value of the parameter whose name is "propertyName"
      */
     public Object getParameter(String propertyName) {
-        return getParameterAux(getInstanceHlaClassName(), propertyName).getValue();
-    }
-
-    /**
-     * Returns the value of the parameter whose handle is "propertyHandle"
-     * (RTI assigned) for this interaction.
-     *
-     * @param propertyHandle handle (RTI assigned) of parameter whose
-     * value to retrieve
-     * @return the value of the parameter whose handle is "propertyHandle"
-     */
-    public Object getParameter( int propertyHandle ) {
-        ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(propertyHandle);
-        if (classAndPropertyName == null) {
-            logger.error("getParameter: propertyHandle {} does not exist.", propertyHandle);
-            return null;
-        }
-        String propertyName = classAndPropertyName.getPropertyName();
-        Object value = getParameter(propertyName);
-        if (value == null) {
-            logger.error(
-                "getParameter: propertyHandle {} corresponds to property of name \"{}\", which " +
-                "does not exist in class \"{}\" (it's defined in class\"{}\")",
-                propertyHandle, propertyName, getClass(), classAndPropertyName.getClassName()
-            );
-        }
-
-        return value;
+        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(getInstanceHlaClassName(), propertyName);
+        return propertyClassNameAndValue == null ? null
+          : propertyClassNameAndValue.getValue();
     }
 
     //-----------------------------------------------
@@ -1030,7 +1012,7 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void load() { }
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -1173,15 +1155,16 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_all_parameter_names();
     }
 
-
     /*
-     * INITIALIZE STATIC DATAMEMBERS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        // ADD CLASS OBJECT OF THIS CLASS TO _classNameClassMap DEFINED IN InteractionRoot
-        _classNameClassMap.put(get_hla_class_name(), InteractionRoot.class);
+        InteractionRoot instance = new InteractionRoot();
+        instance.classAndPropertyNameValueMap = null;
+
+        _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
 
@@ -1198,23 +1181,22 @@ public class InteractionRoot implements InteractionRootInterface {
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"{}\" (hla class \"{}\") loaded",
-          InteractionRoot.class.getName(), get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"" + InteractionRoot.class.getName() + "\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
 
     // --------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH NAMES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH NAMES.
     // --------------------------------------------------------
 
 
     // ----------------------------------------------------------------------------
-    // STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // THIS CODE IS STATIC BECAUSE IT IS CLASS-DEPENDENT AND NOT INSTANCE-DEPENDENT
     // ----------------------------------------------------------------------------
 
@@ -1265,7 +1247,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     // ----------------------------------------------------------
-    // END OF STATIC DATAMEMBERS AND CODE THAT DEAL WITH HANDLES.
+    // END OF STATIC PROPERTYS AND CODE THAT DEAL WITH HANDLES.
     // ----------------------------------------------------------
 
 
@@ -1354,6 +1336,7 @@ public class InteractionRoot implements InteractionRootInterface {
         unsubscribe_interaction(rti);
     }
 
+
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -1371,13 +1354,80 @@ public class InteractionRoot implements InteractionRootInterface {
         return handle == get_class_handle();
     }
 
-    //--------------------------------
-    // DATAMEMBER MANIPULATION METHODS
-    //--------------------------------
+    //-------------
+    // CONSTRUCTORS
+    //-------------
 
-    //------------------------------------
-    // END DATAMEMBER MANIPULATION METHODS
-    //------------------------------------
+    public InteractionRoot() {
+        this(get_hla_class_name());
+    }
+
+    public InteractionRoot(LogicalTime logicalTime) {
+        this();
+        setTime(logicalTime);
+    }
+
+    public InteractionRoot(ReceivedInteraction propertyMap) {
+        this();
+        setParameters( propertyMap );
+    }
+
+    public InteractionRoot(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        this(propertyMap);
+        setTime(logicalTime);
+    }
+
+    //-----------------
+    // END CONSTRUCTORS
+    //-----------------
+
+
+    //-----------------
+    // CREATION METHODS
+    //-----------------
+    public static InteractionRoot create_interaction() {
+        return new InteractionRoot();
+    }
+
+    public InteractionRoot createInteraction() {
+        return create_interaction();
+    }
+
+    public static InteractionRoot create_interaction(LogicalTime logicalTime) {
+        return new InteractionRoot(logicalTime);
+    }
+
+    public InteractionRoot createInteraction(LogicalTime logicalTime) {
+        return create_interaction(logicalTime);
+    }
+
+    public static InteractionRoot create_interaction(ReceivedInteraction propertyMap) {
+        return new InteractionRoot(propertyMap);
+    }
+
+    public InteractionRoot createInteraction(ReceivedInteraction propertyMap) {
+        return create_interaction(propertyMap);
+    }
+
+    public static InteractionRoot create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new InteractionRoot(propertyMap, logicalTime);
+    }
+
+    public InteractionRoot createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return create_interaction(propertyMap, logicalTime);
+    }
+
+    //---------------------
+    // END CREATION METHODS
+    //---------------------
+
+    //------------------------------
+    // PROPERTY MANIPULATION METHODS
+    //------------------------------
+
+    //----------------------------------
+    // END PROPERTY MANIPULATION METHODS
+    //----------------------------------
 
     //-------------------------
     // END OF INCLUDED TEMPLATE
@@ -1423,6 +1473,15 @@ public class InteractionRoot implements InteractionRootInterface {
     // END TIME SET/GET
     //-----------------
 
+    //------------------------------------------
+    // CLASS-AND-PROPERTY-NAME INITIAL-VALUE MAP
+    //
+    // USED IN:
+    // - InteractionRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
+    // - fromJson()
+    // - readFederateDynamicMessageClasses(Reader reader) BELOW
+    //------------------------------------------
+    protected static Map<ClassAndPropertyName, Object> _classAndPropertyNameInitialValueMap = new HashMap<>();
 
     //-------------
     // CONSTRUCTORS
@@ -1431,72 +1490,24 @@ public class InteractionRoot implements InteractionRootInterface {
     /**
      * Creates a new InteractionRoot instance.
      */
-    public InteractionRoot() {
-        _uniqueID = generateUniqueID();
-    }
-
-    /**
-     * Creates a copy of an InteractionRoot instance.  As an
-     * InteractionRoot instance contains no parameters,
-     * this has the same effect as the default constructor.
-     *
-     * @param other the interaction instance to copy
-     */
-    public InteractionRoot( InteractionRoot other ) {
-        this();
-        _time = other._time;
-        classAndPropertyNameValueMap = new HashMap<>(other.classAndPropertyNameValueMap);
-
-    }
-
-    protected InteractionRoot( ReceivedInteraction propertyMap, boolean initFlag ) {
-        this();
-        if ( initFlag ) setParameters( propertyMap );
-    }
-
-    protected InteractionRoot( ReceivedInteraction propertyMap, LogicalTime logicalTime, boolean initFlag ) {
-        this();
-        setTime( logicalTime );
-        if ( initFlag ) setParameters( propertyMap );
-    }
-
-
-    /**
-     * Creates a new interaction instance and initializes its parameters
-     * using the "propertyMap" -- this constructor is usually called as a
-     * super-class constructor to create and initialize an instance of an
-     * interaction further down in the inheritance hierarchy.  "propertyMap"
-     * is usually acquired as an argument to an RTI federate callback method, such
-     * as "receiveInteraction".
-     *
-     * @param propertyMap contains parameter values for the newly created
-     * interaction
-     */
-    public InteractionRoot( ReceivedInteraction propertyMap ) {
-        this( propertyMap, true );
-    }
-
-    /**
-     * Like {@link #InteractionRoot( ReceivedInteraction propertyMap )},
-     * except the new instance has an initial timestamp of "logicalTime".
-     *
-     * @param propertyMap contains parameter values for the newly created
-     * interaction
-     * @param logicalTime initial timestamp for newly created interaction instance
-     */
-    public InteractionRoot( ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
-        this( propertyMap, logicalTime, true );
-    }
-
     public InteractionRoot( String hlaClassName ) {
-        this();
+        _uniqueID = generateUniqueID();
         setInstanceHlaClassName(hlaClassName);
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            logger.error("Constructor \"InteractionRoot( String hlaClassName )\": " +
+              "hlaClassName \"{}\" is not defined -- creating dummy interaction with fictitious type \"{}\"",
+              hlaClassName, hlaClassName
+            );
+            return;
+        }
 
-        Set<ClassAndPropertyName> allClassNamePropertyNameSet = _allClassNamePropertyNameSetMap.get(hlaClassName);
-        for(ClassAndPropertyName classAndPropertyName: allClassNamePropertyNameSet) {
-            Class<?> propertyType = _classAndPropertyNameTypeMap.get(classAndPropertyName);
-            Object initialValue = _classToInitialValueMap.get(propertyType);
-            classAndPropertyNameValueMap.put(classAndPropertyName, initialValue);
+        Set<ClassAndPropertyName> allClassAndPropertyNameSet =
+          _allClassNamePropertyNameSetMap.getOrDefault(hlaClassName, null);
+        if (allClassAndPropertyNameSet != null) {
+            for(ClassAndPropertyName classAndPropertyName: allClassAndPropertyNameSet) {
+                Object initialValue = _classAndPropertyNameInitialValueMap.get(classAndPropertyName);
+                classAndPropertyNameValueMap.put(classAndPropertyName, initialValue);
+            }
         }
     }
 
@@ -1513,6 +1524,19 @@ public class InteractionRoot implements InteractionRootInterface {
     public InteractionRoot( String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime ) {
         this(hlaClassName, propertyMap);
         setTime( logicalTime );
+    }
+
+    /**
+     * Creates a copy of an InteractionRoot instance.  As an
+     * InteractionRoot instance contains no parameters,
+     * this has the same effect as the default constructor.
+     *
+     * @param other the interaction instance to copy
+     */
+    public InteractionRoot( InteractionRoot other ) {
+        this();
+        _time = other._time;
+        classAndPropertyNameValueMap = new HashMap<>(other.classAndPropertyNameValueMap);
     }
 
     //-----------------
@@ -1561,18 +1585,6 @@ public class InteractionRoot implements InteractionRootInterface {
             valueAsString = valueAsString.substring(0, valueAsString.length() - 1);
         }
         setParameter(handle, valueAsString);
-    }
-
-    protected static Map<ClassAndPropertyName, Class<?>> _classAndPropertyNameTypeMap = new HashMap<>();
-
-    private SuppliedParameters createSuppliedParameters() {
-        SuppliedParameters suppliedParameters = _factory.createSuppliedParameters();
-        for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameValueMap.keySet()) {
-            int handle = _classAndPropertyNameHandleMap.get(classAndPropertyName);
-            byte[] value = classAndPropertyNameValueMap.get(classAndPropertyName).toString().getBytes();
-            suppliedParameters.add(handle, value);
-        }
-        return suppliedParameters;
     }
 
     /**
@@ -1694,7 +1706,7 @@ public class InteractionRoot implements InteractionRootInterface {
         for (String key : propertyJSONObject.keySet()) {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
 
-            Class<?> desiredType = _classAndPropertyNameTypeMap.get(classAndPropertyName);
+            Class<?> desiredType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName).getClass();
             Object object = castNumber(propertyJSONObject.get(key), desiredType);
             interactionRoot.classAndPropertyNameValueMap.put(classAndPropertyName, object);
         }
@@ -1721,30 +1733,17 @@ public class InteractionRoot implements InteractionRootInterface {
         federationJson = new JSONObject( new JSONTokener(reader) );
     }
 
-    private static final Map<String, Class<?>> _typeToClassMap = new HashMap<>();
+    private static final Map<String, Object> _typeInitialValueMap = new HashMap<>();
     static {
-        _typeToClassMap.put("boolean", Boolean.class);
-        _typeToClassMap.put("byte", Byte.class);
-        _typeToClassMap.put("char", Character.class);
-        _typeToClassMap.put("double", Double.class);
-        _typeToClassMap.put("float", Float.class);
-        _typeToClassMap.put("int", Integer.class);
-        _typeToClassMap.put("long", Long.class);
-        _typeToClassMap.put("short", Short.class);
-        _typeToClassMap.put("String", String.class);
-    }
-
-    private static final Map<Class<?>, Object> _classToInitialValueMap = new HashMap<>();
-    static {
-        _classToInitialValueMap.put(Boolean.class, false);
-        _classToInitialValueMap.put(Byte.class, (byte)0);
-        _classToInitialValueMap.put(Character.class, (char)0);
-        _classToInitialValueMap.put(Double.class, (double)0);
-        _classToInitialValueMap.put(Float.class, (float)0);
-        _classToInitialValueMap.put(Integer.class, 0);
-        _classToInitialValueMap.put(Long.class, (long)0);
-        _classToInitialValueMap.put(Short.class, (short)0);
-        _classToInitialValueMap.put(String.class, "");
+        _typeInitialValueMap.put("boolean", false);
+        _typeInitialValueMap.put("byte", (byte)0);
+        _typeInitialValueMap.put("char", (char)0);
+        _typeInitialValueMap.put("double", (double)0);
+        _typeInitialValueMap.put("float", (float)0);
+        _typeInitialValueMap.put("int", 0);
+        _typeInitialValueMap.put("long", (long)0);
+        _typeInitialValueMap.put("short", (short)0);
+        _typeInitialValueMap.put("String", "");
     }
 
     public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {
@@ -1793,8 +1792,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 JSONObject typeDataMap = messagingPropertyDataMap.getJSONObject(propertyName);
                 if (!typeDataMap.getBoolean("Hidden")) {
                     String propertyTypeString = typeDataMap.getString("ParameterType");
-                    Class<?> parameterClass = _typeToClassMap.get(propertyTypeString);
-                    _classAndPropertyNameTypeMap.put(classAndPropertyName, parameterClass);
+                    Object initialValue = _typeInitialValueMap.get(propertyTypeString);
+                    _classAndPropertyNameInitialValueMap.put(classAndPropertyName, initialValue);
                 }
             }
 
