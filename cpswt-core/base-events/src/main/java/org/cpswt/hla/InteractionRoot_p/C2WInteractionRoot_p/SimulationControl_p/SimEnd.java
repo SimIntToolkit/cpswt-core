@@ -422,7 +422,6 @@ public class SimEnd extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public SimEnd() {
         this(get_hla_class_name());
     }

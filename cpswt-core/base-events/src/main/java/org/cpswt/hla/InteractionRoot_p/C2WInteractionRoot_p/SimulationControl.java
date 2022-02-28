@@ -422,7 +422,6 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public SimulationControl() {
         this(get_hla_class_name());
     }

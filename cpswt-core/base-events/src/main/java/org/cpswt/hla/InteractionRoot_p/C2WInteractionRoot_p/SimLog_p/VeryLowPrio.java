@@ -434,7 +434,6 @@ public class VeryLowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionR
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public VeryLowPrio() {
         this(get_hla_class_name());
     }

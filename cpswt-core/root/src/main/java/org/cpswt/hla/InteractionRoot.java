@@ -34,7 +34,6 @@
  * @author Himanshu Neema
  * @author Harmon Nine
  */
-
 package org.cpswt.hla;
 
 import hla.rti.*;
@@ -98,7 +97,7 @@ public class InteractionRoot implements InteractionRootInterface {
         return _globalUniqueID++;
     }
 
-    private final int _uniqueID;
+    private final int _uniqueID = generateUniqueID();
     public int getUniqueID() {
         return _uniqueID;
     }
@@ -163,7 +162,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
             //-------------------------------------------------------------------------------------------
             // _classAndPropertyNameSetMap MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
-            // DEFINED *DIRECTLY* IN THE hlaClassName
+            // DEFINED *DIRECTLY* IN THE hlaClassName CLASS
             //
             // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
             // - _classAndPropertyNameHandleMap
@@ -225,16 +224,6 @@ public class InteractionRoot implements InteractionRootInterface {
         return position >= 0 ? hlaClassName.substring(position + 1) : hlaClassName;
     }
 
-    //-----------------------------------------------------------------------------------------
-    // THIS JAVA-INSTANCE INITIALIZATION BLOCK SETS THE INITIAL VALUE FOR _instanceHlaClassName
-    //-----------------------------------------------------------------------------------------
-    {
-        // GENERALLY CONSIDERED POOR FORM TO CALL A POLYMORPHIC FUNCTION FROM A CONSTRUCTOR
-        // (OR, MORE ACCURATELY AN INSTANCE INITIALIZATION BLOCK), BUT THE POLYMORPHIC FUNCTION
-        // USED (getHlaClassName) DOES NOT DEPEND ON OBJECT STATE.
-        setInstanceHlaClassName(getHlaClassName());
-    }
-
     //-------------------------------------------------------------------------
     // HLA CLASS-NAME SET
     //
@@ -248,7 +237,6 @@ public class InteractionRoot implements InteractionRootInterface {
     // METHODS THAT USE HLA CLASS-NAME-SET
     //
     // ALSO USED BY:
-    // - init(RTIambassador) ABOVE
     // - InteractionRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
     //----------------------------------------------------------------------------
@@ -280,7 +268,6 @@ public class InteractionRoot implements InteractionRootInterface {
     // METHODS THAT USE CLASS-NAME PROPERTY-NAME-SET MAP
     //
     // ALSO USED BY:
-    // - init(RTIambassador) ABOVE
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
     //---------------------------------------------------------
     /**
@@ -349,9 +336,9 @@ public class InteractionRoot implements InteractionRootInterface {
     //----------------------------
     protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
 
-    //-------------------------------------------------------------
+    //---------------------------------------------
     // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
-    //-------------------------------------------------------------
+    //---------------------------------------------
     /**
       * Returns the integer handle (RTI defined) of the interaction class
       * corresponding to the fully-qualified interaction class name in className.
@@ -502,19 +489,22 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static InteractionRoot create_interaction(String hlaClassName) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new InteractionRoot( hlaClassName )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName ) : null
           : instance.createInteraction();
     }
 
     public static InteractionRoot create_interaction(String hlaClassName, LogicalTime logicalTime) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new InteractionRoot( hlaClassName, logicalTime )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName, logicalTime ) : null
           : instance.createInteraction( logicalTime );
     }
 
     public static InteractionRoot create_interaction(String hlaClassName, ReceivedInteraction propertyMap) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new InteractionRoot( hlaClassName, propertyMap )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName, propertyMap ) : null
           : instance.createInteraction( propertyMap );
     }
 
@@ -522,7 +512,9 @@ public class InteractionRoot implements InteractionRootInterface {
       String hlaClassName, ReceivedInteraction propertyMap, LogicalTime logicalTime
     ) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new InteractionRoot( hlaClassName, propertyMap, logicalTime )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName )
+            ? new InteractionRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createInteraction( propertyMap, logicalTime );
     }
 
@@ -651,9 +643,9 @@ public class InteractionRoot implements InteractionRootInterface {
         return suppliedParameters;
     }
 
-    //-------------------------------------------------
-    // END CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
-    //-------------------------------------------------
+    //------------------------------------------------
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //------------------------------------------------
 
     //--------------------------------------------
     // PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
@@ -1365,7 +1357,6 @@ public class InteractionRoot implements InteractionRootInterface {
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public InteractionRoot() {
         this(get_hla_class_name());
     }
@@ -1499,7 +1490,6 @@ public class InteractionRoot implements InteractionRootInterface {
      * Creates a new InteractionRoot instance.
      */
     public InteractionRoot( String hlaClassName ) {
-        _uniqueID = generateUniqueID();
         setInstanceHlaClassName(hlaClassName);
         if (!_hlaClassNameSet.contains(hlaClassName)) {
             logger.error("Constructor \"InteractionRoot( String hlaClassName )\": " +

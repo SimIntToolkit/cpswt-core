@@ -422,7 +422,6 @@ public class ActionBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public ActionBase() {
         this(get_hla_class_name());
     }

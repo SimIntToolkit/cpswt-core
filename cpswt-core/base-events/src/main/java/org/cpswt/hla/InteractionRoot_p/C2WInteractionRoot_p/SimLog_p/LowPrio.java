@@ -434,7 +434,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public LowPrio() {
         this(get_hla_class_name());
     }

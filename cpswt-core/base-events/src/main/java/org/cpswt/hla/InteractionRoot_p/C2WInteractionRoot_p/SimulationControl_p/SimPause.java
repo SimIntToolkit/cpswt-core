@@ -422,7 +422,6 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public SimPause() {
         this(get_hla_class_name());
     }

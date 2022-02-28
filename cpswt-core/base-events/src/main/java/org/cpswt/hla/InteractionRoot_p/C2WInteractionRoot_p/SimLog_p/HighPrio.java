@@ -434,7 +434,6 @@ public class HighPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public HighPrio() {
         this(get_hla_class_name());
     }

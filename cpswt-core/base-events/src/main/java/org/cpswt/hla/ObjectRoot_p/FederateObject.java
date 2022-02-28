@@ -327,6 +327,15 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     public int getAttributeHandle(String propertyName) {
         return get_attribute_handle(propertyName);
     }
+
+    public static AttributeHandleSet get_published_attribute_handle_set() {
+        return get_published_attribute_handle_set( get_hla_class_name() );
+    }
+
+    public AttributeHandleSet getPublishedAttributeHandleSet() {
+        return get_published_attribute_handle_set();
+    }
+
     /**
      * Returns a data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription.  To actually subscribe to these
@@ -335,8 +344,12 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * @return data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription
      */
-    private static AttributeHandleSet get_subscribed_attribute_handle_set() {
-        return _classNamePublishedAttributeHandleSetMap.get( get_hla_class_name() );
+    public static AttributeHandleSet get_subscribed_attribute_handle_set() {
+        return get_subscribed_attribute_handle_set( get_hla_class_name() );
+    }
+
+    public AttributeHandleSet getSubscribedAttributeHandleSet() {
+        return get_subscribed_attribute_handle_set();
     }
 
     // ----------------------------------------------------------
@@ -466,19 +479,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     //-------------
     // CONSTRUCTORS
     //-------------
-    {
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateHandle");
-        classAndPropertyNameValueMap.put(key, new Attribute<>(0));
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateHost");
-        classAndPropertyNameValueMap.put(key, new Attribute<>(""));
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        classAndPropertyNameValueMap.put(key, new Attribute<>(""));
-    }
-
     public FederateObject() {
         this(get_hla_class_name());
     }

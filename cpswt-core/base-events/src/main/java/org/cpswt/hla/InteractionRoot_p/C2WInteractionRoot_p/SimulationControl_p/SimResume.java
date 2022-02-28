@@ -422,7 +422,6 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public SimResume() {
         this(get_hla_class_name());
     }

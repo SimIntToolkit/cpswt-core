@@ -454,19 +454,6 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
     //-------------
     // CONSTRUCTORS
     //-------------
-    {
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "Comment");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FedName");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "Time");
-        classAndPropertyNameValueMap.put(key, (double)0);
-    }
-
     public SimLog() {
         this(get_hla_class_name());
     }

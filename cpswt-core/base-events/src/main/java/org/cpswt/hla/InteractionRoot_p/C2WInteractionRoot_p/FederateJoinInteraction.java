@@ -454,19 +454,6 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     //-------------
     // CONSTRUCTORS
     //-------------
-    {
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        classAndPropertyNameValueMap.put(key, false);
-    }
-
     public FederateJoinInteraction() {
         this(get_hla_class_name());
     }

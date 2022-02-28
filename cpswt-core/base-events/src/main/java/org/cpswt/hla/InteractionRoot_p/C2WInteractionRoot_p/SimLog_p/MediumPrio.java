@@ -434,7 +434,6 @@ public class MediumPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public MediumPrio() {
         this(get_hla_class_name());
     }

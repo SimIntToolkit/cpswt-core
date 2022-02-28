@@ -422,7 +422,6 @@ public class OutcomeBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionR
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public OutcomeBase() {
         this(get_hla_class_name());
     }

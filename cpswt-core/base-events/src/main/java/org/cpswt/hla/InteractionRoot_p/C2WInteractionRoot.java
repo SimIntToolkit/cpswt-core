@@ -448,22 +448,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     //-------------
     // CONSTRUCTORS
     //-------------
-    {
-        ClassAndPropertyName key;
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "actualLogicalGenerationTime");
-        classAndPropertyNameValueMap.put(key, (double)0);
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        classAndPropertyNameValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        classAndPropertyNameValueMap.put(key, "");
-    }
-
     public C2WInteractionRoot() {
         this(get_hla_class_name());
     }
@@ -638,7 +622,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         }
         super.sendInteraction( rti );
     }
-
 
     /**
     * Creates an instance of the C2WInteractionRoot interaction class, using

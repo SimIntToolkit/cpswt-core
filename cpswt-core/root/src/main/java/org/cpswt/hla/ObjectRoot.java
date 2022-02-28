@@ -34,7 +34,6 @@
  * @author Himanshu Neema
  * @author Harmon Nine
  */
-
 package org.cpswt.hla;
 
 import hla.rti.*;
@@ -98,7 +97,7 @@ public class ObjectRoot implements ObjectRootInterface {
         return _globalUniqueID++;
     }
 
-    private final int _uniqueID;
+    private final int _uniqueID = generateUniqueID();
     public int getUniqueID() {
         return _uniqueID;
     }
@@ -163,7 +162,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
             //-------------------------------------------------------------------------------------------
             // _classAndPropertyNameSetMap MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
-            // DEFINED *DIRECTLY* IN THE hlaClassName
+            // DEFINED *DIRECTLY* IN THE hlaClassName CLASS
             //
             // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
             // - _classAndPropertyNameHandleMap
@@ -247,17 +246,6 @@ public class ObjectRoot implements ObjectRootInterface {
         return position >= 0 ? hlaClassName.substring(position + 1) : hlaClassName;
     }
 
-    //-----------------------------------------------------------------------------------------
-    // THIS JAVA-INSTANCE INITIALIZATION BLOCK SETS THE INITIAL VALUE FOR _instanceHlaClassName
-    //-----------------------------------------------------------------------------------------
-    {
-        // GENERALLY CONSIDERED POOR FORM TO CALL A POLYMORPHIC FUNCTION FROM A CONSTRUCTOR
-        // (OR, MORE ACCURATELY AN INSTANCE INITIALIZATION BLOCK), BUT THE POLYMORPHIC FUNCTION
-        // USED (getHlaClassName) DOES NOT DEPEND ON OBJECT STATE.
-        setInstanceHlaClassName(getHlaClassName());
-    }
-
-
     //-----------------------------------------------------
     // Attribute CLASS -- USED BY ObjectRoot AND SUBCLASSES
     //-----------------------------------------------------
@@ -327,7 +315,6 @@ public class ObjectRoot implements ObjectRootInterface {
     // METHODS THAT USE HLA CLASS-NAME-SET
     //
     // ALSO USED BY:
-    // - init(RTIambassador) ABOVE
     // - ObjectRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
     //----------------------------------------------------------------------------
@@ -359,7 +346,6 @@ public class ObjectRoot implements ObjectRootInterface {
     // METHODS THAT USE CLASS-NAME PROPERTY-NAME-SET MAP
     //
     // ALSO USED BY:
-    // - init(RTIambassador) ABOVE
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
     //---------------------------------------------------------
     /**
@@ -428,9 +414,9 @@ public class ObjectRoot implements ObjectRootInterface {
     //----------------------------
     protected static Map<String, Integer> _classNameHandleMap = new HashMap<>();
 
-    //-------------------------------------------------------------
+    //---------------------------------------------
     // METHODS THAT USE CLASS-NAME CLASS-HANDLE MAP
-    //-------------------------------------------------------------
+    //---------------------------------------------
     /**
       * Returns the integer handle (RTI defined) of the object class
       * corresponding to the fully-qualified object class name in className.
@@ -584,19 +570,22 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static ObjectRoot create_object(String hlaClassName) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new ObjectRoot( hlaClassName )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName ) : null
           : instance.createObject();
     }
 
     public static ObjectRoot create_object(String hlaClassName, LogicalTime logicalTime) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new ObjectRoot( hlaClassName, logicalTime )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, logicalTime ) : null
           : instance.createObject( logicalTime );
     }
 
     public static ObjectRoot create_object(String hlaClassName, ReflectedAttributes propertyMap) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new ObjectRoot( hlaClassName, propertyMap )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, propertyMap ) : null
           : instance.createObject( propertyMap );
     }
 
@@ -604,7 +593,9 @@ public class ObjectRoot implements ObjectRootInterface {
       String hlaClassName, ReflectedAttributes propertyMap, LogicalTime logicalTime
     ) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
-        return instance == null ? new ObjectRoot( hlaClassName, propertyMap, logicalTime )
+        return instance == null
+          ? _hlaClassNameSet.contains( hlaClassName )
+            ? new ObjectRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createObject( propertyMap, logicalTime );
     }
 
@@ -895,9 +886,9 @@ public class ObjectRoot implements ObjectRootInterface {
         return suppliedAttributes;
     }
 
-    //-------------------------------------------------
-    // END CLASS-NAME-PROPERTY-NAME PROPERTY-HANDLE MAP
-    //-------------------------------------------------
+    //------------------------------------------------
+    // END CLASS-AND-PROPERTY-NAME PROPERTY-HANDLE MAP
+    //------------------------------------------------
 
     //--------------------------------------------
     // PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
@@ -982,6 +973,9 @@ public class ObjectRoot implements ObjectRootInterface {
 
     //----------------------------------------------
     // CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP
+    //
+    // INITIALIZED BY:
+    // - init(RTIambassador) ABOVE
     //----------------------------------------------
     protected static Map<String, AttributeHandleSet> _classNamePublishedAttributeHandleSetMap = new HashMap<>();
 
@@ -1033,12 +1027,19 @@ public class ObjectRoot implements ObjectRootInterface {
         set_is_published(hlaClassName, true);
     }
 
+    public static AttributeHandleSet get_published_attribute_handle_set(String hlaClassName) {
+        return _classNamePublishedAttributeHandleSetMap.getOrDefault(hlaClassName, null);
+    }
+
     //--------------------------------------------------
     // END CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP
     //--------------------------------------------------
 
     //-----------------------------------------------
     // CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //
+    // INITIALIZED BY:
+    // - init(RTIambassador) ABOVE
     //-----------------------------------------------
     protected static Map<String, AttributeHandleSet> _classNameSubscribedAttributeHandleSetMap = new HashMap<>();
 
@@ -1090,9 +1091,13 @@ public class ObjectRoot implements ObjectRootInterface {
         set_is_subscribed(hlaClassName, true);
     }
 
-    //--------------------------------------------------
-    // END CLASS-NAME PUBLISHED-ATTRIBUTE-HANDLE-SET MAP
-    //--------------------------------------------------
+    public static AttributeHandleSet get_subscribed_attribute_handle_set(String hlaClassName) {
+        return _classNameSubscribedAttributeHandleSetMap.getOrDefault(hlaClassName, null);
+    }
+
+    //---------------------------------------------------
+    // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-HANDLE-SET MAP
+    //---------------------------------------------------
 
     public static void unpublish_object(String hlaClassName, RTIambassador rti) {
 
@@ -1185,7 +1190,6 @@ public class ObjectRoot implements ObjectRootInterface {
     // END METHODS THAT USE ONLY OBJECT HANDLE
     //----------------------------------------
 
-
     //----------------------------------
     // OBJECT-HANDLE OBJECT-INSTANCE MAP
     //----------------------------------
@@ -1208,7 +1212,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * in the map that is internal to the ObjectRoot class.
       */
     public static ObjectRoot get_object( int object_handle ) {
-        return _objectHandleInstanceMap.get( object_handle );
+        return _objectHandleInstanceMap.getOrDefault( object_handle, null );
     }
 
     /**
@@ -1311,9 +1315,9 @@ public class ObjectRoot implements ObjectRootInterface {
     //-------------------------------------------------------
 
 
-    //------------------------------------------------------------------------------------------------------
-    // METHODS THAT USE OBJECT-HANDLE INSTANCE MAP, CLASS-HANDLE CLASS-NAME MAP, AND CLASS-NAME INSTANCE MAP
-    //------------------------------------------------------------------------------------------------------
+    //--------------------------------------------
+    // METHODS THAT USE OBJECT-HANDLE INSTANCE MAP
+    //--------------------------------------------
     /**
      * Creates a new instance of the object class corresponding to "class_handle",
      * registers it in an map internal to the ObjectRoot class using "object_handle"
@@ -1336,15 +1340,14 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return new instance of the object class corresponding to class_handle
      */
     public static ObjectRoot discover( int class_handle, int object_handle ) {
-        String hlaClassName = _classHandleNameMap.get( class_handle );
-        ObjectRoot instance = _hlaClassNameInstanceMap.get( hlaClassName );
+        ObjectRoot instance = create_object( class_handle );
 
-        ObjectRoot newInstance = instance.createObject();
-        newInstance.setObjectHandle( object_handle );
+        if (instance != null) {
+            instance.setObjectHandle( object_handle );
+            _objectHandleInstanceMap.put(object_handle, instance);
+        }
 
-        _objectHandleInstanceMap.put(object_handle, newInstance);
-
-        return newInstance;
+        return instance;
     }
 
     //----------------------------------------------------------------------------------------------------------
@@ -1462,7 +1465,9 @@ public class ObjectRoot implements ObjectRootInterface {
         boolean requestNotSubmitted = true;
         while( requestNotSubmitted ) {
             try {
-                rti.requestObjectAttributeValueUpdate( getObjectHandle(), get_subscribed_attribute_handle_set() );
+                rti.requestObjectAttributeValueUpdate(
+                  getObjectHandle(), get_subscribed_attribute_handle_set( getInstanceHlaClassName() )
+                );
                 requestNotSubmitted = false;
             } catch ( FederateNotExecutionMember f ) {
                 logger.error( "{}: request for update failed:  Federate Not Execution Member", getInstanceHlaClassName() );
@@ -1868,6 +1873,15 @@ public class ObjectRoot implements ObjectRootInterface {
     public int getAttributeHandle(String propertyName) {
         return get_attribute_handle(propertyName);
     }
+
+    public static AttributeHandleSet get_published_attribute_handle_set() {
+        return get_published_attribute_handle_set( get_hla_class_name() );
+    }
+
+    public AttributeHandleSet getPublishedAttributeHandleSet() {
+        return get_published_attribute_handle_set();
+    }
+
     /**
      * Returns a data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription.  To actually subscribe to these
@@ -1876,8 +1890,12 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription
      */
-    private static AttributeHandleSet get_subscribed_attribute_handle_set() {
-        return _classNamePublishedAttributeHandleSetMap.get( get_hla_class_name() );
+    public static AttributeHandleSet get_subscribed_attribute_handle_set() {
+        return get_subscribed_attribute_handle_set( get_hla_class_name() );
+    }
+
+    public AttributeHandleSet getSubscribedAttributeHandleSet() {
+        return get_subscribed_attribute_handle_set();
     }
 
     // ----------------------------------------------------------
@@ -2007,7 +2025,6 @@ public class ObjectRoot implements ObjectRootInterface {
     //-------------
     // CONSTRUCTORS
     //-------------
-
     public ObjectRoot() {
         this(get_hla_class_name());
     }
@@ -2141,7 +2158,6 @@ public class ObjectRoot implements ObjectRootInterface {
      * Creates a new ObjectRoot instance.
      */
     public ObjectRoot( String hlaClassName ) {
-        _uniqueID = generateUniqueID();
         setInstanceHlaClassName(hlaClassName);
         if (!_hlaClassNameSet.contains(hlaClassName)) {
             logger.error("Constructor \"ObjectRoot( String hlaClassName )\": " +
@@ -2156,7 +2172,7 @@ public class ObjectRoot implements ObjectRootInterface {
         if (allClassAndPropertyNameSet != null) {
             for(ClassAndPropertyName classAndPropertyName: allClassAndPropertyNameSet) {
                 Object initialValue = _classAndPropertyNameInitialValueMap.get(classAndPropertyName);
-                classAndPropertyNameValueMap.put(classAndPropertyName, initialValue);
+                classAndPropertyNameValueMap.put(classAndPropertyName, new Attribute((Attribute<Object>)(initialValue)));
             }
         }
     }
