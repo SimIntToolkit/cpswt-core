@@ -902,10 +902,10 @@ public class InteractionRoot implements InteractionRootInterface {
         return new HashMap<>(classAndPropertyNameValueMap);
     }
 
-    public void setParameter(String propertyName, Object value) {
+    public void setParameter(String hlaClassName, String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
-          getParameterAux(getInstanceHlaClassName(), propertyName);
+          getParameterAux(hlaClassName, propertyName);
 
         if (propertyClassNameAndValue == null) {
             logger.error(
@@ -976,6 +976,10 @@ public class InteractionRoot implements InteractionRootInterface {
         classAndPropertyNameValueMap.put(key, value);
     }
 
+    public void setParameter(String propertyName, Object value) {
+        setParameter(getInstanceHlaClassName(), propertyName, value);
+    }
+
     private PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
         ClassAndPropertyName key = findProperty(className, propertyName);
         if (key != null) {
@@ -993,10 +997,14 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param propertyName name of parameter whose value to retrieve
      * @return the value of the parameter whose name is "propertyName"
      */
-    public Object getParameter(String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(getInstanceHlaClassName(), propertyName);
+    public Object getParameter(String hlaClassName, String propertyName) {
+        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(hlaClassName, propertyName);
         return propertyClassNameAndValue == null ? null
           : propertyClassNameAndValue.getValue();
+    }
+
+    public Object getParameter(String propertyName) {
+        return getParameter(getInstanceHlaClassName(), propertyName);
     }
 
     //-----------------------------------------------

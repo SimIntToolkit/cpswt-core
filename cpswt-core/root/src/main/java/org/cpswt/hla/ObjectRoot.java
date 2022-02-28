@@ -1519,10 +1519,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return new HashMap<>(classAndPropertyNameValueMap);
     }
 
-    public void setAttribute(String propertyName, Object value) {
+    public void setAttribute(String hlaClassName, String propertyName, Object value) {
 
         PropertyClassNameAndValue propertyClassNameAndValue =
-          getAttributeAux(getInstanceHlaClassName(), propertyName);
+          getAttributeAux(hlaClassName, propertyName);
 
         if (propertyClassNameAndValue == null) {
             logger.error(
@@ -1591,6 +1591,10 @@ public class ObjectRoot implements ObjectRootInterface {
         ((Attribute<Object>)propertyClassNameAndValue.getValue()).setValue(value);
     }
 
+    public void setAttribute(String propertyName, Object value) {
+        setAttribute(getInstanceHlaClassName(), propertyName, value);
+    }
+
     private PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
         ClassAndPropertyName key = findProperty(className, propertyName);
         if (key != null) {
@@ -1608,10 +1612,14 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param propertyName name of attribute whose value to retrieve
      * @return the value of the attribute whose name is "propertyName"
      */
-    public Object getAttribute(String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getAttributeAux(getInstanceHlaClassName(), propertyName);
+    public Object getAttribute(String hlaClassName, String propertyName) {
+        PropertyClassNameAndValue propertyClassNameAndValue = getAttributeAux(hlaClassName, propertyName);
         return propertyClassNameAndValue == null ? null
           : ((Attribute<?>)propertyClassNameAndValue.getValue()).getValue();
+    }
+
+    public Object getAttribute(String propertyName) {
+        return getAttribute(getInstanceHlaClassName(), propertyName);
     }
 
     //-----------------------------------------------

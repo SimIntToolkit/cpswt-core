@@ -82,7 +82,7 @@ public class JsonTest {
 
         Assert.assertEquals(simEnd1.get_originFed(), simEnd2.get_originFed());
         Assert.assertEquals(simEnd1.get_sourceFed(), simEnd2.get_sourceFed());
-        Assert.assertEquals(simEnd1.get_actualLogicalGenerationTime(), simEnd2.get_actualLogicalGenerationTime());
+        Assert.assertEquals(simEnd1.get_actualLogicalGenerationTime(), simEnd2.get_actualLogicalGenerationTime(), 0.01);
         Assert.assertEquals(simEnd1.get_federateFilter(), simEnd2.get_federateFilter());
     }
 
