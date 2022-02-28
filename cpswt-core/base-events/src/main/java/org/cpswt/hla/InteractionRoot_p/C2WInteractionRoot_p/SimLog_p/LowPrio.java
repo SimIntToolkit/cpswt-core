@@ -99,18 +99,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     }
 
     /**
-     * Returns the simple name (last name in its fully-qualified dot-delimited name)
-     * of this instance's interaction class.
-     * Polymorphic equivalent of the get_simple_class_name static method.
-     *
-     * @return the simple name of this instance's interaction class
-     */
-    @Override
-    public String getSimpleClassName() {
-        return get_simple_class_name();
-    }
-
-    /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
      * InteractionRoot.C2WInteractionRoot.SimLog.LowPrio interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -122,17 +110,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
      */
     public static String get_hla_class_name() {
         return "InteractionRoot.C2WInteractionRoot.SimLog.LowPrio";
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
-     */
-    @Override
-    public String getHlaClassName() {
-        return get_hla_class_name();
     }
 
     /**
@@ -154,22 +131,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     }
 
     /**
-     * Returns a sorted list containing the names of all of the non-hiddenparameters of an
-     * interaction class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent to get_parameter_names static method.
-     *
-     * @return sorted list containing the names of all of the parameters of an
-     * interaction class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    @Override
-    public List<ClassAndPropertyName> getParameterNames() {
-        return get_parameter_names();
-    }
-
-    /**
      * Returns a sorted list containing the names of all of the parameters in the
      * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
@@ -185,22 +146,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
      */
     public static List<ClassAndPropertyName> get_all_parameter_names() {
         return get_all_parameter_names(get_hla_class_name());
-    }
-
-    /**
-     * Returns a sorted list containing the names of all of the parameters of an
-     * interaction class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent of get_all_parameter_names() static method.
-     *
-     * @return sorted list containing the names of all of the parameters of an
-     * interaction class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    @Override
-    public List<ClassAndPropertyName> getAllParameterNames() {
-        return get_all_parameter_names();
     }
 
     /*
@@ -290,17 +235,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     }
 
     /**
-     * Returns the handle (RTI assigned) of this instance's interaction class.
-     * Polymorphic equivalent for get_class_handle static method.
-     *
-     * @return the handle (RTI assigned) if this instance's interaction class
-     */
-    public int getClassHandle() {
-        return get_class_handle();
-    }
-
-
-    /**
      * Returns the handle of an parameter (RTI assigned) of
      * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio") given the parameter's name.
      *
@@ -342,18 +276,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     }
 
     /**
-     * Publishes the interaction class of this instance of the class for a federate.
-     * Polymorphic equalivalent of publish_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void publishInteraction(RTIambassador rti) {
-        publish_interaction(rti);
-    }
-
-
-    /**
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
@@ -361,17 +283,6 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
-    }
-
-    /**
-     * Unpublishes the interaction class of this instance of this class for a federate.
-     * Polymorphic equivalent of unpublish_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void unpublishInteraction(RTIambassador rti) {
-        unpublish_interaction(rti);
     }
 
     /**
@@ -384,33 +295,12 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
     }
 
     /**
-     * Subscribes a federate to the interaction class of this instance of this class.
-     * Polymorphic equivalent of subscribe_interaction static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void subscribeInteraction(RTIambassador rti) {
-        subscribe_interaction(rti);
-    }
-
-    /**
      * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
     public static void unsubscribe_interaction(RTIambassador rti) {
         unsubscribe_interaction(get_hla_class_name(), rti);
-    }
-
-    /**
-     * Unsubscribes a federate from the interaction class of this instance of this class.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void unsubscribeInteraction(RTIambassador rti) {
-        unsubscribe_interaction(rti);
     }
 
 

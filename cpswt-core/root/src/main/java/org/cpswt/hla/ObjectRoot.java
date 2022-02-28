@@ -677,6 +677,11 @@ public class ObjectRoot implements ObjectRootInterface {
     // - createSuppliedAttributes(boolean force) BELOW
     // - publish_object BELOW
     //---------------------------------------------------------
+
+    public static Set<ClassAndPropertyName> get_published_attribute_name_set(String hlaClassName) {
+        return _classNamePublishedAttributeNameSetMap.getOrDefault(hlaClassName, null);
+    }
+
     /**
       * Publishes the attribute named by "attributeName" of the object class named
       * by "className" for a federate.  This can also be performed by calling the
@@ -755,6 +760,11 @@ public class ObjectRoot implements ObjectRootInterface {
     // ALSO USED BY:
     // - subscribe_object BELOW
     //----------------------------------------------------------
+
+    public static Set<ClassAndPropertyName> get_subscribed_attribute_name_set(String hlaClassName) {
+        return _classNameSubscribedAttributeNameSetMap.getOrDefault(hlaClassName, null);
+    }
+
     /**
       * Subscribe a federate to the attribute named by "attributeName" of the
       * object class named by "className".  This can also be performed by calling
@@ -1531,7 +1541,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         if (propertyClassNameAndValue == null) {
             logger.error(
-              "setattribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
+              "setAttribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
               "superclasses.", propertyName, value.getClass().getName(), propertyName, getInstanceHlaClassName()
             );
             return;
@@ -1583,7 +1593,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         if (currentValue.getClass() != value.getClass()) {
             logger.error(
-              "setattribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
+              "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
               "should be of type \"{}\".",
               propertyName,
               value.getClass().getName(),
@@ -1679,18 +1689,6 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Returns the simple name (last name in its fully-qualified dot-delimited name)
-     * of this instance's object class.
-     * Polymorphic equivalent of the get_simple_class_name static method.
-     *
-     * @return the simple name of this instance's object class
-     */
-    @Override
-    public String getSimpleClassName() {
-        return get_simple_class_name();
-    }
-
-    /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
      * ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1702,17 +1700,6 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static String get_hla_class_name() {
         return "ObjectRoot";
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
-     */
-    @Override
-    public String getHlaClassName() {
-        return get_hla_class_name();
     }
 
     /**
@@ -1734,22 +1721,6 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
-     * object class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent to get_attribute_names static method.
-     *
-     * @return sorted list containing the names of all of the attributes of an
-     * object class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    @Override
-    public List<ClassAndPropertyName> getAttributeNames() {
-        return get_attribute_names();
-    }
-
-    /**
      * Returns a sorted list containing the names of all of the attributes in the
      * org.cpswt.hla.ObjectRoot object class.
      * The property names are paired with name of the hla class in which they are defined in a
@@ -1765,22 +1736,6 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static List<ClassAndPropertyName> get_all_attribute_names() {
         return get_all_attribute_names(get_hla_class_name());
-    }
-
-    /**
-     * Returns a sorted list containing the names of all of the attributes of an
-     * object class instance.
-     * The property names are paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     * Polymorphic equivalent of get_all_attribute_names() static method.
-     *
-     * @return sorted list containing the names of all of the attributes of an
-     * object class instance paired with name of the hla class in which they are defined in a
-     * ClassAndPropertyName POJO.
-     */
-    @Override
-    public List<ClassAndPropertyName> getAllAttributeNames() {
-        return get_all_attribute_names();
     }
 
     /*
@@ -1842,17 +1797,6 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Returns the handle (RTI assigned) of this instance's object class.
-     * Polymorphic equivalent for get_class_handle static method.
-     *
-     * @return the handle (RTI assigned) if this instance's object class
-     */
-    public int getClassHandle() {
-        return get_class_handle();
-    }
-
-
-    /**
      * Returns the handle of an attribute (RTI assigned) of
      * this object class (i.e. "org.cpswt.hla.ObjectRoot") given the attribute's name.
      *
@@ -1878,10 +1822,6 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_published_attribute_handle_set( get_hla_class_name() );
     }
 
-    public AttributeHandleSet getPublishedAttributeHandleSet() {
-        return get_published_attribute_handle_set();
-    }
-
     /**
      * Returns a data structure containing the handles of all attributes for this object
      * class that are currently marked for subscription.  To actually subscribe to these
@@ -1892,10 +1832,6 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static AttributeHandleSet get_subscribed_attribute_handle_set() {
         return get_subscribed_attribute_handle_set( get_hla_class_name() );
-    }
-
-    public AttributeHandleSet getSubscribedAttributeHandleSet() {
-        return get_subscribed_attribute_handle_set();
     }
 
     // ----------------------------------------------------------
@@ -1917,18 +1853,6 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Publishes the object class of this instance of the class for a federate.
-     * Polymorphic equalivalent of publish_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void publishObject(RTIambassador rti) {
-        publish_object(rti);
-    }
-
-
-    /**
      * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
@@ -1936,17 +1860,6 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static void unpublish_object(RTIambassador rti) {
         unpublish_object(get_hla_class_name(), rti);
-    }
-
-    /**
-     * Unpublishes the object class of this instance of this class for a federate.
-     * Polymorphic equivalent of unpublish_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void unpublishObject(RTIambassador rti) {
-        unpublish_object(rti);
     }
 
     /**
@@ -1959,17 +1872,6 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Subscribes a federate to the object class of this instance of this class.
-     * Polymorphic equivalent of subscribe_object static method.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void subscribeObject(RTIambassador rti) {
-        subscribe_object(rti);
-    }
-
-    /**
      * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
@@ -1978,30 +1880,12 @@ public class ObjectRoot implements ObjectRootInterface {
         unsubscribe_object(get_hla_class_name(), rti);
     }
 
-    /**
-     * Unsubscribes a federate from the object class of this instance of this class.
-     *
-     * @param rti handle to the Local RTI Component
-     */
-    @Override
-    public void unsubscribeObject(RTIambassador rti) {
-        unsubscribe_object(rti);
-    }
-
     protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
         return _classNamePublishedAttributeNameSetMap.get(get_hla_class_name());
     }
 
-    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
-        return get_published_attribute_name_set();
-    }
-
     protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
-    }
-
-    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
-        return get_subscribed_attribute_name_set();
     }
 
 
@@ -2406,6 +2290,138 @@ public class ObjectRoot implements ObjectRootInterface {
         }
         return object;
     }
+
+    //---------------------------------------------------------------
+    // INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
+    //---------------------------------------------------------------
+
+    /**
+     * Returns the simple name (last name in its fully-qualified dot-delimited name)
+     * of this instance's object class.
+     * Polymorphic equivalent of the get_simple_class_name static method.
+     *
+     * @return the simple name of this instance's object class
+     */
+    @Override
+    public String getSimpleClassName() {
+        return get_simple_class_name( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    @Override
+    public String getHlaClassName() {
+        return getInstanceHlaClassName();
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the non-hiddenattributes of an
+     * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent to get_attribute_names static method.
+     *
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    @Override
+    public List<ClassAndPropertyName> getAttributeNames() {
+        return get_attribute_names( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns a sorted list containing the names of all of the attributes of an
+     * object class instance.
+     * The property names are paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     * Polymorphic equivalent of get_all_attribute_names() static method.
+     *
+     * @return sorted list containing the names of all of the attributes of an
+     * object class instance paired with name of the hla class in which they are defined in a
+     * ClassAndPropertyName POJO.
+     */
+    @Override
+    public List<ClassAndPropertyName> getAllAttributeNames() {
+        return get_all_attribute_names( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Returns the handle (RTI assigned) of this instance's object class.
+     * Polymorphic equivalent for get_class_handle static method.
+     *
+     * @return the handle (RTI assigned) if this instance's object class
+     */
+    public int getClassHandle() {
+        return get_class_handle( getInstanceHlaClassName() );
+    }
+
+    public AttributeHandleSet getPublishedAttributeHandleSet() {
+        return get_published_attribute_handle_set( getInstanceHlaClassName() );
+    }
+
+    public AttributeHandleSet getSubscribedAttributeHandleSet() {
+        return get_subscribed_attribute_handle_set( getInstanceHlaClassName() );
+    }
+
+    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
+        return get_published_attribute_name_set( getInstanceHlaClassName() );
+    }
+
+    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
+        return get_subscribed_attribute_name_set( getInstanceHlaClassName() );
+    }
+
+    /**
+     * Publishes the object class of this instance of the class for a federate.
+     * Polymorphic equalivalent of publish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void publishObject(RTIambassador rti) {
+        publish_object(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Unpublishes the object class of this instance of this class for a federate.
+     * Polymorphic equivalent of unpublish_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void unpublishObject(RTIambassador rti) {
+        unpublish_object(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Subscribes a federate to the object class of this instance of this class.
+     * Polymorphic equivalent of subscribe_object static method.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void subscribeObject(RTIambassador rti) {
+        subscribe_object(getInstanceHlaClassName(), rti);
+    }
+
+    /**
+     * Unsubscribes a federate from the object class of this instance of this class.
+     *
+     * @param rti handle to the Local RTI Component
+     */
+    @Override
+    public void unsubscribeObject(RTIambassador rti) {
+        unsubscribe_object(getInstanceHlaClassName(), rti);
+    }
+
+    //-------------------------------------------------------------------
+    // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
+    //-------------------------------------------------------------------
 
     public String toJson() {
         JSONObject topLevelJSONObject = new JSONObject();
