@@ -367,7 +367,7 @@ public class MessagingTests {
         dynamicSimLogInteraction.setParameter("Time", doubleValue2);
 
         Assert.assertEquals(string2, dynamicSimLogInteraction.getParameter("originFed"));
-        Assert.assertEquals(doubleValue2, dynamicSimLogInteraction.getParameter("Time"));
+        Assert.assertEquals(doubleValue2, (double)dynamicSimLogInteraction.getParameter("Time"), 0.01);
 
 
         InteractionRoot staticSimLogInteraction1 = InteractionRoot.create_interaction(SimLog.get_hla_class_name());
