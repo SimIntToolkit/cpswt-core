@@ -149,14 +149,12 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
     }
 
     /*
-     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTIES THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        SimLog instance = new SimLog();
-        instance.classAndPropertyNameValueMap = null;
-
+        SimLog instance = new SimLog(createNoInstanceInit());
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -263,18 +261,6 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
      */
     public static int get_parameter_handle(String propertyName) {
         return get_parameter_handle(get_hla_class_name(), propertyName);
-    }
-
-    /**
-     * Returns the handle associated with the given parameter name for an interaction class instance
-     * Polymorphic equivalent of get_parameter_handle static method.
-     *
-     * @param propertyName the name of a parameter that belongs to this interaction class
-     * @return the RTI handle associated with the parameter name, or -1 if not found
-     */
-    @Override
-    public int getParameterHandle(String propertyName) {
-        return get_parameter_handle(propertyName);
     }
 
     // ----------------------------------------------------------
@@ -477,6 +463,10 @@ public class SimLog extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    protected SimLog(NoInstanceInit noInstanceInit) {
+        super(noInstanceInit);
+    }
 
     /**
     * Creates an instance of the SimLog interaction class, using

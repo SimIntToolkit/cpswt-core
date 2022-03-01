@@ -1739,14 +1739,12 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /*
-     * INITIALIZE STATIC PROPERTYS THAT DEAL WITH NAMES
+     * INITIALIZE STATIC PROPERTIES THAT DEAL WITH NAMES
      */
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        ObjectRoot instance = new ObjectRoot();
-        instance.classAndPropertyNameValueMap = null;
-
+        ObjectRoot instance = new ObjectRoot(createNoInstanceInit());
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -1805,17 +1803,6 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static int get_attribute_handle(String propertyName) {
         return get_attribute_handle(get_hla_class_name(), propertyName);
-    }
-
-    /**
-     * Returns the handle associated with the given attribute name for an object class instance
-     * Polymorphic equivalent of get_attribute_handle static method.
-     *
-     * @param propertyName the name of a attribute that belongs to this object class
-     * @return the RTI handle associated with the attribute name, or -1 if not found
-     */
-    public int getAttributeHandle(String propertyName) {
-        return get_attribute_handle(propertyName);
     }
 
     public static AttributeHandleSet get_published_attribute_handle_set() {
@@ -1880,11 +1867,11 @@ public class ObjectRoot implements ObjectRootInterface {
         unsubscribe_object(get_hla_class_name(), rti);
     }
 
-    protected static Set<ClassAndPropertyName> get_published_attribute_name_set() {
+    public static Set<ClassAndPropertyName> get_published_attribute_name_set() {
         return _classNamePublishedAttributeNameSetMap.get(get_hla_class_name());
     }
 
-    protected static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
+    public static Set<ClassAndPropertyName> get_subscribed_attribute_name_set() {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
@@ -2037,6 +2024,12 @@ public class ObjectRoot implements ObjectRootInterface {
     //-------------
     // CONSTRUCTORS
     //-------------
+
+    protected static class NoInstanceInit { }
+    protected static NoInstanceInit createNoInstanceInit() {
+        return new NoInstanceInit();
+    }
+    protected ObjectRoot(NoInstanceInit noInstanceInit) { }
 
     /**
      * Creates a new ObjectRoot instance.
@@ -2360,6 +2353,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_class_handle( getInstanceHlaClassName() );
     }
 
+    public int getAttributeHandle(String propertyName) {
+        return get_attribute_handle( getInstanceHlaClassName(), propertyName );
+    }
+
     public AttributeHandleSet getPublishedAttributeHandleSet() {
         return get_published_attribute_handle_set( getInstanceHlaClassName() );
     }
@@ -2368,11 +2365,11 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_subscribed_attribute_handle_set( getInstanceHlaClassName() );
     }
 
-    protected Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
+    public Set<ClassAndPropertyName> getPublishedAttributeNameSet() {
         return get_published_attribute_name_set( getInstanceHlaClassName() );
     }
 
-    protected Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
+    public Set<ClassAndPropertyName> getSubscribedAttributeNameSet() {
         return get_subscribed_attribute_name_set( getInstanceHlaClassName() );
     }
 
