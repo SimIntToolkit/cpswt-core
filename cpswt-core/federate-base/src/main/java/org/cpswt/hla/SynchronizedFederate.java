@@ -40,10 +40,12 @@ import org.cpswt.hla.base.ATRQueue;
 import org.cpswt.hla.base.ObjectReflector;
 import org.cpswt.hla.base.ObjectReflectorComparator;
 import org.cpswt.hla.base.TimeAdvanceMode;
+import org.cpswt.hla.InteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import org.cpswt.hla.ObjectRoot;
 import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
@@ -51,6 +53,7 @@ import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -116,7 +119,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * Local RTI component. This is where you submit the "requests"
      * to the RTIExec process that manages the whole federation.
      */
-    protected RTIambassador lrc;
+    protected RTIambassador lrc = null;
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
@@ -165,6 +168,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.lookAhead = federateConfig.lookAhead;
         this.stepSize = federateConfig.stepSize;
 
+        if (
+                federateConfig.federationJsonFileName != null &&
+                        federateConfig.federateDynamicMessagingJsonFileName != null
+        ) {
+            initializeDynamicMessaging(
+                    federateConfig.federationJsonFileName, federateConfig.federateDynamicMessagingJsonFileName
+            );
+        }
         if(federateConfig.name == null || federateConfig.name.isEmpty()) {
             this.federateId = FederateIdUtility.generateID(this.federateType);
         }
@@ -234,13 +245,33 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void createLRC() throws RTIinternalError {
-
-        logger.debug("Federate {} acquiring connection to RTI ...", this.federateId);
-        RtiFactory factory = RtiFactoryFactory.getRtiFactory();
-        this.lrc = factory.createRtiAmbassador();
-        logger.debug("Federate {} connection to RTI successful.", this.federateId);
+        if (this.lrc == null) {
+            logger.debug("Federate {} acquiring connection to RTI ...", this.federateId);
+            RtiFactory factory = RtiFactoryFactory.getRtiFactory();
+            this.lrc = factory.createRtiAmbassador();
+            logger.debug("Federate {} connection to RTI successful.", this.federateId);
+        }
     }
 
+    public void initializeMessaging() {
+        InteractionRoot.init(getLRC());
+        ObjectRoot.init(getLRC());
+    }
+
+    public void initializeDynamicMessaging(File federationJsonFile, File federateDynamicMessagingClassesJsonFile) {
+        InteractionRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
+        ObjectRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
+        initializeMessaging();
+    }
+
+    public void initializeDynamicMessaging(
+            String federationJsonFileName, String federateDynamicMessagingClassesJsonFileName
+    ) {
+        initializeDynamicMessaging(
+                new File(federationJsonFileName),
+                new File(federateDynamicMessagingClassesJsonFileName)
+        );
+    }
     /**
      * Dissociate from the RTI.  This sets the handle to the RTI acquired via
      * {@link #createLRC} to null.  Thus, {@link #getLRC()} returns null after

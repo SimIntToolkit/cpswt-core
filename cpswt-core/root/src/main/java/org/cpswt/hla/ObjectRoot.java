@@ -135,6 +135,10 @@ public class ObjectRoot implements ObjectRootInterface {
         //-------------------------------------------------------------------------
         for(String hlaClassName: _hlaClassNameSet) {
 
+            if (!_hlaClassNameInstanceMap.containsKey(hlaClassName)) {
+                _dynamicHlaClassNameSet.add(hlaClassName);
+            }
+
             //------------------------------------------
             // GET HANDLE FOR hlaClassName TO INITIALIZE
             // - _classNameHandleMap
@@ -311,13 +315,13 @@ public class ObjectRoot implements ObjectRootInterface {
     //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
 
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
     //
     // ALSO USED BY:
     // - ObjectRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the object
       * classes in the current federation.
@@ -332,6 +336,30 @@ public class ObjectRoot implements ObjectRootInterface {
     //-----------------------
     // END HLA CLASS-NAME-SET
     //-----------------------
+
+    //---------------------------
+    // DYNAMIC HLA CLASS-NAME SET
+    //---------------------------
+    private static Set<String> _dynamicHlaClassNameSet = new HashSet<>();
+
+    //--------------------------------------------
+    // METHODS THAT USE DYNAMIC HLA CLASS-NAME SET
+    //--------------------------------------------
+    public static Set<String> get_dynamic_hla_class_name_set() {
+        return new HashSet<>(_dynamicHlaClassNameSet);
+    }
+
+    public static boolean is_dynamic_class(String hlaClassName) {
+        return _dynamicHlaClassNameSet.contains(hlaClassName);
+    }
+
+    public boolean isDynamicInstance() {
+        return getHlaClassName() != getInstanceHlaClassName();
+    }
+
+    //-------------------------------
+    // END DYNAMIC HLA CLASS-NAME SET
+    //-------------------------------
 
     //-------------------------------------------------------------------------
     // CLASS-NAME PROPERTY-NAME-SET MAP
@@ -1606,6 +1634,12 @@ public class ObjectRoot implements ObjectRootInterface {
         ((Attribute<Object>)propertyClassNameAndValue.getValue()).setValue(value);
     }
 
+    public void setAttribute(ClassAndPropertyName classAndPropertyName, Object value) {
+        setAttribute(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName(), value
+        );
+    }
+
     public void setAttribute(String propertyName, Object value) {
         setAttribute(getInstanceHlaClassName(), propertyName, value);
     }
@@ -1614,7 +1648,7 @@ public class ObjectRoot implements ObjectRootInterface {
         ClassAndPropertyName key = findProperty(className, propertyName);
         if (key != null) {
             Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(key.getClassName(), value);
+            return value == null ? null : new PropertyClassNameAndValue(key.getClassName(), value);
         }
 
         return null;
@@ -1627,10 +1661,26 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param propertyName name of attribute whose value to retrieve
      * @return the value of the attribute whose name is "propertyName"
      */
+    public boolean hasAttribute(String hlaClassName, String propertyName) {
+        return getAttributeAux(hlaClassName, propertyName) != null;
+    }
+
+    public boolean hasAttribute(String propertyName) {
+        return hasAttribute(getInstanceHlaClassName(), propertyName);
+    }
+
     public Object getAttribute(String hlaClassName, String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getAttributeAux(hlaClassName, propertyName);
+        PropertyClassNameAndValue propertyClassNameAndValue = getAttributeAux(
+          hlaClassName, propertyName
+        );
         return propertyClassNameAndValue == null ? null
           : ((Attribute<?>)propertyClassNameAndValue.getValue()).getValue();
+    }
+
+    public Object getAttribute(ClassAndPropertyName classAndPropertyName) {
+        return getAttribute(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
+          );
     }
 
     public Object getAttribute(String propertyName) {
@@ -1700,6 +1750,16 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static String get_hla_class_name() {
         return "ObjectRoot";
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's object class
+     */
+    public String getHlaClassName() {
+        return get_hla_class_name();
     }
 
     /**
@@ -2298,17 +2358,6 @@ public class ObjectRoot implements ObjectRootInterface {
     @Override
     public String getSimpleClassName() {
         return get_simple_class_name( getInstanceHlaClassName() );
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's object class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's object class
-     */
-    @Override
-    public String getHlaClassName() {
-        return getInstanceHlaClassName();
     }
 
     /**

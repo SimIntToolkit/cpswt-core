@@ -96,6 +96,24 @@ public class FederateConfig {
     public String name;
 
     /**
+     * Optional 'federationJsonFileName' parameter that names the file that contains
+     * information on all messaging classes for the federation
+     * Use {@link FederateParameterOptional} to exclude the field from "isSet" check
+     */
+    @FederateParameter
+    @FederateParameterOptional
+    public String federationJsonFileName;
+
+    /**
+     * Optional 'federateDynamicMessagingJsonFileName' parameter that names the file that contains
+     * information on all dynamic messaging classes for the federate
+     * Use {@link FederateParameterOptional} to exclude the field from "isSet" check
+     */
+    @FederateParameter
+    @FederateParameterOptional
+    public String federateDynamicMessagingJsonFileName;
+
+    /**
      * Default constructor for FederateConfig.
      */
     public FederateConfig() {}
@@ -108,7 +126,13 @@ public class FederateConfig {
      * @param lookAhead The lookAhead value.
      * @param stepSize The step size value.
      */
-    public FederateConfig(String federateType, String federationId, boolean isLateJoiner, double lookAhead, double stepSize) {
+    public FederateConfig(
+            String federateType,
+            String federationId,
+            boolean isLateJoiner,
+            double lookAhead,
+            double stepSize
+    ) {
         this.federateType = federateType;
         this.federationId = federationId;
         this.isLateJoiner = isLateJoiner;

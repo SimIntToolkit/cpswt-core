@@ -1,5 +1,6 @@
 package org.cpswt.hla;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -40,13 +41,13 @@ public class InteractionRootTests {
                 new ClassAndPropertyName("InteractionRoot.TestBase", "field2"), value++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("TestBase.TestBase.TestDerived", "field3"), value++
+                new ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field3"), value++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("TestBase.TestBase.TestDerived", "field4"), value++
+                new ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field4"), value++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("TestBase.TestBase.TestDerived", "field5"), value
+                new ClassAndPropertyName("InteractionRoot.TestBase.TestDerived", "field5"), value
         );
     }
 
@@ -105,13 +106,16 @@ public class InteractionRootTests {
                     "    ]\n" +
                     "}\n";
 
-            StringReader federateJsonStringReader = new StringReader(federationJson);
+            StringReader federationJsonStringReader = new StringReader(federationJson);
             StringReader dynamicMessagingTypesStringReader = new StringReader(dynamicMessageTypes);
             InteractionRoot.loadDynamicClassFederationData(
-                    federateJsonStringReader, dynamicMessagingTypesStringReader
+                    federationJsonStringReader, dynamicMessagingTypesStringReader
             );
         }
     }
+
+    static Set<String> publishedHlaClassNameSet = new HashSet<>();
+    static Set<String> subscribedHlaClassNameSet = new HashSet<>();
 
     private static final RTIambassador rtiambassador;
     static {
@@ -130,18 +134,35 @@ public class InteractionRootTests {
                         return interactionClassAndPropertyNameHandleMap.get(key);
                     }
             );
+            doAnswer(invocationOnMock -> {
+                int classHandle = invocationOnMock.getArgument(0);
+                String hlaClassName = classHandleNameMap.get(classHandle);
+                publishedHlaClassNameSet.add(hlaClassName);
+                return null;
+            }).when(rtiambassador).publishInteractionClass(anyInt());
+            doAnswer(invocationOnMock -> {
+                int classHandle = invocationOnMock.getArgument(0);
+                String hlaClassName = classHandleNameMap.get(classHandle);
+                subscribedHlaClassNameSet.add(hlaClassName);
+                return null;
+            }).when(rtiambassador).subscribeInteractionClass(anyInt());
         } catch (Exception e) { }
+
+        InteractionRoot.init(rtiambassador);
     }
 
     private static RTIambassador get_rti_ambassador() {
         return rtiambassador;
     }
 
-    @Test
-    public void valueTest() {
-        RTIambassador rtiambassador = get_rti_ambassador();
+    @Before
+    public void clearPubSub() {
+        publishedHlaClassNameSet.clear();
+        subscribedHlaClassNameSet.clear();
+    }
 
-        InteractionRoot.init(rtiambassador);
+    @Test
+    public void dynamicMessagingValueTest() {
 
         InteractionRoot testBase = new InteractionRoot("InteractionRoot.TestBase");
         testBase.setParameter("field1", "value1");
@@ -154,31 +175,22 @@ public class InteractionRootTests {
         testDerived.setParameter("field4", 10L);
         testDerived.setParameter("field5", 3.14);
 
-        Assert.assertEquals(testBase.getParameter("field1"), "value1");
-        Assert.assertEquals(testBase.getParameter("field2"), 5);
+        Assert.assertTrue(testBase.isDynamicInstance());
+        Assert.assertEquals("value1", testBase.getParameter("field1"));
+        Assert.assertEquals(5, testBase.getParameter("field2"));
 
-        Assert.assertEquals(testDerived.getParameter("field1"), "value2");
-        Assert.assertEquals(testDerived.getParameter("field2"), -6);
+        Assert.assertTrue(testDerived.isDynamicInstance());
+        Assert.assertEquals("value2", testDerived.getParameter("field1"));
+        Assert.assertEquals(-6, testDerived.getParameter("field2"));
         Assert.assertTrue((Boolean)testDerived.getParameter("field3"));
-        Assert.assertEquals(testDerived.getParameter("field4"), 10L);
-        Assert.assertEquals(testDerived.getParameter("field5"), 3.14);
+        Assert.assertEquals(10L, testDerived.getParameter("field4"));
+        Assert.assertEquals(3.14, testDerived.getParameter("field5"));
     }
 
     @Test
     public void publishInteractionTest() {
-        Set<String> publishedHlaClassNameSet = new HashSet<>();
 
         RTIambassador rtiambassador = get_rti_ambassador();
-        try {
-            doAnswer(invocationOnMock -> {
-                int classHandle = invocationOnMock.getArgument(0);
-                String hlaClassName = classHandleNameMap.get(classHandle);
-                publishedHlaClassNameSet.add(hlaClassName);
-                return null;
-            }).when(rtiambassador).publishInteractionClass(anyInt());
-        } catch(Exception e) { }
-
-        InteractionRoot.init(rtiambassador);
 
         Set<String> localPublishedHlaClassNameSet = new HashSet<>();
         localPublishedHlaClassNameSet.add("InteractionRoot.TestBase");
@@ -192,19 +204,8 @@ public class InteractionRootTests {
 
     @Test
     public void subscribeInteractionTest() {
-        Set<String> subscribedHlaClassNameSet = new HashSet<>();
 
         RTIambassador rtiambassador = get_rti_ambassador();
-        try {
-            doAnswer(invocationOnMock -> {
-                int classHandle = invocationOnMock.getArgument(0);
-                String hlaClassName = classHandleNameMap.get(classHandle);
-                subscribedHlaClassNameSet.add(hlaClassName);
-                return null;
-            }).when(rtiambassador).subscribeInteractionClass(anyInt());
-        } catch(Exception e) { }
-
-        InteractionRoot.init(rtiambassador);
 
         Set<String> localSubscribedHlaClassNameSet = new HashSet<>();
         localSubscribedHlaClassNameSet.add("InteractionRoot.TestBase.TestDerived");

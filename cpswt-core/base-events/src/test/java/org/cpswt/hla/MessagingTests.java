@@ -351,6 +351,7 @@ public class MessagingTests {
     public void dynamicMessagingTest() {
         InteractionRoot dynamicSimLogInteraction = new InteractionRoot(SimLog.get_hla_class_name());
 
+        Assert.assertTrue(dynamicSimLogInteraction.isDynamicInstance());
         Assert.assertFalse(dynamicSimLogInteraction instanceof SimLog);
         Assert.assertEquals(SimLog.get_hla_class_name(), dynamicSimLogInteraction.getInstanceHlaClassName());
 
@@ -371,6 +372,7 @@ public class MessagingTests {
 
 
         InteractionRoot staticSimLogInteraction1 = InteractionRoot.create_interaction(SimLog.get_hla_class_name());
+        Assert.assertFalse(staticSimLogInteraction1.isDynamicInstance());
         Assert.assertTrue(staticSimLogInteraction1 instanceof SimLog);
         Assert.assertEquals(SimLog.get_hla_class_name(), staticSimLogInteraction1.getInstanceHlaClassName());
 

@@ -135,6 +135,10 @@ public class InteractionRoot implements InteractionRootInterface {
         //-------------------------------------------------------------------------
         for(String hlaClassName: _hlaClassNameSet) {
 
+            if (!_hlaClassNameInstanceMap.containsKey(hlaClassName)) {
+                _dynamicHlaClassNameSet.add(hlaClassName);
+            }
+
             //------------------------------------------
             // GET HANDLE FOR hlaClassName TO INITIALIZE
             // - _classNameHandleMap
@@ -233,13 +237,13 @@ public class InteractionRoot implements InteractionRootInterface {
     //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
 
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
     //
     // ALSO USED BY:
     // - InteractionRoot( String hlaClassName ) DYNAMIC CONSTRUCTOR
     // - readFederateDynamicMessageClasses(Reader reader) BELOW
-    //----------------------------------------------------------------------------
+    //--------------------------------------------------------------
     /**
       * Returns a set of strings containing the names of all of the interaction
       * classes in the current federation.
@@ -254,6 +258,30 @@ public class InteractionRoot implements InteractionRootInterface {
     //-----------------------
     // END HLA CLASS-NAME-SET
     //-----------------------
+
+    //---------------------------
+    // DYNAMIC HLA CLASS-NAME SET
+    //---------------------------
+    private static Set<String> _dynamicHlaClassNameSet = new HashSet<>();
+
+    //--------------------------------------------
+    // METHODS THAT USE DYNAMIC HLA CLASS-NAME SET
+    //--------------------------------------------
+    public static Set<String> get_dynamic_hla_class_name_set() {
+        return new HashSet<>(_dynamicHlaClassNameSet);
+    }
+
+    public static boolean is_dynamic_class(String hlaClassName) {
+        return _dynamicHlaClassNameSet.contains(hlaClassName);
+    }
+
+    public boolean isDynamicInstance() {
+        return getHlaClassName() != getInstanceHlaClassName();
+    }
+
+    //-------------------------------
+    // END DYNAMIC HLA CLASS-NAME SET
+    //-------------------------------
 
     //-------------------------------------------------------------------------
     // CLASS-NAME PROPERTY-NAME-SET MAP
@@ -968,6 +996,12 @@ public class InteractionRoot implements InteractionRootInterface {
         classAndPropertyNameValueMap.put(key, value);
     }
 
+    public void setParameter(ClassAndPropertyName classAndPropertyName, Object value) {
+        setParameter(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName(), value
+        );
+    }
+
     public void setParameter(String propertyName, Object value) {
         setParameter(getInstanceHlaClassName(), propertyName, value);
     }
@@ -976,7 +1010,7 @@ public class InteractionRoot implements InteractionRootInterface {
         ClassAndPropertyName key = findProperty(className, propertyName);
         if (key != null) {
             Object value = classAndPropertyNameValueMap.get(key);
-            return new PropertyClassNameAndValue(key.getClassName(), value);
+            return value == null ? null : new PropertyClassNameAndValue(key.getClassName(), value);
         }
 
         return null;
@@ -989,10 +1023,26 @@ public class InteractionRoot implements InteractionRootInterface {
      * @param propertyName name of parameter whose value to retrieve
      * @return the value of the parameter whose name is "propertyName"
      */
+    public boolean hasParameter(String hlaClassName, String propertyName) {
+        return getParameterAux(hlaClassName, propertyName) != null;
+    }
+
+    public boolean hasParameter(String propertyName) {
+        return hasParameter(getInstanceHlaClassName(), propertyName);
+    }
+
     public Object getParameter(String hlaClassName, String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(hlaClassName, propertyName);
+        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(
+          hlaClassName, propertyName
+        );
         return propertyClassNameAndValue == null ? null
           : propertyClassNameAndValue.getValue();
+    }
+
+    public Object getParameter(ClassAndPropertyName classAndPropertyName) {
+        return getParameter(
+          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
+          );
     }
 
     public Object getParameter(String propertyName) {
@@ -1062,6 +1112,16 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public static String get_hla_class_name() {
         return "InteractionRoot";
+    }
+
+    /**
+     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
+     * Polymorphic equivalent of get_hla_class_name static method.
+     *
+     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
+     */
+    public String getHlaClassName() {
+        return get_hla_class_name();
     }
 
     /**
@@ -1574,17 +1634,6 @@ public class InteractionRoot implements InteractionRootInterface {
     @Override
     public String getSimpleClassName() {
         return get_simple_class_name( getInstanceHlaClassName() );
-    }
-
-    /**
-     * Returns the fully-qualified (dot-delimited) hla class name of this instance's interaction class.
-     * Polymorphic equivalent of get_hla_class_name static method.
-     *
-     * @return the fully-qualified (dot-delimited) name of this instance's interaction class
-     */
-    @Override
-    public String getHlaClassName() {
-        return getInstanceHlaClassName();
     }
 
     /**
