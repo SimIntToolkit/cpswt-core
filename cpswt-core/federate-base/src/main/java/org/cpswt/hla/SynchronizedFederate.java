@@ -157,6 +157,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public boolean isLateJoiner() { return this.isLateJoiner; }
 
     private double stepSize;
+
+    private String federationJsonFileName = null;
+    private String federateDynamicMessagingJsonFileName = null;
     public double getStepSize() { return this.stepSize; }
     private void setStepSize(double stepSize) { this.stepSize = stepSize; }
 
@@ -167,15 +170,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.isLateJoiner = federateConfig.isLateJoiner;
         this.lookAhead = federateConfig.lookAhead;
         this.stepSize = federateConfig.stepSize;
+        this.federationJsonFileName = federateConfig.federationJsonFileName;
+        this.federateDynamicMessagingJsonFileName = federateConfig.federateDynamicMessagingJsonFileName;
 
-        if (
-                federateConfig.federationJsonFileName != null &&
-                        federateConfig.federateDynamicMessagingJsonFileName != null
-        ) {
-            initializeDynamicMessaging(
-                    federateConfig.federationJsonFileName, federateConfig.federateDynamicMessagingJsonFileName
-            );
-        }
         if(federateConfig.name == null || federateConfig.name.isEmpty()) {
             this.federateId = FederateIdUtility.generateID(this.federateType);
         }
@@ -267,6 +264,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void initializeDynamicMessaging(
             String federationJsonFileName, String federateDynamicMessagingClassesJsonFileName
     ) {
+        if (
+                federationJsonFileName == null ||
+                        federationJsonFileName.isEmpty() ||
+                        federateDynamicMessagingClassesJsonFileName == null ||
+                        federateDynamicMessagingClassesJsonFileName.isEmpty()
+        ) {
+            initializeMessaging();
+            return;
+        }
         initializeDynamicMessaging(
                 new File(federationJsonFileName),
                 new File(federateDynamicMessagingClassesJsonFileName)
@@ -313,9 +319,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
         }
 
+        initializeDynamicMessaging(federationJsonFileName, federateDynamicMessagingJsonFileName);
+
         this.ensureSimEndSubscription();
 
         this.notifyFederationOfJoin();
+
+
     }
 
     public void notifyFederationOfJoin() {

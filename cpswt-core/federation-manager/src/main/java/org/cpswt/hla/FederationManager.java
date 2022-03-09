@@ -98,7 +98,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private final Set<String> _synchronizationLabels = new HashSet<>();
 
     private final FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
-    private IC2WFederationEventsHandler _federationEventsHandler = null;
+    private IC2WFederationEventsHandler _federationEventsHandler;
 
     /*
         ==============================================================================================================
@@ -118,7 +118,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * Indicates if real time mode is on.
      */
-    private boolean realTimeMode = true;
+    private boolean realTimeMode;
 
     /**
      * Indicates if federation manager terminates when COA finishes.
@@ -163,10 +163,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private boolean federationAttempted = false;
 
-    boolean timeRegulationEnabled = false;
-
-    boolean timeConstrainedEnabled = false;
-
     private boolean granted = false;
 
     private DoubleTime time = new DoubleTime(0);
@@ -204,6 +200,21 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 //    }
     /* ============================================================================================================== */
 
+    static {
+        FederateJoinInteraction.load();
+        FederateResignInteraction.load();
+
+        SimEnd.load();
+        SimPause.load();
+        SimResume.load();
+
+        VeryLowPrio.load();
+        LowPrio.load();
+        MediumPrio.load();
+        HighPrio.load();
+
+        FederateObject.load();
+    }
     /**
      * Creates a @FederationManager instance.
      *
@@ -656,14 +667,14 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 continue;
             if (intrtime < tmin) {
 
-                String interactionClassList = "";
+                StringBuilder interactionClassList = new StringBuilder();
                 boolean notFirst = false;
                 for (InteractionRoot interactionRoot : interactionRootList) {
-                    if (notFirst) interactionClassList += ", ";
+                    if (notFirst) interactionClassList.append(", ");
                     notFirst = true;
-                    interactionClassList += interactionRoot.getHlaClassName();
+                    interactionClassList.append(interactionRoot.getHlaClassName());
                 }
-                logger.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList);
+                logger.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList.toString());
             } else if (intrtime >= tmin && intrtime < tmin + super.getStepSize()) {
 
                 List<InteractionRoot> interactionsSent = new ArrayList<>();
@@ -1095,10 +1106,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate join" interaction
             if(FederateJoinInteraction.match(intrHandle)) {
                 FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
-                if(federateJoinInteraction == null) {
-                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate federateJoinInteraction");
-                    return;
-                }
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
@@ -1110,10 +1117,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate resign" interaction
             else if(FederateResignInteraction.match(intrHandle)) {
                 FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
-                if(federateResignInteraction == null) {
-                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate federateResignInteraction");
-                    return;
-                }
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
@@ -1161,10 +1164,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate join" interaction
             if(FederateJoinInteraction.match(intrHandle)) {
                 FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
-                if(federateJoinInteraction == null) {
-                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate federateJoinInteraction");
-                    return;
-                }
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
@@ -1176,10 +1175,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             // "federate resign" interaction
             else if(FederateResignInteraction.match(intrHandle)) {
                 FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
-                if(federateResignInteraction == null) {
-                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate federateResignInteraction");
-                    return;
-                }
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??

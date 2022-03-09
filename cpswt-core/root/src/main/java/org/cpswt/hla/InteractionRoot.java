@@ -262,7 +262,7 @@ public class InteractionRoot implements InteractionRootInterface {
     //---------------------------
     // DYNAMIC HLA CLASS-NAME SET
     //---------------------------
-    private static Set<String> _dynamicHlaClassNameSet = new HashSet<>();
+    private static final Set<String> _dynamicHlaClassNameSet = new HashSet<>();
 
     //--------------------------------------------
     // METHODS THAT USE DYNAMIC HLA CLASS-NAME SET
@@ -276,7 +276,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     public boolean isDynamicInstance() {
-        return getHlaClassName() != getInstanceHlaClassName();
+        return !getHlaClassName().equals( getInstanceHlaClassName() );
     }
 
     //-------------------------------
@@ -1477,6 +1477,7 @@ public class InteractionRoot implements InteractionRootInterface {
     public InteractionRoot( InteractionRoot other ) {
         this();
         _time = other._time;
+        _instanceHlaClassName = other._instanceHlaClassName;
         classAndPropertyNameValueMap = new HashMap<>(other.classAndPropertyNameValueMap);
     }
 
