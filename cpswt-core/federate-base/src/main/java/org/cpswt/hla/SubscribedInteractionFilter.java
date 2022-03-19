@@ -105,8 +105,8 @@ public class SubscribedInteractionFilter {
             return false;
         }
 
-        boolean isSourceMapper = c2wInteractionRoot.get_sourceFed().endsWith( "Mapper" );
-        boolean isFromSelf = c2wInteractionRoot.get_originFed().equals(federateId);
+        boolean isSourceMapper = c2wInteractionRoot.getSourceFederateId().endsWith( "Mapper" );
+        boolean isFromSelf = c2wInteractionRoot.getOriginFederateId().equals(federateId);
 
         return
          ( filter.getSourceFedFilter() == SourceFedFilter.MAPPER && !isSourceMapper ) ||

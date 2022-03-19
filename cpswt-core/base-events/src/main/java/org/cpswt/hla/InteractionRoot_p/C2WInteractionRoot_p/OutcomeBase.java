@@ -185,11 +185,7 @@ public class OutcomeBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionR
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
         ));
 
 

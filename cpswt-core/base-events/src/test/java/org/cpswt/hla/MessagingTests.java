@@ -1,5 +1,6 @@
 package org.cpswt.hla;
 
+import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
 import static org.mockito.Mockito.*;
@@ -49,11 +50,7 @@ public class MessagingTests {
                 value++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "sourceFed"),
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"),
                 value++
         );
         interactionClassAndPropertyNameHandleMap.put(
@@ -242,10 +239,7 @@ public class MessagingTests {
                 C2WInteractionRoot.get_hla_class_name(), "federateFilter"
         ));
         expectedC2WInteractionRootParameterList.add(new InteractionRoot.ClassAndPropertyName(
-                C2WInteractionRoot.get_hla_class_name(), "originFed"
-        ));
-        expectedC2WInteractionRootParameterList.add(new InteractionRoot.ClassAndPropertyName(
-                C2WInteractionRoot.get_hla_class_name(), "sourceFed"
+                C2WInteractionRoot.get_hla_class_name(), "federateSequence"
         ));
         Collections.sort(expectedC2WInteractionRootParameterList);
 
@@ -331,11 +325,11 @@ public class MessagingTests {
     public void propertyHandleTest() {
 
         int expectedValue = interactionClassAndPropertyNameHandleMap.get(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "originFed"));
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"));
 
-        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("originFed"));
-        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("originFed"));
-        Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("originFed"));
+        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("federateSequence"));
+        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("federateSequence"));
+        Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("federateSequence"));
 
         expectedValue = interactionClassAndPropertyNameHandleMap.get(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
@@ -358,18 +352,24 @@ public class MessagingTests {
         String string1 = "string1";
         double doubleValue1 = 1.2;
 
-        dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "originFed", string1);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(string1);
+        dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "federateSequence", jsonArray.toString());
         dynamicSimLogInteraction.setParameter("Time", doubleValue1);
+
+        Assert.assertEquals(string1, C2WInteractionRoot.get_origin_federate_id(dynamicSimLogInteraction));
+        Assert.assertEquals(doubleValue1, (double)dynamicSimLogInteraction.getParameter("Time"), 0.01);
 
         String string2 = "string2";
         double doubleValue2 = 3.4;
 
-        dynamicSimLogInteraction.setParameter("originFed", string2);
+        C2WInteractionRoot.update_federate_sequence(dynamicSimLogInteraction, string2);
         dynamicSimLogInteraction.setParameter("Time", doubleValue2);
 
-        Assert.assertEquals(string2, dynamicSimLogInteraction.getParameter("originFed"));
+        List<String> federateSequenceList = C2WInteractionRoot.get_federate_sequence_list(dynamicSimLogInteraction);
+        Assert.assertEquals(string1, federateSequenceList.get(0));
+        Assert.assertEquals(string2, federateSequenceList.get(1));
         Assert.assertEquals(doubleValue2, (double)dynamicSimLogInteraction.getParameter("Time"), 0.01);
-
 
         InteractionRoot staticSimLogInteraction1 = InteractionRoot.create_interaction(SimLog.get_hla_class_name());
         Assert.assertFalse(staticSimLogInteraction1.isDynamicInstance());
@@ -380,25 +380,29 @@ public class MessagingTests {
         double doubleValue3 = 5.6;
 
         SimLog simLogInteraction = (SimLog)staticSimLogInteraction1;
-        simLogInteraction.setParameter("originFed", string3);
+        C2WInteractionRoot.update_federate_sequence(simLogInteraction, string3);
         simLogInteraction.setParameter("Time", doubleValue3);
 
-        Assert.assertEquals(string3, simLogInteraction.getParameter("originFed"));
+        federateSequenceList = simLogInteraction.getFederateSequenceList();
+        Assert.assertEquals(string3, federateSequenceList.get(0));
         Assert.assertEquals(doubleValue3, simLogInteraction.getParameter("Time"));
 
-        Assert.assertEquals(string3, simLogInteraction.get_originFed());
+        Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
         Assert.assertEquals(doubleValue3, simLogInteraction.get_Time(), 0.01);
 
         String string4 = "string4";
         double doubleValue4 = 17.3;
 
-        simLogInteraction.set_originFed(string4);
+        simLogInteraction.updateFederateSequence(string4);
         simLogInteraction.set_Time(doubleValue4);
 
-        Assert.assertEquals(string4, simLogInteraction.getParameter("originFed"));
+        federateSequenceList = simLogInteraction.getFederateSequenceList();
+        Assert.assertEquals(string3, federateSequenceList.get(0));
+        Assert.assertEquals(string4, federateSequenceList.get(federateSequenceList.size() - 1));
         Assert.assertEquals(doubleValue4, simLogInteraction.getParameter("Time"));
 
-        Assert.assertEquals(string4, simLogInteraction.get_originFed());
+        Assert.assertEquals(string4, simLogInteraction.getSourceFederateId());
+        Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
         Assert.assertEquals(doubleValue4, simLogInteraction.get_Time(), 0.01);
     }
 }

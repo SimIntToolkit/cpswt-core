@@ -328,6 +328,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     }
 
+    public void sendInteraction( InteractionRoot interactionRoot, double time ) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateId());
+        interactionRoot.sendInteraction(getLRC(), time);
+
+    }
+
+    public void sendInteraction(InteractionRoot interactionRoot) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateId());
+        interactionRoot.sendInteraction(getLRC());
+    }
+
     public void notifyFederationOfJoin() {
         synchronized (this.lrc) {
             // every federate will send a "FederateJoinInteraction" and a "FederateResignInteraction"
@@ -337,15 +348,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
             // create a notification for "join" and send it
             FederateJoinInteraction joinInteraction = new FederateJoinInteraction();
-            joinInteraction.set_sourceFed(this.federateId);
-            joinInteraction.set_originFed(this.federateId);
             joinInteraction.set_FederateId(this.federateId);
             joinInteraction.set_FederateType(this.federateType);
             joinInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateJoinInteraction for federate {}", this.federateId);
-                joinInteraction.sendInteraction(this.lrc);
+                sendInteraction(joinInteraction);
             }
             catch (Exception ex) {
                 logger.error("Error while sending FederateJoinInteraction for federate {}", this.federateId);
@@ -356,15 +365,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void notifyFederationOfResign() {
         synchronized (this.lrc) {
             FederateResignInteraction resignInteraction = new FederateResignInteraction();
-            resignInteraction.set_sourceFed(this.federateId);
-            resignInteraction.set_originFed(this.federateId);
             resignInteraction.set_FederateId(this.federateId);
             resignInteraction.set_FederateType(this.federateType);
             resignInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateResignInteraction for federate {}", this.federateId);
-                resignInteraction.sendInteraction(this.lrc);
+                sendInteraction(resignInteraction);
             }
             catch(Exception ex) {
                 logger.error("Error while sending FederateResignInteraction for federate {}", this.federateId);

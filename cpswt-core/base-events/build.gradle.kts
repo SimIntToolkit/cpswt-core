@@ -58,6 +58,7 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
+    implementation(group="org.json", name="json", version="20210307")
     implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
     implementation(group="org.cpswt", name="root", version="0.7.0-SNAPSHOT")
 

@@ -488,7 +488,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // SEND OUT "INITIALIZATION INTERACTIONS," WHICH ARE SUPPOSED TO BE "RECEIVE" ORDERED.
         for (InteractionRoot interactionRoot : initialization_interactions) {
             logger.trace("Sending {} interaction.", interactionRoot.getSimpleClassName());
-            interactionRoot.sendInteraction(getLRC());
+            sendInteraction(interactionRoot);
         }
 
         // TODO: eliminate this #18
@@ -680,7 +680,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 List<InteractionRoot> interactionsSent = new ArrayList<>();
                 for (InteractionRoot interactionRoot : interactionRootList) {
                     try {
-                        interactionRoot.sendInteraction(getLRC(), intrtime);
+                        sendInteraction(interactionRoot, intrtime);
                     } catch (Exception e) {
                         logger.error("Failed to send interaction: {}", interactionRoot);
                         logger.error(e.getStackTrace());
@@ -756,10 +756,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         synchronized (super.lrc) {
             try {
                 SimEnd e = new SimEnd();
-                e.set_originFed(getFederateId());
-                e.set_sourceFed(getFederateId());
                 double tmin = time.getTime() + super.getLookAhead();
-                e.sendInteraction(getLRC(), tmin);
+                sendInteraction(e, tmin);
             } catch (Exception e) {
                 e.printStackTrace();
             }

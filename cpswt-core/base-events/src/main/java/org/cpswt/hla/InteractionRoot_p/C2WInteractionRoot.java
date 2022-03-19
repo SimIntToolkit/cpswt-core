@@ -39,6 +39,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import org.json.JSONArray;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -175,10 +180,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
             "InteractionRoot.C2WInteractionRoot", "federateFilter"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-        classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
         ));
 
         // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -197,11 +199,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
         ));
 
 
@@ -217,10 +215,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         key = new ClassAndPropertyName(get_hla_class_name(), "federateFilter");
         _classAndPropertyNameInitialValueMap.put(key, "");
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        _classAndPropertyNameInitialValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
+        key = new ClassAndPropertyName(get_hla_class_name(), "federateSequence");
         _classAndPropertyNameInitialValueMap.put(key, "");
 
         logger.info(
@@ -445,43 +440,22 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
 
     /**
-     * Set the value of the "originFed" parameter to "value" for this parameter.
+     * Set the value of the "federateSequence" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "originFed" parameter
+     * @param value the new value for the "federateSequence" parameter
      */
-    public void set_originFed(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
+    public void set_federateSequence(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "federateSequence");
         classAndPropertyNameValueMap.put(key, value);
     }
 
     /**
-     * Returns the value of the "originFed" parameter of this interaction.
+     * Returns the value of the "federateSequence" parameter of this interaction.
      *
-     * @return the value of the "originFed" parameter
+     * @return the value of the "federateSequence" parameter
      */
-    public String get_originFed() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "originFed");
-        return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "sourceFed" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "sourceFed" parameter
-     */
-    public void set_sourceFed(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "sourceFed" parameter of this interaction.
-     *
-     * @return the value of the "sourceFed" parameter
-     */
-    public String get_sourceFed() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "sourceFed");
+    public String get_federateSequence() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "federateSequence");
         return (String)classAndPropertyNameValueMap.get(key);
     }
 
@@ -489,22 +463,105 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
-    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+    private static Pattern federateSequenceRegex = Pattern.compile(
+      "\\s*\\[(?:\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\",)*\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\"\\s*\\]\\s*"
+    );
+
+    private static boolean is_federate_sequence(String federateSequence) {
+        Matcher matcher = federateSequenceRegex.matcher( federateSequence );
+        return matcher.matches();
+    }
+
+    private static void update_federate_sequence_aux(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+        String federateSequence = (String)interactionRoot.getParameter("federateSequence");
+
+        JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
+            new JSONArray( federateSequence ) : new JSONArray();
+
+        jsonArray.put( federateId );
+        interactionRoot.setParameter("federateSequence", jsonArray.toString());
+    }
+
+    public static void update_federate_sequence(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+        String instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
+
+        if ( instanceHlaClassName.startsWith("InteractionRoot.C2WInteractionRoot") ) {
+            update_federate_sequence_aux(interactionRoot, federateId);
+        }
+    }
+
+    public void updateFederateSequence(String federateId) {
+        update_federate_sequence_aux(this, federateId);
+    }
+
+    private static List<String> get_federate_sequence_list_aux(org.cpswt.hla.InteractionRoot interactionRoot) {
+        String federateSequence = (String)interactionRoot.getParameter("federateSequence");
+
+        JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
+            new JSONArray( federateSequence ) : new JSONArray();
+
+        ArrayList<String> retval = new ArrayList<String>();
+        for(Object federateId: jsonArray.toList()) {
+            retval.add( (String)federateId );
+        }
+
+        return retval;
+    }
+
+    public static List<String> get_federate_sequence_list(org.cpswt.hla.InteractionRoot interactionRoot) {
+
+        String instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
+
+        return instanceHlaClassName.startsWith("InteractionRoot.C2WInteractionRoot") ?
+          get_federate_sequence_list_aux(interactionRoot) : new ArrayList<>();
+    }
+
+    public List<String> getFederateSequenceList() {
+        return get_federate_sequence_list_aux(this);
+    }
+
+    public static String get_origin_federate_id(org.cpswt.hla.InteractionRoot interactionRoot) {
+        List<String> federateSequenceList = get_federate_sequence_list(interactionRoot);
+        return federateSequenceList.isEmpty() ? null : federateSequenceList.get(0);
+    }
+
+    public String getOriginFederateId() {
+        return get_origin_federate_id(this);
+    }
+
+    public static String get_source_federate_id(org.cpswt.hla.InteractionRoot interactionRoot) {
+        List<String> federateSequenceList = get_federate_sequence_list(interactionRoot);
+        return federateSequenceList.isEmpty() ? null : federateSequenceList.get(federateSequenceList.size() - 1);
+    }
+
+    public String getSourceFederateId() {
+        return get_source_federate_id(this);
+    }
+
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
+    // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
     @Override
     public void sendInteraction( RTIambassador rti, double time ) throws Exception {
-        if (  get_sourceFed() == null || "".equals( get_sourceFed() ) || get_originFed() == null || "".equals( get_originFed() )  ) {
-            throw new Exception( "source and/or origin federate not specified." );
+
+        if (  !is_federate_sequence( get_federateSequence() )  ) {
+            throw new Exception(
+                "federateSequence parameter is invalid: must contain sequence " +
+                "of federate-ids of federates that have handled this interaction."
+            );
         }
         super.sendInteraction( rti, time );
     }
 
-    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCE OF C2WInteractionRoot
-    // SHOULD HAVE NON-EMPTY VALUES FOR THEIR originFed AND sourceFed PARAMETERS.
+    // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
+    // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
     @Override
     public void sendInteraction( RTIambassador rti ) throws Exception {
-        if (  get_sourceFed() == null || "".equals( get_sourceFed() ) || get_originFed() == null || "".equals( get_originFed() )  ) {
-            throw new Exception( "source and/or origin federate not specified." );
+
+        if (  !is_federate_sequence( get_federateSequence() )  ) {
+            throw new Exception(
+                "federateSequence parameter is invalid: must contain sequence " +
+                "of federate-ids of federates that have handled this interaction."
+            );
         }
         super.sendInteraction( rti );
     }

@@ -185,11 +185,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
         ));
 
 

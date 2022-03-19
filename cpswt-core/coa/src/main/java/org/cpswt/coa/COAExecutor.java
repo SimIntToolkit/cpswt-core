@@ -49,6 +49,7 @@ import org.cpswt.coa.node.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import org.cpswt.hla.InteractionRoot;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import org.portico.impl.hla13.types.DoubleTime;
 
@@ -145,8 +146,8 @@ public class COAExecutor {
 
 
         // It is not a SimEnd interaction, send normally
-        interactionRoot.setParameter("sourceFed", this.federateId);
-        interactionRoot.setParameter("originFed", this.federateId);
+
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, this.federateId);
         Map<String, String> nameValueParamPairs = nodeAction.getNameValueParamPairs();
         for (String paramName : nameValueParamPairs.keySet()) {
             String paramValue = nameValueParamPairs.get(paramName);
@@ -158,6 +159,7 @@ public class COAExecutor {
 
         // Send the interaction
         try {
+            C2WInteractionRoot.update_federate_sequence(interactionRoot, this.federateId);
             interactionRoot.sendInteraction(this.rti, tmin);
             logger.info("Successfully sent interaction '{}' at time '{}'", interactionClassName, tmin);
         } catch (Exception e) {

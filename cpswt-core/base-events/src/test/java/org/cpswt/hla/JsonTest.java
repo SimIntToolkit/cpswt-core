@@ -32,6 +32,7 @@
 
 package org.cpswt.hla;
 
+import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
 import static org.mockito.Mockito.*;
@@ -71,8 +72,10 @@ public class JsonTest {
     public void interactionJsonTest() {
 
         SimEnd simEnd1 = new SimEnd();
-        simEnd1.set_originFed("Federate1");
-        simEnd1.set_sourceFed("Federate2");
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put("Federate1");
+        jsonArray.put("Federate2");
+        simEnd1.set_federateSequence(jsonArray.toString());
         simEnd1.set_actualLogicalGenerationTime(5.0);
         simEnd1.set_federateFilter("Filter1");
 
@@ -80,8 +83,7 @@ public class JsonTest {
 
         SimEnd simEnd2 = (SimEnd)InteractionRoot.fromJson(jsonString);
 
-        Assert.assertEquals(simEnd1.get_originFed(), simEnd2.get_originFed());
-        Assert.assertEquals(simEnd1.get_sourceFed(), simEnd2.get_sourceFed());
+        Assert.assertEquals(simEnd1.get_federateSequence(), simEnd2.get_federateSequence());
         Assert.assertEquals(simEnd1.get_actualLogicalGenerationTime(), simEnd2.get_actualLogicalGenerationTime(), 0.01);
         Assert.assertEquals(simEnd1.get_federateFilter(), simEnd2.get_federateFilter());
     }

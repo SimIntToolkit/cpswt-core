@@ -197,11 +197,7 @@ public class LowPrio extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "originFed"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot", "sourceFed"
+            "InteractionRoot.C2WInteractionRoot", "federateSequence"
         ));
 
 
