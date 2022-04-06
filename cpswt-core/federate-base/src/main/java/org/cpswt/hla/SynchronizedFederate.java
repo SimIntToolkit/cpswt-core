@@ -329,13 +329,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction( InteractionRoot interactionRoot, double time ) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateId());
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
         interactionRoot.sendInteraction(getLRC(), time);
 
     }
 
     public void sendInteraction(InteractionRoot interactionRoot) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateId());
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
         interactionRoot.sendInteraction(getLRC());
     }
 
