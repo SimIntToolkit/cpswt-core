@@ -26,8 +26,6 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Harmon Nine
  */
 
 package org.cpswt.hla;
@@ -108,8 +106,6 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * {@link AdvanceTimeRequest#requestSyncStart()}, {@link AdvanceTimeRequest#requestSyncEnd()},
  * {@link #startAdvanceTimeThread()} )</li>
  * </ul>
- *
- * @author Harmon Nine
  */
 public class SynchronizedFederate extends NullFederateAmbassador {
     private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);

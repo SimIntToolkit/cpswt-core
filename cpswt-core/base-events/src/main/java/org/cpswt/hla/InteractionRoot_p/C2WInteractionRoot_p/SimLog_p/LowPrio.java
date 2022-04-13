@@ -1,4 +1,3 @@
-
 /*
  * Certain portions of this software are Copyright (C) 2006-present
  * Vanderbilt University, Institute for Software Integrated Systems.
@@ -27,11 +26,7 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Himanshu Neema
- * @author Harmon Nine
  */
-
 
 package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p;
 

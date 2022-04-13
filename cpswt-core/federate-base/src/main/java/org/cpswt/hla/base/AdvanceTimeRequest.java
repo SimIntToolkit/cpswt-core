@@ -26,8 +26,6 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Himanshu Neema
  */
 
 package org.cpswt.hla.base;
@@ -40,8 +38,6 @@ package org.cpswt.hla.base;
  * from advancing the time any further until the federate thread has completed
  * its processing for this time.
  * See {@link AdvanceTimeThread}.
- *
- * @author Harmon Nine
  */
 public class AdvanceTimeRequest {
     private static Object object = new Object();

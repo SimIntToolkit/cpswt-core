@@ -26,8 +26,6 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Himanshu Neema
  */
 
 package org.cpswt.hla.base;
@@ -60,8 +58,6 @@ import org.portico.impl.hla13.types.DoubleTime;
  * on this ObjectReflector to apply the attribute reflections for the object
  * class instance it contains, and then calls {@link ObjectReflector#getObjectRoot()}
  * to retrieve this instance.
- *
- * @author Harmon Nine
  */
 public class ObjectReflector {
     private int objectHandle;

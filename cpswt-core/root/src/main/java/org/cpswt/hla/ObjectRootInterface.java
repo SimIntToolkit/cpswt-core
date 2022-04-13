@@ -1,4 +1,3 @@
-
 /*
  * Certain portions of this software are Copyright (C) 2006-present
  * Vanderbilt University, Institute for Software Integrated Systems.

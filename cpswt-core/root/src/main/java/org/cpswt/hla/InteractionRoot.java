@@ -1,7 +1,3 @@
-
-/* THIS IS THE ROOT CLASS OF EITHER THE INTERACTION OR OBJECT-CLASS HIERARCHY
-(i.e. "InteractionRoot" OR "ObjectRoot") */
-
 /*
  * Certain portions of this software are Copyright (C) 2006-present
  * Vanderbilt University, Institute for Software Integrated Systems.
@@ -30,10 +26,11 @@
  * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
- *
- * @author Himanshu Neema
- * @author Harmon Nine
  */
+
+/* THIS IS THE ROOT CLASS OF EITHER THE INTERACTION OR OBJECT-CLASS HIERARCHY
+(i.e. "InteractionRoot" OR "ObjectRoot") */
+
 package org.cpswt.hla;
 
 import hla.rti.*;
