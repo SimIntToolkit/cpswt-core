@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for package in root base-events coa config federate-base federation-manager fedmanager-host; do
+for package in utils root base-events coa config federate-base federation-manager fedmanager-host; do
 
     echo "PLEASE REMOVE THE FOLLOWING PACKAGE FROM YOUR MAVEN REPOSITORY:"
     echo
