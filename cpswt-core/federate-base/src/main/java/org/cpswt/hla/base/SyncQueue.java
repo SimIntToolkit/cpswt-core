@@ -30,11 +30,9 @@
 
 package org.cpswt.hla.base;
 
-/**
+/*
  * Synchronous Queue class that the AdvanceTimeThread uses to synchronize
  * itself with the threads of the federate that are interacting with the RTI.
- *
- * @author Harmon Nine
  */
 import java.util.concurrent.SynchronousQueue;
 

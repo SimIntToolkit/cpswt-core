@@ -33,8 +33,6 @@ package org.cpswt.util;
 /**
  * Some utility methods for double numbers. Comparisons done up to fourth
  * decimal place.
- * 
- * @author Himanshu Neema
  */
 public class DoubleUtil {
 

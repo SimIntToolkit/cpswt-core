@@ -36,8 +36,6 @@ import javax.swing.filechooser.FileFilter;
 
 /**
  * A file filter for JFileChooser to open only XML files.
- * 
- * @author Himanshu Neema
  */
 public class XmlFileFilter
         extends FileFilter {

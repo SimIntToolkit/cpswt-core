@@ -100,8 +100,6 @@ import org.portico.impl.hla13.types.DoubleTime;
  * atr = new_atr;
  * }
  * --------
- *
- * @author Harmon Nine
  */
 public class AdvanceTimeThread extends Thread {
     private static final Logger logger = LogManager.getLogger(AdvanceTimeThread.class);

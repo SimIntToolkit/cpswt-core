@@ -36,8 +36,6 @@ import org.cpswt.hla.InteractionRoot;
  * Stores last arrived interaction in the Federation Manager and is used by
  * OutcomeFilters of sequence model orchestrator to check the last arrived
  * interaction of the Outcome it filters.
- *
- * @author Himanshu Neema
  */
 public class ArrivedInteraction {
     private InteractionRoot _ir;

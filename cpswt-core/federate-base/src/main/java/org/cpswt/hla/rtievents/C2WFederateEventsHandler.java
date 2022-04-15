@@ -37,8 +37,6 @@ import org.apache.logging.log4j.Logger;
  * Basic handler for federate events.
  * Does nothing about the received events.
  * Can be overriden by users as required.
- * 
- * @author Himanshu Neema
  */
 public class C2WFederateEventsHandler implements IC2WFederateEventsHandler {
     private static final Logger logger = LogManager.getLogger(C2WFederateEventsHandler.class);

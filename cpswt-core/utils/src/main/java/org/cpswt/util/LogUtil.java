@@ -35,8 +35,6 @@ import java.io.PrintStream;
 /**
  * Small utility for logging to a file and to standard out -- can be turned
  * ON/OFF individually.
- * 
- * @author Himanshu Neema
  */
 public class LogUtil {
 

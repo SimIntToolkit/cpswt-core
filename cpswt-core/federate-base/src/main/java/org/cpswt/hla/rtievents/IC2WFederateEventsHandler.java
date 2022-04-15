@@ -32,8 +32,6 @@ package org.cpswt.hla.rtievents;
 
 /**
  * Very simple interface to register a handler for federate events.
- * 
- * @author Himanshu Neema
  */
 public interface IC2WFederateEventsHandler {
 	

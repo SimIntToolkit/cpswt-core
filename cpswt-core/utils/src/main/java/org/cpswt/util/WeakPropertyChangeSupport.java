@@ -44,8 +44,6 @@ import java.util.logging.Logger;
  * A replacement for
  * {@link java.beans.PropertyChangeSupport PropertyChangeSupport} for using weak
  * references to listeners in order to avoid memory leaks.
- * 
- * @author Himanshu Neema
  */
 public class WeakPropertyChangeSupport {
     private static Logger log = Logger
