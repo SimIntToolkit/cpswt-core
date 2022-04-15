@@ -1,31 +1,49 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- * 
- * @author Harmon Nine
- * 
-*/
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
 
 package org.cpswt.hla;
 
 import hla.rti.*;
-import org.cpswt.hla.base.*;
+import org.cpswt.hla.base.AdvanceTimeRequest;
+import org.cpswt.hla.base.AdvanceTimeThread;
+import org.cpswt.hla.base.ATRComparator;
+import org.cpswt.hla.base.ATRQueue;
+import org.cpswt.hla.base.ObjectReflector;
+import org.cpswt.hla.base.ObjectReflectorComparator;
+import org.cpswt.hla.base.TimeAdvanceMode;
+import org.cpswt.hla.InteractionRoot;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import org.cpswt.hla.ObjectRoot;
 import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
@@ -33,6 +51,7 @@ import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -87,8 +106,6 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * {@link AdvanceTimeRequest#requestSyncStart()}, {@link AdvanceTimeRequest#requestSyncEnd()},
  * {@link #startAdvanceTimeThread()} )</li>
  * </ul>
- *
- * @author Harmon Nine
  */
 public class SynchronizedFederate extends NullFederateAmbassador {
     private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);
@@ -98,11 +115,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * Local RTI component. This is where you submit the "requests"
      * to the RTIExec process that manages the whole federation.
      */
-    protected RTIambassador lrc;
+    protected RTIambassador lrc = null;
 
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
 
-    private Set<String> _achievedSynchronizationPoints = new HashSet<String>();
+    private final Set<String> _achievedSynchronizationPoints = new HashSet<>();
 
     private boolean _timeConstrainedNotEnabled = true;
     private boolean _timeRegulationNotEnabled = true;
@@ -136,6 +153,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public boolean isLateJoiner() { return this.isLateJoiner; }
 
     private double stepSize;
+
+    private String federationJsonFileName = null;
+    private String federateDynamicMessagingJsonFileName = null;
     public double getStepSize() { return this.stepSize; }
     private void setStepSize(double stepSize) { this.stepSize = stepSize; }
 
@@ -146,6 +166,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.isLateJoiner = federateConfig.isLateJoiner;
         this.lookAhead = federateConfig.lookAhead;
         this.stepSize = federateConfig.stepSize;
+        this.federationJsonFileName = federateConfig.federationJsonFileName;
+        this.federateDynamicMessagingJsonFileName = federateConfig.federateDynamicMessagingJsonFileName;
 
         if(federateConfig.name == null || federateConfig.name.isEmpty()) {
             this.federateId = FederateIdUtility.generateID(this.federateType);
@@ -216,13 +238,42 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void createLRC() throws RTIinternalError {
-
-        logger.debug("Federate {} acquiring connection to RTI ...", this.federateId);
-        RtiFactory factory = RtiFactoryFactory.getRtiFactory();
-        this.lrc = factory.createRtiAmbassador();
-        logger.debug("Federate {} connection to RTI successful.", this.federateId);
+        if (this.lrc == null) {
+            logger.debug("Federate {} acquiring connection to RTI ...", this.federateId);
+            RtiFactory factory = RtiFactoryFactory.getRtiFactory();
+            this.lrc = factory.createRtiAmbassador();
+            logger.debug("Federate {} connection to RTI successful.", this.federateId);
+        }
     }
 
+    public void initializeMessaging() {
+        InteractionRoot.init(getLRC());
+        ObjectRoot.init(getLRC());
+    }
+
+    public void initializeDynamicMessaging(File federationJsonFile, File federateDynamicMessagingClassesJsonFile) {
+        InteractionRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
+        ObjectRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
+        initializeMessaging();
+    }
+
+    public void initializeDynamicMessaging(
+            String federationJsonFileName, String federateDynamicMessagingClassesJsonFileName
+    ) {
+        if (
+                federationJsonFileName == null ||
+                        federationJsonFileName.isEmpty() ||
+                        federateDynamicMessagingClassesJsonFileName == null ||
+                        federateDynamicMessagingClassesJsonFileName.isEmpty()
+        ) {
+            initializeMessaging();
+            return;
+        }
+        initializeDynamicMessaging(
+                new File(federationJsonFileName),
+                new File(federateDynamicMessagingClassesJsonFileName)
+        );
+    }
     /**
      * Dissociate from the RTI.  This sets the handle to the RTI acquired via
      * {@link #createLRC} to null.  Thus, {@link #getLRC()} returns null after
@@ -264,29 +315,42 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
         }
 
+        initializeDynamicMessaging(federationJsonFileName, federateDynamicMessagingJsonFileName);
+
         this.ensureSimEndSubscription();
 
         this.notifyFederationOfJoin();
+
+
+    }
+
+    public void sendInteraction( InteractionRoot interactionRoot, double time ) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
+        interactionRoot.sendInteraction(getLRC(), time);
+
+    }
+
+    public void sendInteraction(InteractionRoot interactionRoot) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
+        interactionRoot.sendInteraction(getLRC());
     }
 
     public void notifyFederationOfJoin() {
         synchronized (this.lrc) {
             // every federate will send a "FederateJoinInteraction" and a "FederateResignInteraction"
             // so we need to publish these objects on current LRC
-            FederateJoinInteraction.publish(this.lrc);
-            FederateResignInteraction.publish(this.lrc);
+            FederateJoinInteraction.publish_interaction(this.lrc);
+            FederateResignInteraction.publish_interaction(this.lrc);
 
             // create a notification for "join" and send it
             FederateJoinInteraction joinInteraction = new FederateJoinInteraction();
-            joinInteraction.set_sourceFed(this.federateId);
-            joinInteraction.set_originFed(this.federateId);
             joinInteraction.set_FederateId(this.federateId);
             joinInteraction.set_FederateType(this.federateType);
             joinInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateJoinInteraction for federate {}", this.federateId);
-                joinInteraction.sendInteraction(this.lrc);
+                sendInteraction(joinInteraction);
             }
             catch (Exception ex) {
                 logger.error("Error while sending FederateJoinInteraction for federate {}", this.federateId);
@@ -297,15 +361,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void notifyFederationOfResign() {
         synchronized (this.lrc) {
             FederateResignInteraction resignInteraction = new FederateResignInteraction();
-            resignInteraction.set_sourceFed(this.federateId);
-            resignInteraction.set_originFed(this.federateId);
             resignInteraction.set_FederateId(this.federateId);
             resignInteraction.set_FederateType(this.federateType);
             resignInteraction.set_IsLateJoiner(this.isLateJoiner);
 
             try {
                 logger.trace("Sending FederateResignInteraction for federate {}", this.federateId);
-                resignInteraction.sendInteraction(this.lrc);
+                sendInteraction(resignInteraction);
             }
             catch(Exception ex) {
                 logger.error("Error while sending FederateResignInteraction for federate {}", this.federateId);
@@ -485,7 +547,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (_simEndNotSubscribed) {
             // Auto-subscribing also ensures that there is no filter set for SimEnd
-            SimEnd.subscribe(getLRC());
+            SimEnd.subscribe_interaction(getLRC());
             _simEndNotSubscribed = false;
         }
     }
@@ -1039,7 +1101,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     protected void enteredTimeGrantedState() {
         if(_receivedSimEnd != null) {
-            handleIfSimEnd(SimEnd.get_handle(), _receivedSimEnd, null);
+            handleIfSimEnd(SimEnd.get_class_handle(), _receivedSimEnd, null);
         }
     }
 
