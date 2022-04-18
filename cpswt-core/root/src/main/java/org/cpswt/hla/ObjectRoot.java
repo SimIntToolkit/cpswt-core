@@ -236,6 +236,15 @@ public class ObjectRoot implements ObjectRootInterface {
         return _instanceHlaClassName;
     }
 
+    public boolean isInstanceOfHlaClass( String hlaClassName ) {
+        return getInstanceHlaClassName().equals( hlaClassName );
+    }
+
+    public boolean isInstanceHlaClassDerivedFromHlaClass( String hlaClassName ) {
+        String prefix = hlaClassName + ".";
+        return isInstanceOfHlaClass( hlaClassName ) || getInstanceHlaClassName().startsWith( prefix );
+    }
+
     protected void setInstanceHlaClassName(String instanceHlaClassName) {
         _instanceHlaClassName = instanceHlaClassName;
     }
