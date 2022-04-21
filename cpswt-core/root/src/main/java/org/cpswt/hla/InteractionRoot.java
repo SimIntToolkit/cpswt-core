@@ -672,8 +672,17 @@ public class InteractionRoot implements InteractionRootInterface {
         SuppliedParameters suppliedParameters = _rtiFactory.createSuppliedParameters();
         for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameValueMap.keySet()) {
             int handle = _classAndPropertyNameHandleMap.get(classAndPropertyName);
-            byte[] value = classAndPropertyNameValueMap.get(classAndPropertyName).toString().getBytes();
-            suppliedParameters.add(handle, value);
+            Object value = classAndPropertyNameValueMap.get(classAndPropertyName);
+            String stringValue;
+            if (value instanceof Boolean) {
+                stringValue = (Boolean)value ? "1" : "0";
+            } else if (value instanceof Character) {
+                stringValue = String.valueOf((short) ((Character) value).charValue());
+            } else {
+                stringValue = value.toString();
+            }
+            byte[] byteArrayValue = stringValue.getBytes();
+            suppliedParameters.add(handle, byteArrayValue);
         }
         return suppliedParameters;
     }
@@ -956,30 +965,52 @@ public class InteractionRoot implements InteractionRootInterface {
 
         // IF value IS A STRING, AND THE TYPE OF THE PARAMETER IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
-        if (value instanceof String && (currentValue instanceof Number || currentValue instanceof Boolean)) {
-            Method method;
-            try {
-                method = currentValue.getClass().getMethod("valueOf", String.class);
-            } catch (NoSuchMethodException noSuchMethodException) {
-                logger.error(
-                  "setParameter(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
-                  "method of \"Number\" object: cannot set value!",
-                  propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
-                );
-                return;
-            }
+        if (value instanceof String) {
+
+            String stringValue = ((String)value).toLowerCase();
             Object newValue = null;
-            try {
-                // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
-                String intermediateValue = (String)value;
-                if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
-                    int dotPosition = intermediateValue.indexOf(".");
-                    if (dotPosition > 0) {
-                        intermediateValue = intermediateValue.substring(0, dotPosition);
-                    }
+
+            if (currentValue instanceof Number) {
+                Method method;
+                try {
+                    method = currentValue.getClass().getMethod("valueOf", String.class);
+                } catch (NoSuchMethodException noSuchMethodException) {
+                    logger.error(
+                            "setParameter(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
+                                    "method of \"Number\" object: cannot set value!",
+                            propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
+                    );
+                    return;
                 }
-                newValue = method.invoke(null, intermediateValue);
-            } catch(Exception e) { }
+                try {
+                    // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
+                    if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
+                        int dotPosition = stringValue.indexOf(".");
+                        if (dotPosition > 0) {
+                            stringValue = stringValue.substring(0, dotPosition);
+                        }
+                        int ePosition = stringValue.indexOf("e");
+                        if (ePosition > 0) {
+                            stringValue = stringValue.substring(0, ePosition);
+                        }
+                    }
+                    newValue = method.invoke(null, stringValue);
+                } catch (Exception e) { }
+
+            } else if (currentValue instanceof Character) {
+                try {
+                    newValue = (char)Short.valueOf(stringValue).shortValue();
+                } catch (Exception e) { }
+
+            } else if (currentValue instanceof Boolean) {
+                try {
+                    newValue = Double.parseDouble(stringValue) != 0;
+                } catch (Exception e) { }
+
+                if (newValue == null) {
+                    newValue = Boolean.valueOf(stringValue);
+                }
+            }
 
             if (newValue != null) {
                 value = newValue;

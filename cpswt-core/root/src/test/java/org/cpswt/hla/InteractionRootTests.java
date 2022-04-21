@@ -109,6 +109,14 @@ public class InteractionRootTests {
                     "             \"field5\": {\n" +
                     "                 \"Hidden\": false,\n" +
                     "                 \"ParameterType\": \"double\"\n" +
+                    "             },\n" +
+                    "             \"field6\": {\n" +
+                    "                 \"Hidden\": false,\n" +
+                    "                 \"ParameterType\": \"byte\"\n" +
+                    "             },\n" +
+                    "             \"field7\": {\n" +
+                    "                 \"Hidden\": false,\n" +
+                    "                 \"ParameterType\": \"char\"\n" +
                     "             }\n" +
                     "        },\n" +
                     "        \"InteractionRoot.OtherClass\": {\n" +
@@ -205,6 +213,10 @@ public class InteractionRootTests {
         testDerived.setParameter("field4", 10L);
         testDerived.setParameter("field5", 3.14);
 
+        // TEST ASSIGNMENT VIA STRING TO Byte AND Char FIELDS
+        testDerived.setParameter("field6", "-17");
+        testDerived.setParameter("field7", 'Q');
+
         Assert.assertTrue(testBase.isDynamicInstance());
         Assert.assertEquals("value1", testBase.getParameter("field1"));
         Assert.assertEquals(5, testBase.getParameter("field2"));
@@ -215,6 +227,8 @@ public class InteractionRootTests {
         Assert.assertTrue((Boolean)testDerived.getParameter("field3"));
         Assert.assertEquals(10L, testDerived.getParameter("field4"));
         Assert.assertEquals(3.14, testDerived.getParameter("field5"));
+        Assert.assertEquals((byte)-17, testDerived.getParameter("field6"));
+        Assert.assertEquals('Q', testDerived.getParameter("field7"));
     }
 
     @Test
