@@ -435,4 +435,41 @@ public class MessagingTests {
         Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
         Assert.assertEquals(doubleValue4, simLogInteraction.get_Time(), 0.01);
     }
+
+    @Test
+    public void messagingInstanceHlaClassTest() {
+        InteractionRoot interactionRoot = new InteractionRoot(
+                "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio"
+        );
+
+        Assert.assertTrue( interactionRoot.isInstanceOfHlaClass(
+                "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio"
+        ));
+        Assert.assertTrue( interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+                "InteractionRoot.C2WInteractionRoot.Simlog.HighPrio"
+        ));
+        Assert.assertTrue( interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+                "InteractionRoot.C2WInteractionRoot.Simlog"
+        ));
+
+        Assert.assertFalse( interactionRoot.isInstanceOfHlaClass(
+                "InteractionRoot.C2WInteractionRoot.Simlog"
+        ));
+        Assert.assertFalse( interactionRoot.isInstanceHlaClassDerivedFromHlaClass(
+                "InteractionRoot.C2WInteractionRoot.SimulationControl"
+        ));
+
+        ObjectRoot objectRoot = new ObjectRoot();
+
+        Assert.assertTrue( objectRoot.isInstanceOfHlaClass("ObjectRoot"));
+        Assert.assertTrue( objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
+        Assert.assertFalse( objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
+        Assert.assertFalse( objectRoot.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+
+        ObjectRoot federateObject = new ObjectRoot("ObjectRoot.FederateObject");
+        Assert.assertFalse( federateObject.isInstanceOfHlaClass("ObjectRoot"));
+        Assert.assertTrue( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
+        Assert.assertTrue( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
+        Assert.assertTrue( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+    }
 }

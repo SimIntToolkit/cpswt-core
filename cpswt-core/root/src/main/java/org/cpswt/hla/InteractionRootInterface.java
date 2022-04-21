@@ -29,6 +29,7 @@
  */
 
 package org.cpswt.hla;
+
 import java.util.*;
 import hla.rti.*;
 
