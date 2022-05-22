@@ -305,7 +305,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         @Override
         public String toString() {
-            return _value.toString();
+            return _value instanceof Character ? String.valueOf((short)((Character)_value).charValue()) : _value.toString();
         }
     }
 
@@ -921,11 +921,21 @@ public class ObjectRoot implements ObjectRootInterface {
 
         for(ClassAndPropertyName key: _classNamePublishedAttributeNameSetMap.get(getInstanceHlaClassName())) {
             int handle = _classAndPropertyNameHandleMap.get(key);
-            Attribute<?> value = (Attribute<?>)classAndPropertyNameValueMap.get(key);
-            if (value.shouldBeUpdated(force)) {
-                suppliedAttributes.add(handle, value.toString().getBytes() );
+            Attribute<?> attribute = (Attribute<?>)classAndPropertyNameValueMap.get(key);
+            if (attribute.shouldBeUpdated(force)) {
+                Object value = attribute.getValue();
+                String stringValue;
+                if (value instanceof Boolean) {
+                    stringValue = (Boolean)value ? "1" : "0";
+                } else if (value instanceof Character) {
+                    stringValue = String.valueOf((short) ((Character) value).charValue());
+                } else {
+                    stringValue = value.toString();
+                }
+                byte[] byteArrayValue = stringValue.getBytes();
+                suppliedAttributes.add(handle, byteArrayValue );
+                attribute.setHasBeenUpdated();
             }
-            value.setHasBeenUpdated();
         }
 
         return suppliedAttributes;
@@ -1596,30 +1606,52 @@ public class ObjectRoot implements ObjectRootInterface {
 
         // IF value IS A STRING, AND THE TYPE OF THE ATTRIBUTE IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
-        if (value instanceof String && (currentValue instanceof Number || currentValue instanceof Boolean)) {
-            Method method;
-            try {
-                method = currentValue.getClass().getMethod("valueOf", String.class);
-            } catch (NoSuchMethodException noSuchMethodException) {
-                logger.error(
-                  "setAttribute(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
-                  "method of \"Number\" object: cannot set value!",
-                  propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
-                );
-                return;
-            }
+        if (value instanceof String) {
+
+            String stringValue = ((String)value).toLowerCase();
             Object newValue = null;
-            try {
-                // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
-                String intermediateValue = (String)value;
-                if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
-                    int dotPosition = intermediateValue.indexOf(".");
-                    if (dotPosition > 0) {
-                        intermediateValue = intermediateValue.substring(0, dotPosition);
-                    }
+
+            if (currentValue instanceof Number) {
+                Method method;
+                try {
+                    method = currentValue.getClass().getMethod("valueOf", String.class);
+                } catch (NoSuchMethodException noSuchMethodException) {
+                    logger.error(
+                            "setParameter(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
+                                    "method of \"Number\" object: cannot set value!",
+                            propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
+                    );
+                    return;
                 }
-                newValue = method.invoke(null, intermediateValue);
-            } catch(Exception e) { }
+                try {
+                    // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
+                    if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
+                        int dotPosition = stringValue.indexOf(".");
+                        if (dotPosition > 0) {
+                            stringValue = stringValue.substring(0, dotPosition);
+                        }
+                        int ePosition = stringValue.indexOf("e");
+                        if (ePosition > 0) {
+                            stringValue = stringValue.substring(0, ePosition);
+                        }
+                    }
+                    newValue = method.invoke(null, stringValue);
+                } catch (Exception e) { }
+
+            } else if (currentValue instanceof Character) {
+                try {
+                    newValue = (char)Short.valueOf(stringValue).shortValue();
+                } catch (Exception e) { }
+
+            } else if (currentValue instanceof Boolean) {
+                try {
+                    newValue = Double.parseDouble(stringValue) != 0;
+                } catch (Exception e) { }
+
+                if (newValue == null) {
+                    newValue = Boolean.valueOf(stringValue);
+                }
+            }
 
             if (newValue != null) {
                 value = newValue;
