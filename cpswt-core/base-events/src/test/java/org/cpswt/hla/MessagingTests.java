@@ -34,7 +34,6 @@ import hla.rti.*;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
-import static org.mockito.Mockito.*;
 
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog;
@@ -46,234 +45,15 @@ import static org.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
 
 import org.cpswt.hla.ObjectRoot_p.FederateObject;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.portico.impl.hla13.types.DoubleTime;
 
 import java.util.*;
 
 
 public class MessagingTests {
 
-    static class ReflectedAttributeImpl implements ReflectedAttributes {
-
-        private final SuppliedAttributes _suppliedAttributes;
-
-        public ReflectedAttributeImpl(SuppliedAttributes suppliedAttributes) {
-            _suppliedAttributes = suppliedAttributes;
-        }
-
-        public int getAttributeHandle(int offset) throws ArrayIndexOutOfBounds {
-            return _suppliedAttributes.getHandle(offset);
-        }
-
-        public int getOrderType(int offset) throws ArrayIndexOutOfBounds {
-            return 0; // DUMMY VALUE -- NOT USED
-        }
-
-        public Region getRegion(int offset) throws ArrayIndexOutOfBounds {
-            return null; // DUMMY VALUE -- NOT USED
-        }
-
-        public int getTransportType(int offset) throws ArrayIndexOutOfBounds {
-            return 0; // DUMMY VALUE -=- NOT USED
-        }
-
-        public byte[] getValue(int offset) throws ArrayIndexOutOfBounds {
-            return  _suppliedAttributes.getValue(offset);
-        }
-
-        public int getValueLength(int offset) throws ArrayIndexOutOfBounds {
-            return _suppliedAttributes.getValueLength(offset);
-        }
-
-        public byte[] getValueReference(int offset) throws ArrayIndexOutOfBounds {
-            return _suppliedAttributes.getValueReference(offset);
-        }
-
-        public int size() {
-            return _suppliedAttributes.size();
-        }
-    }
-
-    static class EventRetractionHandleImpl implements EventRetractionHandle { }
-
-    static HashMap<String, Integer> interactionClassNameHandleMap = new HashMap<>();
+    private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
+    private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
     static {
-        int value = 0;
-        interactionClassNameHandleMap.put("InteractionRoot", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd", value);
-    }
-
-    static HashMap<String, Integer> objectClassNameHandleMap = new HashMap<>();
-    static {
-        int value = 0;
-        objectClassNameHandleMap.put("ObjectRoot", value++);
-        objectClassNameHandleMap.put("ObjectRoot.FederateObject", value);
-    }
-
-    static HashMap<ClassAndPropertyName, Integer> interactionClassAndPropertyNameHandleMap = new HashMap<>();
-    static HashMap<ObjectRootInterface.ClassAndPropertyName, Integer> objectClassAndPropertyNameHandleMap =
-            new HashMap<>();
-    static RTIambassador rtiambassador;
-
-    static int currentClassHandle = 0;
-    static void setCurrentClassHandle(int classHandle) {
-        currentClassHandle = classHandle;
-    }
-    static int getCurrentClassHandle() {
-        return currentClassHandle;
-    }
-
-    static int uniqueObjectHandle = 0;
-    static int currentObjectHandle = 0;
-    static void setCurrentObjectHandle(int objectHandle) {
-        currentObjectHandle = objectHandle;
-    }
-    static void setCurrentObjectHandle() {
-        currentObjectHandle = uniqueObjectHandle++;
-    }
-    static int getCurrentObjectHandle() {
-        return currentObjectHandle;
-    }
-
-    static SuppliedAttributes currentSuppliedAttributes = null;
-    static void setCurrentSuppliedAttributes(SuppliedAttributes suppliedAttributes) {
-        currentSuppliedAttributes = suppliedAttributes;
-    }
-    static SuppliedAttributes getCurrentSuppliedAttributes() {
-        return currentSuppliedAttributes;
-    }
-
-    static ReflectedAttributes getCurrentReflectedAttributes() {
-        return new ReflectedAttributeImpl(getCurrentSuppliedAttributes());
-    }
-
-    static LogicalTime currentLogicalTime = null;
-    static void setCurrentLogicalTime(LogicalTime logicalTime) {
-        currentLogicalTime = logicalTime;
-    }
-    static LogicalTime getCurrentLogicalTime() {
-        return currentLogicalTime;
-    }
-    static DoubleTime getCurrentDoubleTime() {
-        LogicalTime logicalTime = getCurrentLogicalTime();
-        return logicalTime instanceof DoubleTime ? (DoubleTime)logicalTime : null;
-    }
-
-    static {
-        int value = 0;
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateFilter"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Comment"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "Time"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateId"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "FederateType"),
-                value++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"),
-                value++
-        );
-        objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle"), value++
-        );
-        objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"), value++
-        );
-        objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType"), value
-        );
-
-        rtiambassador = mock(RTIambassador.class);
-        try {
-            when(rtiambassador.getInteractionClassHandle(anyString())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) ->
-                            interactionClassNameHandleMap.get((String)invocationOnMock.getArgument(0))
-            );
-            when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) -> {
-                        String parameterName = invocationOnMock.getArgument(0);
-                        int classHandle = invocationOnMock.getArgument(1);
-                        String className = InteractionRoot.get_hla_class_name(classHandle);
-                        ClassAndPropertyName key = new ClassAndPropertyName(className, parameterName);
-                        return interactionClassAndPropertyNameHandleMap.get(key);
-                    }
-            );
-            when(rtiambassador.getAttributeHandle(anyString(), anyInt())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) -> {
-                        String attributeName = invocationOnMock.getArgument(0);
-                        int classHandle = invocationOnMock.getArgument(1);
-                        String className = ObjectRoot.get_hla_class_name(classHandle);
-                        ObjectRootInterface.ClassAndPropertyName key =
-                                new ObjectRootInterface.ClassAndPropertyName(className, attributeName);
-                        return objectClassAndPropertyNameHandleMap.get(key);
-                    }
-            );
-            when(rtiambassador.registerObjectInstance(anyInt())).thenAnswer(
-                    (InvocationOnMock invocationOnMock) -> {
-                        int classHandle = invocationOnMock.getArgument(0);
-                        setCurrentClassHandle(classHandle);
-                        setCurrentObjectHandle();
-                        return getCurrentClassHandle();
-                    }
-            );
-            when(rtiambassador.updateAttributeValues(
-                    anyInt(), any(SuppliedAttributes.class), nullable(byte[].class), any(LogicalTime.class)
-            )).thenAnswer(
-                    (InvocationOnMock invocationMock) -> {
-                        int objectHandle = invocationMock.getArgument(0);
-                        SuppliedAttributes suppliedAttributes = invocationMock.getArgument(1);
-                        LogicalTime logicalTime = invocationMock.getArgument(3);
-
-                        setCurrentObjectHandle(objectHandle);
-                        setCurrentSuppliedAttributes(suppliedAttributes);
-                        setCurrentLogicalTime(logicalTime);
-
-                        return new EventRetractionHandleImpl(); // DUMMY EventRestractionHandle
-                    }
-            );
-        } catch(Exception e) {}
-
         HighPrio.load();
         SimEnd.load();
         FederateObject.load();
@@ -296,8 +76,6 @@ public class MessagingTests {
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
 
 
-        new FederateObject();
-
         Set<String> expectedObjectClassNameSet = new HashSet<>();
         expectedObjectClassNameSet.add("ObjectRoot");
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
@@ -309,47 +87,47 @@ public class MessagingTests {
     @Test
     public void classHandleTest() {
 
-        Assert.assertEquals((int) interactionClassNameHandleMap.get("InteractionRoot"), InteractionRoot.get_class_handle());
+        Assert.assertEquals((int) mock.getInteractionClassNameHandleMap().get("InteractionRoot"), InteractionRoot.get_class_handle());
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot"), C2WInteractionRoot.get_class_handle()
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot"), C2WInteractionRoot.get_class_handle()
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimLog"), SimLog.get_class_handle()
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog"), SimLog.get_class_handle()
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
                 HighPrio.get_class_handle()
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
                 SimulationControl.get_class_handle()
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
                 SimEnd.get_class_handle()
         );
 
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot"),
                 InteractionRoot.get_class_handle("InteractionRoot"));
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot"),
                 C2WInteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot")
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimLog"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog"),
                 SimLog.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog")
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
                 HighPrio.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
                 SimulationControl.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl")
         );
         Assert.assertEquals(
-                (int) interactionClassNameHandleMap.get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
+                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
                 SimEnd.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
         );
     }
@@ -472,19 +250,19 @@ public class MessagingTests {
     @Test
     public void propertyHandleTest() {
 
-        int expectedValue = interactionClassAndPropertyNameHandleMap.get(
+        int expectedValue = mock.getInteractionClassAndPropertyNameHandleMap().get(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"));
 
         Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("federateSequence"));
         Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("federateSequence"));
         Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("federateSequence"));
 
-        expectedValue = interactionClassAndPropertyNameHandleMap.get(
+        expectedValue = mock.getInteractionClassAndPropertyNameHandleMap().get(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
         Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
         Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
 
-        expectedValue = objectClassAndPropertyNameHandleMap.get(
+        expectedValue = mock.getObjectClassAndPropertyNameHandleMap().get(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));
         Assert.assertEquals(expectedValue, FederateObject.get_attribute_handle("FederateHost"));
     }
@@ -593,6 +371,9 @@ public class MessagingTests {
 
     @Test
     public void objectTest1() {
+//        // make the rtiambassador here
+//        RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
+//        RTIambassador rtiambassador = mock.getRTIAmbassador();
         // MAKE SURE ATTRIBUTES ARE PUBLISHED
         FederateObject.publish_FederateHandle_attribute();
         FederateObject.publish_FederateHost_attribute();
@@ -609,11 +390,11 @@ public class MessagingTests {
         federateObject1.registerObject(rtiambassador);
 
         // CHECK MOST RTI VALUES
-        Assert.assertEquals(0, getCurrentObjectHandle());
-        Assert.assertEquals(FederateObject.get_class_handle(), getCurrentClassHandle());
+        Assert.assertEquals(0, mock.getCurrentObjectHandle());
+        Assert.assertEquals(FederateObject.get_class_handle(), mock.getCurrentClassHandle());
 
         // DISCOVER OBJECT INSTANCE TO CREATE A SECOND INSTANCE
-        ObjectRoot objectRoot1 = ObjectRoot.discover(getCurrentClassHandle(), getCurrentObjectHandle());
+        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentObjectHandle());
         Assert.assertTrue(objectRoot1 instanceof FederateObject);
 
         // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
@@ -626,15 +407,15 @@ public class MessagingTests {
         federateObject1.updateAttributeValues(rtiambassador, 5.0);
 
         // CHECK MOCK RTI VALUES
-        Assert.assertNotNull(getCurrentDoubleTime());
-        Assert.assertEquals(5.0, getCurrentDoubleTime().getTime(), 0.1);
+        Assert.assertNotNull(mock.getCurrentDoubleTime());
+        Assert.assertEquals(5.0, mock.getCurrentDoubleTime().getTime(), 0.1);
 
         // ALL VALUES SHOULD BE UPDATED (3)
-        SuppliedAttributes currentSuppliedAttributes = getCurrentSuppliedAttributes();
+        SuppliedAttributes currentSuppliedAttributes = mock.getCurrentSuppliedAttributes();
         Assert.assertEquals(3, currentSuppliedAttributes.size());
 
         // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        FederateObject.reflect(getCurrentObjectHandle(), getCurrentReflectedAttributes(), getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("test", federateObject2.get_FederateType());
@@ -644,15 +425,15 @@ public class MessagingTests {
         federateObject1.updateAttributeValues(rtiambassador, 6.0);
 
         // CHECK MOCK RTI VALUES
-        Assert.assertNotNull(getCurrentDoubleTime());
-        Assert.assertEquals(6.0, getCurrentDoubleTime().getTime(), 0.1);
+        Assert.assertNotNull(mock.getCurrentDoubleTime());
+        Assert.assertEquals(6.0, mock.getCurrentDoubleTime().getTime(), 0.1);
 
         // ONLY ONE VALUE SHOULD BE UPDATED SINCE ONLY ONE WAS CHANGED
-        currentSuppliedAttributes = getCurrentSuppliedAttributes();
+        currentSuppliedAttributes = mock.getCurrentSuppliedAttributes();
         Assert.assertEquals(1, currentSuppliedAttributes.size());
 
         // REFLECT CHANGED ATTRIBUTE INTO SECOND INSTANCE, CHECK VALUES
-        FederateObject.reflect(getCurrentObjectHandle(), getCurrentReflectedAttributes(), getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("foobar", federateObject2.get_FederateType());
