@@ -76,8 +76,6 @@ public class MessagingTests {
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
 
 
-//        new FederateObject();  line not needed.
-
         Set<String> expectedObjectClassNameSet = new HashSet<>();
         expectedObjectClassNameSet.add("ObjectRoot");
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
