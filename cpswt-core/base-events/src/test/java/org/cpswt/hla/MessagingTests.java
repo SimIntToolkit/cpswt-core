@@ -41,8 +41,6 @@ import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 
-import static org.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
-
 import org.cpswt.hla.ObjectRoot_p.FederateObject;
 
 
@@ -62,7 +60,7 @@ public class MessagingTests {
     }
 
     @Test
-    public void messagingNamesTest() {
+    public void interactionClassNamesTest() {
 
         Set<String> expectedInteractionClassNameSet = new HashSet<>();
         expectedInteractionClassNameSet.add("InteractionRoot");
@@ -74,7 +72,10 @@ public class MessagingTests {
 
         Set<String> actualInteractionClassNameSet = InteractionRoot.get_interaction_hla_class_name_set();
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
+    }
 
+    @Test
+    public void objectClassNamesTest() {
 
         Set<String> expectedObjectClassNameSet = new HashSet<>();
         expectedObjectClassNameSet.add("ObjectRoot");
@@ -85,79 +86,129 @@ public class MessagingTests {
     }
 
     @Test
-    public void classHandleTest() {
+    public void interactionClassHandleTest() {
 
-        Assert.assertEquals((int) mock.getInteractionClassNameHandleMap().get("InteractionRoot"), InteractionRoot.get_class_handle());
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot"), C2WInteractionRoot.get_class_handle()
+        InteractionRoot interactionRoot;
+
+        // InteractionRoot
+        int interactionRootClassHandle = mock.getInteractionClassNameHandleMap().get("InteractionRoot");
+        Assert.assertEquals(interactionRootClassHandle, InteractionRoot.get_class_handle());
+        interactionRoot = new InteractionRoot();
+        Assert.assertEquals(interactionRootClassHandle, interactionRoot.getClassHandle());
+        Assert.assertEquals(interactionRootClassHandle, InteractionRoot.get_class_handle("InteractionRoot"));
+
+        // InteractionRoot.C2WInteractionRoot
+        int c2wInteractionRootClassHandle = mock.getInteractionClassNameHandleMap().get(
+                "InteractionRoot.C2WInteractionRoot"
         );
+        Assert.assertEquals(c2wInteractionRootClassHandle, C2WInteractionRoot.get_class_handle());
+        interactionRoot = new C2WInteractionRoot();
+        Assert.assertEquals(c2wInteractionRootClassHandle, interactionRoot.getClassHandle());
         Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog"), SimLog.get_class_handle()
-        );
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
-                HighPrio.get_class_handle()
-        );
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
-                SimulationControl.get_class_handle()
-        );
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
-                SimEnd.get_class_handle()
+                c2wInteractionRootClassHandle, InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot")
         );
 
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot"),
-                InteractionRoot.get_class_handle("InteractionRoot"));
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot"),
-                C2WInteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot")
+        // InteractionRoot.C2WInteractionRoot.SimLog
+        int simLogClassHandle = mock.getInteractionClassNameHandleMap().get(
+                "InteractionRoot.C2WInteractionRoot.SimLog"
         );
+        Assert.assertEquals(simLogClassHandle, SimLog.get_class_handle());
+        interactionRoot = new SimLog();
+        Assert.assertEquals(simLogClassHandle, interactionRoot.getClassHandle());
         Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog"),
-                SimLog.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog")
+                simLogClassHandle,
+                InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog")
         );
-        Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"),
-                HighPrio.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
+
+        // InteractionRoot.C2WInteractionRoot.SimLog.HighPrio
+        int highPrioClassHandle = mock.getInteractionClassNameHandleMap().get(
+                "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
         );
+        Assert.assertEquals(highPrioClassHandle, HighPrio.get_class_handle());
+        interactionRoot = new HighPrio();
+        Assert.assertEquals(highPrioClassHandle, interactionRoot.getClassHandle());
         Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl"),
-                SimulationControl.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl")
+                highPrioClassHandle,
+                InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
         );
+
+        // InteractionRoot.C2WInteractionRoot.SimulationControl
+        int simulationControlClassHandle = mock.getInteractionClassNameHandleMap().get(
+                "InteractionRoot.C2WInteractionRoot.SimulationControl"
+        );
+        Assert.assertEquals(simulationControlClassHandle, SimulationControl.get_class_handle());
+        interactionRoot = new SimulationControl();
+        Assert.assertEquals(simulationControlClassHandle, interactionRoot.getClassHandle());
         Assert.assertEquals(
-                (int) mock.getInteractionClassNameHandleMap().get("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"),
-                SimEnd.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
+                simulationControlClassHandle,
+                InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl")
+        );
+
+        // InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd
+        int simEndClassHandle = mock.getInteractionClassNameHandleMap().get(
+                "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd"
+        );
+        Assert.assertEquals(simEndClassHandle, SimEnd.get_class_handle());
+        interactionRoot = new SimEnd();
+        Assert.assertEquals(simEndClassHandle, interactionRoot.getClassHandle());
+        Assert.assertEquals(
+                simEndClassHandle,
+                InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
         );
     }
 
     @Test
-    public void parameterNamesTest() {
+    public void objectClassHandleTest() {
+
+        ObjectRoot objectRoot;
+
+        // InteractionRoot
+        int objectRootClassHandle = mock.getObjectClassNameHandleMap().get("ObjectRoot");
+        Assert.assertEquals(objectRootClassHandle, ObjectRoot.get_class_handle());
+        objectRoot = new ObjectRoot();
+        Assert.assertEquals(objectRootClassHandle, objectRoot.getClassHandle());
+        Assert.assertEquals(objectRootClassHandle, ObjectRoot.get_class_handle("ObjectRoot"));
+
+        // InteractionRoot.C2WInteractionRoot
+        int federateObjectClassHandle = mock.getObjectClassNameHandleMap().get("ObjectRoot.FederateObject");
+        Assert.assertEquals(federateObjectClassHandle, FederateObject.get_class_handle());
+        objectRoot = new FederateObject();
+        Assert.assertEquals(federateObjectClassHandle, objectRoot.getClassHandle());
+        Assert.assertEquals(
+                federateObjectClassHandle, ObjectRoot.get_class_handle("ObjectRoot.FederateObject")
+        );
+    }
+
+    @Test
+    public void interactionParameterNamesTest() {
+
+        InteractionRoot interactionRoot;
 
         // TEST InteractionRoot get_parameter_names()
-        List<ClassAndPropertyName> expectedInteractionRootParameterList = new ArrayList<>();
+        List<InteractionRoot.ClassAndPropertyName> expectedInteractionRootParameterList = new ArrayList<>();
+
+        interactionRoot = new InteractionRoot();
 
         Assert.assertEquals(expectedInteractionRootParameterList, InteractionRoot.get_parameter_names());
+        Assert.assertEquals(expectedInteractionRootParameterList, interactionRoot.getParameterNames());
         Assert.assertEquals(
-                expectedInteractionRootParameterList,
-                InteractionRoot.get_parameter_names("InteractionRoot")
+                expectedInteractionRootParameterList, InteractionRoot.get_parameter_names("InteractionRoot")
         );
 
         // TEST InteractionRoot get_all_parameter_names()
-        List<ClassAndPropertyName> expectedInteractionRootAllParameterList = new ArrayList<>(
+        List<InteractionRoot.ClassAndPropertyName> expectedInteractionRootAllParameterList = new ArrayList<>(
                 expectedInteractionRootParameterList
         );
 
         Assert.assertEquals(expectedInteractionRootAllParameterList, InteractionRoot.get_all_parameter_names());
+        Assert.assertEquals(expectedInteractionRootAllParameterList, interactionRoot.getAllParameterNames());
         Assert.assertEquals(
-                expectedInteractionRootAllParameterList,
-                InteractionRoot.get_all_parameter_names("InteractionRoot")
+                expectedInteractionRootAllParameterList, InteractionRoot.get_all_parameter_names("InteractionRoot")
         );
 
 
         // TEST InteractionRoot.C2WInteractionRoot get_parameter_names()
-        List<ClassAndPropertyName> expectedC2WInteractionRootParameterList = new ArrayList<>();
+        List<InteractionRoot.ClassAndPropertyName> expectedC2WInteractionRootParameterList = new ArrayList<>();
         expectedC2WInteractionRootParameterList.add(new InteractionRoot.ClassAndPropertyName(
                 C2WInteractionRoot.get_hla_class_name(), "actualLogicalGenerationTime"
         ));
@@ -169,20 +220,23 @@ public class MessagingTests {
         ));
         Collections.sort(expectedC2WInteractionRootParameterList);
 
+        interactionRoot = new C2WInteractionRoot();
+
         Assert.assertEquals(expectedC2WInteractionRootParameterList, C2WInteractionRoot.get_parameter_names());
+        Assert.assertEquals(expectedC2WInteractionRootParameterList, interactionRoot.getParameterNames());
         Assert.assertEquals(
                 expectedC2WInteractionRootParameterList,
                 InteractionRoot.get_parameter_names("InteractionRoot.C2WInteractionRoot")
         );
 
-
         // TEST InteractionRoot.C2WInteractionRoot get_all_parameter_names()
-        List<ClassAndPropertyName> expectedC2WInteractionRootAllParameterList =
+        List<InteractionRoot.ClassAndPropertyName> expectedC2WInteractionRootAllParameterList =
                 new ArrayList<>(expectedInteractionRootAllParameterList);
         expectedC2WInteractionRootAllParameterList.addAll(expectedC2WInteractionRootParameterList);
         Collections.sort(expectedC2WInteractionRootAllParameterList);
 
         Assert.assertEquals(expectedC2WInteractionRootAllParameterList, C2WInteractionRoot.get_all_parameter_names());
+        Assert.assertEquals(expectedC2WInteractionRootAllParameterList, interactionRoot.getAllParameterNames());
         Assert.assertEquals(
                 expectedC2WInteractionRootAllParameterList,
                 InteractionRoot.get_all_parameter_names("InteractionRoot.C2WInteractionRoot")
@@ -190,7 +244,7 @@ public class MessagingTests {
 
 
         // TEST InteractionRoot.C2WInteractionRoot.SimLog get_parameter_names()
-        List<ClassAndPropertyName> expectedSimLogParameterList = new ArrayList<>();
+        List<InteractionRoot.ClassAndPropertyName> expectedSimLogParameterList = new ArrayList<>();
         expectedSimLogParameterList.add(new InteractionRoot.ClassAndPropertyName(
                 SimLog.get_hla_class_name(), "Comment"
         ));
@@ -202,7 +256,10 @@ public class MessagingTests {
         ));
         Collections.sort(expectedSimLogParameterList);
 
+        interactionRoot = new SimLog();
+
         Assert.assertEquals(expectedSimLogParameterList, SimLog.get_parameter_names());
+        Assert.assertEquals(expectedSimLogParameterList, interactionRoot.getParameterNames());
         Assert.assertEquals(
                 expectedSimLogParameterList,
                 InteractionRoot.get_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog")
@@ -210,35 +267,40 @@ public class MessagingTests {
 
 
         // TEST InteractionRoot.C2WInteractionRoot.SimLog get_all_parameter_names()
-        List<ClassAndPropertyName> expectedSimLogAllParameterList =
+        List<InteractionRoot.ClassAndPropertyName> expectedSimLogAllParameterList =
                 new ArrayList<>(expectedC2WInteractionRootAllParameterList);
         expectedSimLogAllParameterList.addAll(expectedSimLogParameterList);
         Collections.sort(expectedSimLogAllParameterList);
 
         Assert.assertEquals(expectedSimLogAllParameterList, SimLog.get_all_parameter_names());
+        Assert.assertEquals(expectedSimLogAllParameterList, interactionRoot.getAllParameterNames());
         Assert.assertEquals(
                 expectedSimLogAllParameterList,
                 InteractionRoot.get_all_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog")
         );
 
 
-        // TEST InteractionRoot.C2WInteractionRoot.SimLog get_parameter_names()
-        List<ClassAndPropertyName> expectedHighPrioParameterList = new ArrayList<>();
+        // TEST InteractionRoot.C2WInteractionRoot.SimLog.HighPrio get_parameter_names()
+        List<InteractionRoot.ClassAndPropertyName> expectedHighPrioParameterList = new ArrayList<>();
+
+        interactionRoot = new HighPrio();
 
         Assert.assertEquals(expectedHighPrioParameterList, HighPrio.get_parameter_names());
+        Assert.assertEquals(expectedHighPrioParameterList, interactionRoot.getParameterNames());
         Assert.assertEquals(
                 expectedHighPrioParameterList,
                 InteractionRoot.get_parameter_names("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio")
         );
 
 
-        // TEST InteractionRoot.C2WInteractionRoot.SimLog get_all_parameter_names()
-        List<ClassAndPropertyName> expectedHighPrioAllParameterList =
+        // TEST InteractionRoot.C2WInteractionRoot.SimLog.HighPrio get_all_parameter_names()
+        List<InteractionRoot.ClassAndPropertyName> expectedHighPrioAllParameterList =
                 new ArrayList<>(expectedSimLogAllParameterList);
         expectedHighPrioAllParameterList.addAll(expectedHighPrioParameterList);
         Collections.sort(expectedHighPrioAllParameterList);
 
         Assert.assertEquals(expectedHighPrioAllParameterList, HighPrio.get_all_parameter_names());
+        Assert.assertEquals(expectedHighPrioAllParameterList, interactionRoot.getAllParameterNames());
         Assert.assertEquals(
                 expectedHighPrioAllParameterList,
                 InteractionRoot.get_all_parameter_names(
@@ -248,23 +310,117 @@ public class MessagingTests {
     }
 
     @Test
-    public void propertyHandleTest() {
+    public void objectAttributesNamesTest() {
+
+        ObjectRoot objectRoot;
+
+        // TEST ObjectRoot get_attribute_names()
+        List<ObjectRoot.ClassAndPropertyName> expectedObjectRootAttributeList = new ArrayList<>();
+
+        objectRoot = new ObjectRoot();
+
+        Assert.assertEquals(expectedObjectRootAttributeList, ObjectRoot.get_attribute_names());
+        Assert.assertEquals(expectedObjectRootAttributeList, objectRoot.getAttributeNames());
+        Assert.assertEquals(
+                expectedObjectRootAttributeList, ObjectRoot.get_attribute_names("ObjectRoot")
+        );
+
+        // TEST ObjectRoot get_all_attribute_names()
+        List<org.cpswt.hla.ObjectRootInterface.ClassAndPropertyName> expectedInteractionRootAllParameterList =
+                new ArrayList<>(expectedObjectRootAttributeList);
+
+        Assert.assertEquals(expectedInteractionRootAllParameterList, ObjectRoot.get_all_attribute_names());
+        Assert.assertEquals(expectedInteractionRootAllParameterList, objectRoot.getAllAttributeNames());
+        Assert.assertEquals(
+                expectedInteractionRootAllParameterList,
+                ObjectRoot.get_all_attribute_names("ObjectRoot")
+        );
+
+
+        // TEST ObjectRoot.FederateObject get_attribute_names()
+        List<ObjectRoot.ClassAndPropertyName> expectedFederateObjectAttributeList = new ArrayList<>();
+        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
+                FederateObject.get_hla_class_name(), "FederateHandle"
+        ));
+        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
+                FederateObject.get_hla_class_name(), "FederateHost"
+        ));
+        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
+                FederateObject.get_hla_class_name(), "FederateType"
+        ));
+        Collections.sort(expectedFederateObjectAttributeList);
+
+        objectRoot = new FederateObject();
+
+        Assert.assertEquals(expectedFederateObjectAttributeList, FederateObject.get_attribute_names());
+        Assert.assertEquals(expectedFederateObjectAttributeList, objectRoot.getAttributeNames());
+        Assert.assertEquals(
+                expectedFederateObjectAttributeList,
+                ObjectRoot.get_attribute_names("ObjectRoot.FederateObject")
+        );
+
+    }
+
+    @Test
+    public void interactionParameterHandleTest() {
+
+        InteractionRoot interactionRoot;
 
         int expectedValue = mock.getInteractionClassAndPropertyNameHandleMap().get(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"));
+                new InteractionRoot.ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "federateSequence"));
+
+        Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("federateSequence"));
+        interactionRoot = new C2WInteractionRoot();
+        Assert.assertEquals(expectedValue, interactionRoot.getParameterHandle("federateSequence"));
+        Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
+                "InteractionRoot.C2WInteractionRoot", "federateSequence"
+        ));
+
+        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("federateSequence"));
+        interactionRoot = new SimLog();
+        Assert.assertEquals(expectedValue, interactionRoot.getParameterHandle("federateSequence"));
+        Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
+                "InteractionRoot.C2WInteractionRoot.SimLog", "federateSequence"
+        ));
 
         Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("federateSequence"));
-        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("federateSequence"));
-        Assert.assertEquals(expectedValue, C2WInteractionRoot.get_parameter_handle("federateSequence"));
+        interactionRoot = new HighPrio();
+        Assert.assertEquals(expectedValue, interactionRoot.getParameterHandle("federateSequence"));
+        Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
+                "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", "federateSequence"
+        ));
 
         expectedValue = mock.getInteractionClassAndPropertyNameHandleMap().get(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName"));
-        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
-        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
+                new InteractionRoot.ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.SimLog", "FedName")
+        );
 
-        expectedValue = mock.getObjectClassAndPropertyNameHandleMap().get(
+        Assert.assertEquals(expectedValue, SimLog.get_parameter_handle("FedName"));
+        interactionRoot = new SimLog();
+        Assert.assertEquals(expectedValue, interactionRoot.getParameterHandle("FedName"));
+        Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
+                "InteractionRoot.C2WInteractionRoot.SimLog", "FedName"
+        ));
+
+        Assert.assertEquals(expectedValue, HighPrio.get_parameter_handle("FedName"));
+        interactionRoot = new HighPrio();
+        Assert.assertEquals(expectedValue, interactionRoot.getParameterHandle("FedName"));
+        Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
+                "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", "FedName"
+        ));
+    }
+
+    @Test
+    public void objectAttributeHandleTest() {
+
+        int expectedValue = mock.getObjectClassAndPropertyNameHandleMap().get(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));
+
+        ObjectRoot objectRoot;
+
         Assert.assertEquals(expectedValue, FederateObject.get_attribute_handle("FederateHost"));
+        objectRoot = new FederateObject();
+        Assert.assertEquals(expectedValue, objectRoot.getAttributeHandle("FederateHost"));
+        Assert.assertEquals(expectedValue, ObjectRoot.get_attribute_handle("ObjectRoot.FederateObject", "FederateHost"));
     }
 
     @Test
@@ -371,9 +527,6 @@ public class MessagingTests {
 
     @Test
     public void objectTest1() {
-//        // make the rtiambassador here
-//        RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
-//        RTIambassador rtiambassador = mock.getRTIAmbassador();
         // MAKE SURE ATTRIBUTES ARE PUBLISHED
         FederateObject.publish_FederateHandle_attribute();
         FederateObject.publish_FederateHost_attribute();
