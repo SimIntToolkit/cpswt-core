@@ -222,6 +222,10 @@ public class RTIAmbassadorProxy1 {
                     (InvocationOnMock invocationOnMock) ->
                             interactionClassNameHandleMap.get((String)invocationOnMock.getArgument(0))
             );
+            when(rtiambassador.getObjectClassHandle(anyString())).thenAnswer(
+                    (InvocationOnMock invocationOnMock) ->
+                            objectClassNameHandleMap.get((String)invocationOnMock.getArgument(0))
+            );
             when(rtiambassador.getParameterHandle(anyString(), anyInt())).thenAnswer(
                     (InvocationOnMock invocationOnMock) -> {
                         String parameterName = invocationOnMock.getArgument(0);
@@ -246,7 +250,7 @@ public class RTIAmbassadorProxy1 {
                         int classHandle = invocationOnMock.getArgument(0);
                         setCurrentClassHandle(classHandle);
                         setCurrentObjectHandle();
-                        return getCurrentClassHandle();
+                        return getCurrentObjectHandle();
                     }
             );
             when(rtiambassador.updateAttributeValues(
