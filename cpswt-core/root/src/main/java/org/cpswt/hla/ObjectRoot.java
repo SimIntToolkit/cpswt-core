@@ -995,6 +995,15 @@ public class ObjectRoot implements ObjectRootInterface {
         setAttribute(classAndPropertyName.getPropertyName(), value);
     }
 
+    public static int get_num_attributes(String hlaClassName) {
+        return _allClassNamePropertyNameSetMap.containsKey(hlaClassName) ?
+          _allClassNamePropertyNameSetMap.get(hlaClassName).size() : -1;
+    }
+
+    public int getNumAttributes() {
+        return _allClassNamePropertyNameSetMap.get(getInstanceHlaClassName()).size();
+    }
+
     /**
      * Returns the value of the attribute whose handle is "propertyHandle"
      * (RTI assigned) for this object.
@@ -1670,7 +1679,9 @@ public class ObjectRoot implements ObjectRootInterface {
             );
             return;
         }
-        ((Attribute<Object>)propertyClassNameAndValue.getValue()).setValue(value);
+        Attribute<Object> attribute = ((Attribute<Object>)propertyClassNameAndValue.getValue());
+        attribute.setValue(value);
+        attribute.setTime(getTime());
     }
 
     public void setAttribute(ClassAndPropertyName classAndPropertyName, Object value) {
@@ -1719,7 +1730,7 @@ public class ObjectRoot implements ObjectRootInterface {
     public Object getAttribute(ClassAndPropertyName classAndPropertyName) {
         return getAttribute(
           classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
-          );
+        );
     }
 
     public Object getAttribute(String propertyName) {
@@ -2057,6 +2068,11 @@ public class ObjectRoot implements ObjectRootInterface {
     //---------------------
     // END CREATION METHODS
     //---------------------
+
+    public static int get_num_attributes() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
 
     //------------------------------
     // PROPERTY MANIPULATION METHODS
