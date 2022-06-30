@@ -387,6 +387,11 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // END CREATION METHODS
     //---------------------
 
+    public static int get_num_parameters() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
+
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------

@@ -407,6 +407,11 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     // END CREATION METHODS
     //---------------------
 
+    public static int get_num_attributes() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
+
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------

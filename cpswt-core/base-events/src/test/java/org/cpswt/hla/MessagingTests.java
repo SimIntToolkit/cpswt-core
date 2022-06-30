@@ -307,6 +307,12 @@ public class MessagingTests {
                         "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
                 )
         );
+
+        Assert.assertEquals(6, HighPrio.get_num_parameters());
+        Assert.assertEquals(6, interactionRoot.getNumParameters());
+        Assert.assertEquals(6, InteractionRoot.get_num_parameters(
+                "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio"
+        ));
     }
 
     @Test
@@ -359,6 +365,9 @@ public class MessagingTests {
                 ObjectRoot.get_attribute_names("ObjectRoot.FederateObject")
         );
 
+        Assert.assertEquals(3, FederateObject.get_num_attributes());
+        Assert.assertEquals(3, objectRoot.getNumAttributes());
+        Assert.assertEquals(3, ObjectRoot.get_num_attributes("ObjectRoot.FederateObject"));
     }
 
     @Test

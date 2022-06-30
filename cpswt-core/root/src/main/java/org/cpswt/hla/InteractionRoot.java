@@ -741,6 +741,15 @@ public class InteractionRoot implements InteractionRootInterface {
         setParameter(classAndPropertyName.getPropertyName(), value);
     }
 
+    public static int get_num_parameters(String hlaClassName) {
+        return _allClassNamePropertyNameSetMap.containsKey(hlaClassName) ?
+          _allClassNamePropertyNameSetMap.get(hlaClassName).size() : -1;
+    }
+
+    public int getNumParameters() {
+        return _allClassNamePropertyNameSetMap.get(getInstanceHlaClassName()).size();
+    }
+
     /**
      * Returns the value of the parameter whose handle is "propertyHandle"
      * (RTI assigned) for this interaction.
@@ -1080,7 +1089,7 @@ public class InteractionRoot implements InteractionRootInterface {
     public Object getParameter(ClassAndPropertyName classAndPropertyName) {
         return getParameter(
           classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
-          );
+        );
     }
 
     public Object getParameter(String propertyName) {
@@ -1394,6 +1403,11 @@ public class InteractionRoot implements InteractionRootInterface {
     //---------------------
     // END CREATION METHODS
     //---------------------
+
+    public static int get_num_parameters() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
 
     //------------------------------
     // PROPERTY MANIPULATION METHODS

@@ -362,6 +362,11 @@ public class SimPause extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
     // END CREATION METHODS
     //---------------------
 
+    public static int get_num_parameters() {
+        return _allClassNamePropertyNameSetMap.get(get_hla_class_name()).size();
+    }
+
+
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
