@@ -484,15 +484,19 @@ public class MessagingTests {
         String string4 = "string4";
         double doubleValue4 = 17.3;
 
+        // AS ONLY ONE FEDERATE NAME CAN BE ADDED TO THE federateSequence OF AN INTERACTION THAT IS DERIVED FROM
+        // "InteractionRoot.C2WInteractionRoot" USING EITHER THE "update_federate_sequence" or "updateFederateSequence"
+        // METHODS, THESE METHODS WILL NOT CHANGE THE "federateSequence" FOR simLogInteraction AFTER THE
+        // CALL TO "update_federate_sequence" ABOVE
         simLogInteraction.updateFederateSequence(string4);
         simLogInteraction.set_Time(doubleValue4);
 
         federateSequenceList = simLogInteraction.getFederateSequenceList();
         Assert.assertEquals(string3, federateSequenceList.get(0));
-        Assert.assertEquals(string4, federateSequenceList.get(federateSequenceList.size() - 1));
+        Assert.assertEquals(string3, federateSequenceList.get(federateSequenceList.size() - 1));
         Assert.assertEquals(doubleValue4, simLogInteraction.getParameter("Time"));
 
-        Assert.assertEquals(string4, simLogInteraction.getSourceFederateId());
+        Assert.assertEquals(string3, simLogInteraction.getSourceFederateId());
         Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
         Assert.assertEquals(doubleValue4, simLogInteraction.get_Time(), 0.01);
     }
@@ -532,6 +536,59 @@ public class MessagingTests {
         Assert.assertTrue( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot"));
         Assert.assertTrue( federateObject.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.FederateObject"));
         Assert.assertTrue( federateObject.isInstanceOfHlaClass("ObjectRoot.FederateObject"));
+    }
+
+    @Test
+    public void federateSequenceTest() {
+
+        // CHECK federateSequence THAT STARTS OUT EMPTY
+        InteractionRoot interactionRoot1 = new InteractionRoot("InteractionRoot.C2WInteractionRoot.SimLog");
+
+        String federateName1 = "federateName1";
+
+        // ADD federateName1 TO federateSequence
+        C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
+
+        // MAKE SURE IT'S THERE
+        List<String> federateSequenceList1 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot1);
+
+        Assert.assertEquals(1, federateSequenceList1.size());
+        Assert.assertEquals(federateName1, federateSequenceList1.get(0));
+
+        // ADD IT AGAIN
+        C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
+
+        // MAKE SURE federateSequence IS UNCHANGED
+        List<String> federateSequenceList2 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot1);
+
+        Assert.assertEquals(1, federateSequenceList2.size());
+        Assert.assertEquals(federateName1, federateSequenceList2.get(0));
+
+
+        // CHECK federateSequence THAT STARTS OUT NON-EMPTY
+        InteractionRoot interactionRoot2 = new InteractionRoot("InteractionRoot.C2WInteractionRoot.SimLog");
+
+        List<String> federateNameList = new ArrayList<>(Arrays.asList("federateName2", "federateName3"));
+
+        JSONArray jsonArray = new JSONArray(federateNameList);
+        interactionRoot2.setParameter("federateSequence", jsonArray.toString());
+
+        // ADD federateName1 TO federateSequence
+        C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
+
+        // MAKE SURE IT'S THERE
+        List<String> federateSequenceList3 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
+        federateNameList.add(federateName1);
+
+        Assert.assertEquals(federateNameList, federateSequenceList3);
+
+        // ADD IT AGAIN
+        C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
+
+        // MAKE SURE federateSequence IS UNCHANGED
+        List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
+
+        Assert.assertEquals(federateNameList, federateSequenceList3);
     }
 
     @Test

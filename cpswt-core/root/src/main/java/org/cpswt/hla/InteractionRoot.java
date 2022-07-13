@@ -227,6 +227,17 @@ public class InteractionRoot implements InteractionRootInterface {
         _instanceHlaClassName = instanceHlaClassName;
     }
 
+    // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
+    protected boolean federateAppendedToFederateSequence = false;
+
+    protected static void set_federate_appended_to_federate_sequence(InteractionRoot interactionRoot) {
+        interactionRoot.federateAppendedToFederateSequence = true;
+    }
+
+    protected static boolean get_federate_appended_to_federate_sequence(InteractionRoot interactionRoot) {
+        return interactionRoot.federateAppendedToFederateSequence;
+    }
+
     public static String get_simple_class_name(String hlaClassName) {
         if (hlaClassName == null) {
             return null;

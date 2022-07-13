@@ -35,10 +35,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -463,16 +462,32 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    private static Pattern federateSequenceRegex = Pattern.compile(
-      "\\s*\\[(?:\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\",)*\\s*\"(?:[^\"]|(?:\\\\)*\\\")+\"\\s*\\]\\s*"
-    );
-
     private static boolean is_federate_sequence(String federateSequence) {
-        Matcher matcher = federateSequenceRegex.matcher( federateSequence );
-        return matcher.matches();
+
+        JSONArray jsonArray;
+
+        try {
+            jsonArray = new JSONArray( federateSequence );
+        } catch (JSONException jsonException) {
+            return false;
+        }
+
+        int jsonArrayLength = jsonArray.length();
+        for(int ix = 0 ; ix < jsonArrayLength ; ++ix) {
+            if (!(jsonArray.get(ix) instanceof String)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void update_federate_sequence_aux(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+
+        if (org.cpswt.hla.InteractionRoot.get_federate_appended_to_federate_sequence(interactionRoot)) {
+            return;
+        }
+        org.cpswt.hla.InteractionRoot.set_federate_appended_to_federate_sequence(interactionRoot);
+
         String federateSequence = (String)interactionRoot.getParameter("federateSequence");
 
         JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
