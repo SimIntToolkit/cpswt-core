@@ -717,6 +717,50 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNamePublishedAttributeNameSetMap.getOrDefault(hlaClassName, null);
     }
 
+
+    private static void pub_sub_class_and_property_name(
+      Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
+      String className,
+      String attributeClassName,
+      String attributeName,
+      boolean publish,
+      boolean insert
+    ) {
+        String prefix = insert ? "" : "un";
+        String pubsub = publish ? "publish" : "subscribe";
+        String operationName = prefix + pubsub;
+
+        if (!className.startsWith(attributeClassName)) {
+            logger.error(
+                "{}_attribute(\"{}\", \"{}\", \"{}\"): the \"{}\" class cannot {} attribute of " +
+                "a class (\"{}\") that is out of its inheritance hierarchy.",
+                operationName, className, attributeClassName, attributeName,
+                className, operationName, attributeClassName
+            );
+            return;
+        }
+        ClassAndPropertyName key = findProperty(attributeClassName, attributeName);
+        if (key == null) {
+            logger.error(
+                "{}_attribute(\"{}\", \"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
+                operationName, className, attributeClassName, attributeName, attributeName, attributeClassName
+            );
+            return;
+        }
+
+        if (insert) {
+            classNamePubSubAttributeNameSetMap.get(className).add(key);
+        } else {
+            classNamePubSubAttributeNameSetMap.get(className).remove(key);
+        }
+    }
+
+    public static void publish_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, true
+        );
+    }
+
     /**
       * Publishes the attribute named by "attributeName" of the object class named
       * by "className" for a federate.  This can also be performed by calling the
@@ -735,16 +779,13 @@ public class ObjectRoot implements ObjectRootInterface {
       * @param attributeName name of the attribute to be published
       */
     public static void publish_attribute( String className, String attributeName ) {
-        ClassAndPropertyName key = findProperty(className, attributeName);
-        if (key == null) {
-            logger.error(
-                "publish_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                className, attributeName, attributeName, className
-            );
-            return;
-        }
+        publish_attribute(className, className, attributeName);
+    }
 
-        _classNamePublishedAttributeNameSetMap.get(key.getClassName()).add(key);
+    public static void unpublish_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, false
+        );
     }
 
     /**
@@ -765,16 +806,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @param attributeName name of the attribute to be unpublished
       */
     public static void unpublish_attribute( String className, String attributeName ) {
-        ClassAndPropertyName key = findProperty(className, attributeName);
-        if (key == null) {
-            logger.error(
-                "unpublish_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                className, attributeName, attributeName, className
-            );
-            return;
-        }
-
-        _classNamePublishedAttributeNameSetMap.get(key.getClassName()).remove(key);
+        unpublish_attribute(className, className, attributeName);
     }
 
     //--------------------------------------------
@@ -800,6 +832,12 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNameSubscribedAttributeNameSetMap.getOrDefault(hlaClassName, null);
     }
 
+    public static void subscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
+        );
+    }
+
     /**
       * Subscribe a federate to the attribute named by "attributeName" of the
       * object class named by "className".  This can also be performed by calling
@@ -818,17 +856,14 @@ public class ObjectRoot implements ObjectRootInterface {
       * @param attributeName name of the attribute to be published
       */
     public static void subscribe_attribute( String className, String attributeName ) {
-        ClassAndPropertyName key = findProperty(className, attributeName);
-        if (key == null) {
-            logger.error(
-                "subscribe_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                className, attributeName, attributeName, className
-            );
-            return;
-        }
-        _classNameSubscribedAttributeNameSetMap.get(key.getClassName()).add(key);
+        subscribe_attribute(className, className, attributeName);
     }
 
+    public static void unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+        );
+    }
     /**
       * Unsubscribe a federate from the attribute named by "attributeName" of the
       * object class named by "className".  This can also be performed by calling
@@ -847,15 +882,7 @@ public class ObjectRoot implements ObjectRootInterface {
       * @param attributeName name of the attribute to be published
       */
     public static void unsubscribe_attribute( String className, String attributeName ) {
-        ClassAndPropertyName key = findProperty(className, attributeName);
-        if (key == null) {
-            logger.error(
-                "unsubscribe_attribute(\"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                className, attributeName, attributeName, className
-            );
-            return;
-        }
-        _classNameSubscribedAttributeNameSetMap.get(key.getClassName()).remove(key);
+        unsubscribe_attribute(className, className, attributeName);
     }
 
     //---------------------------------------------
