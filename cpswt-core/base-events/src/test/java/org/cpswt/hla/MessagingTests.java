@@ -42,7 +42,7 @@ import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 
 import org.cpswt.hla.ObjectRoot_p.FederateObject;
-
+import org.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 
 import java.util.*;
 
@@ -55,6 +55,7 @@ public class MessagingTests {
         HighPrio.load();
         SimEnd.load();
         FederateObject.load();
+        DerivedObjectClass.load();
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
     }
@@ -80,6 +81,8 @@ public class MessagingTests {
         Set<String> expectedObjectClassNameSet = new HashSet<>();
         expectedObjectClassNameSet.add("ObjectRoot");
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
+        expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass");
+        expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass.DerivedObjectClass");
 
         Set<String> actualObjectClassNameSet = ObjectRoot.get_object_hla_class_name_set();
         Assert.assertEquals(expectedObjectClassNameSet, actualObjectClassNameSet);
@@ -589,6 +592,101 @@ public class MessagingTests {
         List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
 
         Assert.assertEquals(federateNameList, federateSequenceList3);
+    }
+
+    @Test
+    public void attributePubSubTest() {
+
+        // PUBLISH
+        Set<ObjectRootInterface.ClassAndPropertyName> expectedPublishedClassAndPropertyNameSet =
+                new HashSet<>();
+        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+        ));
+        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
+        ));
+        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
+        ));
+        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "int_attribute1"
+        ));
+        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "string_attribute1"
+        ));
+
+        DerivedObjectClass.publish_int_attribute1_attribute();
+        DerivedObjectClass.publish_int_attribute2_attribute();
+        DerivedObjectClass.publish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+        DerivedObjectClass.publish_string_attribute1_attribute();
+        DerivedObjectClass.publish_string_attribute2_attribute();
+
+        Set<ObjectRootInterface.ClassAndPropertyName> actualPublishedClassAndPropertyNameSet =
+                DerivedObjectClass.get_published_attribute_name_set();
+
+        Assert.assertEquals(expectedPublishedClassAndPropertyNameSet, actualPublishedClassAndPropertyNameSet);
+
+        // UNPUBLISH
+        DerivedObjectClass.unpublish_int_attribute1_attribute();
+        DerivedObjectClass.unpublish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+
+        expectedPublishedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+        ));
+        expectedPublishedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "int_attribute1"
+        ));
+
+        actualPublishedClassAndPropertyNameSet = DerivedObjectClass.get_published_attribute_name_set();
+
+        Assert.assertEquals(expectedPublishedClassAndPropertyNameSet, actualPublishedClassAndPropertyNameSet);
+
+
+        // SUBSCRIBE
+        Set<ObjectRootInterface.ClassAndPropertyName> expectedSubscribedClassAndPropertyNameSet =
+                new HashSet<>();
+        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+        ));
+        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
+        ));
+        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
+        ));
+        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "int_attribute1"
+        ));
+        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "string_attribute1"
+        ));
+
+        DerivedObjectClass.subscribe_int_attribute1_attribute();
+        DerivedObjectClass.subscribe_int_attribute2_attribute();
+        DerivedObjectClass.subscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+        DerivedObjectClass.subscribe_string_attribute1_attribute();
+        DerivedObjectClass.subscribe_string_attribute2_attribute();
+
+        Set<ObjectRootInterface.ClassAndPropertyName> actualSubscribedClassAndPropertyNameSet =
+                DerivedObjectClass.get_subscribed_attribute_name_set();
+
+        Assert.assertEquals(expectedSubscribedClassAndPropertyNameSet, actualSubscribedClassAndPropertyNameSet);
+
+        // UNSUBSCRIBE
+        DerivedObjectClass.unsubscribe_int_attribute1_attribute();
+        DerivedObjectClass.unsubscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
+
+        expectedSubscribedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
+        ));
+        expectedSubscribedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
+                "ObjectRoot.BaseObjectClass", "int_attribute1"
+        ));
+
+        actualSubscribedClassAndPropertyNameSet = DerivedObjectClass.get_subscribed_attribute_name_set();
+
+        Assert.assertEquals(expectedSubscribedClassAndPropertyNameSet, actualSubscribedClassAndPropertyNameSet);
     }
 
     @Test
