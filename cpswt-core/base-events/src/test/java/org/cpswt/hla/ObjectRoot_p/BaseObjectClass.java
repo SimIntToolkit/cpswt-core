@@ -160,7 +160,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        BaseObjectClass instance = new BaseObjectClass(createNoInstanceInit());
+        BaseObjectClass instance = new BaseObjectClass(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();

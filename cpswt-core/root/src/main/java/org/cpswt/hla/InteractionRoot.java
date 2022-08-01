@@ -1111,6 +1111,10 @@ public class InteractionRoot implements InteractionRootInterface {
     // END CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //-----------------------------------------------
 
+    // USED TO GET "DUMMY" INSTANCES OF CLASSES TO EXECUTE "createInteraction" METHOD POLYMORPHICALLY
+    protected static class NoInstanceInit { }
+    protected static final NoInstanceInit noInstanceInit = new NoInstanceInit();
+
     //---------------------------
     // START OF INCLUDED TEMPLATE
     //---------------------------
@@ -1224,7 +1228,7 @@ public class InteractionRoot implements InteractionRootInterface {
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        InteractionRoot instance = new InteractionRoot(createNoInstanceInit());
+        InteractionRoot instance = new InteractionRoot(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -1486,10 +1490,6 @@ public class InteractionRoot implements InteractionRootInterface {
     // CONSTRUCTORS
     //-------------
 
-    protected static class NoInstanceInit { }
-    protected static NoInstanceInit createNoInstanceInit() {
-        return new NoInstanceInit();
-    }
     protected InteractionRoot(NoInstanceInit noInstanceInit) { }
 
     /**
@@ -1827,6 +1827,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
         return interactionRoot;
     }
+
     private static JSONObject federationJson = null;
 
     public static void readFederationJson(File federationJsonFile) {
