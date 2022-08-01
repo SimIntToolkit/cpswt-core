@@ -1102,7 +1102,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
         logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Created interaction root as: {}", ir);
-        if (!unmatchingFedFilterProvided(ir)) {
+        if (!C2WInteractionRoot.is_reject_source_federate_id(ir) && !unmatchingFedFilterProvided(ir)) {
             if(SimEnd.match(interactionClass)) {
                 _receivedSimEnd = theInteraction;
             }
