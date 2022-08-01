@@ -35,9 +35,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
+import org.json.JSONTokener;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -163,7 +170,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        C2WInteractionRoot instance = new C2WInteractionRoot(createNoInstanceInit());
+        C2WInteractionRoot instance = new C2WInteractionRoot(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -553,6 +560,54 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_source_federate_id(this);
     }
 
+    private static Map<String, Set<String>> _hlaClassNameToRejectSourceFederateIdSetMap = new HashMap<>();
+
+    public static void add_reject_source_federate_id(String hlaClassName, String federateId) {
+        if (
+          "InteractionRoot.C2WInteractionRoot".equals(hlaClassName) ||
+          (
+            hlaClassName.startsWith("InteractionRoot.C2WInteractionRoot" + ".") &&
+            _hlaClassNameSet.contains(hlaClassName)
+          )
+        ) {
+            if (!_hlaClassNameToRejectSourceFederateIdSetMap.containsKey(hlaClassName)) {
+                _hlaClassNameToRejectSourceFederateIdSetMap.put(hlaClassName, new HashSet<>());
+            }
+            _hlaClassNameToRejectSourceFederateIdSetMap.get(hlaClassName).add(federateId);
+        }
+    }
+
+    public void addRejectSourceFederateId(String federateId) {
+        add_reject_source_federate_id(getInstanceHlaClassName(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String hlaClassName, String federateId) {
+        return _hlaClassNameToRejectSourceFederateIdSetMap.containsKey(hlaClassName) &&
+          _hlaClassNameToRejectSourceFederateIdSetMap.get(hlaClassName).contains(federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(
+      org.cpswt.hla.InteractionRoot interactionRoot
+    ) {
+        return is_reject_source_federate_id(
+          interactionRoot.getInstanceHlaClassName(), get_source_federate_id(interactionRoot)
+        );
+    }
+
+    public boolean isRejectSourceFederateId() {
+        return is_reject_source_federate_id(this);
+    }
+
+    public static void remove_reject_source_federate_id(String hlaClassName, String federateId) {
+        if (_hlaClassNameToRejectSourceFederateIdSetMap.containsKey(hlaClassName)) {
+            _hlaClassNameToRejectSourceFederateIdSetMap.get(hlaClassName).remove(federateId);
+        }
+    }
+
+    public void removeRejectSourceFederateId(String federateId) {
+        remove_reject_source_federate_id(getInstanceHlaClassName(), federateId);
+    }
+
     // THIS METHOD ACTS AS AN ERROR DETECTOR -- ALL INSTANCES OF C2WInteractionRoot
     // SHOULD HAVE A NON-EMPTY JSON-ARRAY VALUE FOR THEIR federateSequence PARAMETER.
     @Override
@@ -579,6 +634,42 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
             );
         }
         super.sendInteraction( rti );
+    }
+
+    public static void readRejectSourceFederateIdData(File rejectSourceFederateIdJsonFile) {
+        try (
+            FileReader fileReader = new FileReader(rejectSourceFederateIdJsonFile)
+        ) {
+            readRejectSourceFederateIdData(fileReader);
+        } catch(Exception e) {
+            logger.error(
+              "readRejectSourceFederateIdJson: \"{}\" exception on file \"{}\"",
+              e.getClass().getSimpleName(),
+              rejectSourceFederateIdJsonFile.getAbsolutePath()
+            );
+        }
+    }
+
+    public static void readRejectSourceFederateIdData(Reader reader) {
+        Map<String, Object> rejectSourceFederateIdMap = new JSONObject( new JSONTokener(reader) ).toMap();
+
+        for(String hlaClassName: rejectSourceFederateIdMap.keySet()) {
+            for(Object object: (JSONArray)rejectSourceFederateIdMap.get(hlaClassName)) {
+                add_reject_source_federate_id(hlaClassName, (String)object);
+            }
+        }
+    }
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
     }
 
     protected C2WInteractionRoot(NoInstanceInit noInstanceInit) {

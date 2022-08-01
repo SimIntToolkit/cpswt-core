@@ -31,6 +31,7 @@
 package org.cpswt.hla;
 
 import hla.rti.*;
+import org.apache.logging.log4j.core.pattern.ThreadIdPatternConverter;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
@@ -754,5 +755,62 @@ public class MessagingTests {
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("foobar", federateObject2.get_FederateType());
+    }
+
+    @Test
+    public void rejectSourceFederateIdTest() {
+
+        String interactionRootHlaClassName = InteractionRoot.get_hla_class_name();
+        C2WInteractionRoot.add_reject_source_federate_id(interactionRootHlaClassName, "foobar");
+        Assert.assertFalse(C2WInteractionRoot.is_reject_source_federate_id(interactionRootHlaClassName, "foobar"));
+
+        HighPrio highPrio1 = new HighPrio();
+        HighPrio.add_reject_source_federate_id("foo");
+        highPrio1.addRejectSourceFederateId("bar");
+
+
+        JSONArray jsonArray = new JSONArray();
+
+        jsonArray.put("foo");
+        highPrio1.set_federateSequence(jsonArray.toString());
+        Assert.assertTrue(highPrio1.isRejectSourceFederateId());
+        Assert.assertTrue(HighPrio.is_reject_source_federate_id(highPrio1));
+
+        jsonArray.put("boz");
+        highPrio1.set_federateSequence(jsonArray.toString());
+        Assert.assertFalse(highPrio1.isRejectSourceFederateId());
+        Assert.assertFalse(HighPrio.is_reject_source_federate_id(highPrio1));
+
+        jsonArray.put("bar");
+        highPrio1.set_federateSequence(jsonArray.toString());
+        Assert.assertTrue(highPrio1.isRejectSourceFederateId());
+        Assert.assertTrue(HighPrio.is_reject_source_federate_id(highPrio1));
+
+        highPrio1.removeRejectSourceFederateId("bar");
+        Assert.assertFalse(highPrio1.isRejectSourceFederateId());
+        Assert.assertFalse(HighPrio.is_reject_source_federate_id(highPrio1));
+
+
+        String highPrioHlaClassName = HighPrio.get_hla_class_name();
+        InteractionRoot highPrio2 = new InteractionRoot(highPrioHlaClassName);
+        C2WInteractionRoot.add_reject_source_federate_id(highPrioHlaClassName, "foo");
+        C2WInteractionRoot.add_reject_source_federate_id(highPrioHlaClassName, "bar");
+
+        jsonArray = new JSONArray();
+
+        jsonArray.put("foo");
+        highPrio2.setParameter("federateSequence", jsonArray.toString());
+        Assert.assertTrue(C2WInteractionRoot.is_reject_source_federate_id(highPrio2));
+
+        jsonArray.put("boz");
+        highPrio2.setParameter("federateSequence", jsonArray.toString());
+        Assert.assertFalse(C2WInteractionRoot.is_reject_source_federate_id(highPrio2));
+
+        jsonArray.put("bar");
+        highPrio2.setParameter("federateSequence", jsonArray.toString());
+        Assert.assertTrue(C2WInteractionRoot.is_reject_source_federate_id(highPrio2));
+
+        C2WInteractionRoot.remove_reject_source_federate_id(highPrioHlaClassName, "bar");
+        Assert.assertFalse(C2WInteractionRoot.is_reject_source_federate_id(highPrio2));
     }
 }

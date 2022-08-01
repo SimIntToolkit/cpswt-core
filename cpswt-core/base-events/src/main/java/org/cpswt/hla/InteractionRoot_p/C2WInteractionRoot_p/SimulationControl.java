@@ -159,7 +159,7 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        SimulationControl instance = new SimulationControl(createNoInstanceInit());
+        SimulationControl instance = new SimulationControl(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -374,6 +374,18 @@ public class SimulationControl extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected SimulationControl(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

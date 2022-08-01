@@ -156,6 +156,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private String federationJsonFileName = null;
     private String federateDynamicMessagingJsonFileName = null;
+
+    private String rejectSourceFederateIdJsonFileName = null;
     public double getStepSize() { return this.stepSize; }
     private void setStepSize(double stepSize) { this.stepSize = stepSize; }
 
@@ -168,6 +170,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.stepSize = federateConfig.stepSize;
         this.federationJsonFileName = federateConfig.federationJsonFileName;
         this.federateDynamicMessagingJsonFileName = federateConfig.federateDynamicMessagingJsonFileName;
+        this.rejectSourceFederateIdJsonFileName = federateConfig.rejectSourceFederateIdJsonFileName;
 
         if(federateConfig.name == null || federateConfig.name.isEmpty()) {
             this.federateId = FederateIdUtility.generateID(this.federateType);
@@ -251,14 +254,19 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         ObjectRoot.init(getLRC());
     }
 
-    public void initializeDynamicMessaging(File federationJsonFile, File federateDynamicMessagingClassesJsonFile) {
+    public void initializeDynamicMessaging(
+      File federationJsonFile, File federateDynamicMessagingClassesJsonFile, File rejectSourceFederateIdJsonFile
+    ) {
         InteractionRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
         ObjectRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
+        C2WInteractionRoot.readRejectSourceFederateIdData(rejectSourceFederateIdJsonFile);
         initializeMessaging();
     }
 
     public void initializeDynamicMessaging(
-            String federationJsonFileName, String federateDynamicMessagingClassesJsonFileName
+            String federationJsonFileName,
+            String federateDynamicMessagingClassesJsonFileName,
+            String rejectSourceFederateIdJsonFileName
     ) {
         if (
                 federationJsonFileName == null ||
@@ -269,9 +277,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             initializeMessaging();
             return;
         }
+        File federationJsonFile = new File(federationJsonFileName);
+        File federateDynamicMessagingClassesJsonFile = new File(federateDynamicMessagingClassesJsonFileName);
+        File rejectSourceFederateIdJsonFile = rejectSourceFederateIdJsonFileName == null ?
+          null : new File(rejectSourceFederateIdJsonFileName);
         initializeDynamicMessaging(
-                new File(federationJsonFileName),
-                new File(federateDynamicMessagingClassesJsonFileName)
+          federationJsonFile, federateDynamicMessagingClassesJsonFile, rejectSourceFederateIdJsonFile
         );
     }
     /**
@@ -315,7 +326,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
         }
 
-        initializeDynamicMessaging(federationJsonFileName, federateDynamicMessagingJsonFileName);
+        initializeDynamicMessaging(
+          federationJsonFileName, federateDynamicMessagingJsonFileName, rejectSourceFederateIdJsonFileName
+        );
 
         this.ensureSimEndSubscription();
 
@@ -1038,7 +1051,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction);
         logger.trace("SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", ir);
 
-        if (!unmatchingFedFilterProvided(ir)) {
+        if (!C2WInteractionRoot.is_reject_source_federate_id(ir) && !unmatchingFedFilterProvided(ir)) {
             if(SimEnd.match(interactionClass)) {
                 _receivedSimEnd = theInteraction;
             }
@@ -1089,7 +1102,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
         logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Created interaction root as: {}", ir);
-        if (!unmatchingFedFilterProvided(ir)) {
+        if (!C2WInteractionRoot.is_reject_source_federate_id(ir) && !unmatchingFedFilterProvided(ir)) {
             if(SimEnd.match(interactionClass)) {
                 _receivedSimEnd = theInteraction;
             }

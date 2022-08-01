@@ -160,7 +160,7 @@ public class DerivedObjectClass extends org.cpswt.hla.ObjectRoot_p.BaseObjectCla
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        DerivedObjectClass instance = new DerivedObjectClass(createNoInstanceInit());
+        DerivedObjectClass instance = new DerivedObjectClass(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -563,54 +563,6 @@ public class DerivedObjectClass extends org.cpswt.hla.ObjectRoot_p.BaseObjectCla
     }
 
     /**
-    * Publishes the "int_attribute2" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "int_attribute2" attribute for publication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
-    */
-    public static void publish_int_attribute2_attribute() {
-        publish_attribute(get_hla_class_name(), "int_attribute2");
-    }
-
-    /**
-    * Unpublishes the "int_attribute2" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "int_attribute2" attribute for unpublication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
-    */
-    public static void unpublish_int_attribute2_attribute() {
-        unpublish_attribute(get_hla_class_name(), "int_attribute2");
-    }
-
-    /**
-    * Subscribes a federate to the "int_attribute2" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "int_attribute2" attribute for subscription.
-    * To actually subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
-    */
-    public static void subscribe_int_attribute2_attribute() {
-        subscribe_attribute(get_hla_class_name(), "int_attribute2");
-    }
-
-    /**
-    * Unsubscribes a federate from the "int_attribute2" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "int_attribute2" attribute for unsubscription.
-    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
-    */
-    public static void unsubscribe_int_attribute2_attribute() {
-        unsubscribe_attribute(get_hla_class_name(), "int_attribute2");
-    }
-
-    /**
     * Publishes the "string_attribute1" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "string_attribute1" attribute for publication.
@@ -656,6 +608,54 @@ public class DerivedObjectClass extends org.cpswt.hla.ObjectRoot_p.BaseObjectCla
     */
     public static void unsubscribe_string_attribute1_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "string_attribute1");
+    }
+
+    /**
+    * Publishes the "int_attribute2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "int_attribute2" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_int_attribute2_attribute() {
+        publish_attribute(get_hla_class_name(), "int_attribute2");
+    }
+
+    /**
+    * Unpublishes the "int_attribute2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "int_attribute2" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_int_attribute2_attribute() {
+        unpublish_attribute(get_hla_class_name(), "int_attribute2");
+    }
+
+    /**
+    * Subscribes a federate to the "int_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute2" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_int_attribute2_attribute() {
+        subscribe_attribute(get_hla_class_name(), "int_attribute2");
+    }
+
+    /**
+    * Unsubscribes a federate from the "int_attribute2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "int_attribute2" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_int_attribute2_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "int_attribute2");
     }
 
     /**

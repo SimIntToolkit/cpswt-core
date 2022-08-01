@@ -159,7 +159,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        SimResume instance = new SimResume(createNoInstanceInit());
+        SimResume instance = new SimResume(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -374,6 +374,18 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected SimResume(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

@@ -159,7 +159,7 @@ public class ActionBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        ActionBase instance = new ActionBase(createNoInstanceInit());
+        ActionBase instance = new ActionBase(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -374,6 +374,18 @@ public class ActionBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRo
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected ActionBase(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

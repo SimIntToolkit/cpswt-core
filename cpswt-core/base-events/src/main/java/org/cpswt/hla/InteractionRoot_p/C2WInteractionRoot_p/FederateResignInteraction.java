@@ -159,7 +159,7 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        FederateResignInteraction instance = new FederateResignInteraction(createNoInstanceInit());
+        FederateResignInteraction instance = new FederateResignInteraction(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -469,6 +469,18 @@ public class FederateResignInteraction extends org.cpswt.hla.InteractionRoot_p.C
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected FederateResignInteraction(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

@@ -159,7 +159,7 @@ public class OutcomeBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionR
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        OutcomeBase instance = new OutcomeBase(createNoInstanceInit());
+        OutcomeBase instance = new OutcomeBase(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -374,6 +374,18 @@ public class OutcomeBase extends org.cpswt.hla.InteractionRoot_p.C2WInteractionR
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
+
+    public static void add_reject_source_federate_id(String federateId) {
+        add_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static boolean is_reject_source_federate_id(String federateId) {
+        return is_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
+
+    public static void remove_reject_source_federate_id(String federateId) {
+        remove_reject_source_federate_id(get_hla_class_name(), federateId);
+    }
 
     protected OutcomeBase(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
