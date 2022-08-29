@@ -38,12 +38,11 @@ import org.cpswt.hla.base.ATRQueue;
 import org.cpswt.hla.base.ObjectReflector;
 import org.cpswt.hla.base.ObjectReflectorComparator;
 import org.cpswt.hla.base.TimeAdvanceMode;
-import org.cpswt.hla.InteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
-import org.cpswt.hla.ObjectRoot;
 import org.cpswt.utils.CpswtDefaults;
 import org.cpswt.utils.CpswtUtils;
 import org.cpswt.utils.FederateIdUtility;
@@ -126,7 +125,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     private boolean _simEndNotSubscribed = true;
     private boolean _timeAdvanceNotGranted = true;
     private boolean _advanceTimeThreadNotStarted = true;
-    private ReceivedInteraction _receivedSimEnd = null;
+    private InteractionRoot _receivedSimEnd = null;
 
     protected boolean exitCondition = false;	// set to true when SimEnd is received
 
@@ -333,19 +332,72 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.ensureSimEndSubscription();
 
         this.notifyFederationOfJoin();
+    }
 
+    public void sendInteraction(
+            InteractionRoot interactionRoot, Set<String> federateNameSet, double time
+    ) throws Exception {
 
+        if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
+
+            String interactionJson = interactionRoot.toJson();
+
+            for (String federateName : federateNameSet) {
+                String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
+                InteractionRoot embeddedMessagingForNetworkFederate = new InteractionRoot(
+                        embeddedMessagingHlaClassName
+                );
+                if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name())) {
+                    embeddedMessagingForNetworkFederate.setParameter(
+                            "federateSequence",
+                            interactionRoot.getParameter("federateSequence")
+                    );
+                    embeddedMessagingForNetworkFederate.setFederateAppendedToFederateSequence(true);
+                }
+                embeddedMessagingForNetworkFederate.setParameter(
+                        "hlaClassName", interactionRoot.getInstanceHlaClassName()
+                );
+                embeddedMessagingForNetworkFederate.setParameter("messagingJson", interactionJson);
+
+                if (time >= 0) {
+                    sendInteraction(embeddedMessagingForNetworkFederate, time);
+                } else {
+                    sendInteraction(embeddedMessagingForNetworkFederate);
+                }
+            }
+        }
+    }
+
+    public void sendInteraction(InteractionRoot interactionRoot, String federateName, double time) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(interactionRoot, stringSet, time);
     }
 
     public void sendInteraction( InteractionRoot interactionRoot, double time ) throws Exception {
         C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
-        interactionRoot.sendInteraction(getLRC(), time);
 
+        if (interactionRoot.getIsPublished()) {
+            interactionRoot.sendInteraction(getLRC(), time);
+        }
+
+        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), time);
     }
 
     public void sendInteraction(InteractionRoot interactionRoot) throws Exception {
         C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
-        interactionRoot.sendInteraction(getLRC());
+
+        if (interactionRoot.getIsPublished()) {
+            interactionRoot.sendInteraction(getLRC());
+        }
+
+        sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(),-1);
+    }
+
+    public void sendInteraction(InteractionRoot interactionRoot, String federateName) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(interactionRoot, stringSet, -1);
     }
 
     public void notifyFederationOfJoin() {
@@ -1042,25 +1094,42 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         // for now, use the federate's current time or LBTS whichever is greater
         // as the timestamp
         DoubleTime assumedTimestamp = new DoubleTime();
-        if (getLBTS() >= getCurrentTime()) {
-            assumedTimestamp.setTime(getLBTS());
-        } else {
-            assumedTimestamp.setTime(getCurrentTime());
-        }
+        assumedTimestamp.setTime(Math.max(getLBTS(), getCurrentTime()));
 
-        InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction);
-        logger.trace("SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", ir);
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction);
+        logger.trace(
+                "SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", interactionRoot
+        );
 
-        if (!C2WInteractionRoot.is_reject_source_federate_id(ir) && !unmatchingFedFilterProvided(ir)) {
-            if(SimEnd.match(interactionClass)) {
-                _receivedSimEnd = theInteraction;
+        receiveInteractionSFAux(interactionRoot);
+    }
+
+    private final void receiveInteractionSFAux(InteractionRoot interactionRoot) {
+        if (!C2WInteractionRoot.is_reject_source_federate_id(interactionRoot) && !unmatchingFedFilterProvided(interactionRoot)) {
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
+                receiveEmbeddedInteraction((EmbeddedMessaging)interactionRoot);
+                return;
+            }
+
+            if(SimEnd.match(interactionRoot.getClassHandle())) {
+                _receivedSimEnd = interactionRoot;
             }
             // handleIfSimEnd(interactionClass, theInteraction, assumedTimestamp);
-            addInteraction(ir);
+            addInteraction(interactionRoot);
             // createLog(interactionClass, theInteraction, assumedTimestamp);
         }
     }
 
+    private void receiveEmbeddedInteraction(EmbeddedMessaging embeddedMessaging) {
+        String hlaClassName = embeddedMessaging.get_hlaClassName();
+        if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
+            return;
+        }
+
+        InteractionRoot embeddedInteraction =
+                InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
+        receiveInteractionSFAux(embeddedInteraction);
+    }
 
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchronizedFederate uses this method
@@ -1100,26 +1169,23 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     ) {
         logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
 
-        InteractionRoot ir = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
-        logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Created interaction root as: {}", ir);
-        if (!C2WInteractionRoot.is_reject_source_federate_id(ir) && !unmatchingFedFilterProvided(ir)) {
-            if(SimEnd.match(interactionClass)) {
-                _receivedSimEnd = theInteraction;
-            }
-            // handleIfSimEnd(interactionClass, theInteraction, theTime);
-            addInteraction(ir);
-            // createLog(interactionClass, theInteraction, theTime);
-        }
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
+        logger.trace(
+                "SynchronizedFederate::receiveInteractionSF (with time): Created interaction root as: {}",
+                interactionRoot
+        );
+
+        receiveInteractionSFAux(interactionRoot);
     }
 
     protected void enteredTimeGrantedState() {
         if(_receivedSimEnd != null) {
-            handleIfSimEnd(SimEnd.get_class_handle(), _receivedSimEnd, null);
+            handleIfSimEnd(_receivedSimEnd);
         }
     }
 
-    protected void handleIfSimEnd(int interactionClass, ReceivedInteraction theInteraction, LogicalTime theTime) {
-        if (SimEnd.match(interactionClass)) {
+    protected void handleIfSimEnd(InteractionRoot interactionRoot) {
+        if (SimEnd.match(interactionRoot.getClassHandle())) {
             logger.info("{}: SimEnd interaction received, exiting...", getFederateId());
 
             // this one will set flag allowing foreground federate to gracefully shut down

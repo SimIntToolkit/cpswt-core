@@ -44,10 +44,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction
+ * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging
  */
 @SuppressWarnings("unused")
-public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
+public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -60,7 +60,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -69,7 +69,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction";
+        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging";
     }
 
     /**
@@ -85,7 +85,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      *
      * @return the name of this interaction class
      */
@@ -95,7 +95,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.FederateJoinInteraction interaction class.
+     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -104,7 +104,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     public static String get_hla_class_name() {
-        return "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction";
+        return "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging";
     }
 
     /**
@@ -119,7 +119,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -137,7 +137,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -159,18 +159,15 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        FederateJoinInteraction instance = new FederateJoinInteraction(noInstanceInit);
+        EmbeddedMessaging instance = new EmbeddedMessaging(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType"
-        ));
-        classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
         ));
 
         // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -181,15 +178,11 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateId"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "FederateType"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "IsLateJoiner"
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -211,21 +204,18 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
         ClassAndPropertyName key;
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
+        key = new ClassAndPropertyName(get_hla_class_name(), "hlaClassName");
         _classAndPropertyNameInitialValueMap.put(key, "");
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
+        key = new ClassAndPropertyName(get_hla_class_name(), "messagingJson");
         _classAndPropertyNameInitialValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        _classAndPropertyNameInitialValueMap.put(key, false);
 
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction\" (hla class \"" +
+          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -241,7 +231,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -255,7 +245,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction") given the parameter's name.
+     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -274,7 +264,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
+     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -287,7 +277,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
+     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -297,7 +287,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -318,7 +308,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class.
+     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -348,12 +338,12 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class).
+     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -362,21 +352,21 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     //-------------
     // CONSTRUCTORS
     //-------------
-    public FederateJoinInteraction() {
+    public EmbeddedMessaging() {
         this(get_hla_class_name());
     }
 
-    public FederateJoinInteraction(LogicalTime logicalTime) {
+    public EmbeddedMessaging(LogicalTime logicalTime) {
         this();
         setTime(logicalTime);
     }
 
-    public FederateJoinInteraction(ReceivedInteraction propertyMap) {
+    public EmbeddedMessaging(ReceivedInteraction propertyMap) {
         this();
         setParameters( propertyMap );
     }
 
-    public FederateJoinInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public EmbeddedMessaging(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         this(propertyMap);
         setTime(logicalTime);
     }
@@ -389,35 +379,35 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
     //-----------------
     // CREATION METHODS
     //-----------------
-    public static FederateJoinInteraction create_interaction() {
-        return new FederateJoinInteraction();
+    public static EmbeddedMessaging create_interaction() {
+        return new EmbeddedMessaging();
     }
 
-    public FederateJoinInteraction createInteraction() {
+    public EmbeddedMessaging createInteraction() {
         return create_interaction();
     }
 
-    public static FederateJoinInteraction create_interaction(LogicalTime logicalTime) {
-        return new FederateJoinInteraction(logicalTime);
+    public static EmbeddedMessaging create_interaction(LogicalTime logicalTime) {
+        return new EmbeddedMessaging(logicalTime);
     }
 
-    public FederateJoinInteraction createInteraction(LogicalTime logicalTime) {
+    public EmbeddedMessaging createInteraction(LogicalTime logicalTime) {
         return create_interaction(logicalTime);
     }
 
-    public static FederateJoinInteraction create_interaction(ReceivedInteraction propertyMap) {
-        return new FederateJoinInteraction(propertyMap);
+    public static EmbeddedMessaging create_interaction(ReceivedInteraction propertyMap) {
+        return new EmbeddedMessaging(propertyMap);
     }
 
-    public FederateJoinInteraction createInteraction(ReceivedInteraction propertyMap) {
+    public EmbeddedMessaging createInteraction(ReceivedInteraction propertyMap) {
         return create_interaction(propertyMap);
     }
 
-    public static FederateJoinInteraction create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
-        return new FederateJoinInteraction(propertyMap, logicalTime);
+    public static EmbeddedMessaging create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new EmbeddedMessaging(propertyMap, logicalTime);
     }
 
-    public FederateJoinInteraction createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public EmbeddedMessaging createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         return create_interaction(propertyMap, logicalTime);
     }
 
@@ -436,65 +426,44 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
 
     /**
-     * Set the value of the "FederateId" parameter to "value" for this parameter.
+     * Set the value of the "hlaClassName" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "FederateId" parameter
+     * @param value the new value for the "hlaClassName" parameter
      */
-    public void set_FederateId(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
+    public void set_hlaClassName(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "hlaClassName");
         classAndPropertyNameValueMap.put(key, value);
     }
 
     /**
-     * Returns the value of the "FederateId" parameter of this interaction.
+     * Returns the value of the "hlaClassName" parameter of this interaction.
      *
-     * @return the value of the "FederateId" parameter
+     * @return the value of the "hlaClassName" parameter
      */
-    public String get_FederateId() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateId");
+    public String get_hlaClassName() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "hlaClassName");
         return (String)classAndPropertyNameValueMap.get(key);
     }
 
 
     /**
-     * Set the value of the "FederateType" parameter to "value" for this parameter.
+     * Set the value of the "messagingJson" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "FederateType" parameter
+     * @param value the new value for the "messagingJson" parameter
      */
-    public void set_FederateType(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
+    public void set_messagingJson(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "messagingJson");
         classAndPropertyNameValueMap.put(key, value);
     }
 
     /**
-     * Returns the value of the "FederateType" parameter of this interaction.
+     * Returns the value of the "messagingJson" parameter of this interaction.
      *
-     * @return the value of the "FederateType" parameter
+     * @return the value of the "messagingJson" parameter
      */
-    public String get_FederateType() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
+    public String get_messagingJson() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "messagingJson");
         return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "IsLateJoiner" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "IsLateJoiner" parameter
-     */
-    public void set_IsLateJoiner(Boolean value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "IsLateJoiner" parameter of this interaction.
-     *
-     * @return the value of the "IsLateJoiner" parameter
-     */
-    public boolean get_IsLateJoiner() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
-        return (boolean)classAndPropertyNameValueMap.get(key);
     }
 
     //----------------------------------
@@ -513,32 +482,32 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
         remove_reject_source_federate_id(get_hla_class_name(), federateId);
     }
 
-    protected FederateJoinInteraction(NoInstanceInit noInstanceInit) {
+    protected EmbeddedMessaging(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
 
     /**
-    * Creates an instance of the FederateJoinInteraction interaction class, using
+    * Creates an instance of the EmbeddedMessaging interaction class, using
     * "datamemberMap" to initialize its parameter values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new FederateJoinInteraction interaction class instance
+    * parameters of this new EmbeddedMessaging interaction class instance
     */
-    protected FederateJoinInteraction( String hlaClassName ) {
+    protected EmbeddedMessaging( String hlaClassName ) {
         super( hlaClassName );
     }
 
     /**
-    * Creates a new FederateJoinInteraction interaction class instance that is a duplicate
+    * Creates a new EmbeddedMessaging interaction class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var FederateJoinInteraction interaction class instance of which
-    * this newly created FederateJoinInteraction interaction class instance will be a
+    * @param messaging_var EmbeddedMessaging interaction class instance of which
+    * this newly created EmbeddedMessaging interaction class instance will be a
     * duplicate
     */
-    public FederateJoinInteraction(FederateJoinInteraction messaging_var) {
+    public EmbeddedMessaging(EmbeddedMessaging messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);

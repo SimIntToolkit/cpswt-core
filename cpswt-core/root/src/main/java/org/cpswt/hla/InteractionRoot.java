@@ -119,6 +119,16 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
+    private static Map<String, Boolean> _hlaClassNameIsInitializedMap = new HashMap<>();
+
+    private static Boolean get_hla_class_name_is_initialized(String hlaClassName) {
+        return _hlaClassNameIsInitializedMap.getOrDefault(hlaClassName, false);
+    }
+
+    private static void set_hla_class_name_is_initialized(String hlaClassName) {
+        _hlaClassNameIsInitializedMap.put(hlaClassName, true);
+    }
+
     private static boolean _isInitialized = false;
     public static void init(RTIambassador rtiAmbassador) {
         if (_isInitialized) {
@@ -126,19 +136,33 @@ public class InteractionRoot implements InteractionRootInterface {
         }
         _isInitialized = true;
 
+        for(String hlaClassName: _hlaClassNameSet) {
+            init(hlaClassName, rtiAmbassador);
+        }
+    }
+
+    public static void init(String hlaClassName, RTIambassador rtiAmbassador) {
+
         //-------------------------------------------------------------------------
         // _hlaClassNameSet IS POPULATED BY
         // - STATIC INITIALIZATION BLOCKS IN THE DERIVED INTERACTION/OBJECT CLASSES
         // - THE DYNAMIC-MESSAGE-CLASSES FILE
         //-------------------------------------------------------------------------
-        for(String hlaClassName: _hlaClassNameSet) {
+        List<String> hlaClassNameComponents = new ArrayList<>(Arrays.asList(hlaClassName.split("\\.")));
+        while(!hlaClassNameComponents.isEmpty()) {
+            String localHlaClassName = String.join(".", hlaClassNameComponents);
+            hlaClassNameComponents.remove(hlaClassNameComponents.size() - 1);
 
-            if (!_hlaClassNameInstanceMap.containsKey(hlaClassName)) {
-                _dynamicHlaClassNameSet.add(hlaClassName);
+            if (get_hla_class_name_is_initialized(localHlaClassName)) {
+                continue;
+            }
+
+            if (!_hlaClassNameInstanceMap.containsKey(localHlaClassName)) {
+                _dynamicHlaClassNameSet.add(localHlaClassName);
             }
 
             //------------------------------------------
-            // GET HANDLE FOR hlaClassName TO INITIALIZE
+            // GET HANDLE FOR localHlaClassName TO INITIALIZE
             // - _classNameHandleMap
             // - _classHandleNameMap
             //------------------------------------------
@@ -146,9 +170,9 @@ public class InteractionRoot implements InteractionRootInterface {
             int classHandle = 0;
             while(isNotInitialized) {
                 try {
-                    classHandle = rtiAmbassador.getInteractionClassHandle(hlaClassName);
-                    _classNameHandleMap.put(hlaClassName, classHandle);
-                    _classHandleNameMap.put(classHandle, hlaClassName);
+                    classHandle = rtiAmbassador.getInteractionClassHandle(localHlaClassName);
+                    _classNameHandleMap.put(localHlaClassName, classHandle);
+                    _classHandleNameMap.put(classHandle, localHlaClassName);
                     isNotInitialized = false;
                 } catch (FederateNotExecutionMember e) {
                     logger.error("could not initialize: Federate Not Execution Member", e);
@@ -163,14 +187,14 @@ public class InteractionRoot implements InteractionRootInterface {
             }
 
             //-------------------------------------------------------------------------------------------
-            // _classAndPropertyNameSetMap MAPS hlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
-            // DEFINED *DIRECTLY* IN THE hlaClassName CLASS
+            // _classAndPropertyNameSetMap MAPS localHlaClassName TO THE PROPERTIES (PARAMETERS OR ATTRIBUTES)
+            // DEFINED *DIRECTLY* IN THE localHlaClassName CLASS
             //
             // GET HANDLE FOR THESE PROPERTIES TO INITIALIZE
             // - _classAndPropertyNameHandleMap
             // - _handleClassAndPropertyNameMap
             //-------------------------------------------------------------------------------------------
-            Set<ClassAndPropertyName> classAndPropertyNameSet = _classNamePropertyNameSetMap.get(hlaClassName);
+            Set<ClassAndPropertyName> classAndPropertyNameSet = _classNamePropertyNameSetMap.get(localHlaClassName);
             for(ClassAndPropertyName classAndPropertyName: classAndPropertyNameSet) {
                 isNotInitialized = true;
                 while(isNotInitialized) {
@@ -198,8 +222,9 @@ public class InteractionRoot implements InteractionRootInterface {
             //-------------------------------------------------------
             // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
             //-------------------------------------------------------
-            _classNamePublishStatusMap.put(hlaClassName, false);
-            _classNameSubscribeStatusMap.put(hlaClassName, false);
+            _classNamePublishStatusMap.put(localHlaClassName, false);
+            _classNameSubscribeStatusMap.put(localHlaClassName, false);
+            _classNameSoftSubscribeStatusMap.put(localHlaClassName, false);
         }
     }
 
@@ -230,12 +255,12 @@ public class InteractionRoot implements InteractionRootInterface {
     // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
     protected boolean federateAppendedToFederateSequence = false;
 
-    protected static void set_federate_appended_to_federate_sequence(InteractionRoot interactionRoot) {
-        interactionRoot.federateAppendedToFederateSequence = true;
+    public void setFederateAppendedToFederateSequence(boolean value) {
+        federateAppendedToFederateSequence = value;
     }
 
-    protected static boolean get_federate_appended_to_federate_sequence(InteractionRoot interactionRoot) {
-        return interactionRoot.federateAppendedToFederateSequence;
+    public boolean getFederateAppendedToFederateSequence() {
+        return federateAppendedToFederateSequence;
     }
 
     public static String get_simple_class_name(String hlaClassName) {
@@ -574,24 +599,34 @@ public class InteractionRoot implements InteractionRootInterface {
     // POPULATED BY:
     // - init(RTIambassador) ABOVE
     //------------------------------
-    protected static HashMap<String, Boolean> _classNamePublishStatusMap = new HashMap<>();
+    protected static final HashMap<String, Boolean> _classNamePublishStatusMap = new HashMap<>();
 
     //-----------------------------------------------
     // METHODS THAT USE CLASS-NAME PUBLISH-STATUS MAP
     //-----------------------------------------------
     public static Boolean get_is_published(String hlaClassName) {
-        return _classNamePublishStatusMap.getOrDefault(hlaClassName, null);
+        if (!_classNamePublishStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "get_is_published: Could not get publish-status of class \"{}\":  class not defined.", hlaClassName
+            );
+            return null;
+        }
+        return _classNamePublishStatusMap.get(hlaClassName);
+    }
+
+    public Boolean getIsPublished() {
+        return get_is_published(getInstanceHlaClassName());
     }
 
     private static void set_is_published(String hlaClassName, boolean publishStatus) {
-        if (_classNamePublishStatusMap.containsKey(hlaClassName)) {
-            _classNamePublishStatusMap.put(hlaClassName, publishStatus);
+        if (!_classNamePublishStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "set_is_published: Could not set publish-status of class \"{}\" to \"{}\":  class not defined.",
+              hlaClassName, publishStatus
+            );
             return;
         }
-        logger.warn(
-          "set_is_published: Could not set publish-status of class \"{}\" to \"{}\":  class not defined.",
-          hlaClassName, publishStatus
-        );
+        _classNamePublishStatusMap.put(hlaClassName, publishStatus);
     }
 
     //----------------------------------
@@ -604,28 +639,81 @@ public class InteractionRoot implements InteractionRootInterface {
     // POPULATED BY:
     // - init(RTIambassador) ABOVE
     //--------------------------------
-    protected static HashMap<String, Boolean> _classNameSubscribeStatusMap = new HashMap<>();
+    protected static final HashMap<String, Boolean> _classNameSubscribeStatusMap = new HashMap<>();
 
     //-------------------------------------------------
     // METHODS THAT USE CLASS-NAME SUBSCRIBE-STATUS MAP
     //-------------------------------------------------
-    public static Boolean get_is_subscribed(String className) {
-        return _classNameSubscribeStatusMap.getOrDefault(className, null);
+    public static Boolean get_is_subscribed(String hlaClassName) {
+        if (!_classNameSubscribeStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "get_is_subscribed: Could not get subscribe-status of class \"{}\":  class not defined.", hlaClassName
+            );
+            return null;
+        }
+        return _classNameSubscribeStatusMap.get(hlaClassName);
     }
 
-    private static void set_is_subscribed(String className, boolean subscribeStatus) {
-        if (_classNameSubscribeStatusMap.containsKey(className)) {
-            _classNameSubscribeStatusMap.put(className, subscribeStatus);
+    public Boolean getIsSubscribed() {
+        return get_is_subscribed(getInstanceHlaClassName());
+    }
+
+
+    private static void set_is_subscribed(String hlaClassName, boolean subscribeStatus) {
+        if (!_classNameSubscribeStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "set_is_subscribed: Could not set subscribe-status of class \"{}\" to \"{}\":  class not defined.",
+              hlaClassName, subscribeStatus
+            );
             return;
         }
-        logger.warn(
-          "setIsSubscribeed: Could not set subscribe-status of class \"{}\" to \"{}\":  class not defined.",
-          className, subscribeStatus
-        );
+        _classNameSubscribeStatusMap.put(hlaClassName, subscribeStatus);
     }
 
     //------------------------------------
     // END CLASS-NAME SUBSCRIBE-STATUS MAP
+    //------------------------------------
+
+    //-------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBE-STATUS MAP
+    //
+    // POPULATED BY:
+    // - init(RTIambassador) ABOVE
+    //-------------------------------------
+    protected static final HashMap<String, Boolean> _classNameSoftSubscribeStatusMap = new HashMap<>();
+
+    //------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SOFT-SUBSCRIBE-STATUS MAP
+    //------------------------------------------------------
+    public static Boolean get_is_soft_subscribed(String hlaClassName) {
+        if (!_classNameSoftSubscribeStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "get_is_soft_subscribed: Could not get soft-subscribe-status of class \"{}\":  class not defined",
+              hlaClassName
+            );
+            return null;
+        }
+        return _classNameSoftSubscribeStatusMap.get(hlaClassName);
+    }
+
+    public Boolean getIsSoftSubscribed() {
+        return get_is_soft_subscribed(getInstanceHlaClassName());
+    }
+
+
+    private static void set_is_soft_subscribed(String hlaClassName, boolean softSubscribeStatus) {
+        if (!_classNameSoftSubscribeStatusMap.containsKey(hlaClassName)) {
+            logger.warn(
+              "set_is_soft_subscribed: Could not set soft-subscribe-status of class \"{}\" to \"{}\":  class not defined",
+              hlaClassName, softSubscribeStatus
+            );
+            return;
+        }
+        _classNameSoftSubscribeStatusMap.put(hlaClassName, softSubscribeStatus);
+    }
+
+    //------------------------------------
+    // END CLASS-NAME SOFT-SUBSCRIBE-STATUS MAP
     //------------------------------------
 
     //--------------------------------------------
@@ -794,6 +882,11 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void publish_interaction(String hlaClassName, RTIambassador rti) {
 
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("publish_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
+
         if (get_is_published(hlaClassName)) {
             return;
         }
@@ -825,6 +918,11 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void subscribe_interaction(String hlaClassName, RTIambassador rti) {
 
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("subscribe_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
+
         if (get_is_subscribed(hlaClassName)) {
             return;
         }
@@ -854,7 +952,21 @@ public class InteractionRoot implements InteractionRootInterface {
         set_is_subscribed(hlaClassName, true);
     }
 
+    public static void soft_subscribe_interaction(String hlaClassName, RTIambassador rti) {
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("soft_subscribe_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
+
+        set_is_soft_subscribed(hlaClassName, true);
+    }
+
     public static void unpublish_interaction(String hlaClassName, RTIambassador rti) {
+
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("unpublish_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
 
         if (!get_is_published(hlaClassName)) {
             return;
@@ -890,6 +1002,11 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void unsubscribe_interaction(String hlaClassName, RTIambassador rti) {
 
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("unsubscribe_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
+
         if (!get_is_subscribed(hlaClassName)) {
             return;
         }
@@ -920,6 +1037,15 @@ public class InteractionRoot implements InteractionRootInterface {
         logger.debug("unsubscribe: {}", hlaClassName);
 
         set_is_subscribed(hlaClassName, false);
+    }
+
+    public static void soft_unsubscribe_interaction(String hlaClassName, RTIambassador rti) {
+        if (!loadDynamicHlaClass(hlaClassName, rti)) {
+            logger.warn("soft_unsubscribe_interaction(\"{}}\"):  no such class", hlaClassName);
+            return;
+        }
+
+        set_is_soft_subscribed(hlaClassName, false);
     }
 
     //-----------------------------------------------------------------------------------------------------------
@@ -1307,6 +1433,10 @@ public class InteractionRoot implements InteractionRootInterface {
         publish_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_published() {
+        return get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
@@ -1326,6 +1456,18 @@ public class InteractionRoot implements InteractionRootInterface {
         subscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_subscribed() {
+        return get_is_subscribed(get_hla_class_name());
+    }
+
+    public static void soft_subscribe_interaction(RTIambassador rti) {
+        soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static Boolean get_is_soft_subscribed() {
+        return get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot interaction class.
      *
@@ -1335,6 +1477,21 @@ public class InteractionRoot implements InteractionRootInterface {
         unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static void soft_unsubscribe_interaction(RTIambassador rti) {
+        soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static void add_federate_name_soft_publish(String networkFederateName) {
+        add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public static void remove_federate_name_soft_publish(String networkFederateName) {
+        remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public Set<String> getFederateNameSoftPublishSet() {
+        return get_federate_name_soft_publish_set(get_hla_class_name());
+    }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
@@ -1789,6 +1946,14 @@ public class InteractionRoot implements InteractionRootInterface {
         unsubscribe_interaction(getInstanceHlaClassName(), rti);
     }
 
+    public void softSubscribeInteraction(RTIambassador rti) {
+        soft_subscribe_interaction(getInstanceHlaClassName(), rti);
+    }
+
+    public void softUnsubscribeInteraction(RTIambassador rti) {
+        soft_unsubscribe_interaction(getInstanceHlaClassName(), rti);
+    }
+
     //-------------------------------------------------------------------
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
@@ -1826,6 +1991,51 @@ public class InteractionRoot implements InteractionRootInterface {
         }
 
         return interactionRoot;
+    }
+
+    private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();
+
+    public static void add_federate_name_soft_publish(String hlaClassName, String federateName) {
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            logger.warn(
+              "add_federate_name_soft_publish(\"{}\", \"{}\") -- no such interaction class \"{}\"",
+              hlaClassName, federateName, hlaClassName
+            );
+            return;
+        }
+
+        if (!_hlaClassNameToFederateNameSoftPublishSetMap.containsKey(hlaClassName)) {
+            _hlaClassNameToFederateNameSoftPublishSetMap.put(hlaClassName, new HashSet<>());
+        }
+        _hlaClassNameToFederateNameSoftPublishSetMap.get(hlaClassName).add(federateName);
+    }
+
+    public void addFederateNameSoftPublish(String federateName) {
+        add_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
+    }
+
+    public static void remove_federate_name_soft_publish(String hlaClassName, String federateName) {
+        if (_hlaClassNameToFederateNameSoftPublishSetMap.containsKey(hlaClassName)) {
+            Set<String> federateNameSoftPublishSet =
+              _hlaClassNameToFederateNameSoftPublishSetMap.get(hlaClassName);
+            federateNameSoftPublishSet.remove(federateName);
+            if (federateNameSoftPublishSet.isEmpty()) {
+                _hlaClassNameToFederateNameSoftPublishSetMap.remove(hlaClassName);
+            }
+        }
+    }
+
+    public void removeFederateNameSoftPublish(String federateName) {
+        remove_federate_name_soft_publish(getInstanceHlaClassName(), federateName);
+    }
+
+    public Set<String> get_federate_name_soft_publish_set(String hlaClassName) {
+        return _hlaClassNameToFederateNameSoftPublishSetMap.containsKey(hlaClassName) ?
+          new HashSet<>(_hlaClassNameToFederateNameSoftPublishSetMap.get(hlaClassName)) : new HashSet<>();
+    }
+
+    public Set<String> getFederateNameSoftPublishSet(String hlaClassName) {
+        return get_federate_name_soft_publish_set(getInstanceHlaClassName());
     }
 
     private static JSONObject federationJson = null;
@@ -1877,19 +2087,45 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void readFederateDynamicMessageClasses(Reader reader) {
 
-        JSONObject dynamicMessageTypes = new JSONObject( new JSONTokener(reader) );
-        JSONObject federationMessaging = federationJson.getJSONObject("interactions");
-
-        Set<String> localHlaClassNameSet = new HashSet<>();
+        JSONObject dynamicMessageTypes = new JSONObject(new JSONTokener(reader));
 
         JSONArray dynamicHlaClassNames = dynamicMessageTypes.getJSONArray("interactions");
+
+        Set<String> dynamicHlaClassNameSet = new HashSet<>();
         for(Object object: dynamicHlaClassNames) {
-            String hlaClassName = (String)object;
+            dynamicHlaClassNameSet.add((String)object);
+        }
+
+        readFederateDynamicMessageClasses(dynamicHlaClassNameSet);
+    }
+
+    public static void readFederateDynamicMessageClasses(Set<String> dynamicHlaClassNameSet) {
+
+        if (federationJson == null) {
+            logger.warn("readFederateDynamicMessageClasses:  no federation messaging loaded.");
+            return;
+        }
+
+        JSONObject federationMessaging = federationJson.getJSONObject("interactions");
+        Set<String> localHlaClassNameSet = new HashSet<>();
+
+        for(String hlaClassName: dynamicHlaClassNameSet) {
             List<String> hlaClassNameComponents = new ArrayList<>(Arrays.asList(hlaClassName.split("\\.")));
             while(!hlaClassNameComponents.isEmpty()) {
                 String localHlaClassName = String.join(".", hlaClassNameComponents);
-                localHlaClassNameSet.add(localHlaClassName);
                 hlaClassNameComponents.remove(hlaClassNameComponents.size() - 1);
+
+                if (_hlaClassNameSet.contains(localHlaClassName)) {
+                    break;
+                }
+                if (federationMessaging.has(localHlaClassName)) {
+                    localHlaClassNameSet.add(localHlaClassName);
+                } else {
+                    logger.warn(
+                            "readFederateDynamicMessageClasses: Could not load HLA class \"{}\": no definition exists.",
+                            localHlaClassName
+                    );
+                }
             }
         }
 
@@ -1922,12 +2158,20 @@ public class InteractionRoot implements InteractionRootInterface {
             List<String> hlaClassNameComponents = new ArrayList<>(Arrays.asList(hlaClassName.split("\\.")));
             while(!hlaClassNameComponents.isEmpty()) {
                 String localHlaClassName = String.join(".", hlaClassNameComponents);
-                allClassAndPropertyNameSet.addAll(_classNamePropertyNameSetMap.get(localHlaClassName));
                 hlaClassNameComponents.remove(hlaClassNameComponents.size() - 1);
+
+                allClassAndPropertyNameSet.addAll(_classNamePropertyNameSetMap.get(localHlaClassName));
             }
 
             _allClassNamePropertyNameSetMap.put(hlaClassName, allClassAndPropertyNameSet);
         }
+    }
+
+    public static void readFederateDynamicMessageClass(String dynamicHlaClassName) {
+        Set<String> dynamicHlaClassNameSet = new HashSet<>();
+        dynamicHlaClassNameSet.add(dynamicHlaClassName);
+
+        readFederateDynamicMessageClasses(dynamicHlaClassNameSet);
     }
 
     public static void loadDynamicClassFederationData(
@@ -1940,6 +2184,17 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void loadDynamicClassFederationData(File federationJsonFile, File federateDynamicMessageClassesFile) {
         readFederationJson(federationJsonFile);
         readFederateDynamicMessageClasses(federateDynamicMessageClassesFile);
+    }
+
+    private static boolean loadDynamicHlaClass(String hlaClassName, RTIambassador rtiAmbassador) {
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            readFederateDynamicMessageClass(hlaClassName);
+            if (!_hlaClassNameSet.contains(hlaClassName)) {
+                return false;
+            }
+            init(hlaClassName, rtiAmbassador);
+        }
+        return true;
     }
 
     @Override
