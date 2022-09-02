@@ -281,6 +281,10 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         publish_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_published() {
+        return get_is_published(get_hla_class_name());
+    }
+
     /**
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
      *
@@ -300,6 +304,18 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         subscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static Boolean get_is_subscribed() {
+        return get_is_subscribed(get_hla_class_name());
+    }
+
+    public static void soft_subscribe_interaction(RTIambassador rti) {
+        soft_subscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static Boolean get_is_soft_subscribed() {
+        return get_is_soft_subscribed(get_hla_class_name());
+    }
+
     /**
      * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      *
@@ -309,6 +325,21 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         unsubscribe_interaction(get_hla_class_name(), rti);
     }
 
+    public static void soft_unsubscribe_interaction(RTIambassador rti) {
+        soft_unsubscribe_interaction(get_hla_class_name(), rti);
+    }
+
+    public static void add_federate_name_soft_publish(String networkFederateName) {
+        add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public static void remove_federate_name_soft_publish(String networkFederateName) {
+        remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
+    }
+
+    public Set<String> getFederateNameSoftPublishSet() {
+        return get_federate_name_soft_publish_set(get_hla_class_name());
+    }
 
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
@@ -490,10 +521,10 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     private static void update_federate_sequence_aux(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
 
-        if (org.cpswt.hla.InteractionRoot.get_federate_appended_to_federate_sequence(interactionRoot)) {
+        if (interactionRoot.getFederateAppendedToFederateSequence()) {
             return;
         }
-        org.cpswt.hla.InteractionRoot.set_federate_appended_to_federate_sequence(interactionRoot);
+        interactionRoot.setFederateAppendedToFederateSequence(true);
 
         String federateSequence = (String)interactionRoot.getParameter("federateSequence");
 
