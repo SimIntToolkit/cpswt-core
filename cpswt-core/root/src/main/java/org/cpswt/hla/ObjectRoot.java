@@ -288,13 +288,13 @@ public class ObjectRoot implements ObjectRootInterface {
     protected static class Attribute<T> {
         private T _value;
         private T _oldValue = null;
-        private boolean _oldValueInit = false;
+        private boolean _valueUpdateSent = false;
         private double _time = 0;
 
         public Attribute(Attribute<T> other) {
             _value = other._value;
             _oldValue = other._oldValue;
-            _oldValueInit = other._oldValueInit;
+            _valueUpdateSent = other._valueUpdateSent;
             _time = other._time;
         }
 
@@ -309,6 +309,7 @@ public class ObjectRoot implements ObjectRootInterface {
         public void setValue( T value ) {
             if ( value == null ) return;
             _value = value;
+            _valueUpdateSent = _value.equals(_oldValue);
         }
 
         public double getTime() {
@@ -319,13 +320,13 @@ public class ObjectRoot implements ObjectRootInterface {
             _time = time;
         }
 
-        public void setHasBeenUpdated() {
+        public void setUpdateSent() {
             _oldValue = _value;
-            _oldValueInit = true;
+            _valueUpdateSent = true;
         }
 
         public boolean shouldBeUpdated( boolean force ) {
-            return force || !_oldValueInit || !_oldValue.equals( _value );
+            return force || !_valueUpdateSent;
         }
 
         @Override
@@ -1012,7 +1013,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-      * Returns the handle ofan attribute(RTI assigned) given
+      * Returns the handle of an attribute (RTI assigned) given
       * its object class name and attribute name
       *
       * @param hlaClassName name of object class
@@ -1025,7 +1026,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         if (key == null) {
             logger.error(
-                    "Bad parameter \"{}\" for class \"{}\" and super-classes on get_attribute_handle.",
+                    "Bad attribute \"{}\" for class \"{}\" and super-classes on get_attribute_handle.",
                     propertyName, hlaClassName
             );
             return -1;
@@ -1051,7 +1052,7 @@ public class ObjectRoot implements ObjectRootInterface {
                 }
                 byte[] byteArrayValue = stringValue.getBytes();
                 suppliedAttributes.add(handle, byteArrayValue );
-                attribute.setHasBeenUpdated();
+                attribute.setUpdateSent();
             }
         }
 
@@ -1074,12 +1075,12 @@ public class ObjectRoot implements ObjectRootInterface {
     // METHODS THAT USE PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
     //-------------------------------------------------------------
     /**
-      * Returns the name ofan attributecorresponding to
+      * Returns the name of an attribute corresponding to
       * its handle (RTI assigned) in propertyHandle.
       *
       * @param propertyHandle handle ofattribute(RTI assigned)
       * for which to return the name
-      * @return the name of theattributecorresponding to propertyHandle
+      * @return the name of theattribute corresponding to propertyHandle
       */
     public static ClassAndPropertyName get_class_and_attribute_name( int propertyHandle ) {
         return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
@@ -1087,8 +1088,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
       * Returns the full class and attribute names associated with the given handle for an
-      * object class instance.  The full name of a parameter is the full name of the class in which the
-      * parameter is defined and the parameter name, in that order, delimited by a ",".
+      * object class instance.  The full name of an attribute is the full name of the class in which the
+      * attribute is defined and the attribute name, in that order, delimited by a ",".
       *
       * @param propertyHandle a attribute handle assigned by the RTI
       * @return the full attribute name associated with the handle, or null if the handle does not exist.
@@ -1707,30 +1708,6 @@ public class ObjectRoot implements ObjectRootInterface {
         }
     }
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
-    protected static class PropertyClassNameAndValue {
-        private final String className;
-        private final Object value;
-
-        public PropertyClassNameAndValue(String className, Object value) {
-            this.className = className;
-            this.value = value;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-        public Object getValue() {
-            return value;
-        }
-    }
-
     //-------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //-------------------------------------------
@@ -1745,13 +1722,12 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public void setAttribute(String hlaClassName, String propertyName, Object value) {
 
-        PropertyClassNameAndValue propertyClassNameAndValue =
-          getAttributeAux(hlaClassName, propertyName);
+        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
 
-        if (propertyClassNameAndValue == null) {
+        if (classAndPropertyName == null) {
             logger.error(
-              "setAttribute(\"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
-              "superclasses.", propertyName, value.getClass().getName(), propertyName, getInstanceHlaClassName()
+                    "setAttribute(\"{}\", \"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
+                    "superclasses.", hlaClassName, propertyName, value.getClass().getName(), propertyName, hlaClassName
             );
             return;
         }
@@ -1759,14 +1735,13 @@ public class ObjectRoot implements ObjectRootInterface {
         // CANNOT SET VALUE TO NULL
         if (value == null) {
             logger.warn(
-              "setAttribute(\"{}\", null): attempt to set \"{}\" attribute in " +
-              "\"{}\"  class to null.",
-              propertyName, propertyName, propertyClassNameAndValue.getClassName()
+              "setAttribute(\"{}\", \"{}\", null): attempt to set \"{}\" attribute in \"{}\" class to null.",
+              hlaClassName, propertyName, propertyName, hlaClassName
             );
             return;
         }
 
-        Object currentValue = ((Attribute<?>)propertyClassNameAndValue.getValue()).getValue();
+        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
 
         // IF value IS A STRING, AND THE TYPE OF THE ATTRIBUTE IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
@@ -1781,9 +1756,9 @@ public class ObjectRoot implements ObjectRootInterface {
                     method = currentValue.getClass().getMethod("valueOf", String.class);
                 } catch (NoSuchMethodException noSuchMethodException) {
                     logger.error(
-                            "setParameter(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
+                            "setAttribute(\"{}\", \"{}\", {} value): unable to access \"valueOf\" " +
                                     "method of \"Number\" object: cannot set value!",
-                            propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
+                            hlaClassName, propertyName, value.getClass().getName()
                     );
                     return;
                 }
@@ -1824,7 +1799,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         if (currentValue.getClass() != value.getClass()) {
             logger.error(
-              "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
+              "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" attribute, " +
               "should be of type \"{}\".",
               propertyName,
               value.getClass().getName(),
@@ -1834,7 +1809,7 @@ public class ObjectRoot implements ObjectRootInterface {
             );
             return;
         }
-        Attribute<Object> attribute = ((Attribute<Object>)propertyClassNameAndValue.getValue());
+        Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(classAndPropertyName);
         attribute.setValue(value);
         attribute.setTime(getTime());
     }
@@ -1849,16 +1824,6 @@ public class ObjectRoot implements ObjectRootInterface {
         setAttribute(getInstanceHlaClassName(), propertyName, value);
     }
 
-    private PropertyClassNameAndValue getAttributeAux(String className, String propertyName) {
-        ClassAndPropertyName key = findProperty(className, propertyName);
-        if (key != null) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            return value == null ? null : new PropertyClassNameAndValue(key.getClassName(), value);
-        }
-
-        return null;
-    }
-
     /**
      * Returns the value of the attribute named "propertyName" for this
      * object.
@@ -1867,7 +1832,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the value of the attribute whose name is "propertyName"
      */
     public boolean hasAttribute(String hlaClassName, String propertyName) {
-        return getAttributeAux(hlaClassName, propertyName) != null;
+        return findProperty(hlaClassName, propertyName) != null;
     }
 
     public boolean hasAttribute(String propertyName) {
@@ -1875,17 +1840,12 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     public Object getAttribute(String hlaClassName, String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getAttributeAux(
-          hlaClassName, propertyName
-        );
-        return propertyClassNameAndValue == null ? null
-          : ((Attribute<?>)propertyClassNameAndValue.getValue()).getValue();
+        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
+        return classAndPropertyName == null ? null : classAndPropertyNameValueMap.get(classAndPropertyName);
     }
 
     public Object getAttribute(ClassAndPropertyName classAndPropertyName) {
-        return getAttribute(
-          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
-        );
+        return getAttribute(classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName());
     }
 
     public Object getAttribute(String propertyName) {
