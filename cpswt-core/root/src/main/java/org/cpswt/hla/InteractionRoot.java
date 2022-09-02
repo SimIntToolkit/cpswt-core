@@ -119,7 +119,7 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    private static Map<String, Boolean> _hlaClassNameIsInitializedMap = new HashMap<>();
+    private static final Map<String, Boolean> _hlaClassNameIsInitializedMap = new HashMap<>();
 
     private static Boolean get_hla_class_name_is_initialized(String hlaClassName) {
         return _hlaClassNameIsInitializedMap.getOrDefault(hlaClassName, false);
@@ -1830,13 +1830,27 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     private static Object castNumber(Object object, Class<?> desiredType) {
-        if (!desiredType.isInstance(object) && object instanceof Number && Number.class.isAssignableFrom(desiredType)) {
-            String desiredTypeName = desiredType.getSimpleName().toLowerCase();
-            Method conversionMethod;
-            try {
-                conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
-                return conversionMethod.invoke(object);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
+        if (!desiredType.isInstance(object)) {
+            if (Number.class.isAssignableFrom(desiredType)) {
+                if (object instanceof Character) {
+                    object = (int)((Character)object).charValue();
+                }
+                if (object instanceof Number) {
+                    String desiredTypeName = desiredType.getSimpleName().toLowerCase();
+                    Method conversionMethod;
+                    try {
+                        conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
+                        return conversionMethod.invoke(object);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    }
+                }
+            } else if (Character.class.equals(desiredType)) {
+                if (object instanceof Number) {
+                    return (char)((Number)object).doubleValue();
+                } else if (object instanceof String) {
+                    return ((String)object).charAt(0);
+                }
+            }
         }
         return object;
     }

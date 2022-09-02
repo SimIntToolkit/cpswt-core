@@ -1126,8 +1126,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             return;
         }
 
-        InteractionRoot embeddedInteraction =
-                InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
+        InteractionRoot embeddedInteraction = InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
+        embeddedInteraction.setTime(embeddedMessaging.getTime());
+
         receiveInteractionSFAux(embeddedInteraction);
     }
 
