@@ -35,8 +35,6 @@ import org.cpswt.hla.base.AdvanceTimeRequest;
 import org.cpswt.hla.base.AdvanceTimeThread;
 import org.cpswt.hla.base.ATRComparator;
 import org.cpswt.hla.base.ATRQueue;
-import org.cpswt.hla.base.ObjectReflector;
-import org.cpswt.hla.base.ObjectReflectorComparator;
 import org.cpswt.hla.base.TimeAdvanceMode;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
@@ -49,6 +47,9 @@ import org.cpswt.utils.FederateIdUtility;
 import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
+
+import static org.cpswt.hla.ObjectRoot.ObjectReflector;
+import static org.cpswt.hla.ObjectRoot.ObjectReflectorComparator;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -33,7 +33,6 @@ package org.cpswt.hla;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
-import static org.mockito.Mockito.*;
 
 import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import org.cpswt.hla.ObjectRoot_p.FederateObject;
@@ -42,18 +41,9 @@ import hla.rti.RTIambassador;
 
 public class JsonTest {
 
-    private static final int classHandle = 42;
-    private static final int objectHandle = 50;
+    private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
 
-
-    private static final RTIambassador rtiambassador;
-    static {
-        rtiambassador = mock(RTIambassador.class);
-        try {
-            when(rtiambassador.registerObjectInstance(anyInt(), anyString())).thenReturn(objectHandle);
-            when(rtiambassador.getObjectClassHandle(anyString())).thenReturn(classHandle);
-        } catch(Exception e) {}
-    }
+    private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
 
     private static RTIambassador get_rti_ambassador() {
         return rtiambassador;
@@ -107,8 +97,10 @@ public class JsonTest {
         federateObject1.set_FederateHost("FederateHost1");
         federateObject1.set_FederateHandle(20);
 
+        int federateObjectHandle = 0;
         try {
             federateObject1.registerObject(rtiambassador, "MyObject1");
+            federateObjectHandle = federateObject1.getObjectHandle();
         } catch (Exception e) {}
 
         String jsonString = federateObject1.toJson();
@@ -116,9 +108,10 @@ public class JsonTest {
         federateObject1.unregisterObject(rtiambassador);
 
         FederateObject federateObject2 =
-                (FederateObject)ObjectRoot.discover(FederateObject.get_class_handle(), objectHandle);
+                (FederateObject)ObjectRoot.discover(FederateObject.get_class_handle(), federateObjectHandle);
 
-        FederateObject.fromJson(jsonString);
+        ObjectRoot.ObjectReflector objectReflector = ObjectRoot.fromJson(jsonString);
+        objectReflector.reflect();
 
         Assert.assertEquals(federateObject1.get_FederateType(), federateObject2.get_FederateType());
         Assert.assertEquals(federateObject1.get_FederateHost(), federateObject2.get_FederateHost());

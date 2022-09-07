@@ -39,6 +39,8 @@ import hla.rti.jlc.RtiFactoryFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -102,7 +104,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     //-------------------------------
     // _rtiFactory IS USED TO CREATE:
-    // - ATTRIBUTE HANDLE SETS
+    // - PARAMETER/ATTRIBUTE HANDLE SETS
     // - SUPPLIED ATTRIBUTES
     //-------------------------------
     protected static RtiFactory _rtiFactory;
@@ -332,6 +334,155 @@ public class ObjectRoot implements ObjectRootInterface {
         @Override
         public String toString() {
             return _value instanceof Character ? String.valueOf((short)((Character)_value).charValue()) : _value.toString();
+        }
+    }
+
+    private static String getStringFromByteArray(byte[] value) {
+        String valueAsString = new String( value, 0, value.length );
+        if (valueAsString.length() > 0 && valueAsString.charAt(valueAsString.length() - 1) == '\0') {
+            valueAsString = valueAsString.substring(0, valueAsString.length() - 1);
+        }
+        return valueAsString;
+    }
+
+    private static Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap(ReflectedAttributes propertyMap) {
+        Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
+
+        int size = propertyMap.size();
+        for( int ix = 0 ; ix < size ; ++ix ) {
+            try {
+                int handle = propertyMap.getAttributeHandle(ix);
+                byte[] byteArray = propertyMap.getValue(ix);
+                String valueAsString = getStringFromByteArray(byteArray);
+                ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(handle);
+                Object newValue = getValueForClassAndPropertyName(classAndPropertyName, valueAsString);
+                classAndPropertyNameValueMap.put(classAndPropertyName, newValue);
+            } catch ( Exception e ) {
+                logger.error( "setAttributes: Exception caught!" );
+                logger.error("{}", CpswtUtils.getStackTrace(e));
+            }
+        }
+        return classAndPropertyNameValueMap;
+    }
+
+    /**
+     * This class serializes reflections of the attributes of object class
+     * instances that come in from the RTI.  An object of this class contains:
+     * <p>
+     * - a reference to the object class instance for whom attribute reflections
+     * have been received
+     * - the reflected attributes and their new (reflected) values
+     * - the timestamp of the reflections
+     * <p>
+     * This class is necessary because potentially many attribute reflections
+     * can come in from the RTI before a federate thread processes them.  If the
+     * reflections were simply performed when they came in, such a federate thread
+     * could miss several reflections.
+     * <p>
+     * Instead, this class allows a federate thread to apply the reflections
+     * itself.  The thread calls either {@link SynchronizedFederate#getNextObjectReflector()}
+     * or {@link SynchronizedFederate#getNextObjectReflectorNoWait()} to get the
+     * next ObjectReflector.  It then calls {@link ObjectReflector#reflect()}
+     * on this ObjectReflector to apply the attribute reflections for the object
+     * class instance it contains, and then calls {@link ObjectReflector#getObjectRoot()}
+     * to retrieve this instance.
+     */
+    public static class ObjectReflector {
+        private final int objectHandle;
+        private final Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap;
+        private double time;
+
+        /**
+         * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
+         * The {@link SynchronizedFederate#reflectAttributeValues(int, ReflectedAttributes, byte[])}
+         * method uses this constructor to create a new "receive-order" ObjectReflector.
+         */
+
+        public ObjectReflector(int objectHandle, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap) {
+            this.objectHandle = objectHandle;
+            this.classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
+            this.time = -1;
+        }
+
+        public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
+            this(objectHandle, getClassAndPropertyNameValueMap(reflectedAttributes));
+        }
+
+        /**
+         * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
+         * The {@link SynchronizedFederate#reflectAttributeValues(int, ReflectedAttributes, byte[], LogicalTime, EventRetractionHandle)}
+         * method uses this constructor to create a new "timestamp-order" ObjectReflector.
+         */
+        public ObjectReflector(
+                int objectHandle,
+                Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap,
+                LogicalTime logicalTime
+        ) {
+            this.objectHandle = objectHandle;
+            this.classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
+            DoubleTime doubleTime = new DoubleTime();
+            doubleTime.setTo(logicalTime);
+            this.time = doubleTime.getTime();
+        }
+
+        public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
+            this(objectHandle, getClassAndPropertyNameValueMap(reflectedAttributes), logicalTime);
+        }
+
+        /**
+         * A federate or federate thread calls this method to perform the attribute
+         * reflections contained in this ObjectReflector object to the object class
+         * instance contained by this ObjectReflector object.
+         */
+        public void reflect() {
+            if (this.time < 0) {
+                ObjectRoot.reflect(this.objectHandle, this.classAndPropertyNameValueMap);
+            }
+            else {
+                ObjectRoot.reflect(this.objectHandle, this.classAndPropertyNameValueMap, this.time);
+            }
+        }
+
+        /**
+         * A federate or federate thread calls this method to retrieve the object
+         * class instance contained by the ObjectReflector object.  Note that if
+         * this is done before {@link #reflect()} is called, the instance will not have
+         * the attribute reflections contained in this ObjectReflector object.
+         * <p>
+         * Note that the type of the reference returned by this method is always
+         * "ObjectRoot", as this is the highest super-class for all object class
+         * instances.  If a reference to the actual class of the instance is desired,
+         * then this ObjectRoot reference will have to be cast up the inheritance
+         * hierarchy.
+         *
+         * @return the object class instance contained by the ObjectReflector object.
+         */
+        public ObjectRoot getObjectRoot() {
+            return ObjectRoot.get_object(this.objectHandle);
+        }
+
+        public void setTime(double time) {
+            this.time = time;
+        }
+
+        public double getTime() {
+            return this.time;
+        }
+
+        public int getUniqueID() {
+            return getObjectRoot().getUniqueID();
+        }
+    }
+
+    public static class ObjectReflectorComparator implements Comparator<ObjectReflector> {
+        public int compare(ObjectReflector objectReflection1, ObjectReflector objectReflection2) {
+            if (objectReflection1.getTime() < objectReflection2.getTime()) return -1;
+            if (objectReflection1.getTime() > objectReflection2.getTime()) return 1;
+
+            if (objectReflection1.getUniqueID() < objectReflection2.getUniqueID()) return -1;
+            if (objectReflection1.getUniqueID() > objectReflection2.getUniqueID()) return 1;
+
+            return 0;
         }
     }
 
@@ -1078,9 +1229,9 @@ public class ObjectRoot implements ObjectRootInterface {
       * Returns the name of an attribute corresponding to
       * its handle (RTI assigned) in propertyHandle.
       *
-      * @param propertyHandle handle ofattribute(RTI assigned)
+      * @param propertyHandle handle of attribute (RTI assigned)
       * for which to return the name
-      * @return the name of theattribute corresponding to propertyHandle
+      * @return the name of the attribute corresponding to propertyHandle
       */
     public static ClassAndPropertyName get_class_and_attribute_name( int propertyHandle ) {
         return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
@@ -1110,7 +1261,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        setAttribute(classAndPropertyName.getPropertyName(), value);
+        setAttribute(classAndPropertyName, value);
     }
 
     public static int get_num_attributes(String hlaClassName) {
@@ -1453,6 +1604,12 @@ public class ObjectRoot implements ObjectRootInterface {
         return _objectHandleInstanceMap.remove( object_handle );
     }
 
+    private void setAttributes(Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap) {
+        for(Map.Entry<ClassAndPropertyName, Object> entry: classAndPropertyNameValueMap.entrySet()) {
+            ((Attribute<Object>)this.classAndPropertyNameValueMap.get(entry.getKey())).setValue(entry.getValue());
+        }
+    }
+
     /**
      * Retrieves the object instance corresponding to "object_handle" from an
      * internal table in the ObjectRoot class, updates its attribute values using
@@ -1469,12 +1626,18 @@ public class ObjectRoot implements ObjectRootInterface {
      * object instance corresponding to object_handle.
      * @return the object instance with updated attribute values
      */
-    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes ) {
+    public static ObjectRoot reflect(
+            int object_handle, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap
+    ) {
         ObjectRoot objectRoot = _objectHandleInstanceMap.get( object_handle );
         if ( objectRoot == null ) return null;
-        objectRoot.setTime( -1 );
-        objectRoot.setAttributes( reflectedAttributes );
+        objectRoot.setAttributes(classAndPropertyNameValueMap);
+        objectRoot.setTime(-1);
         return objectRoot;
+    }
+
+    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes ) {
+        return reflect(object_handle, getClassAndPropertyNameValueMap(reflectedAttributes));
     }
 
     /**
@@ -1489,12 +1652,20 @@ public class ObjectRoot implements ObjectRootInterface {
      * @param logicalTime new time stamp for attributes that are updated
      * @return the object instance with updated attribute values
      */
-    public static ObjectRoot reflect( int object_handle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime ) {
+    public static ObjectRoot reflect(
+            int object_handle, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap, double time
+    ) {
         ObjectRoot objectRoot = _objectHandleInstanceMap.get( object_handle );
         if ( objectRoot == null ) return null;
-        objectRoot.setTime( logicalTime );
-        objectRoot.setAttributes( reflectedAttributes );
+        objectRoot.setAttributes(classAndPropertyNameValueMap);
+        objectRoot.setTime( time );
         return objectRoot;
+    }
+
+    public static ObjectRoot reflect(
+            int object_handle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime
+    ) {
+        return reflect(object_handle, getClassAndPropertyNameValueMap(reflectedAttributes));
     }
 
     /**
@@ -1720,28 +1891,20 @@ public class ObjectRoot implements ObjectRootInterface {
         return new HashMap<>(classAndPropertyNameValueMap);
     }
 
-    public void setAttribute(String hlaClassName, String propertyName, Object value) {
-
-        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
-
-        if (classAndPropertyName == null) {
-            logger.error(
-                    "setAttribute(\"{}\", \"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
-                    "superclasses.", hlaClassName, propertyName, value.getClass().getName(), propertyName, hlaClassName
-            );
-            return;
-        }
+    private static Object getValueForClassAndPropertyName(ClassAndPropertyName classAndPropertyName, Object value) {
+        String hlaClassName = classAndPropertyName.getClassName();
+        String propertyName = classAndPropertyName.getPropertyName();
 
         // CANNOT SET VALUE TO NULL
         if (value == null) {
             logger.warn(
-              "setAttribute(\"{}\", \"{}\", null): attempt to set \"{}\" attribute in \"{}\" class to null.",
-              hlaClassName, propertyName, propertyName, hlaClassName
+                    "setAttribute(\"{}\", \"{}\", null): attempt to set \"{}\" attribute in \"{}\" class to null.",
+                    hlaClassName, propertyName, propertyName, hlaClassName
             );
-            return;
+            return null;
         }
-
-        Object currentValue = classAndPropertyNameValueMap.get(classAndPropertyName);
+        Object initialValueForType =
+          ((Attribute<Object>)_classAndPropertyNameInitialValueMap.get(classAndPropertyName)).getValue();
 
         // IF value IS A STRING, AND THE TYPE OF THE ATTRIBUTE IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
@@ -1750,21 +1913,21 @@ public class ObjectRoot implements ObjectRootInterface {
             String stringValue = ((String)value).toLowerCase();
             Object newValue = null;
 
-            if (currentValue instanceof Number) {
+            if (initialValueForType instanceof Number) {
                 Method method;
                 try {
-                    method = currentValue.getClass().getMethod("valueOf", String.class);
+                    method = initialValueForType.getClass().getMethod("valueOf", String.class);
                 } catch (NoSuchMethodException noSuchMethodException) {
                     logger.error(
                             "setAttribute(\"{}\", \"{}\", {} value): unable to access \"valueOf\" " +
                                     "method of \"Number\" object: cannot set value!",
                             hlaClassName, propertyName, value.getClass().getName()
                     );
-                    return;
+                    return null;
                 }
                 try {
                     // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
-                    if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
+                    if (!(initialValueForType instanceof Double) && !(initialValueForType instanceof Float)) {
                         int dotPosition = stringValue.indexOf(".");
                         if (dotPosition > 0) {
                             stringValue = stringValue.substring(0, dotPosition);
@@ -1777,12 +1940,12 @@ public class ObjectRoot implements ObjectRootInterface {
                     newValue = method.invoke(null, stringValue);
                 } catch (Exception e) { }
 
-            } else if (currentValue instanceof Character) {
+            } else if (initialValueForType instanceof Character) {
                 try {
                     newValue = (char)Short.valueOf(stringValue).shortValue();
                 } catch (Exception e) { }
 
-            } else if (currentValue instanceof Boolean) {
+            } else if (initialValueForType instanceof Boolean) {
                 try {
                     newValue = Double.parseDouble(stringValue) != 0;
                 } catch (Exception e) { }
@@ -1797,20 +1960,56 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        if (currentValue.getClass() != value.getClass()) {
+        if (initialValueForType.getClass() != value.getClass()) {
             logger.error(
-              "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" attribute, " +
-              "should be of type \"{}\".",
-              propertyName,
-              value.getClass().getName(),
-              value.getClass().getName(),
-              propertyName,
-              currentValue.getClass().getName()
+                    "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" " +
+                            "attribute, should be of type \"{}\".",
+                    propertyName,
+                    value.getClass().getName(),
+                    value.getClass().getName(),
+                    propertyName,
+                    initialValueForType.getClass().getName()
             );
+            return null;
+        }
+
+        return value;
+    }
+
+    private static Map.Entry<ClassAndPropertyName, Object> getValueForClassAndPropertyName(
+            String hlaClassName, String propertyName, Object value
+    ) {
+        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
+
+        if (classAndPropertyName == null) {
+            logger.error(
+                    "setAttribute(\"{}\", \"{}\", {} value): could not find \"{}\" attribute of class \"{}\" or its " +
+                    "superclasses.", hlaClassName, propertyName, value.getClass().getName(), propertyName, hlaClassName
+            );
+            return null;
+        }
+
+        Object newValue = getValueForClassAndPropertyName(classAndPropertyName, value);
+        if (newValue == null) {
+            return null;
+        }
+
+        return new AbstractMap.SimpleEntry<>(classAndPropertyName, newValue);
+    }
+
+    public void setAttribute(String hlaClassName, String propertyName, Object value) {
+
+        Map.Entry<ClassAndPropertyName, Object> classAndPropertyNameAndValue = getValueForClassAndPropertyName(
+                hlaClassName, propertyName, value
+        );
+        if (classAndPropertyNameAndValue == null) {
             return;
         }
+        ClassAndPropertyName classAndPropertyName = classAndPropertyNameAndValue.getKey();
+        Object newValue = classAndPropertyNameAndValue.getValue();
+
         Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(classAndPropertyName);
-        attribute.setValue(value);
+        attribute.setValue(newValue);
         attribute.setTime(getTime());
     }
 
@@ -2701,13 +2900,16 @@ public class ObjectRoot implements ObjectRootInterface {
         JSONObject propertyJSONObject = new JSONObject();
         topLevelJSONObject.put("properties", propertyJSONObject);
         for(ClassAndPropertyName key : getPublishedAttributeNameSet()) {
-            Attribute<Object> value = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
-            propertyJSONObject.put(key.toString(), value.getValue());
+            Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+            if (attribute.shouldBeUpdated(false)) {
+                Object value = attribute.getValue();
+                propertyJSONObject.put(key.toString(), value);
+            }
         }
         return topLevelJSONObject.toString(4);
     }
 
-    public static void fromJson(String jsonString) {
+    public static ObjectReflector fromJson(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
         int objectHandle = jsonObject.getInt("object_handle");
         ObjectRoot objectRoot = _objectHandleInstanceMap.getOrDefault(objectHandle, null);
@@ -2716,21 +2918,22 @@ public class ObjectRoot implements ObjectRootInterface {
                     "ObjectRoot:  fromJson:  no registered object exists with received object-handle ({})",
                     objectHandle
             );
-            return;
+            return null;
         }
 
         Set<ClassAndPropertyName> subscribedAttributeNameSet = objectRoot.getSubscribedAttributeNameSet();
 
+        Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
         JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
         for (String key : propertyJSONObject.keySet()) {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
             if (subscribedAttributeNameSet.contains(classAndPropertyName)) {
-
                 Class<?> desiredType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName).getClass();
                 Object object = castNumber(propertyJSONObject.get(key), desiredType);
-                ((Attribute<Object>)objectRoot.classAndPropertyNameValueMap.get(classAndPropertyName)).setValue(object);
+                classAndPropertyNameValueMap.put(classAndPropertyName, object);
             }
         }
+        return new ObjectReflector(objectHandle, classAndPropertyNameValueMap);
     }
 
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();

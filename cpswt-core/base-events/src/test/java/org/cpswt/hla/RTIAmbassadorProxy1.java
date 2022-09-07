@@ -155,7 +155,7 @@ public class RTIAmbassadorProxy1 {
     public HashMap<String, Integer> getObjectClassNameHandleMap(){
         return objectClassNameHandleMap;
     }
-    static{
+    static {
         objectClassNameHandleMap = new HashMap<>();
         int value = 0;
         objectClassNameHandleMap.put("ObjectRoot", value++);
