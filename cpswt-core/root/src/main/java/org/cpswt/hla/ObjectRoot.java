@@ -389,6 +389,8 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public static class ObjectReflector {
         private final int objectHandle;
+        private String hlaClassName = "";
+        private String federateSequence = "[]";
         private final Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap;
         private double time;
 
@@ -398,14 +400,21 @@ public class ObjectRoot implements ObjectRootInterface {
          * method uses this constructor to create a new "receive-order" ObjectReflector.
          */
 
+        private void initHlaClassName() {
+            ObjectRoot objectRoot = _objectHandleInstanceMap.get( objectHandle );
+            if ( objectRoot == null ) return;
+            hlaClassName = objectRoot.getInstanceHlaClassName();
+        }
+
         public ObjectReflector(int objectHandle, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap) {
             this.objectHandle = objectHandle;
             this.classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
             this.time = -1;
+            initHlaClassName();
         }
 
         public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
-            this(objectHandle, getClassAndPropertyNameValueMap(reflectedAttributes));
+            this(objectHandle, ObjectRoot.getClassAndPropertyNameValueMap(reflectedAttributes));
         }
 
         /**
@@ -423,10 +432,11 @@ public class ObjectRoot implements ObjectRootInterface {
             DoubleTime doubleTime = new DoubleTime();
             doubleTime.setTo(logicalTime);
             this.time = doubleTime.getTime();
+            initHlaClassName();
         }
 
         public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
-            this(objectHandle, getClassAndPropertyNameValueMap(reflectedAttributes), logicalTime);
+            this(objectHandle, ObjectRoot.getClassAndPropertyNameValueMap(reflectedAttributes), logicalTime);
         }
 
         /**
@@ -441,6 +451,37 @@ public class ObjectRoot implements ObjectRootInterface {
             else {
                 ObjectRoot.reflect(this.objectHandle, this.classAndPropertyNameValueMap, this.time);
             }
+        }
+
+        public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
+            return classAndPropertyNameValueMap;
+        }
+
+        public String getHlaClassName() {
+            return hlaClassName;
+        }
+
+        public void setFederateSequence(String federateSequence) {
+            this.federateSequence = federateSequence;
+        }
+
+        public String getFederateSequence() {
+            return federateSequence;
+        }
+
+        public String toJson() {
+            JSONObject topLevelJSONObject = new JSONObject();
+            topLevelJSONObject.put("messaging_type", "object");
+            topLevelJSONObject.put("messaging_name", hlaClassName);
+            topLevelJSONObject.put("object_handle", objectHandle);
+            topLevelJSONObject.put("federateSequence", federateSequence);
+
+            JSONObject propertyJSONObject = new JSONObject();
+            for(Map.Entry<ClassAndPropertyName, Object> entry : classAndPropertyNameValueMap.entrySet()) {
+                propertyJSONObject.put(entry.getKey().toString(), entry.getValue());
+            }
+            topLevelJSONObject.put("properties", propertyJSONObject);
+            return topLevelJSONObject.toString(4);
         }
 
         /**
@@ -461,10 +502,6 @@ public class ObjectRoot implements ObjectRootInterface {
             return ObjectRoot.get_object(this.objectHandle);
         }
 
-        public void setTime(double time) {
-            this.time = time;
-        }
-
         public double getTime() {
             return this.time;
         }
@@ -479,10 +516,7 @@ public class ObjectRoot implements ObjectRootInterface {
             if (objectReflection1.getTime() < objectReflection2.getTime()) return -1;
             if (objectReflection1.getTime() > objectReflection2.getTime()) return 1;
 
-            if (objectReflection1.getUniqueID() < objectReflection2.getUniqueID()) return -1;
-            if (objectReflection1.getUniqueID() > objectReflection2.getUniqueID()) return 1;
-
-            return 0;
+            return Integer.compare(objectReflection1.getUniqueID(), objectReflection2.getUniqueID());
         }
     }
 
@@ -1888,7 +1922,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
     public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
-        return new HashMap<>(classAndPropertyNameValueMap);
+        return classAndPropertyNameValueMap;
     }
 
     private static Object getValueForClassAndPropertyName(ClassAndPropertyName classAndPropertyName, Object value) {
@@ -2323,16 +2357,40 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
+    public static void add_object_update_embedded_only_id(int id) {
+        add_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    public static void remove_object_update_embedded_only_id(int id) {
+        remove_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    public static Set<Integer> get_object_update_embedded_only_id_set() {
+        return get_object_update_embedded_only_id_set(get_hla_class_name());
+    }
+
+    public static boolean get_is_object_update_embedded_only_id(int id) {
+        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
+    }
+
+    public static void add_federate_name_soft_publish_direct(String federateName) {
+        add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    public static void remove_federate_name_soft_publish_direct(String federateName) {
+        remove_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
+    }
+
+    public static Set<String> get_federate_name_soft_publish_direct_set() {
+        return get_federate_name_soft_publish_direct_set(get_hla_class_name());
+    }
+
     public static void add_federate_name_soft_publish(String networkFederateName) {
         add_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
     public static void remove_federate_name_soft_publish(String networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    public Set<String> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -2895,6 +2953,8 @@ public class ObjectRoot implements ObjectRootInterface {
     public String toJson() {
         JSONObject topLevelJSONObject = new JSONObject();
         topLevelJSONObject.put("messaging_type", "object");
+        topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
+        topLevelJSONObject.put("federateSequence", "[]");
         topLevelJSONObject.put("object_handle", getObjectHandle());
 
         JSONObject propertyJSONObject = new JSONObject();
@@ -2912,28 +2972,112 @@ public class ObjectRoot implements ObjectRootInterface {
     public static ObjectReflector fromJson(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
         int objectHandle = jsonObject.getInt("object_handle");
-        ObjectRoot objectRoot = _objectHandleInstanceMap.getOrDefault(objectHandle, null);
-        if (objectRoot == null) {
-            logger.error(
-                    "ObjectRoot:  fromJson:  no registered object exists with received object-handle ({})",
-                    objectHandle
-            );
+        String className = jsonObject.getString("messaging_name");
+        String federateSequence = jsonObject.getString("federateSequence");
+
+        Set<ClassAndPropertyName> subscribedAttributeNameSet = ObjectRoot.get_subscribed_attribute_name_set(
+          className
+        );
+        if (subscribedAttributeNameSet == null) {
+            logger.error("ObjectRoot:  fromJson:  no class \"{}\" is defined", className);
             return null;
         }
-
-        Set<ClassAndPropertyName> subscribedAttributeNameSet = objectRoot.getSubscribedAttributeNameSet();
 
         Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap = new HashMap<>();
         JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
         for (String key : propertyJSONObject.keySet()) {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
             if (subscribedAttributeNameSet.contains(classAndPropertyName)) {
-                Class<?> desiredType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName).getClass();
+                Class<?> desiredType = ((Attribute<Object>)_classAndPropertyNameInitialValueMap.get(
+                  classAndPropertyName
+                )).getValue().getClass();
                 Object object = castNumber(propertyJSONObject.get(key), desiredType);
                 classAndPropertyNameValueMap.put(classAndPropertyName, object);
             }
         }
-        return new ObjectReflector(objectHandle, classAndPropertyNameValueMap);
+        ObjectReflector objectReflector = new ObjectReflector(objectHandle, classAndPropertyNameValueMap);
+        objectReflector.setFederateSequence(federateSequence);
+        return objectReflector;
+    }
+
+    private static final Map<String, Set<Integer>> _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap = new HashMap<>();
+
+    public static void add_object_update_embedded_only_id(String hlaClassName, int id) {
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            logger.warn(
+              "add_object_update_embedded_only_id(\"{}\", {}) -- no such object " +
+              "class \"{}\"", hlaClassName, id, hlaClassName
+            );
+            return;
+        }
+        if (!_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
+            _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.put(hlaClassName, new HashSet<>());
+        }
+        _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).add(id);
+    }
+
+    public static void remove_object_update_embedded_only_id(String hlaClassName, int id) {
+        if (_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
+            Set<Integer> integerSet = _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName);
+            integerSet.remove(id);
+            if (integerSet.isEmpty()) {
+                _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.remove(hlaClassName);
+            }
+        }
+    }
+
+    public static Set<Integer> get_object_update_embedded_only_id_set(String hlaClassName) {
+        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) ?
+            new HashSet<>(_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName)) : new HashSet<>();
+    }
+
+    public static boolean get_is_object_update_embedded_only_id(String hlaClassName, int id) {
+        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) &&
+          _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).contains(id);
+    }
+
+    public static boolean get_is_object_update_embedded_only_id(int classId, int id) {
+        if (_classHandleNameMap.containsKey(classId)) {
+            String hlaClassName = _classHandleNameMap.get(classId);
+            return get_is_object_update_embedded_only_id(hlaClassName, id);
+        }
+        return false;
+    }
+
+    private static Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
+
+    public static void add_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            logger.warn(
+              "add_federate_name_soft_publish_direct(\"{}\", \"{}\") -- no such object " +
+              "class \"{}\"", hlaClassName, federateName, hlaClassName
+            );
+            return;
+        }
+        if (!_hlaClassNameToFederateNameSoftPublishDirectSetMap.containsKey(hlaClassName)) {
+            _hlaClassNameToFederateNameSoftPublishDirectSetMap.put(hlaClassName, new HashSet<>());
+        }
+        _hlaClassNameToFederateNameSoftPublishDirectSetMap.get(hlaClassName).add(federateName);
+
+    }
+
+    public static void remove_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
+        if (_hlaClassNameToFederateNameSoftPublishDirectSetMap.containsKey(hlaClassName)) {
+            Set<String> stringSet = _hlaClassNameToFederateNameSoftPublishDirectSetMap.get(hlaClassName);
+            stringSet.remove(federateName);
+            if (stringSet.isEmpty()) {
+                _hlaClassNameToFederateNameSoftPublishDirectSetMap.remove(hlaClassName);
+            }
+        }
+    }
+
+    public static Set<String> get_federate_name_soft_publish_direct_set(String hlaClassName) {
+        return _hlaClassNameToFederateNameSoftPublishDirectSetMap.containsKey(hlaClassName) ?
+            new HashSet<>(_hlaClassNameToFederateNameSoftPublishDirectSetMap.get(hlaClassName)) : new HashSet<>();
+    }
+
+    public Set<String> getFederateNameSoftPublishDirectSet() {
+        return get_federate_name_soft_publish_direct_set(getInstanceHlaClassName());
     }
 
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();
@@ -2977,7 +3121,7 @@ public class ObjectRoot implements ObjectRootInterface {
           new HashSet<>(_hlaClassNameToFederateNameSoftPublishSetMap.get(hlaClassName)) : new HashSet<>();
     }
 
-    public Set<String> getFederateNameSoftPublishSet(String hlaClassName) {
+    public Set<String> getFederateNameSoftPublishSet() {
         return get_federate_name_soft_publish_set(getInstanceHlaClassName());
     }
 

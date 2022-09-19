@@ -44,6 +44,7 @@ val archivaPort: String by project
 
 dependencies {
     implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
+    implementation(group="org.json", name="json", version="20210307")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 

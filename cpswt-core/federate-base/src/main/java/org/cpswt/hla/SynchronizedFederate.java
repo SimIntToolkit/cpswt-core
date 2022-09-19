@@ -61,6 +61,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cpswt.config.FederateConfig;
+import org.json.JSONObject;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
 
@@ -355,6 +356,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                     );
                     embeddedMessagingForNetworkFederate.setFederateAppendedToFederateSequence(true);
                 }
+                embeddedMessagingForNetworkFederate.setParameter("command", "interaction");
                 embeddedMessagingForNetworkFederate.setParameter(
                         "hlaClassName", interactionRoot.getInstanceHlaClassName()
                 );
@@ -399,6 +401,98 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         Set<String> stringSet = new HashSet<>();
         stringSet.add(federateName);
         sendInteraction(interactionRoot, stringSet, -1);
+    }
+
+    public void registerObject(ObjectRoot objectRoot) throws Exception {
+        objectRoot.registerObject(getLRC());
+
+        if (objectRoot.getFederateNameSoftPublishDirectSet().size() > 0) {
+            for (String federateName : objectRoot.getFederateNameSoftPublishDirectSet()) {
+                String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
+                InteractionRoot embeddedMessagingDirect = new InteractionRoot(embeddedMessagingHlaClassName);
+                embeddedMessagingDirect.setParameter("command", "discover");
+                embeddedMessagingDirect.setParameter("hlaClassName", objectRoot.getInstanceHlaClassName());
+
+                JSONObject topLevelJSONObject = new JSONObject();
+                topLevelJSONObject.put("object_handle", objectRoot.getObjectHandle());
+                embeddedMessagingDirect.setParameter("messagingJson", topLevelJSONObject.toString(4));
+
+                sendInteraction(embeddedMessagingDirect);
+            }
+        }
+    }
+
+    private void sendInteraction(
+            String objectJson, String hlaClassName, String federateSequence, Set<String> federateNameSet, double time
+    ) throws Exception {
+        for(String federateName : federateNameSet) {
+            String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
+            InteractionRoot embeddedMessagingForNetworkFederate = new InteractionRoot(
+                    embeddedMessagingHlaClassName
+            );
+            embeddedMessagingForNetworkFederate.setParameter("command", "object");
+            embeddedMessagingForNetworkFederate.setParameter("hlaClassName", hlaClassName);
+            embeddedMessagingForNetworkFederate.setParameter("federateSequence", federateSequence);
+            embeddedMessagingForNetworkFederate.setParameter("messagingJson", objectJson);
+
+            if (time >= 0) {
+                sendInteraction(embeddedMessagingForNetworkFederate, time);
+            } else {
+                sendInteraction(embeddedMessagingForNetworkFederate);
+            }
+        }
+    }
+
+    public void sendInteraction(
+            ObjectReflector objectReflector, Set<String> federateNameSet, double time
+    ) throws Exception {
+        sendInteraction(
+                objectReflector.toJson(),
+                objectReflector.getHlaClassName(),
+                objectReflector.getFederateSequence(),
+                federateNameSet,
+                time
+        );
+    }
+    
+    public void sendInteraction(ObjectRoot objectRoot, Set<String> federateNameSet, double time) throws Exception {
+        sendInteraction(objectRoot.toJson(), objectRoot.getInstanceHlaClassName(), "[]", federateNameSet, time);
+    }
+
+    public void sendInteraction(ObjectReflector objectReflector, String federateName, double time) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(objectReflector, stringSet, time);
+    }
+
+    public void sendInteraction(ObjectRoot objectRoot, String federateName, double time) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(objectRoot, stringSet, time);
+    }
+
+    public void sendInteraction(ObjectReflector objectReflector, String federateName) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(objectReflector, stringSet, -1);
+    }
+
+    public void sendInteraction(ObjectRoot objectRoot, String federateName) throws Exception {
+        Set<String> stringSet = new HashSet<>();
+        stringSet.add(federateName);
+        sendInteraction(objectRoot, stringSet, -1);
+    }
+
+    public void updateAttributeValues(ObjectRoot objectRoot, double time, boolean force) throws Exception {
+        objectRoot.updateAttributeValues(getLRC(), time, force);
+
+        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), time);
+    }
+
+    public void updateAttributeValues(ObjectRoot objectRoot, boolean force) throws Exception {
+        objectRoot.updateAttributeValues(getLRC(), force);
+
+        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), -1);
     }
 
     public void notifyFederationOfJoin() {
@@ -1122,15 +1216,56 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     private void receiveEmbeddedInteraction(EmbeddedMessaging embeddedMessaging) {
+        String command = embeddedMessaging.get_command();
         String hlaClassName = embeddedMessaging.get_hlaClassName();
-        if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
+        String federateSequence = embeddedMessaging.get_federateSequence();
+
+        if ("discover".equals(command)) {
+            JSONObject jsonObject = new JSONObject(embeddedMessaging.get_messagingJson());
+            int objectHandle = jsonObject.getInt("object_handle");
+            if (!ObjectRoot.get_object_hla_class_name_set().contains(hlaClassName)) {
+                logger.error(
+                        "SynchronizedFederate.receiveEmbeddedInteraction: Bad class name \"{}\" on discover",
+                        hlaClassName
+                );
+                return;
+            }
+            ObjectRoot.add_object_update_embedded_only_id(hlaClassName, objectHandle);
             return;
         }
 
-        InteractionRoot embeddedInteraction = InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
-        embeddedInteraction.setTime(embeddedMessaging.getTime());
+        if ("interaction".equals(command)) {
+            if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
+                logger.warn(
+                        "SynchronizedFederate.receiveEmbeddedInteraction:  interaction class \"{}\" " +
+                                "not soft subscribed",
+                        hlaClassName
+                );
+                return;
+            }
+            InteractionRoot embeddedInteraction = InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
+            embeddedInteraction.setTime(embeddedMessaging.getTime());
 
-        receiveInteractionSFAux(embeddedInteraction);
+            receiveInteractionSFAux(embeddedInteraction);
+            return;
+        }
+
+        if ("object".equals(command)) {
+            if (!ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
+                logger.warn(
+                        "SynchronizedFederate.receiveEmbeddedInteraction:  object class \"{}\" " +
+                                "not soft subscribed",
+                        hlaClassName
+                );
+                return;
+            }
+            ObjectReflector objectReflector = ObjectRoot.fromJson(embeddedMessaging.get_messagingJson());
+            objectReflector.setFederateSequence(federateSequence);
+            _objectReflectionQueue.add(objectReflector);
+            return;
+        }
+
+        logger.warn("SynchronizedFederate.receiveEmbeddedInteraction, unrecognized command \"{}\"", command);
     }
 
     /**
@@ -1195,7 +1330,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    private static PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue = new PriorityBlockingQueue<ObjectReflector>(10, new ObjectReflectorComparator());
+    private static final PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue =
+            new PriorityBlockingQueue<>(10, new ObjectReflectorComparator());
 
 
     /**
@@ -1227,7 +1363,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                            instance corresponding to objectHandle
      * @param logicalTime         timestamp of the attribute reflections
      */
-    public static void addObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime) {
+    public static void addObjectReflector(
+            int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime
+    ) {
         _objectReflectionQueue.add(new ObjectReflector(objectHandle, reflectedAttributes, logicalTime));
     }
 

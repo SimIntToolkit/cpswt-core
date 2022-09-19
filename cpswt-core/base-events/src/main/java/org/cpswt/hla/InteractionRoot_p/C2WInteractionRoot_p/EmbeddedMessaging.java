@@ -164,6 +164,9 @@ public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WIntera
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -176,6 +179,10 @@ public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WIntera
 
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
+        ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
@@ -203,6 +210,9 @@ public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         ClassAndPropertyName key;
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "command");
+        _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "hlaClassName");
         _classAndPropertyNameInitialValueMap.put(key, "");
@@ -328,10 +338,6 @@ public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WIntera
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
     }
 
-    public Set<String> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
-    }
-
     //-----------------------------------------------------
     // END METHODS FOR PUBLISHING/SUBSCRIBING-TO THIS CLASS
     //-----------------------------------------------------
@@ -423,6 +429,27 @@ public class EmbeddedMessaging extends org.cpswt.hla.InteractionRoot_p.C2WIntera
     //------------------------------
     // PROPERTY MANIPULATION METHODS
     //------------------------------
+
+
+    /**
+     * Set the value of the "command" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "command" parameter
+     */
+    public void set_command(String value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "command");
+        classAndPropertyNameValueMap.put(key, value);
+    }
+
+    /**
+     * Returns the value of the "command" parameter of this interaction.
+     *
+     * @return the value of the "command" parameter
+     */
+    public String get_command() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "command");
+        return (String)classAndPropertyNameValueMap.get(key);
+    }
 
 
     /**
