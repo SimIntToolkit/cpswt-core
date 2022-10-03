@@ -293,15 +293,15 @@ public class ObjectRoot implements ObjectRootInterface {
         private boolean _valueUpdateSent = false;
         private double _time = 0;
 
+        public Attribute( T init ) {
+            _value = init;
+        }
+
         public Attribute(Attribute<T> other) {
             _value = other._value;
             _oldValue = other._oldValue;
             _valueUpdateSent = other._valueUpdateSent;
             _time = other._time;
-        }
-
-        public Attribute( T init ) {
-            _value = init;
         }
 
         public T getValue() {
@@ -312,6 +312,11 @@ public class ObjectRoot implements ObjectRootInterface {
             if ( value == null ) return;
             _value = value;
             _valueUpdateSent = _value.equals(_oldValue);
+        }
+
+        public void setValue( Attribute<T> value ) {
+            if ( value == null ) return;
+            setValue(value.getValue());
         }
 
         public double getTime() {
@@ -356,7 +361,7 @@ public class ObjectRoot implements ObjectRootInterface {
                 String valueAsString = getStringFromByteArray(byteArray);
                 ClassAndPropertyName classAndPropertyName = _handleClassAndPropertyNameMap.get(handle);
                 Object newValue = getValueForClassAndPropertyName(classAndPropertyName, valueAsString);
-                classAndPropertyNameValueMap.put(classAndPropertyName, newValue);
+                classAndPropertyNameValueMap.put(classAndPropertyName, new Attribute<>(newValue));
             } catch ( Exception e ) {
                 logger.error( "setAttributes: Exception caught!" );
                 logger.error("{}", CpswtUtils.getStackTrace(e));
@@ -1640,7 +1645,9 @@ public class ObjectRoot implements ObjectRootInterface {
 
     private void setAttributes(Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap) {
         for(Map.Entry<ClassAndPropertyName, Object> entry: classAndPropertyNameValueMap.entrySet()) {
-            ((Attribute<Object>)this.classAndPropertyNameValueMap.get(entry.getKey())).setValue(entry.getValue());
+            ((Attribute<Object>)this.classAndPropertyNameValueMap.get(entry.getKey())).setValue(
+              (Attribute<Object>)entry.getValue()
+            );
         }
     }
 
@@ -2950,7 +2957,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    public String toJson() {
+    public String toJson(boolean force) {
         JSONObject topLevelJSONObject = new JSONObject();
         topLevelJSONObject.put("messaging_type", "object");
         topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
@@ -2961,12 +2968,16 @@ public class ObjectRoot implements ObjectRootInterface {
         topLevelJSONObject.put("properties", propertyJSONObject);
         for(ClassAndPropertyName key : getPublishedAttributeNameSet()) {
             Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
-            if (attribute.shouldBeUpdated(false)) {
+            if (attribute.shouldBeUpdated(force)) {
                 Object value = attribute.getValue();
                 propertyJSONObject.put(key.toString(), value);
             }
         }
         return topLevelJSONObject.toString(4);
+    }
+
+    public String toJson() {
+        return toJson(false);
     }
 
     public static ObjectReflector fromJson(String jsonString) {
@@ -2992,7 +3003,7 @@ public class ObjectRoot implements ObjectRootInterface {
                   classAndPropertyName
                 )).getValue().getClass();
                 Object object = castNumber(propertyJSONObject.get(key), desiredType);
-                classAndPropertyNameValueMap.put(classAndPropertyName, object);
+                classAndPropertyNameValueMap.put(classAndPropertyName, new Attribute<>(object));
             }
         }
         ObjectReflector objectReflector = new ObjectReflector(objectHandle, classAndPropertyNameValueMap);
@@ -3229,7 +3240,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
                 JSONObject typeDataMap = messagingPropertyDataMap.getJSONObject(propertyName);
                 if (!typeDataMap.getBoolean("Hidden")) {
-                    String propertyTypeString = typeDataMap.getString("AttributeType");
+                    String propertyTypeString = typeDataMap.getString("ParameterType");
                     Object initialValue = _typeInitialValueMap.get(propertyTypeString);
                     _classAndPropertyNameInitialValueMap.put(classAndPropertyName, initialValue);
                 }

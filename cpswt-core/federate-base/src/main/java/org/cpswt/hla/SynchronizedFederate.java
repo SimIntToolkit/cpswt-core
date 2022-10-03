@@ -455,8 +455,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         );
     }
     
+    public void sendInteraction(ObjectRoot objectRoot, Set<String> federateNameSet, double time, boolean force) throws Exception {
+        sendInteraction(objectRoot.toJson(force), objectRoot.getInstanceHlaClassName(), "[]", federateNameSet, time);
+    }
+
     public void sendInteraction(ObjectRoot objectRoot, Set<String> federateNameSet, double time) throws Exception {
-        sendInteraction(objectRoot.toJson(), objectRoot.getInstanceHlaClassName(), "[]", federateNameSet, time);
+        sendInteraction(objectRoot, federateNameSet, time, false);
     }
 
     public void sendInteraction(ObjectReflector objectReflector, String federateName, double time) throws Exception {
@@ -486,13 +490,21 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void updateAttributeValues(ObjectRoot objectRoot, double time, boolean force) throws Exception {
         objectRoot.updateAttributeValues(getLRC(), time, force);
 
-        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), time);
+        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), time, true);
+    }
+
+    public void updateAttributeValues(ObjectRoot objectRoot, double time) throws Exception {
+        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), time, false);
     }
 
     public void updateAttributeValues(ObjectRoot objectRoot, boolean force) throws Exception {
         objectRoot.updateAttributeValues(getLRC(), force);
 
-        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), -1);
+        sendInteraction(objectRoot, objectRoot.getFederateNameSoftPublishSet(), -1, true);
+    }
+
+    public void updateAttributeValues(ObjectRoot objectRoot) throws Exception {
+        updateAttributeValues(objectRoot, false);
     }
 
     public void notifyFederationOfJoin() {
@@ -1251,10 +1263,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         if ("object".equals(command)) {
-            if (!ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
+            if (!ObjectRoot.get_is_subscribed(hlaClassName) && !ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
                         "SynchronizedFederate.receiveEmbeddedInteraction:  object class \"{}\" " +
-                                "not soft subscribed",
+                                "neither subscribed nor soft subscribed",
                         hlaClassName
                 );
                 return;
@@ -1426,6 +1438,28 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         ObjectRoot.discover(objectClassHandle, objectHandle);
     }
 
+
+    private boolean checkDirectReflect(int theObject) {
+        ObjectRoot objectRoot = ObjectRoot.get_object(theObject);
+        if (objectRoot == null) {
+            logger.warn(
+                    "Received \"reflectAttributeValues\" for object handle ({}) that has no corresponding object",
+                    theObject
+            );
+            return false;
+        }
+        String hlaClassName = objectRoot.getInstanceHlaClassName();
+        Set<Integer> objectHandleSet = ObjectRoot.get_object_update_embedded_only_id_set(hlaClassName);
+        if (objectHandleSet.contains(theObject)) {
+            logger.info(
+                    "Direct \"reflectAttributeValues\" for Object ({}) of class \"{}\" rejected as it should " +
+                            "only reflect via EmbeddedMessaging", theObject, hlaClassName
+            );
+            return false;
+        }
+        return true;
+    }
+
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchonizedFederate class uses this
      * method to receive receive-order attribute reflections for an object class
@@ -1450,6 +1484,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     @Override
     public void reflectAttributeValues(int theObject, ReflectedAttributes theAttributes, byte[] userSuppliedTag) {
+
+        if (!checkDirectReflect(theObject)) {
+            return;
+        }
+
         addObjectReflector(theObject, theAttributes);
 
         // Himanshu: We normally use only TSO updates, so this shouldn't be
@@ -1493,6 +1532,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
+        if (!checkDirectReflect(theObject)) {
+            return;
+        }
+
         addObjectReflector(theObject, theAttributes, theTime);
         // createLog(theObject, theAttributes, theTime);
     }
