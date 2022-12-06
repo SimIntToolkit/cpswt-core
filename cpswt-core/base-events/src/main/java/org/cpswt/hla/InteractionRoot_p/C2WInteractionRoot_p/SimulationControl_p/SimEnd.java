@@ -258,7 +258,7 @@ public class SimEnd extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);

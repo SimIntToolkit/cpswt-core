@@ -295,7 +295,7 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
      * Unpublishes the org.cpswt.hla.ObjectRoot_p.FederateObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_object(RTIambassador rti) {
         unpublish_object(get_hla_class_name(), rti);
@@ -610,54 +610,6 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-    * Publishes the "FederateType" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateType" attribute for publication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
-    */
-    public static void publish_FederateType_attribute() {
-        publish_attribute(get_hla_class_name(), "FederateType");
-    }
-
-    /**
-    * Unpublishes the "FederateType" attribute of the attribute's containing object
-    * class for a federate.
-    * Note:  This method only marks the "FederateType" attribute for unpublication.
-    * To actually publish the attribute, the federate must (re)publish its containing
-    * object class.
-    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
-    */
-    public static void unpublish_FederateType_attribute() {
-        unpublish_attribute(get_hla_class_name(), "FederateType");
-    }
-
-    /**
-    * Subscribes a federate to the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for subscription.
-    * To actually subscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
-    */
-    public static void subscribe_FederateType_attribute() {
-        subscribe_attribute(get_hla_class_name(), "FederateType");
-    }
-
-    /**
-    * Unsubscribes a federate from the "FederateType" attribute of the attribute's
-    * containing object class.
-    * Note:  This method only marks the "FederateType" attribute for unsubscription.
-    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
-    * containing object class.
-    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
-    */
-    public static void unsubscribe_FederateType_attribute() {
-        unsubscribe_attribute(get_hla_class_name(), "FederateType");
-    }
-
-    /**
     * Publishes the "FederateHandle" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "FederateHandle" attribute for publication.
@@ -751,6 +703,54 @@ public class FederateObject extends org.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_FederateHost_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "FederateHost");
+    }
+
+    /**
+    * Publishes the "FederateType" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "FederateType" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_FederateType_attribute() {
+        publish_attribute(get_hla_class_name(), "FederateType");
+    }
+
+    /**
+    * Unpublishes the "FederateType" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "FederateType" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_FederateType_attribute() {
+        unpublish_attribute(get_hla_class_name(), "FederateType");
+    }
+
+    /**
+    * Subscribes a federate to the "FederateType" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateType" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_FederateType_attribute() {
+        subscribe_attribute(get_hla_class_name(), "FederateType");
+    }
+
+    /**
+    * Unsubscribes a federate from the "FederateType" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateType" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_FederateType_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "FederateType");
     }
 
     protected FederateObject(NoInstanceInit noInstanceInit) {

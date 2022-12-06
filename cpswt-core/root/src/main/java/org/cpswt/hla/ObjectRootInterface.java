@@ -151,7 +151,7 @@ public interface ObjectRootInterface {
      * Publishes the object class of this instance of the class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void publishObject( RTIambassador rti );
 
@@ -159,7 +159,7 @@ public interface ObjectRootInterface {
      * Unpublishes the object class of this instance of this class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void unpublishObject( RTIambassador rti );
 
@@ -167,7 +167,7 @@ public interface ObjectRootInterface {
      * Subscribes a federate to the object class of this instance of this class.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void subscribeObject( RTIambassador rti );
 
@@ -175,7 +175,7 @@ public interface ObjectRootInterface {
      * Unsubscribes a federate from the object class of this instance of this class.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void unsubscribeObject( RTIambassador rti );
 
@@ -273,7 +273,7 @@ public interface ObjectRootInterface {
      * has modification rights on these attributes.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void requestUpdate( RTIambassador rti );
 
@@ -292,7 +292,7 @@ public interface ObjectRootInterface {
      * these attribute and conveying their updated values to the RTI).
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void registerObject( RTIambassador rti );
 
@@ -303,7 +303,7 @@ public interface ObjectRootInterface {
      * these attribute and conveying their updated values to the RTI).
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      * @param name unique identifier to assign to the object instance
      * @throws ObjectAlreadyRegistered if the name is already assigned to another object instance
      */
@@ -316,7 +316,7 @@ public interface ObjectRootInterface {
      * it and has write-privileges to its attributes.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void unregisterObject( RTIambassador rti );
 
@@ -326,7 +326,7 @@ public interface ObjectRootInterface {
      * objects whose attributes have "timestamp" ordering.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      * @param time timestamp on attribute values of this object
      * @param force if "false", only the attributes whose values have changed since
      * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
@@ -339,7 +339,7 @@ public interface ObjectRootInterface {
      * except "force" is always false.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      * @param time timestamp on attribute values of this object
      */
     void updateAttributeValues( RTIambassador rti, double time );
@@ -350,7 +350,7 @@ public interface ObjectRootInterface {
      * "receive" ordering.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      * @param force if "false", only the attributes whose values have changed since
      * the last call to "updateAttributeValues" will be broadcast to the RTI.  If
      * "true", all attributes and their values are broadcast to the RTI.
@@ -362,7 +362,7 @@ public interface ObjectRootInterface {
      * except "force" is always false.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void updateAttributeValues( RTIambassador rti );
 }

@@ -332,8 +332,11 @@ public class ObjectRoot implements ObjectRootInterface {
             _valueUpdateSent = true;
         }
 
-        public boolean shouldBeUpdated( boolean force ) {
+        public boolean getShouldBeUpdated( boolean force ) {
             return force || !_valueUpdateSent;
+        }
+        public void setShouldBeUpdated(boolean shouldBeUpdated) {
+            _valueUpdateSent = !shouldBeUpdated;
         }
 
         @Override
@@ -1230,7 +1233,7 @@ public class ObjectRoot implements ObjectRootInterface {
         for(ClassAndPropertyName key: _classNamePublishedAttributeNameSetMap.get(getInstanceHlaClassName())) {
             int handle = _classAndPropertyNameHandleMap.get(key);
             Attribute<?> attribute = (Attribute<?>)classAndPropertyNameValueMap.get(key);
-            if (attribute.shouldBeUpdated(force)) {
+            if (attribute.getShouldBeUpdated(force)) {
                 Object value = attribute.getValue();
                 String stringValue;
                 if (value instanceof Boolean) {
@@ -1247,6 +1250,26 @@ public class ObjectRoot implements ObjectRootInterface {
         }
 
         return suppliedAttributes;
+    }
+
+    protected Set<ClassAndPropertyName> getAttributesToBeUpdatedClassAndPropertyNameSet() {
+        Set<ClassAndPropertyName> attributesToBeUpdatedSet = new HashSet<>();
+        for(ClassAndPropertyName key: _classNamePublishedAttributeNameSetMap.get(getInstanceHlaClassName())) {
+            Attribute<?> attribute = (Attribute<?>)classAndPropertyNameValueMap.get(key);
+            if (attribute.getShouldBeUpdated(false)) {
+                attributesToBeUpdatedSet.add(key);
+            }
+        }
+
+        return attributesToBeUpdatedSet;
+    }
+
+    protected void restoreAttributesToBeUpdated(Set<ClassAndPropertyName> classAndPropertyNameSet) {
+        for(ClassAndPropertyName key: _classNamePublishedAttributeNameSetMap.get(getInstanceHlaClassName())) {
+            Attribute<?> attribute = (Attribute<?>)classAndPropertyNameValueMap.get(key);
+            boolean shouldBeUpdated = classAndPropertyNameSet.contains(key);
+            attribute.setShouldBeUpdated(shouldBeUpdated);
+        }
     }
 
     //------------------------------------------------
@@ -2316,7 +2339,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_object(RTIambassador rti) {
         unpublish_object(get_hla_class_name(), rti);
@@ -2968,7 +2991,7 @@ public class ObjectRoot implements ObjectRootInterface {
         topLevelJSONObject.put("properties", propertyJSONObject);
         for(ClassAndPropertyName key : getPublishedAttributeNameSet()) {
             Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
-            if (attribute.shouldBeUpdated(force)) {
+            if (attribute.getShouldBeUpdated(force)) {
                 Object value = attribute.getValue();
                 propertyJSONObject.put(key.toString(), value);
             }
