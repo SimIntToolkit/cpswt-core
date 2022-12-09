@@ -74,10 +74,10 @@ public class FederateConfig {
     public boolean isLateJoiner;
 
     /**
-     * The lookAhead value.
+     * The lookahead value.
      */
     @FederateParameter
-    public double lookAhead;
+    public double lookahead;
 
     /**
      * The step size value.
@@ -130,20 +130,20 @@ public class FederateConfig {
      * @param federateType The type of the Federate (i.e.: the model name).
      * @param federationId The unique identifier of the federation.
      * @param isLateJoiner Indicates if current federate is a late joiner.
-     * @param lookAhead The lookAhead value.
+     * @param lookahead The lookahead value.
      * @param stepSize The step size value.
      */
     public FederateConfig(
             String federateType,
             String federationId,
             boolean isLateJoiner,
-            double lookAhead,
+            double lookahead,
             double stepSize
     ) {
         this.federateType = federateType;
         this.federationId = federationId;
         this.isLateJoiner = isLateJoiner;
-        this.lookAhead = lookAhead;
+        this.lookahead = lookahead;
         this.stepSize = stepSize;
     }
 

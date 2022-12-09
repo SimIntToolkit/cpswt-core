@@ -31,7 +31,6 @@
 package org.cpswt.hla;
 
 import hla.rti.*;
-import org.apache.logging.log4j.core.pattern.ThreadIdPatternConverter;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
@@ -48,7 +47,7 @@ import org.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 import java.util.*;
 
 
-public class MessagingTests {
+public class InteractionTests {
 
     private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
     private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
@@ -74,19 +73,6 @@ public class MessagingTests {
 
         Set<String> actualInteractionClassNameSet = InteractionRoot.get_interaction_hla_class_name_set();
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
-    }
-
-    @Test
-    public void objectClassNamesTest() {
-
-        Set<String> expectedObjectClassNameSet = new HashSet<>();
-        expectedObjectClassNameSet.add("ObjectRoot");
-        expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
-        expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass");
-        expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass.DerivedObjectClass");
-
-        Set<String> actualObjectClassNameSet = ObjectRoot.get_object_hla_class_name_set();
-        Assert.assertEquals(expectedObjectClassNameSet, actualObjectClassNameSet);
     }
 
     @Test
@@ -158,28 +144,6 @@ public class MessagingTests {
         Assert.assertEquals(
                 simEndClassHandle,
                 InteractionRoot.get_class_handle("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd")
-        );
-    }
-
-    @Test
-    public void objectClassHandleTest() {
-
-        ObjectRoot objectRoot;
-
-        // InteractionRoot
-        int objectRootClassHandle = mock.getObjectClassNameHandleMap().get("ObjectRoot");
-        Assert.assertEquals(objectRootClassHandle, ObjectRoot.get_class_handle());
-        objectRoot = new ObjectRoot();
-        Assert.assertEquals(objectRootClassHandle, objectRoot.getClassHandle());
-        Assert.assertEquals(objectRootClassHandle, ObjectRoot.get_class_handle("ObjectRoot"));
-
-        // InteractionRoot.C2WInteractionRoot
-        int federateObjectClassHandle = mock.getObjectClassNameHandleMap().get("ObjectRoot.FederateObject");
-        Assert.assertEquals(federateObjectClassHandle, FederateObject.get_class_handle());
-        objectRoot = new FederateObject();
-        Assert.assertEquals(federateObjectClassHandle, objectRoot.getClassHandle());
-        Assert.assertEquals(
-                federateObjectClassHandle, ObjectRoot.get_class_handle("ObjectRoot.FederateObject")
         );
     }
 
@@ -320,61 +284,6 @@ public class MessagingTests {
     }
 
     @Test
-    public void objectAttributesNamesTest() {
-
-        ObjectRoot objectRoot;
-
-        // TEST ObjectRoot get_attribute_names()
-        List<ObjectRoot.ClassAndPropertyName> expectedObjectRootAttributeList = new ArrayList<>();
-
-        objectRoot = new ObjectRoot();
-
-        Assert.assertEquals(expectedObjectRootAttributeList, ObjectRoot.get_attribute_names());
-        Assert.assertEquals(expectedObjectRootAttributeList, objectRoot.getAttributeNames());
-        Assert.assertEquals(
-                expectedObjectRootAttributeList, ObjectRoot.get_attribute_names("ObjectRoot")
-        );
-
-        // TEST ObjectRoot get_all_attribute_names()
-        List<org.cpswt.hla.ObjectRootInterface.ClassAndPropertyName> expectedInteractionRootAllParameterList =
-                new ArrayList<>(expectedObjectRootAttributeList);
-
-        Assert.assertEquals(expectedInteractionRootAllParameterList, ObjectRoot.get_all_attribute_names());
-        Assert.assertEquals(expectedInteractionRootAllParameterList, objectRoot.getAllAttributeNames());
-        Assert.assertEquals(
-                expectedInteractionRootAllParameterList,
-                ObjectRoot.get_all_attribute_names("ObjectRoot")
-        );
-
-
-        // TEST ObjectRoot.FederateObject get_attribute_names()
-        List<ObjectRoot.ClassAndPropertyName> expectedFederateObjectAttributeList = new ArrayList<>();
-        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
-                FederateObject.get_hla_class_name(), "FederateHandle"
-        ));
-        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
-                FederateObject.get_hla_class_name(), "FederateHost"
-        ));
-        expectedFederateObjectAttributeList.add(new ObjectRoot.ClassAndPropertyName(
-                FederateObject.get_hla_class_name(), "FederateType"
-        ));
-        Collections.sort(expectedFederateObjectAttributeList);
-
-        objectRoot = new FederateObject();
-
-        Assert.assertEquals(expectedFederateObjectAttributeList, FederateObject.get_attribute_names());
-        Assert.assertEquals(expectedFederateObjectAttributeList, objectRoot.getAttributeNames());
-        Assert.assertEquals(
-                expectedFederateObjectAttributeList,
-                ObjectRoot.get_attribute_names("ObjectRoot.FederateObject")
-        );
-
-        Assert.assertEquals(3, FederateObject.get_num_attributes());
-        Assert.assertEquals(3, objectRoot.getNumAttributes());
-        Assert.assertEquals(3, ObjectRoot.get_num_attributes("ObjectRoot.FederateObject"));
-    }
-
-    @Test
     public void interactionParameterHandleTest() {
 
         InteractionRoot interactionRoot;
@@ -420,20 +329,6 @@ public class MessagingTests {
         Assert.assertEquals(expectedValue, InteractionRoot.get_parameter_handle(
                 "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", "FedName"
         ));
-    }
-
-    @Test
-    public void objectAttributeHandleTest() {
-
-        int expectedValue = mock.getObjectClassAndPropertyNameHandleMap().get(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"));
-
-        ObjectRoot objectRoot;
-
-        Assert.assertEquals(expectedValue, FederateObject.get_attribute_handle("FederateHost"));
-        objectRoot = new FederateObject();
-        Assert.assertEquals(expectedValue, objectRoot.getAttributeHandle("FederateHost"));
-        Assert.assertEquals(expectedValue, ObjectRoot.get_attribute_handle("ObjectRoot.FederateObject", "FederateHost"));
     }
 
     @Test
@@ -593,168 +488,6 @@ public class MessagingTests {
         List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
 
         Assert.assertEquals(federateNameList, federateSequenceList3);
-    }
-
-    @Test
-    public void attributePubSubTest() {
-
-        // PUBLISH
-        Set<ObjectRootInterface.ClassAndPropertyName> expectedPublishedClassAndPropertyNameSet =
-                new HashSet<>();
-        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
-        ));
-        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
-        ));
-        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
-        ));
-        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "int_attribute1"
-        ));
-        expectedPublishedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "string_attribute1"
-        ));
-
-        DerivedObjectClass.publish_int_attribute1_attribute();
-        DerivedObjectClass.publish_int_attribute2_attribute();
-        DerivedObjectClass.publish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
-        DerivedObjectClass.publish_string_attribute1_attribute();
-        DerivedObjectClass.publish_string_attribute2_attribute();
-
-        Set<ObjectRootInterface.ClassAndPropertyName> actualPublishedClassAndPropertyNameSet =
-                DerivedObjectClass.get_published_attribute_name_set();
-
-        Assert.assertEquals(expectedPublishedClassAndPropertyNameSet, actualPublishedClassAndPropertyNameSet);
-
-        // UNPUBLISH
-        DerivedObjectClass.unpublish_int_attribute1_attribute();
-        DerivedObjectClass.unpublish_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
-
-        expectedPublishedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
-        ));
-        expectedPublishedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "int_attribute1"
-        ));
-
-        actualPublishedClassAndPropertyNameSet = DerivedObjectClass.get_published_attribute_name_set();
-
-        Assert.assertEquals(expectedPublishedClassAndPropertyNameSet, actualPublishedClassAndPropertyNameSet);
-
-
-        // SUBSCRIBE
-        Set<ObjectRootInterface.ClassAndPropertyName> expectedSubscribedClassAndPropertyNameSet =
-                new HashSet<>();
-        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
-        ));
-        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute2"
-        ));
-        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "string_attribute2"
-        ));
-        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "int_attribute1"
-        ));
-        expectedSubscribedClassAndPropertyNameSet.add( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "string_attribute1"
-        ));
-
-        DerivedObjectClass.subscribe_int_attribute1_attribute();
-        DerivedObjectClass.subscribe_int_attribute2_attribute();
-        DerivedObjectClass.subscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
-        DerivedObjectClass.subscribe_string_attribute1_attribute();
-        DerivedObjectClass.subscribe_string_attribute2_attribute();
-
-        Set<ObjectRootInterface.ClassAndPropertyName> actualSubscribedClassAndPropertyNameSet =
-                DerivedObjectClass.get_subscribed_attribute_name_set();
-
-        Assert.assertEquals(expectedSubscribedClassAndPropertyNameSet, actualSubscribedClassAndPropertyNameSet);
-
-        // UNSUBSCRIBE
-        DerivedObjectClass.unsubscribe_int_attribute1_attribute();
-        DerivedObjectClass.unsubscribe_attribute("ObjectRoot.BaseObjectClass", "int_attribute1");
-
-        expectedSubscribedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass.DerivedObjectClass", "int_attribute1"
-        ));
-        expectedSubscribedClassAndPropertyNameSet.remove( new ObjectRootInterface.ClassAndPropertyName(
-                "ObjectRoot.BaseObjectClass", "int_attribute1"
-        ));
-
-        actualSubscribedClassAndPropertyNameSet = DerivedObjectClass.get_subscribed_attribute_name_set();
-
-        Assert.assertEquals(expectedSubscribedClassAndPropertyNameSet, actualSubscribedClassAndPropertyNameSet);
-    }
-
-    @Test
-    public void objectTest1() {
-        // MAKE SURE ATTRIBUTES ARE PUBLISHED
-        FederateObject.publish_FederateHandle_attribute();
-        FederateObject.publish_FederateHost_attribute();
-        FederateObject.publish_FederateType_attribute();
-        FederateObject.publish_object(rtiambassador);  // NOT REALLY NEEDED FOR TESTING
-
-        // CREATE FederateObject, GIVE ATTRIBUTES VALUES
-        FederateObject federateObject1 = new FederateObject();
-        federateObject1.set_FederateHandle(2);
-        federateObject1.set_FederateHost("localhost");
-        federateObject1.set_FederateType("test");
-
-        // REGISTER THE OBJECT WITH MOCK RTI
-        federateObject1.registerObject(rtiambassador);
-
-        // CHECK MOST RTI VALUES
-        Assert.assertEquals(0, mock.getCurrentObjectHandle());
-        Assert.assertEquals(FederateObject.get_class_handle(), mock.getCurrentClassHandle());
-
-        // DISCOVER OBJECT INSTANCE TO CREATE A SECOND INSTANCE
-        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentObjectHandle());
-        Assert.assertTrue(objectRoot1 instanceof FederateObject);
-
-        // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
-        FederateObject federateObject2 = (FederateObject)objectRoot1;
-        Assert.assertEquals(0, federateObject2.get_FederateHandle());
-        Assert.assertEquals("", federateObject2.get_FederateHost());
-        Assert.assertEquals("", federateObject2.get_FederateType());
-
-        // SEND OUT ATTRIBUTE VALUES OF FIRST INSTANCE TO MOCK RTI
-        federateObject1.updateAttributeValues(rtiambassador, 5.0);
-
-        // CHECK MOCK RTI VALUES
-        Assert.assertNotNull(mock.getCurrentDoubleTime());
-        Assert.assertEquals(5.0, mock.getCurrentDoubleTime().getTime(), 0.1);
-
-        // ALL VALUES SHOULD BE UPDATED (3)
-        SuppliedAttributes currentSuppliedAttributes = mock.getCurrentSuppliedAttributes();
-        Assert.assertEquals(3, currentSuppliedAttributes.size());
-
-        // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
-        Assert.assertEquals(2, federateObject2.get_FederateHandle());
-        Assert.assertEquals("localhost", federateObject2.get_FederateHost());
-        Assert.assertEquals("test", federateObject2.get_FederateType());
-
-        // CHANGE ONLY ONE VALUE IN FIRST INSTANCE AND SEND OUT UPDATE TO MOCK RTI
-        federateObject1.set_FederateType("foobar");
-        federateObject1.updateAttributeValues(rtiambassador, 6.0);
-
-        // CHECK MOCK RTI VALUES
-        Assert.assertNotNull(mock.getCurrentDoubleTime());
-        Assert.assertEquals(6.0, mock.getCurrentDoubleTime().getTime(), 0.1);
-
-        // ONLY ONE VALUE SHOULD BE UPDATED SINCE ONLY ONE WAS CHANGED
-        currentSuppliedAttributes = mock.getCurrentSuppliedAttributes();
-        Assert.assertEquals(1, currentSuppliedAttributes.size());
-
-        // REFLECT CHANGED ATTRIBUTE INTO SECOND INSTANCE, CHECK VALUES
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
-        Assert.assertEquals(2, federateObject2.get_FederateHandle());
-        Assert.assertEquals("localhost", federateObject2.get_FederateHost());
-        Assert.assertEquals("foobar", federateObject2.get_FederateType());
     }
 
     @Test

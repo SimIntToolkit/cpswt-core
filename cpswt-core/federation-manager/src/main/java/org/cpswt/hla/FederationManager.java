@@ -224,7 +224,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 SynchronizedFederate.FEDERATION_MANAGER_NAME,
                 params.federationId,
                 false,
-                params.lookAhead,
+                params.lookahead,
                 params.stepSize
         ));
 
@@ -317,7 +317,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if(coaLoader != null) {
                 COAGraph coaGraph = coaLoader.loadGraph();
 
-                this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getRTI());
+                this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookahead(), this.terminateOnCOAFinish, getRTI());
                 this.coaExecutor.setCoaExecutorEventListener(this);
                 this.coaExecutor.setCOAGraph(coaGraph);
         } else {
@@ -416,7 +416,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         super.enableTimeConstrained();
 
-        super.enableTimeRegulation(time.getTime(), super.getLookAhead());
+        super.enableTimeRegulation(time.getTime(), super.getLookahead());
 
         super.enableAsynchronousDelivery();
 
@@ -656,7 +656,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     private void sendScriptInteractions() {
-        double tmin = time.getTime() + super.getLookAhead() + (super.getLookAhead() / 10000.0);
+        double tmin = time.getTime() + super.getLookahead() + (super.getLookahead() / 10000.0);
 
         for (double intrtime : script_interactions.keySet()) {
             logger.trace("Interaction time = {}", intrtime);
@@ -754,7 +754,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         synchronized (super.rti) {
             try {
                 SimEnd e = new SimEnd();
-                double tmin = time.getTime() + super.getLookAhead();
+                double tmin = time.getTime() + super.getLookahead();
                 sendInteraction(e, tmin);
             } catch (Exception e) {
                 e.printStackTrace();

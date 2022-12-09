@@ -109,9 +109,13 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
  * {@link #startAdvanceTimeThread()} )</li>
  * </ul>
  */
+
+@SuppressWarnings("unused")
 public class SynchronizedFederate extends NullFederateAmbassador {
     private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 250;
+
+    public static void load() { }
 
     /**
      * Local RTI component. This is where you submit the "requests"
@@ -196,12 +200,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private boolean _simEndNotSubscribed = true;
 
-    private double lookAhead;
-    public double getLookAhead() {
-        return lookAhead;
+    private double lookahead;
+    public double getLookahead() {
+        return lookahead;
     }
-    public void setLookAhead(double lookAhead) {
-        this.lookAhead = lookAhead;
+    public void setLookahead(double lookahead) {
+        this.lookahead = lookahead;
     }
 
     private double stepSize;
@@ -228,7 +232,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.federateDynamicMessagingJsonFileName = federateConfig.federateDynamicMessagingJsonFileName;
         this.rejectSourceFederateIdJsonFileName = federateConfig.rejectSourceFederateIdJsonFileName;
 
-        this.lookAhead = federateConfig.lookAhead;
+        this.lookahead = federateConfig.lookahead;
         this.stepSize = federateConfig.stepSize;
 
         this.federateRTIInitWaitTime = federateConfig.federateRTIInitWaitTimeMs;
@@ -317,7 +321,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void notifyFederationOfJoin() {
-        synchronized (this.rti) {
+        synchronized (rti) {
             // every federate will send a "FederateJoinInteraction" and a "FederateResignInteraction"
             // so we need to publish these objects on current RTI
             FederateJoinInteraction.publish_interaction(this.rti);
@@ -340,7 +344,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void notifyFederationOfResign() {
-        synchronized (this.rti) {
+        synchronized (rti) {
             FederateResignInteraction resignInteraction = new FederateResignInteraction();
             resignInteraction.set_FederateId(this.federateId);
             resignInteraction.set_FederateType(this.federateType);
@@ -379,7 +383,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 attempts++;
                 logger.debug("[{}] federate joining federation [{}] attempt #{}", this.federateId, this.federationId, attempts);
                 synchronized (rti) {
-                    this.rti.joinFederationExecution(this.federateId, this.federationId, this, null);
+                    rti.joinFederationExecution(this.federateId, this.federationId, this, null);
                 }
                 federationNotPresent = false;
                 logger.debug("[{}] federate joined federation [{}] successfully", this.federateId, this.federationId);
@@ -493,6 +497,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 sendInteraction(embeddedMessagingDirect);
             }
         }
+    }
+
+    public void unregisterObject(ObjectRoot objectRoot) {
+        objectRoot.unregisterObject(getRTI());
     }
 
     private void sendInteraction(
@@ -634,7 +642,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             synchronized (rti) {
                 rti.tick();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         while (_timeConstrainedNotEnabled) {
             CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
@@ -642,7 +650,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 synchronized (rti) {
                     rti.tick();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -690,7 +698,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             synchronized (rti) {
                 rti.tick();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         while (_timeRegulationNotEnabled) {
             CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
@@ -698,7 +706,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 synchronized (rti) {
                     rti.tick();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -744,7 +752,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             synchronized (rti) {
                 rti.tick();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         while (!_timeRegulationNotEnabled) {
             CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
@@ -752,7 +760,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 synchronized (rti) {
                     rti.tick();
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -1034,7 +1042,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         dtLogicalTime.setTo(logicalTime);
         double dblLogicalTime = dtLogicalTime.getTime();
 
-        double timestampWithLogicalTime = dblLogicalTime + getLookAhead();
+        double timestampWithLogicalTime = dblLogicalTime + getLookahead();
 
         return Math.max(dblLBTSTime, timestampWithLogicalTime);
     }
@@ -1065,7 +1073,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     /**
      * Start the {@link AdvanceTimeThread}
-     * Assumes the federate is a lookAhead value greater than zero. Uses
+     * Assumes the federate is a lookahead value greater than zero. Uses
      * {@link hla.rti.RTIambassador#timeAdvanceRequest(LogicalTime)} for advancing
      * federates time.
      */
@@ -1082,8 +1090,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @param #timeAdvanceMode If
      *                         {@link TimeAdvanceMode#TimeAdvanceRequestAvailable} or
      *                         {@link TimeAdvanceMode#NextEventRequestAvailable} is used, the
-     *                         federate's lookAhead value is allowed to be zero. For other two cases,
-     *                         federate's lookAhead must be greater than zero.
+     *                         federate's lookahead value is allowed to be zero. For other two cases,
+     *                         federate's lookahead must be greater than zero.
      */
     protected void startAdvanceTimeThread(TimeAdvanceMode timeAdvanceMode) {
         if (_advanceTimeThreadNotStarted) {
@@ -1137,7 +1145,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             try {
                 interactionRoot = _interactionQueue.take();
                 takeNotComplete = false;
-            } catch (InterruptedException i) {
+            } catch (InterruptedException ignored) {
             }
 
         }
@@ -1341,16 +1349,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             ObjectReflector objectReflector = ObjectRoot.fromJson(embeddedMessaging.get_messagingJson());
             objectReflector.setFederateSequence(federateSequence);
 
-            Set<ObjectRootInterface.ClassAndPropertyName> attributeClassAndPropertyNameSet =
-                    ObjectRoot.get_subscribed_attribute_name_set(objectReflector.getHlaClassName());
-            Map<ObjectRootInterface.ClassAndPropertyName, Object> classAndPropertyNameValueMap =
-                    objectReflector.getClassAndPropertyNameValueMap();
-            for(ObjectRootInterface.ClassAndPropertyName classAndPropertyName: classAndPropertyNameValueMap.keySet()) {
-                if (!attributeClassAndPropertyNameSet.contains(classAndPropertyName)) {
-                    classAndPropertyNameValueMap.remove(classAndPropertyName);
-                }
-            }
-
             _objectReflectionQueue.add(objectReflector);
             return;
         }
@@ -1432,7 +1430,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             try {
                 objectReflection = _objectReflectionQueue.take();
                 takeNotComplete = false;
-            } catch (InterruptedException i) {
+            } catch (InterruptedException ignored) {
             }
 
         }
@@ -1470,6 +1468,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         ObjectRoot.discover(objectClassHandle, objectHandle);
     }
 
+    @Override
+    public void removeObjectInstance(int theObject, byte[] userSuppliedTag) {
+        ObjectRoot.remove_object(theObject);
+    }
+
+    @Override
+    public void removeObjectInstance(
+            int theObject, byte[] userSuppliedTag, LogicalTime theTime, EventRetractionHandle retractionHandle
+    ) {
+        ObjectRoot.remove_object(theObject);
+    }
 
     private boolean checkNetworkReflect(int theObject) {
         ObjectRoot objectRoot = ObjectRoot.get_object(theObject);
