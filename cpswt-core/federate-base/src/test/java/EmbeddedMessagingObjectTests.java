@@ -242,26 +242,23 @@ public class EmbeddedMessagingObjectTests {
         // THE messagingJson SHOULD BE FOR ALL OF THE PUBLISHED ATTRIBUTES
         Assert.assertEquals(7, objectReflectorJsonPropertiesMap.size());
 
-        // GET ClassAndPropertyNameValueMap FOR THE senderTestObject
-        Map<ObjectRootInterface.ClassAndPropertyName, Object> senderClassAndPropertyNameValueMap =
-                senderTestObject.getClassAndPropertyNameValueMap();
-
-        // GET TestObject CLASS SUBSCRIBED ATTRIBUTE NAMES (ClassAndPropertyName SET)
-        Set<ObjectRootInterface.ClassAndPropertyName> testObjectSubscribedClassAndPropertyNameSet =
-                TestObject.get_subscribed_attribute_name_set();
+        // GET TestObject CLASS PUBLISHED ATTRIBUTE NAMES (ClassAndPropertyName SET)
+        Set<ObjectRootInterface.ClassAndPropertyName> testObjectPublishedClassAndPropertyNameSet =
+                TestObject.get_published_attribute_name_set();
 
         // testObjectClassAndPropertyNameSet SHOULD HAVE 7 MEMBERS
-        Assert.assertEquals(7, testObjectSubscribedClassAndPropertyNameSet.size());
+        Assert.assertEquals(7, testObjectPublishedClassAndPropertyNameSet.size());
 
         // MAKE SURE objectReflector HAS SAME JSON-ENCODED ATTRIBUTE VALUES AS VALUES OF ATTRIBUTES
         // FOR senderTestObject
+
         for(
                 ObjectRootInterface.ClassAndPropertyName classAndPropertyName:
-                testObjectSubscribedClassAndPropertyNameSet
+                testObjectPublishedClassAndPropertyNameSet
         ) {
             Assert.assertEquals(
-                    senderClassAndPropertyNameValueMap.get(classAndPropertyName).toString(),
-                    objectReflectorJsonPropertiesMap.get(classAndPropertyName.toString())
+                    senderTestObject.getAttribute(classAndPropertyName).toString(),
+                    objectReflectorJsonPropertiesMap.get(classAndPropertyName.toString()).toString()
             );
         }
 

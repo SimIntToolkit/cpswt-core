@@ -2104,7 +2104,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public Object getAttribute(String hlaClassName, String propertyName) {
         ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
-        return classAndPropertyName == null ? null : classAndPropertyNameValueMap.get(classAndPropertyName);
+        return classAndPropertyName == null ? null : ((Attribute<?>)classAndPropertyNameValueMap.get(classAndPropertyName)).getValue();
     }
 
     public Object getAttribute(ClassAndPropertyName classAndPropertyName) {

@@ -462,6 +462,7 @@ public class RTIAmbassadorProxy2 {
                     }
                 }
                 if (timeRegulationRequestOutstanding) {
+                    timeRegulationRequestOutstanding = false;
                     for (FederateAmbassador federateAmbassador : federateAmbassadorList) {
                         federateAmbassador.timeRegulationEnabled(defaultLogicalTime);
                     }
