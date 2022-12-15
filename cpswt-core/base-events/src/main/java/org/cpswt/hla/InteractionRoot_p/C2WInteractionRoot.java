@@ -289,7 +289,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
@@ -335,10 +335,6 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     public static void remove_federate_name_soft_publish(String networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    public Set<String> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -547,9 +543,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         update_federate_sequence_aux(this, federateId);
     }
 
-    private static List<String> get_federate_sequence_list_aux(org.cpswt.hla.InteractionRoot interactionRoot) {
-        String federateSequence = (String)interactionRoot.getParameter("federateSequence");
-
+    public static List<String> get_federate_sequence_list(String federateSequence) {
         JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
             new JSONArray( federateSequence ) : new JSONArray();
 
@@ -559,6 +553,12 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         }
 
         return retval;
+    }
+
+    private static List<String> get_federate_sequence_list_aux(org.cpswt.hla.InteractionRoot interactionRoot) {
+        String federateSequence = (String)interactionRoot.getParameter("federateSequence");
+
+        return get_federate_sequence_list(federateSequence);
     }
 
     public static List<String> get_federate_sequence_list(org.cpswt.hla.InteractionRoot interactionRoot) {

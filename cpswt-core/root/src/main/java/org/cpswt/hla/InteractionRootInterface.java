@@ -151,7 +151,7 @@ public interface InteractionRootInterface {
      * Publishes the interaction class of this instance of the class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void publishInteraction( RTIambassador rti );
 
@@ -159,7 +159,7 @@ public interface InteractionRootInterface {
      * Unpublishes the interaction class of this instance of this class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void unpublishInteraction( RTIambassador rti );
 
@@ -167,7 +167,7 @@ public interface InteractionRootInterface {
      * Subscribes a federate to the interaction class of this instance of this class.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void subscribeInteraction( RTIambassador rti );
 
@@ -175,7 +175,7 @@ public interface InteractionRootInterface {
      * Unsubscribes a federate from the interaction class of this instance of this class.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void unsubscribeInteraction( RTIambassador rti );
 
@@ -264,7 +264,7 @@ public interface InteractionRootInterface {
      * ordering.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      * @param time timestamp for this interaction.  The timestamp should be no
      * less than the current federation time + the LOOKAHEAD value of the federate
      * sending this interaction.
@@ -277,7 +277,7 @@ public interface InteractionRootInterface {
      * ordering.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     * {@link SynchronizedFederate#getLRC()} call
+     * {@link SynchronizedFederate#getRTI()} call
      */
     void sendInteraction( RTIambassador rti ) throws Exception;
 }

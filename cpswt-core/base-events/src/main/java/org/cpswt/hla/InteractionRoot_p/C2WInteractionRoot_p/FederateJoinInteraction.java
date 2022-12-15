@@ -290,7 +290,7 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
      * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
@@ -336,10 +336,6 @@ public class FederateJoinInteraction extends org.cpswt.hla.InteractionRoot_p.C2W
 
     public static void remove_federate_name_soft_publish(String networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    public Set<String> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------

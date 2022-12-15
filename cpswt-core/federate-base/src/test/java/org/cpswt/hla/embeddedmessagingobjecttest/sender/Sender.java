@@ -28,18 +28,49 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.base;
+package org.cpswt.hla.embeddedmessagingobjecttest.sender;
 
-import java.util.Comparator;
+import org.cpswt.config.FederateConfig;
 
-public class ObjectReflectorComparator implements Comparator<ObjectReflector> {
-    public int compare(ObjectReflector objectReflection1, ObjectReflector objectReflection2) {
-        if (objectReflection1.getTime() < objectReflection2.getTime()) return -1;
-        if (objectReflection1.getTime() > objectReflection2.getTime()) return 1;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.cpswt.hla.ObjectRoot_p.TestObject;
 
-        if (objectReflection1.getUniqueID() < objectReflection2.getUniqueID()) return -1;
-        if (objectReflection1.getUniqueID() > objectReflection2.getUniqueID()) return 1;
 
-        return 0;
+// Define the  type of federate for the federation.
+
+@SuppressWarnings("unused")
+public class Sender extends SenderBase {
+
+    public static void load() {}
+
+    private final static Logger log = LogManager.getLogger();
+
+    org.cpswt.hla.ObjectRoot_p.TestObject TestObject_0 =
+            new org.cpswt.hla.ObjectRoot_p.TestObject();
+
+    public Sender(FederateConfig params) throws Exception {
+        super(params);
+
+        registerObject(TestObject_0);
+    }
+
+    public TestObject getTestObject() {
+        return TestObject_0;
+    }
+
+    public void execute() throws Exception {
+
+        TestObject_0.set_BooleanValue1(false);
+        TestObject_0.set_BooleanValue2(true);
+        TestObject_0.set_ByteValue((byte)42);
+        TestObject_0.set_CharValue('X');
+        TestObject_0.set_DoubleValue(2.7181);
+        TestObject_0.set_FloatValue(3.14f);
+        TestObject_0.set_IntValue(1000000);
+        TestObject_0.set_ShortValue((short)300);
+        TestObject_0.set_LongValue(1000000000000000000L);
+        TestObject_0.set_StringValue("Hello");
+        updateAttributeValues(TestObject_0, 0.0);
     }
 }

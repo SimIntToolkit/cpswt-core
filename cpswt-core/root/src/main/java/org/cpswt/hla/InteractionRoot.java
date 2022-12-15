@@ -39,6 +39,7 @@ import hla.rti.jlc.RtiFactoryFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     //-------------------------------
     // _rtiFactory IS USED TO CREATE:
-    // - ATTRIBUTE HANDLE SETS
+    // - PARAMETER/ATTRIBUTE HANDLE SETS
     // - SUPPLIED PARAMETERS
     //-------------------------------
     protected static RtiFactory _rtiFactory;
@@ -746,7 +747,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-      * Returns the handle ofa parameter(RTI assigned) given
+      * Returns the handle of a parameter (RTI assigned) given
       * its interaction class name and parameter name
       *
       * @param hlaClassName name of interaction class
@@ -802,12 +803,12 @@ public class InteractionRoot implements InteractionRootInterface {
     // METHODS THAT USE PROPERTY-HANDLE CLASS-AND-PROPERTY-NAME MAP
     //-------------------------------------------------------------
     /**
-      * Returns the name ofa parametercorresponding to
+      * Returns the name of a parameter corresponding to
       * its handle (RTI assigned) in propertyHandle.
       *
-      * @param propertyHandle handle ofparameter(RTI assigned)
+      * @param propertyHandle handle of parameter (RTI assigned)
       * for which to return the name
-      * @return the name of theparametercorresponding to propertyHandle
+      * @return the name of the parameter corresponding to propertyHandle
       */
     public static ClassAndPropertyName get_class_and_parameter_name( int propertyHandle ) {
         return _handleClassAndPropertyNameMap.getOrDefault(propertyHandle, null);
@@ -837,7 +838,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        setParameter(classAndPropertyName.getPropertyName(), value);
+        setParameter(classAndPropertyName, value);
     }
 
     public static int get_num_parameters(String hlaClassName) {
@@ -1048,30 +1049,6 @@ public class InteractionRoot implements InteractionRootInterface {
         set_is_soft_subscribed(hlaClassName, false);
     }
 
-    //-----------------------------------------------------------------------------------------------------------
-    // PROPERTY-CLASS-NAME AND PROPERTY-VALUE DATA CLASS
-    // THIS CLASS IS USED ESPECIALLY FOR THE BENEFIT OF THE SET METHOD BELOW.  WHEN A VALUE IS RETRIEVED FROM THE
-    // classPropertyNameValueMap USING A GET METHOD, IT IS PAIRED WITH THE NAME OF THE CLASS IN WHICH THE
-    // PROPERTY IS DEFINED. IN THIS WAY, THE SET METHOD CAN PLACE THE NEW VALUE FOR THE PROPERTY USING THE
-    // CORRECT (CLASS-NAME, PROPERTY-NAME) KEY.
-    //-----------------------------------------------------------------------------------------------------------
-    protected static class PropertyClassNameAndValue {
-        private final String className;
-        private final Object value;
-
-        public PropertyClassNameAndValue(String className, Object value) {
-            this.className = className;
-            this.value = value;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-        public Object getValue() {
-            return value;
-        }
-    }
-
     //-------------------------------------------
     // CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //-------------------------------------------
@@ -1081,33 +1058,22 @@ public class InteractionRoot implements InteractionRootInterface {
     // METHODS THAT USE CLASS-AND-PROPERTY-NAME PROPERTY-VALUE MAP
     //------------------------------------------------------------
     public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
-        return new HashMap<>(classAndPropertyNameValueMap);
+        return classAndPropertyNameValueMap;
     }
 
-    public void setParameter(String hlaClassName, String propertyName, Object value) {
-
-        PropertyClassNameAndValue propertyClassNameAndValue =
-          getParameterAux(hlaClassName, propertyName);
-
-        if (propertyClassNameAndValue == null) {
-            logger.error(
-              "setParameter(\"{}\", {} value): could not find \"{}\" parameter of class \"{}\" or its " +
-              "superclasses.", propertyName, value.getClass().getName(), propertyName, getInstanceHlaClassName()
-            );
-            return;
-        }
+    private static Object getValueForClassAndPropertyName(ClassAndPropertyName classAndPropertyName, Object value) {
+        String hlaClassName = classAndPropertyName.getClassName();
+        String propertyName = classAndPropertyName.getPropertyName();
 
         // CANNOT SET VALUE TO NULL
         if (value == null) {
             logger.warn(
-              "setParameter(\"{}\", null): attempt to set \"{}\" parameter in " +
-              "\"{}\"  class to null.",
-              propertyName, propertyName, propertyClassNameAndValue.getClassName()
+                    "setParameter(\"{}\", \"{}\", null): attempt to set \"{}\" parameter in \"{}\" class to null.",
+                    hlaClassName, propertyName, propertyName, hlaClassName
             );
-            return;
+            return null;
         }
-
-        Object currentValue = propertyClassNameAndValue.getValue();
+        Object initialValueForType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName);
 
         // IF value IS A STRING, AND THE TYPE OF THE PARAMETER IS A NUMBER-TYPE, TRY TO SEE IF THE
         // STRING CAN BE CONVERTED TO A NUMBER.
@@ -1116,21 +1082,21 @@ public class InteractionRoot implements InteractionRootInterface {
             String stringValue = ((String)value).toLowerCase();
             Object newValue = null;
 
-            if (currentValue instanceof Number) {
+            if (initialValueForType instanceof Number) {
                 Method method;
                 try {
-                    method = currentValue.getClass().getMethod("valueOf", String.class);
+                    method = initialValueForType.getClass().getMethod("valueOf", String.class);
                 } catch (NoSuchMethodException noSuchMethodException) {
                     logger.error(
-                            "setParameter(\"{}\", {} value) (for class \"{}\"): unable to access \"valueOf\" " +
+                            "setParameter(\"{}\", \"{}\", {} value): unable to access \"valueOf\" " +
                                     "method of \"Number\" object: cannot set value!",
-                            propertyName, value.getClass().getName(), propertyClassNameAndValue.getClassName()
+                            hlaClassName, propertyName, value.getClass().getName()
                     );
-                    return;
+                    return null;
                 }
                 try {
                     // DEAL WITH STRING-VERSIONS OF FLOATING-POINT VALUES THAT ARE TO BE CONVERTED TO AN INTEGRAL TYPE
-                    if (!(currentValue instanceof Double) && !(currentValue instanceof Float)) {
+                    if (!(initialValueForType instanceof Double) && !(initialValueForType instanceof Float)) {
                         int dotPosition = stringValue.indexOf(".");
                         if (dotPosition > 0) {
                             stringValue = stringValue.substring(0, dotPosition);
@@ -1143,12 +1109,12 @@ public class InteractionRoot implements InteractionRootInterface {
                     newValue = method.invoke(null, stringValue);
                 } catch (Exception e) { }
 
-            } else if (currentValue instanceof Character) {
+            } else if (initialValueForType instanceof Character) {
                 try {
                     newValue = (char)Short.valueOf(stringValue).shortValue();
                 } catch (Exception e) { }
 
-            } else if (currentValue instanceof Boolean) {
+            } else if (initialValueForType instanceof Boolean) {
                 try {
                     newValue = Double.parseDouble(stringValue) != 0;
                 } catch (Exception e) { }
@@ -1163,21 +1129,55 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        if (currentValue.getClass() != value.getClass()) {
+        if (initialValueForType.getClass() != value.getClass()) {
             logger.error(
-              "setParameter(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" parameter, " +
-              "should be of type \"{}\".",
-              propertyName,
-              value.getClass().getName(),
-              value.getClass().getName(),
-              propertyName,
-              currentValue.getClass().getName()
+                    "setParameter(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" " +
+                            "parameter, should be of type \"{}\".",
+                    propertyName,
+                    value.getClass().getName(),
+                    value.getClass().getName(),
+                    propertyName,
+                    initialValueForType.getClass().getName()
             );
+            return null;
+        }
+
+        return value;
+    }
+
+    private static Map.Entry<ClassAndPropertyName, Object> getValueForClassAndPropertyName(
+            String hlaClassName, String propertyName, Object value
+    ) {
+        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
+
+        if (classAndPropertyName == null) {
+            logger.error(
+                    "setParameter(\"{}\", \"{}\", {} value): could not find \"{}\" parameter of class \"{}\" or its " +
+                    "superclasses.", hlaClassName, propertyName, value.getClass().getName(), propertyName, hlaClassName
+            );
+            return null;
+        }
+
+        Object newValue = getValueForClassAndPropertyName(classAndPropertyName, value);
+        if (newValue == null) {
+            return null;
+        }
+
+        return new AbstractMap.SimpleEntry<>(classAndPropertyName, newValue);
+    }
+
+    public void setParameter(String hlaClassName, String propertyName, Object value) {
+
+        Map.Entry<ClassAndPropertyName, Object> classAndPropertyNameAndValue = getValueForClassAndPropertyName(
+                hlaClassName, propertyName, value
+        );
+        if (classAndPropertyNameAndValue == null) {
             return;
         }
-        ClassAndPropertyName key =
-          new ClassAndPropertyName(propertyClassNameAndValue.getClassName(), propertyName);
-        classAndPropertyNameValueMap.put(key, value);
+        ClassAndPropertyName classAndPropertyName = classAndPropertyNameAndValue.getKey();
+        Object newValue = classAndPropertyNameAndValue.getValue();
+
+        classAndPropertyNameValueMap.put(classAndPropertyName, newValue);
     }
 
     public void setParameter(ClassAndPropertyName classAndPropertyName, Object value) {
@@ -1190,16 +1190,6 @@ public class InteractionRoot implements InteractionRootInterface {
         setParameter(getInstanceHlaClassName(), propertyName, value);
     }
 
-    private PropertyClassNameAndValue getParameterAux(String className, String propertyName) {
-        ClassAndPropertyName key = findProperty(className, propertyName);
-        if (key != null) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            return value == null ? null : new PropertyClassNameAndValue(key.getClassName(), value);
-        }
-
-        return null;
-    }
-
     /**
      * Returns the value of the parameter named "propertyName" for this
      * interaction.
@@ -1208,7 +1198,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the value of the parameter whose name is "propertyName"
      */
     public boolean hasParameter(String hlaClassName, String propertyName) {
-        return getParameterAux(hlaClassName, propertyName) != null;
+        return findProperty(hlaClassName, propertyName) != null;
     }
 
     public boolean hasParameter(String propertyName) {
@@ -1216,17 +1206,12 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     public Object getParameter(String hlaClassName, String propertyName) {
-        PropertyClassNameAndValue propertyClassNameAndValue = getParameterAux(
-          hlaClassName, propertyName
-        );
-        return propertyClassNameAndValue == null ? null
-          : propertyClassNameAndValue.getValue();
+        ClassAndPropertyName classAndPropertyName = findProperty(hlaClassName, propertyName);
+        return classAndPropertyName == null ? null : classAndPropertyNameValueMap.get(classAndPropertyName);
     }
 
     public Object getParameter(ClassAndPropertyName classAndPropertyName) {
-        return getParameter(
-          classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName()
-        );
+        return getParameter(classAndPropertyName.getClassName(), classAndPropertyName.getPropertyName());
     }
 
     public Object getParameter(String propertyName) {
@@ -1441,7 +1426,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
-     *            {@link SynchronizedFederate#getLRC()} call
+     *            {@link SynchronizedFederate#getRTI()} call
      */
     public static void unpublish_interaction(RTIambassador rti) {
         unpublish_interaction(get_hla_class_name(), rti);
@@ -1487,10 +1472,6 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void remove_federate_name_soft_publish(String networkFederateName) {
         remove_federate_name_soft_publish(get_hla_class_name(), networkFederateName);
-    }
-
-    public Set<String> getFederateNameSoftPublishSet() {
-        return get_federate_name_soft_publish_set(get_hla_class_name());
     }
 
     //-----------------------------------------------------
@@ -2048,7 +2029,7 @@ public class InteractionRoot implements InteractionRootInterface {
           new HashSet<>(_hlaClassNameToFederateNameSoftPublishSetMap.get(hlaClassName)) : new HashSet<>();
     }
 
-    public Set<String> getFederateNameSoftPublishSet(String hlaClassName) {
+    public Set<String> getFederateNameSoftPublishSet() {
         return get_federate_name_soft_publish_set(getInstanceHlaClassName());
     }
 

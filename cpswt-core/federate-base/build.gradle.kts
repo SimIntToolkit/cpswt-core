@@ -44,6 +44,7 @@ val archivaPort: String by project
 
 dependencies {
     implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
+    implementation(group="org.json", name="json", version="20210307")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
@@ -51,6 +52,10 @@ dependencies {
     implementation(group="org.cpswt", name="config", version="0.7.0-SNAPSHOT")
     implementation(group="org.cpswt", name="root", version="0.7.0-SNAPSHOT")
     implementation(group="org.cpswt", name="base-events", version="0.7.0-SNAPSHOT")
+
+
+    testImplementation(group="junit", name="junit", version="4.13.2")
+    testImplementation(group="org.mockito", name="mockito-core", version="4.1.0")
 }
 
 publishing {
