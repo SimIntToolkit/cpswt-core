@@ -1,30 +1,54 @@
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
+
 package org.cpswt.host;
 
-import akka.NotUsed;
 import akka.actor.ActorSystem;
-import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
-import akka.http.javadsl.model.HttpRequest;
-import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
-import akka.stream.ActorMaterializer;
-import akka.stream.javadsl.Flow;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.host.api.FederationManagerControlRequest;
-import org.cpswt.host.api.StateResponse;
 import org.cpswt.config.FederateConfigParser;
 import org.cpswt.hla.FederateState;
 import org.cpswt.hla.FederationManager;
 import org.cpswt.hla.FederationManagerConfig;
 import org.cpswt.host.api.ControlAction;
+import org.cpswt.host.api.FederationManagerControlRequest;
 import org.cpswt.host.api.StateChangeResponse;
+import org.cpswt.host.api.StateResponse;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
@@ -70,7 +94,7 @@ public class FederationManagerHostApp extends AllDirectives {
         try {
             this.federationManager = new FederationManager(this.federationManagerConfig);
         } catch (Exception e) {
-            logger.error("Error while initializing FederationManager!" + e.getMessage());
+            logger.error("Error while initializing FederationManager! " + e.getMessage());
             logger.error(e);
         }
     }
@@ -121,19 +145,23 @@ public class FederationManagerHostApp extends AllDirectives {
                                         try {
                                             switch (action) {
                                                 case START:
+                                                    logger.debug("Starting simulation");
                                                     response = new StateChangeResponse(currentState, FederateState.STARTING);
                                                     this.startSimulationAsync();
                                                     break;
                                                 case PAUSE:
-                                                    this.federationManager.pauseSimulation();
+                                                    logger.debug("Pause simulation");
+                                                  this.federationManager.pauseSimulation();
                                                     response = new StateChangeResponse(currentState, federationManager.getFederateState());
                                                     break;
                                                 case RESUME:
-                                                    this.federationManager.resumeSimulation();
+                                                    logger.debug("Resume simulation");
+                                                   this.federationManager.resumeSimulation();
                                                     response = new StateChangeResponse(currentState, federationManager.getFederateState());
                                                     break;
                                                 case TERMINATE:
-                                                    response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
+                                                    logger.debug("Terminate simulation");
+                                                  response = new StateChangeResponse(federationManager.getFederateState(), FederateState.TERMINATING);
                                                     this.terminateSimulationAsync();
                                                     break;
                                             }
@@ -187,16 +215,12 @@ public class FederationManagerHostApp extends AllDirectives {
         ActorSystem system = ActorSystem.create("routes");
 
         final Http http = Http.get(system);
-        final ActorMaterializer materializer = ActorMaterializer.create(system);
-
         FederationManagerHostApp app = new FederationManagerHostApp();
         app.parseConfig(args);
 
         app.initFederationManager();
-
-        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
-        final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
-                ConnectHttp.toHost(app.getBindingAddress(), app.getPort()), materializer);
+        final Route route = app.createRoute();
+        final CompletionStage<ServerBinding> binding = http.newServerAt(app.getBindingAddress(), app.getPort()).bind(route);
 
         logger.info("Server online at {}:{} ...", app.getBindingAddress(), app.getPort());
         System.in.read();

@@ -1,28 +1,39 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- * 
- * @author Himanshu Neema
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
 
 package org.cpswt.hla;
 
+import org.cpswt.coa.COAExecutor;
+import org.cpswt.coa.COAExecutorEventListener;
+import org.cpswt.coa.COAGraph;
+import org.cpswt.coa.COALoader;
 import org.cpswt.utils.CpswtDefaults;
 import hla.rti.*;
 
@@ -61,17 +72,31 @@ import org.cpswt.util.RandomWithFixedSeed;
 import org.cpswt.hla.rtievents.IC2WFederationEventsHandler;
 import org.cpswt.hla.rtievents.C2WFederationEventsHandler;
 
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume;
+
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio;
+import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
+
+import org.cpswt.hla.ObjectRoot_p.FederateObject;
+
 /**
  * Model class for the Federation Manager.
  */
 public class FederationManager extends SynchronizedFederate implements COAExecutorEventListener {
 
-    private static Logger logger = LogManager.getLogger(FederationManager.class);
+    private static final Logger logger = LogManager.getLogger(FederationManager.class);
 
-    private Set<String> _synchronizationLabels = new HashSet<>();
+    private final Set<String> _synchronizationLabels = new HashSet<>();
 
-    private FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
-    private IC2WFederationEventsHandler _federationEventsHandler = null;
+    private final FederatesMaintainer federatesMaintainer = new FederatesMaintainer();
+    private IC2WFederationEventsHandler _federationEventsHandler;
 
     /*
         ==============================================================================================================
@@ -86,17 +111,22 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     /**
      * The name of the Federation.
      */
-    private String federationId;
+    private final String federationId;
 
     /**
      * Indicates if real time mode is on.
      */
-    private boolean realTimeMode = true;
+    private boolean realTimeMode;
 
     /**
      * Indicates if federation manager terminates when COA finishes.
      */
     private boolean terminateOnCOAFinish;
+
+    /**
+     * Represents which combination of COAs to execute in current run of an experiment.
+     */
+    private String coaSelectionToExecute;
 
     /**
      * Project root directory
@@ -120,8 +150,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private boolean _killingFederation = false;
 
 
-    private Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<Double, List<InteractionRoot>>();
-    private List<InteractionRoot> initialization_interactions = new ArrayList<InteractionRoot>();
+    private Map<Double, List<InteractionRoot>> script_interactions = new TreeMap<>();
+    private List<InteractionRoot> initialization_interactions = new ArrayList<>();
 
     private List<Integer> monitored_interactions = new ArrayList<Integer>();
 
@@ -130,10 +160,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private boolean paused = false;
 
     private boolean federationAttempted = false;
-
-    boolean timeRegulationEnabled = false;
-
-    boolean timeConstrainedEnabled = false;
 
     private boolean granted = false;
 
@@ -155,7 +181,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     private double tMainLoopEndTime = 0.0;
     private boolean executionTimeRecorded = false;
 
-    private COAExecutor coaExecutor;
+    private COAExecutor coaExecutor = null;
 
     //private PrintStream monitor_out;
 
@@ -172,6 +198,21 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 //    }
     /* ============================================================================================================== */
 
+    static {
+        FederateJoinInteraction.load();
+        FederateResignInteraction.load();
+
+        SimEnd.load();
+        SimPause.load();
+        SimResume.load();
+
+        VeryLowPrio.load();
+        LowPrio.load();
+        MediumPrio.load();
+        HighPrio.load();
+
+        FederateObject.load();
+    }
     /**
      * Creates a @FederationManager instance.
      *
@@ -183,8 +224,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 SynchronizedFederate.FEDERATION_MANAGER_NAME,
                 params.federationId,
                 false,
-                params.lookAhead,
-                params.stepSize));
+                params.lookahead,
+                params.stepSize
+        ));
 
         logger.trace("FederationManager initialization start");
 
@@ -192,7 +234,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         this.federationId = params.federationId;
         this._federationEndTime = params.federationEndTime;
         this.realTimeMode = params.realTimeMode;
-        this.terminateOnCOAFinish = params.terminateOnCOAFinish;
 
         // set project's root directory
         this.rootDir = System.getenv(CpswtDefaults.RootPathEnvVarKey);
@@ -214,8 +255,8 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: eliminate loglevels @see #18
         this._logLevel = "NORMAL";
 
-        // See if fixed see must be used
-        // TODO: WHAT IS THIS SHIT
+        // See if fixed seed must be used
+        // TODO: WHAT IS THIS
         int seed4Dur = 0;
         if (seed4Dur > 0) {
             RandomWithFixedSeed.init(seed4Dur);
@@ -224,7 +265,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             this._rand4Dur = new Random();
         }
 
-        // TODO: logging #18 , #13, #7
+        // TODO: logging #18
         Path logDirPath = Paths.get(this.rootDir, "log"); // params.LogDir);
         File logDir = logDirPath.toFile();
         if (Files.notExists(logDirPath)) {
@@ -235,19 +276,52 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // TODO: Prepare core to be able to stream events when needed #27
         this._federationEventsHandler = new C2WFederationEventsHandler();
 
-        Path experimentConfigFilePath = Paths.get(params.experimentConfig);
-        File experimentConfigFile;
-        if (experimentConfigFilePath.isAbsolute()) {
-            experimentConfigFile = experimentConfigFilePath.toFile();
-        } else {
-            experimentConfigFile = Paths.get(this.rootDir, params.experimentConfig).toFile();
-        }
+        Path experimentConfigFilePath = CpswtUtils.getConfigFilePath(params.experimentConfig, this.rootDir);
 
         logger.trace("Loading experiment config file {}", experimentConfigFilePath);
-        this.experimentConfig = ConfigParser.parseConfig(experimentConfigFile, ExperimentConfig.class);
+        this.experimentConfig = ConfigParser.parseConfig(experimentConfigFilePath.toFile(), ExperimentConfig.class);
+        logger.trace("Experiment config loaded");
+        this.terminateOnCOAFinish = this.experimentConfig.terminateOnCOAFinish;
+        this.coaSelectionToExecute = this.experimentConfig.COASelectionToExecute;
+        logger.trace("Updating Federate Join Info in the FederatesMaintainer");
         this.federatesMaintainer.updateFederateJoinInfo(this.experimentConfig);
+        logger.trace("Checking pause times in experiment config: {}", this.experimentConfig.pauseTimes);
         if(this.experimentConfig.pauseTimes != null) {
             this.pauseTimes.addAll(this.experimentConfig.pauseTimes);
+        }
+
+        // load COA related stuff
+        logger.trace("Checking COA coaDefinitions, coaSelections, and coaSelectionToExecute");
+        Path coaDefinitionPath = null;
+        if( this.experimentConfig.coaDefinition != null && !"".equals(this.experimentConfig.coaDefinition) ) {
+                coaDefinitionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaDefinition, this.rootDir);
+        } else {
+                logger.info("No COA definitions were provided!");
+        }
+        Path coaSelectionPath = null;
+        if( this.experimentConfig.coaSelection != null && !"".equals(this.experimentConfig.coaSelection) ) {
+                coaSelectionPath = CpswtUtils.getConfigFilePath(this.experimentConfig.coaSelection, this.rootDir);
+        } else {
+                logger.info("No COA selections were provided!");
+        }
+        if( coaSelectionToExecute != null && !"".equals(coaSelectionToExecute) ) {
+            logger.trace("COASelectionToExecute: {}", coaSelectionToExecute);
+        } else {
+            logger.info("No specific COA-selection was specified for execution!");
+        }
+
+        COALoader coaLoader = null;        
+        if( coaDefinitionPath != null && coaSelectionPath != null && coaSelectionToExecute != null) {
+                coaLoader = new COALoader(coaDefinitionPath, coaSelectionPath, coaSelectionToExecute);
+        }
+        if(coaLoader != null) {
+                COAGraph coaGraph = coaLoader.loadGraph();
+
+                this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookahead(), this.terminateOnCOAFinish, getRTI());
+                this.coaExecutor.setCoaExecutorEventListener(this);
+                this.coaExecutor.setCOAGraph(coaGraph);
+        } else {
+                logger.info("No COAs are used in this experiment.");
         }
 
         if(this.federatesMaintainer.expectedFederatesLeftToJoinCount() == 0) {
@@ -256,57 +330,23 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
             logger.debug("No expected federates are defined, not setting up synchronization points.");
         }
 
-        this.initializeLRC(fedFileURL);
-
-        /*
-
-        // read script file
-        if (params.experimentConfig != null) {
-            File f = Paths.get(this.rootDir, params.experimentConfig).toFile();
-
-            ConfigXMLHandler xmlHandler = new ConfigXMLHandler(this.federationId, this.getFederateId(), this._rand4Dur, this._logLevel, this.getLRC());
-
-            SAXParserFactory.newInstance().newSAXParser().parse(f, xmlHandler);
-            if (xmlHandler.getParseFailed())
-                throw new Exception("Config file reading failed.");
-
-            // Script file loaded
-            // System.out.println("COAGraph is:\n" + _coaGraph.toString());
-
-            // PREPARE FOR FEDERATES TO JOIN -- INITIALIZE _processedFederates AND ELIMINATE
-            // FEDERATES NAMES FROM IT AS THEY JOIN            
-            _processedFederates.addAll(xmlHandler.getExpectedFederates());
-
-            _injectedInteraction = xmlHandler.getInjectedInteraction();
-            pauseTimes.addAll(xmlHandler.getPauseTimes());
-            monitored_interactions.addAll(xmlHandler.getMonitoredInteractions());
-            expectedFederateTypes.addAll(xmlHandler.getExpectedFederates());
-
-            this.coaExecutor = new COAExecutor(this.getFederationId(), this.getFederateId(), super.getLookAhead(), this.terminateOnCOAFinish, getLRC());
-            this.coaExecutor.setCoaExecutorEventListener(this);
-            coaExecutor.setCOAGraph(xmlHandler.getCoaGraph());
-
-            initialization_interactions.addAll(xmlHandler.getInitInteractions());
-            script_interactions = xmlHandler.getScriptInteractions();
-
-            // Remember stop script file's full path
-            // TODO: stop script remove, @see #25
-            _stopScriptFilepath = Paths.get(this.rootDir, "Main/stop.sh").toString(); // params.StopScriptPath).toString();
-        }
-
-        */
+        this.initializeRTI(fedFileURL);
 
         // Before beginning simulation, initialize COA sequence graph
-        // coaExecutor.initializeCOAGraph();
+        if(this.coaExecutor != null) {
+                this.coaExecutor.setRTIambassador(getRTI());
+                this.coaExecutor.initializeCOAGraph();
+        }
+
         this.setFederateState(FederateState.INITIALIZED);
 
     }
 
     void maintainFederatesFromFederationManifest() {
         try {
-            RTIambassador genericRTIambassador = super.getLRC();
+            RTIambassador genericRTIambassador = super.getRTI();
             if(genericRTIambassador instanceof Rti13Ambassador) {
-                Rti13Ambassador rti13Ambassador = (Rti13Ambassador) super.getLRC();
+                Rti13Ambassador rti13Ambassador = (Rti13Ambassador) super.getRTI();
                 IConnection connection = rti13Ambassador.getHelper().getLrc().getConnection();
                 JGroupsConnection jGroupsConnection = (JGroupsConnection) connection;
 
@@ -318,7 +358,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 Manifest joinedFederationManifest = joinedFederation.getManifest();
 
                 synchronized (this.federatesMaintainer) {
-                    for (FederateInfo federateInfo : this.federatesMaintainer.getOnlineFederates()) {
+                    List<FederateInfo> onlineFederatesList = this.federatesMaintainer.getOnlineFederates();
+                    FederateInfo[] onlineFederates = onlineFederatesList.toArray(new FederateInfo[onlineFederatesList.size()]);
+                    for (FederateInfo federateInfo : onlineFederates) {
                         boolean containsFed = joinedFederationManifest.containsFederate(federateInfo.getFederateId());
                         logger.trace("{} :: isContainedByManifest: {}", federateInfo.getFederateId(), containsFed);
 
@@ -351,16 +393,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         }
     }
 
-    private void initializeLRC(URL fedFileURL) throws Exception {
+    private void initializeRTI(URL fedFileURL) throws Exception {
 
         logger.trace("Creating Local RTI component ...");
-        super.createLRC();
+        super.createRTI();
         logger.debug("Local RTI component created successfully.");
 
         logger.trace("[{}] Attempting to create federation \"{}\"...", super.getFederateId(), federationId);
         try {
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.CREATING_FEDERATION, federationId);
-            super.lrc.createFederationExecution(this.federationId, fedFileURL);
+            super.rti.createFederationExecution(this.federationId, fedFileURL);
             _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_CREATED, federationId);
         } catch (FederationExecutionAlreadyExists feae) {
             logger.error("Federation with the name of \"{}\" already exists.", federationId);
@@ -374,53 +416,53 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // PER THE HLA BOOK, ENABLE TIME-CONSTRAINED FIRST, THEN TIME-REGULATING
         super.enableTimeConstrained();
 
-        super.enableTimeRegulation(time.getTime(), super.getLookAhead());
+        super.enableTimeRegulation(time.getTime(), super.getLookahead());
 
         super.enableAsynchronousDelivery();
 
         if (useSyncPoints) {
             logger.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToPopulate);
-            super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
-            super.lrc.tick();
+            super.rti.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToPopulate, null);
+            super.rti.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToPopulate)) {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                super.lrc.tick();
+                super.rti.tick();
             }
             logger.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToPopulate);
 
             logger.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToRun);
-            super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
-            super.lrc.tick();
+            super.rti.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToRun, null);
+            super.rti.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToRun)) {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                super.lrc.tick();
+                super.rti.tick();
             }
             logger.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToRun);
 
             logger.trace("Registering synchronization point: {}", SynchronizationPoints.ReadyToResign);
-            super.lrc.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
-            super.lrc.tick();
+            super.rti.registerFederationSynchronizationPoint(SynchronizationPoints.ReadyToResign, null);
+            super.rti.tick();
             while (!_synchronizationLabels.contains(SynchronizationPoints.ReadyToResign)) {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-                super.lrc.tick();
+                super.rti.tick();
             }
             logger.debug("Synchronization point \"{}\" registered successfully.", SynchronizationPoints.ReadyToResign);
         }
 
         // subscribe for "join" and "resign" interactions
-        FederateJoinInteraction.subscribe(super.getLRC());
-        FederateResignInteraction.subscribe(super.getLRC());
+        FederateJoinInteraction.subscribe_interaction(super.getRTI());
+        FederateResignInteraction.subscribe_interaction(super.getRTI());
 
         super.notifyFederationOfJoin();
 
         // TODO: overview this later
-        SimEnd.publish(getLRC());
-        SimPause.publish(getLRC());
-        SimResume.publish(getLRC());
+        SimEnd.publish_interaction(getRTI());
+        SimPause.publish_interaction(getRTI());
+        SimResume.publish_interaction(getRTI());
     }
 
     /**
-     * Start the federation run - federation that has been created already in the initializeLRC() -- TEMP comment, needs to be refactored
+     * Start the federation run - federation that has been created already in the initializeRTI() -- TEMP comment, needs to be refactored
      *
      * @throws Exception
      */
@@ -444,7 +486,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         // SEND OUT "INITIALIZATION INTERACTIONS," WHICH ARE SUPPOSED TO BE "RECEIVE" ORDERED.
         for (InteractionRoot interactionRoot : initialization_interactions) {
             logger.trace("Sending {} interaction.", interactionRoot.getSimpleClassName());
-            interactionRoot.sendInteraction(getLRC());
+            sendInteraction(interactionRoot);
         }
 
         // TODO: eliminate this #18
@@ -453,7 +495,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         fireTimeUpdate(0.0);
 
         // set time
-        fireTimeUpdate(getLRC().queryFederateTime());
+        fireTimeUpdate(getRTI().queryFederateTime());
         resetTimeOffset();
 
         double step = super.getStepSize();
@@ -470,104 +512,104 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         federatesMaintainerBackgroundThread.setName("FederatesMaintainerThread");
 
         // run rti on a spearate thread
-        Thread mainFederationManagerRunThread = new Thread() {
-            public void run() {
+        Thread mainFederationManagerRunThread = new Thread(() -> {
 
-                try {
-                    recordMainExecutionLoopStartTime();
+            try {
+                recordMainExecutionLoopStartTime();
 
-                    int numStepsExecuted = 0;
-                    while (running) {
-                        if (realTimeMode) {
-                            long sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
-                            while (sleep_time > 0 && realTimeMode) {
-                                long local_sleep_time = sleep_time;
-                                if (local_sleep_time > 1000) local_sleep_time = 1000;
-                                CpswtUtils.sleep(local_sleep_time);
-                                sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
+                int numStepsExecuted = 0;
+                while (running) {
+                    if (realTimeMode) {
+                        long sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
+                        while (sleep_time > 0 && realTimeMode) {
+                            long local_sleep_time = sleep_time;
+                            if (local_sleep_time > 1000) local_sleep_time = 1000;
+                            CpswtUtils.sleep(local_sleep_time);
+                            sleep_time = time_in_millisec - (time_diff + System.currentTimeMillis());
+                        }
+                    }
+
+                    if (!paused) {
+                        synchronized (getRTI()) {
+
+                            sendScriptInteractions();
+
+                            if(coaExecutor != null) {
+                               coaExecutor.executeCOAGraph();
+                            }
+
+                            DoubleTime next_time = new DoubleTime(time.getTime() + step);
+                            logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
+                            getRTI().timeAdvanceRequest(next_time);
+                            if (realTimeMode) {
+                                time_diff = time_in_millisec - System.currentTimeMillis();
+                            }
+
+                            // wait for grant
+                            granted = false;
+                            int numTicks = 0;
+                            boolean stuckWhileWaiting = false;
+                            while (!granted && running) {
+                                getRTI().tick();
+                            }
+                            numTicks = 0;
+
+                            numStepsExecuted++;
+
+
+                            // if we passed next pause time go to pause mode
+                            Iterator<Double> it = pauseTimes.iterator();
+                            if (it.hasNext()) {
+                                double pause_time = it.next();
+                                if (time.getTime() > pause_time) {
+                                    it.remove();
+                                    pauseSimulation();
+                                }
                             }
                         }
 
-                        if (!paused) {
-                            synchronized (getLRC()) {
-
-                                sendScriptInteractions();
-
-                                // coaExecutor.executeCOAGraph();
-
-                                DoubleTime next_time = new DoubleTime(time.getTime() + step);
-                                logger.info("Current_time = {} and step = {} and requested_time = {}", time.getTime(), step, next_time.getTime());
-                                getLRC().timeAdvanceRequest(next_time);
-                                if (realTimeMode) {
-                                    time_diff = time_in_millisec - System.currentTimeMillis();
-                                }
-
-                                // wait for grant
-                                granted = false;
-                                int numTicks = 0;
-                                boolean stuckWhileWaiting = false;
-                                while (!granted && running) {
-                                    getLRC().tick();
-                                }
-                                numTicks = 0;
-
-                                numStepsExecuted++;
-
-
-                                // if we passed next pause time go to pause mode
-                                Iterator<Double> it = pauseTimes.iterator();
-                                if (it.hasNext()) {
-                                    double pause_time = it.next();
-                                    if (time.getTime() > pause_time) {
-                                        it.remove();
-                                        pauseSimulation();
-                                    }
-                                }
-                            }
-
-                            if (numStepsExecuted == 10) {
-                                logger.info("Federation manager current time = {}", time.getTime());
-                                numStepsExecuted = 0;
-                            }
-                        } else {
-                            CpswtUtils.sleep(10);
+                        if (numStepsExecuted == 10) {
+                            logger.info("Federation manager current time = {}", time.getTime());
+                            numStepsExecuted = 0;
                         }
-
-                        // If we have reached federation end time (if it was configured), terminate the federation
-                        if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
-                            _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
-                            terminateSimulation();
-                        }
-
-                    }
-                    _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
-                    prepareForFederatesToResign();
-
-                    if(useSyncPoints) {
-                        logger.info("Waiting for \"ReadyToResign\" ... ");
-                        readyToResign();
-                        logger.info("Done with resign");
+                    } else {
+                        CpswtUtils.sleep(10);
                     }
 
-                    waitForFederatesToResign();
-
-                    while(getFederateState() != FederateState.TERMINATED) {
-                        CpswtUtils.sleepDefault();
+                    // If we have reached federation end time (if it was configured), terminate the federation
+                    if (_federationEndTime > 0 && time.getTime() > _federationEndTime) {
+                        _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
+                        terminateSimulation();
                     }
 
-                    // destroy federation
-                    getLRC().resignFederationExecution(ResignAction.DELETE_OBJECTS);
-                    getLRC().destroyFederationExecution(federationId);
-                    destroyRTI();
-                    logLevel = 0;
-
-                    // In case some federate is still hanging around
-                    killEntireFederation();
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
                 }
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED, federationId);
+                prepareForFederatesToResign();
+
+                if(useSyncPoints) {
+                    logger.info("Waiting for \"ReadyToResign\" ... ");
+                    readyToResign();
+                    logger.info("Done with resign");
+                }
+
+                waitForFederatesToResign();
+
+                while(getFederateState() != FederateState.TERMINATED) {
+                    CpswtUtils.sleepDefault();
+                }
+
+                // destroy federation
+                getRTI().resignFederationExecution(ResignAction.DELETE_OBJECTS);
+                getRTI().destroyFederationExecution(federationId);
+                destroyRTI();
+                logLevel = 0;
+
+                // In case some federate is still hanging around
+                killEntireFederation();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
             }
-        };
+        });
 
         running = true;
         mainFederationManagerRunThread.start();
@@ -575,10 +617,10 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     private void waitExpectedFederatesToJoin() throws Exception {
-        FederateObject.subscribe_FederateHandle();
-        FederateObject.subscribe_FederateType();
-        FederateObject.subscribe_FederateHost();
-        FederateObject.subscribe(getLRC());
+        FederateObject.subscribe_FederateHandle_attribute();
+        FederateObject.subscribe_FederateType_attribute();
+        FederateObject.subscribe_FederateHost_attribute();
+        FederateObject.subscribe_object(getRTI());
 
         for (FederateJoinInfo federateInfo : this.experimentConfig.expectedFederates) {
             logger.trace("Waiting for {} federate{} of type \"{}\" to join", federateInfo.count, federateInfo.count <= 1 ? "" : "s", federateInfo.federateType);
@@ -587,7 +629,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         int numOfFedsToWaitFor = this.federatesMaintainer.expectedFederatesLeftToJoinCount();
         while (numOfFedsToWaitFor > 0) {
             try {
-                super.lrc.tick();
+                super.rti.tick();
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
                 numOfFedsToWaitFor = this.federatesMaintainer.expectedFederatesLeftToJoinCount();
             }
@@ -607,14 +649,14 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     private void waitForFederatesToResign() throws Exception {
         while (this.federatesMaintainer.getOnlineExpectedFederates().size() != 0) {
-//            getLRC().tick();
+//            getRTI().tick();
             CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
         }
         logger.info("All federates have resigned the federation.  Simulation terminated.\n");
     }
 
     private void sendScriptInteractions() {
-        double tmin = time.getTime() + super.getLookAhead() + (super.getLookAhead() / 10000.0);
+        double tmin = time.getTime() + super.getLookahead() + (super.getLookahead() / 10000.0);
 
         for (double intrtime : script_interactions.keySet()) {
             logger.trace("Interaction time = {}", intrtime);
@@ -623,20 +665,20 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 continue;
             if (intrtime < tmin) {
 
-                String interactionClassList = new String();
+                StringBuilder interactionClassList = new StringBuilder();
                 boolean notFirst = false;
                 for (InteractionRoot interactionRoot : interactionRootList) {
-                    if (notFirst) interactionClassList += ", ";
+                    if (notFirst) interactionClassList.append(", ");
                     notFirst = true;
-                    interactionClassList += interactionRoot.getClassName();
+                    interactionClassList.append(interactionRoot.getHlaClassName());
                 }
-                logger.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList);
+                logger.error("Error: simulation passed scheduled interaction time: {}, {}", intrtime, interactionClassList.toString());
             } else if (intrtime >= tmin && intrtime < tmin + super.getStepSize()) {
 
-                List<InteractionRoot> interactionsSent = new ArrayList<InteractionRoot>();
+                List<InteractionRoot> interactionsSent = new ArrayList<>();
                 for (InteractionRoot interactionRoot : interactionRootList) {
                     try {
-                        interactionRoot.sendInteraction(getLRC(), intrtime);
+                        sendInteraction(interactionRoot, intrtime);
                     } catch (Exception e) {
                         logger.error("Failed to send interaction: {}", interactionRoot);
                         logger.error(e.getStackTrace());
@@ -680,6 +722,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     }
 
     public void startSimulation() throws Exception {
+        logger.debug("Starting simulation");
         this.setFederateState(FederateState.STARTING);
         if (!federationAlreadyAttempted()) {
             this.startFederationRun();
@@ -703,17 +746,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     public void terminateSimulation() {
 
+        logger.debug("Terminating simulation");
         _killingFederation = true;
         recordMainExecutionLoopEndTime();
         this.setFederateState(FederateState.TERMINATING);
 
-        synchronized (super.lrc) {
+        synchronized (super.rti) {
             try {
                 SimEnd e = new SimEnd();
-                e.set_originFed(getFederateId());
-                e.set_sourceFed(getFederateId());
-                double tmin = time.getTime() + super.getLookAhead();
-                e.sendInteraction(getLRC(), tmin);
+                double tmin = time.getTime() + super.getLookahead();
+                sendInteraction(e, tmin);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -759,7 +801,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public void updateLogLevel(int selected) throws Exception {
         logLevelToSet = selected;
 
-        if (getLRC() == null) {
+        if (getRTI() == null) {
             return;
         }
 
@@ -788,16 +830,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if (level > 0) {
             if (level == 1) {
                 logger.debug("Unsusbcribing to High priority logs");
-                HighPrio.unsubscribe(getLRC());
+                HighPrio.unsubscribe_interaction(getRTI());
             } else if (level == 2) {
                 logger.debug("Unsusbcribing to Medium priority logs");
-                MediumPrio.unsubscribe(getLRC());
+                MediumPrio.unsubscribe_interaction(getRTI());
             } else if (level == 3) {
                 logger.debug("Unsusbcribing to Low priority logs");
-                LowPrio.unsubscribe(getLRC());
+                LowPrio.unsubscribe_interaction(getRTI());
             } else if (level == 4) {
                 logger.debug("Unsusbcribing to Very Low priority logs");
-                VeryLowPrio.unsubscribe(getLRC());
+                VeryLowPrio.unsubscribe_interaction(getRTI());
             }
         }
     }
@@ -809,16 +851,16 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
         if (level > 0) {
             if (level == 1) {
                 logger.debug("Susbcribing to High priority logs");
-                HighPrio.subscribe(getLRC());
+                HighPrio.subscribe_interaction(getRTI());
             } else if (level == 2) {
                 logger.debug("Susbcribing to Medium priority logs");
-                MediumPrio.subscribe(getLRC());
+                MediumPrio.subscribe_interaction(getRTI());
             } else if (level == 3) {
                 logger.debug("Susbcribing to Low priority logs");
-                LowPrio.subscribe(getLRC());
+                LowPrio.subscribe_interaction(getRTI());
             } else if (level == 4) {
                 logger.debug("Susbcribing to Very Low priority logs");
-                VeryLowPrio.subscribe(getLRC());
+                VeryLowPrio.subscribe_interaction(getRTI());
             }
         }
     }
@@ -899,7 +941,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public void reflectAttributeValues(int objectHandle, ReflectedAttributes reflectedAttributes, byte[] theTag) {
 
         // check if current objectHandle has been already discovered by the RTI
-        ObjectRoot o = ObjectRoot.getObject(objectHandle);
+        ObjectRoot o = ObjectRoot.get_object(objectHandle);
 
 //        if (!this.rtiDiscoveredFederateObjects.contains(o) && !this.rtiDiscoveredCpswtFederateInfoObjects.contains(o))
 //            return;
@@ -1031,13 +1073,28 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
 
     @Override
     public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag) {
+        //some sanity checking to avoid NPE
+        if(intrHandle < 0) {
+            logger.error("FederationManager::receiveInteraction (no time): Invalid interaction handle received");
+            return;
+        }
+
+        if(receivedIntr == null) {
+            logger.error("FederationManager::receiveInteraction (no time): Invalid interaction object received");
+            return;
+        }
+
+        logger.trace("FederationManager::receiveInteraction (no time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
 
         try {
 
             // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
-            // TODO: review when doing something with COAs
             if(this.coaExecutor != null) {
                 InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                if(interactionRoot == null) {
+                    logger.error("FederationManager::receiveInteraction (no time): Unable to instantiate interactionRoot");
+                    return;
+                }
                 // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
                 coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
             }
@@ -1048,9 +1105,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.get_FederateId());
 
-                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.getFederateId(), federateJoinInteraction.getFederateType(), federateJoinInteraction.isLateJoiner()));
+                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.get_FederateId(), federateJoinInteraction.get_FederateType(), federateJoinInteraction.get_IsLateJoiner()));
 
             }
             // "federate resign" interaction
@@ -1059,14 +1116,74 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
 
                 // ??
-                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.getFederateId());
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.get_FederateId());
 
-                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.getFederateId());
+                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.get_FederateId());
                 this.federatesMaintainer.federateResigned(federateInfo);
             }
 
         } catch (Exception e) {
             logger.error("Error while parsing the logger interaction");
+            logger.error(e);
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void receiveInteraction(int intrHandle, ReceivedInteraction receivedIntr, byte[] tag, LogicalTime theTime, EventRetractionHandle retractionHandle) {
+        //some sanity checking to avoid NPE
+        if(intrHandle < 0) {
+            logger.error("FederationManager::receiveInteraction (with time): Invalid interaction handle received");
+            return;
+        }
+
+        if(receivedIntr == null) {
+            logger.error("FederationManager::receiveInteraction (with time): Invalid interaction object received");
+            return;
+        }
+
+        logger.trace("FederationManager::receiveInteraction (with time): Received interaction handle as: {} and interaction as: {}", intrHandle, receivedIntr);
+
+        try {
+
+            // TODO: moved this from legacy 'dumpInteraction' (even though it shouldn't have been there)
+            if(this.coaExecutor != null) {
+                InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrHandle, receivedIntr);
+                if(interactionRoot == null) {
+                    logger.error("FederationManager::receiveInteraction (with time): Unable to instantiate interactionRoot");
+                    return;
+                }
+                // Inform COA orchestrator of arrival of interaction (for awaited Outcomes, if any)
+                coaExecutor.updateArrivedInteractions(intrHandle, time, interactionRoot);
+            }
+
+            // "federate join" interaction
+            if(FederateJoinInteraction.match(intrHandle)) {
+                FederateJoinInteraction federateJoinInteraction = new FederateJoinInteraction(receivedIntr);
+                logger.trace("FederateJoinInteraction received :: {} joined", federateJoinInteraction.toString());
+
+                // ??
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_JOINED, federateJoinInteraction.get_FederateId());
+
+                this.federatesMaintainer.federateJoined(new FederateInfo(federateJoinInteraction.get_FederateId(), federateJoinInteraction.get_FederateType(), federateJoinInteraction.get_IsLateJoiner()));
+
+            }
+            // "federate resign" interaction
+            else if(FederateResignInteraction.match(intrHandle)) {
+                FederateResignInteraction federateResignInteraction = new FederateResignInteraction(receivedIntr);
+                logger.trace("FederateResignInteraction received :: {} resigned", federateResignInteraction.toString());
+
+                // ??
+                _federationEventsHandler.handleEvent(IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATE_RESIGNED, federateResignInteraction.get_FederateId());
+
+                FederateInfo federateInfo = this.federatesMaintainer.getFederateInfo(federateResignInteraction.get_FederateId());
+                this.federatesMaintainer.federateResigned(federateInfo);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while parsing the logger interaction");
+            logger.error("intrHandle=" + intrHandle);
+            logger.error("_federationEventsHandler=" + _federationEventsHandler);
             logger.error(e);
         }
     }
@@ -1084,4 +1201,24 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
     public List<FederateInfo> getFederatesStatus() {
         return this.federatesMaintainer.getAllMaintainedFederates();
     }
+
+    public static void main(String[] args) {
+
+        FederationManagerConfig federationManagerConfig;
+        FederateConfigParser federateConfigParser = new FederateConfigParser();
+
+        System.out.println("args:");
+        for(int ix = 0 ; ix < args.length; ++ix) {
+            System.out.println("args[" + ix + "] = \"" + args[ix] + "\"");
+        }
+        federationManagerConfig = federateConfigParser.parseArgs(args, FederationManagerConfig.class);
+
+        try {
+            FederationManager federationManager = new FederationManager(federationManagerConfig);
+            federationManager.startSimulation();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

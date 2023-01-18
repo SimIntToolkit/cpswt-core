@@ -1,42 +1,53 @@
 /*
- * Copyright (c) 2008, Institute for Software Integrated Systems, Vanderbilt University
- * All rights reserved.
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
  *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose, without fee, and without written agreement is
- * hereby granted, provided that the above copyright notice, the following
- * two paragraphs and the author appear in all copies of this software.
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
  *
- * IN NO EVENT SHALL THE VANDERBILT UNIVERSITY BE LIABLE TO ANY PARTY FOR
- * DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
- * OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE VANDERBILT
- * UNIVERSITY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * THE VANDERBILT UNIVERSITY SPECIFICALLY DISCLAIMS ANY WARRANTIES,
- * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- * ON AN "AS IS" BASIS, AND THE VANDERBILT UNIVERSITY HAS NO OBLIGATION TO
- * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- * 
- * @author Himanshu Neema
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
  */
 
 package org.cpswt.coa;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.util.RandomSingleton;
+
+import org.cpswt.coa.edge.*;
+import org.cpswt.coa.node.*;
+import org.cpswt.utils.RandomSingleton;
+
+import hla.rti.RTIambassador;
+import org.cpswt.hla.InteractionRoot;
+
+import java.lang.reflect.Method;
 
 /**
  * This is the main class to represent the COA sequence graph.
- * 
- * @author Himanshu Neema
  */
 public class COAGraph {
 
@@ -52,22 +63,107 @@ public class COAGraph {
 
 	private HashMap<COANode, HashSet<COAEdge>> _edgesFromNodeMap = new HashMap<COANode, HashSet<COAEdge>>();
 
-	public static final String PROP_GRAPH_STATUS = "property_graph_status";
-
-	/**
-	 * Property change event handling.
-	 */
-	private PropertyChangeSupport changeSupport = new PropertyChangeSupport(
-			this);
-
 	public COAGraph() {
 	}
 
-	public void initialize() {
+	public void setCurrentRootNodesAsActive() {
 		// Mark COA nodes at the beginning of the graph as active from the
 		// beginning
 		for (COANode n : _currentRootNodes) {
 			n.setActive();
+		}
+	}
+
+	public void initialize(String federationName, RTIambassador rti) {
+		synchronized(rti) {
+			// Mark COA nodes at the beginning of the graph as active from the
+			// beginning
+			for (COANode n : _currentRootNodes) {
+				n.setActive();
+			}
+
+			// Make sure all interaction classes are loaded and pub-sub is configured
+			for (COANode node: _allNodes.values()) {
+				if (COANodeType.Action == node.getNodeType()) {
+					COAAction actionNode = (COAAction) node;
+					loadPublishedInteractionAndConfigurePublish(actionNode.getInteractionClassName(), federationName, rti);
+				} else if (COANodeType.Outcome == node.getNodeType()) {
+					COAOutcome outcomeNode = (COAOutcome) node;
+					loadSubscribedInteractionAndConfigureSubscribe(outcomeNode.getInteractionClassName(), federationName, rti);
+					logger.trace("COAGraph: Before setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
+					outcomeNode.setInteractionClassHandle(InteractionRoot.get_class_handle(outcomeNode.getInteractionClassName()));
+					logger.trace("COAGraph: After setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
+				}
+			}
+		}
+	}
+
+	public Class loadInteractionClass(String intrFullyQualifiedName, String federationName) {
+		// Get class name for the fully qualified interaction name and try loading it
+		logger.trace("COAGraph: Interaction class name: {}... Now trying to load interaction class", intrFullyQualifiedName);
+		String intrClassName = federationName + "." + intrFullyQualifiedName.substring( intrFullyQualifiedName.lastIndexOf( '.' ) + 1 );
+		Class intrClass = null;
+		try {
+			intrClass = Class.forName(intrClassName);
+			logger.trace("COAGraph: Class loaded successfully: {}", intrClassName);
+			return intrClass;
+		} catch (Exception e) {
+			logger.error("COAGraph: Could not load class: {}", intrClassName);
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public InteractionRoot createInteractionInstance(String intrFullyQualifiedName, String intrClassName) {
+		logger.trace("COAGraph: Trying to create interaction using class: {}", intrClassName);
+        InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrFullyQualifiedName);
+		logger.trace("COAGraph: Interaction created was: {}", interactionRoot);
+		return interactionRoot;
+	}
+
+	public void publishOrSubscribeAnInteractionClass(Class intrClass, RTIambassador rti, boolean bPublish) {
+		synchronized (rti) {
+			logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Got interaction class as: {}", intrClass);
+			if (intrClass == null)
+				return;
+			try {
+				Class[] pubSubMethodArgs = new Class[1];
+				pubSubMethodArgs[0] = hla.rti.RTIambassador.class;
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Getting Publish/Subscribe method to invoke");
+				Method pubSubMethod = null;
+				if (bPublish) {
+					pubSubMethod = intrClass.getDeclaredMethod("publish", pubSubMethodArgs);
+				} else {
+					pubSubMethod = intrClass.getDeclaredMethod("subscribe", pubSubMethodArgs);
+				}
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Invoking Publish/Subscribe method: {}", pubSubMethod);
+				pubSubMethod.invoke(null, rti);
+				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Publish/Subscribe method invokation was successful");
+			} catch (Exception e) {
+				logger.error("COAGraph:publishOrSubscribeAnInteractionClass: Failed to invoke Publish/Subscribe method");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void loadPublishedInteractionAndConfigurePublish(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
+		synchronized (rti) {
+			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
+			if ( intrClass != null ) {
+				logger.trace("COAGraph: For COAs, PUBLISHING interaction class: {}", intrClass);
+				publishOrSubscribeAnInteractionClass(intrClass, rti, true);
+			}
+		}
+	}
+
+	public void loadSubscribedInteractionAndConfigureSubscribe(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
+		synchronized(rti) {
+			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
+			if ( intrClass != null ) {
+				logger.trace("COAGraph: For COAs, SUBSCRIBING to interaction class: {}", intrClass);
+				publishOrSubscribeAnInteractionClass(intrClass, rti, false);
+			}
 		}
 	}
 
@@ -102,7 +198,7 @@ public class COAGraph {
 			throw new RuntimeException("(" + this
 					+ "): Node supplied to add is NULL");
 		}
-		_allNodes.put(node.getUniqueID(), node);
+		_allNodes.put(node.getId(), node);
 		_rootNodes.add(node);
 		_currentRootNodes.add(node);
 	}
@@ -121,28 +217,36 @@ public class COAGraph {
 					+ "): Edge supplied to add is NULL");
 		}
 
+		// fill fromNode and toNode after deserialization
+		if(edge.getFromNode() == null) {
+			edge.setFromNode(this.getNode(edge.getFromNodeId()));
+		}
+		if(edge.getToNode() == null) {
+			edge.setToNode(this.getNode(edge.getToNodeId()));
+		}
+
 		COANode fromNode = edge.getFromNode();
 		COANode toNode = edge.getToNode();
 
 		if (_allNodes.isEmpty()
-				|| !_allNodes.containsKey(fromNode.getUniqueID())
-				|| !_allNodes.containsKey(toNode.getUniqueID())) {
+				|| !_allNodes.containsKey(fromNode.getId())
+				|| !_allNodes.containsKey(toNode.getId())) {
 			throw new RuntimeException(
 					"All nodes must be added before edges are added in the graph.");
 		}
 
 		// First, check for correct use of Outcome and OutcomeFilter nodes and
 		// update link of Outcome node in OutcomeFilter node
-		if (toNode.getNodeType() == COANode.NODE_TYPE.NODE_OUTCOME_FILTER) {
+		if (toNode.getNodeType() == COANodeType.OutcomeFilter) {
 			if (toNode.getPredecessors().size() > 0) {
 				throw new RuntimeException("OutcomeFilter "
-						+ toNode.getNodeName()
+						+ toNode.getName()
 						+ " must be preceeded only by an Outcome node!");
 			}
-			if (fromNode.getNodeType() != COANode.NODE_TYPE.NODE_OUTCOME) {
+			if (fromNode.getNodeType() != COANodeType.Outcome) {
 				throw new RuntimeException(
 						"OutcomeFilter "
-								+ toNode.getNodeName()
+								+ toNode.getName()
 								+ " node can only be preceeded by a node of type Outcome!");
 			}
 
@@ -151,7 +255,7 @@ public class COAGraph {
 
 		_rootNodes.remove(toNode);
 		_currentRootNodes.remove(toNode);
-		fromNode.addSucccessor(toNode);
+		fromNode.addSuccessor(toNode);
 		toNode.addPredecessor(fromNode);
 
 		_allEdges.add(edge);
@@ -183,7 +287,7 @@ public class COAGraph {
 
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
-		if (COANode.NODE_TYPE.NODE_PROBABILISTIC_CHOICE == node.getNodeType()) {
+		if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
 			HashMap<COANode, Double> successorsWithCumuProb = new HashMap<COANode, Double>();
 			HashSet<COAEdge> outEdges = _edgesFromNodeMap.get(node);
 			COANode chosenSuccessor = null;
@@ -240,6 +344,7 @@ public class COAGraph {
 
 		// Successor status updates and graph updates
 		HashSet<COANode> successors = node.getSuccessors();
+		logger.trace("COAGraph: Node {} has {} successors", node, successors.size());
 		if (successors.size() > 0) {
 			for (COANode succ : successors) {
 				// Take care of multiple directed edges coming to the successor
@@ -250,10 +355,11 @@ public class COAGraph {
 				// the successor is of type SyncPt or AwaitN).
 				// Also, before activating make sure that the chosen successor
 				// is enabled as choice.
+				logger.trace("COAGraph: Checking out the successor {}", succ);
 				boolean succAlreadyInCurrentRootNodes = _currentRootNodes
 						.contains(succ);
 				if (!succAlreadyInCurrentRootNodes
-						&& COANode.NODE_STATUS.NODE_EXECUTED != succ.getNodeStatus()) {
+						&& COANodeStatus.Executed != succ.getNodeStatus()) {
 					boolean aSuccPredecessorInCurrentRootNodes = false;
 					for (COANode succPred : succ.getPredecessors()) {
 						if (_currentRootNodes.contains(succPred)) {
@@ -262,9 +368,9 @@ public class COAGraph {
 						}
 					}
 					if (!aSuccPredecessorInCurrentRootNodes
-							|| COANode.NODE_TYPE.NODE_SYNC_PT == succ.getNodeType()
-							|| COANode.NODE_TYPE.NODE_AWAITN == succ.getNodeType()) {
-						if (COANode.NODE_TYPE.NODE_SYNC_PT == node.getNodeType()) {
+							|| COANodeType.SyncPoint == succ.getNodeType()
+							|| COANodeType.AwaitN== succ.getNodeType()) {
+						if (COANodeType.SyncPoint == node.getNodeType()) {
 							// TODO: If node that executed is SyncPt, then
 							// enable only those successors that have valid
 							// branches finished (i.e., handle exceptions)
@@ -282,21 +388,14 @@ public class COAGraph {
 				}
 
 				// Do post-processing on successors, if any
-				if (COANode.NODE_TYPE.NODE_SYNC_PT == succ.getNodeType()) {
-					COASyncPt nodeSyncPt = (COASyncPt) succ;
+				if (COANodeType.SyncPoint == succ.getNodeType()) {
+					COASyncPoint nodeSyncPt = (COASyncPoint) succ;
 					nodeSyncPt.incrementBranchesFinished();
-				} else if (COANode.NODE_TYPE.NODE_AWAITN == succ.getNodeType()) {
+				} else if (COANodeType.AwaitN == succ.getNodeType()) {
 					COAAwaitN nodeAwaitN = (COAAwaitN) succ;
 					nodeAwaitN.incrementBranchesFinished();
 				}
 			}
 		}
-
-		changeSupport.firePropertyChange(PROP_GRAPH_STATUS, 0, 1);
-	}
-
-	public void addPropertyChangeListener(String propertyName,
-			PropertyChangeListener listener) {
-		changeSupport.addPropertyChangeListener(propertyName, listener);
 	}
 }

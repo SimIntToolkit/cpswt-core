@@ -1,3 +1,33 @@
+/*
+ * Certain portions of this software are Copyright (C) 2006-present
+ * Vanderbilt University, Institute for Software Integrated Systems.
+ *
+ * Certain portions of this software are contributed as a public service by
+ * The National Institute of Standards and Technology (NIST) and are not
+ * subject to U.S. Copyright.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above Vanderbilt University copyright notice, NIST contribution
+ * notice and this permission and disclaimer notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE. THE AUTHORS OR COPYRIGHT HOLDERS SHALL NOT HAVE
+ * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
+ * OR MODIFICATIONS.
+ */
+
 package org.cpswt.config;
 
 import org.cpswt.utils.CpswtDefaults;
@@ -67,7 +97,7 @@ public class FederateConfigParser {
         this.cliOptions.addOption(option);
     }
 
-    static final Set<Class<?>> supportedCLIArgTypes = new HashSet();
+    static final Set<Class<?>> supportedCLIArgTypes = new HashSet<Class<?>>();
 
     static {
         supportedCLIArgTypes.add(Double.class);
@@ -154,7 +184,7 @@ public class FederateConfigParser {
         if (configFile != null && configFile.exists()) {
 
             try {
-                federateParameter = ConfigParser.parseConfig(configFile, clazz);
+                federateParameter = ConfigParser.parseFederateConfig(configFile, clazz);
             } catch (IOException ioExp) {
                 logger.error("Parsing input configuration file failed.");
                 logger.error(ioExp);
@@ -198,9 +228,11 @@ public class FederateConfigParser {
 
                     if (optType == String.class) {
                         optField.set(federateParameter, optType.cast(optVal));
+                        federateParameter.fieldsSet.add(optField.getName());
                     } else if (supportedCLIArgTypes.contains(optType)) {
                         Object castedValue = optType.cast(optType.getDeclaredMethod("valueOf", String.class).invoke(null, optVal));
                         optField.set(federateParameter, castedValue);
+                        federateParameter.fieldsSet.add(optField.getName());
                     } else {
                         logger.error("{} type not supported as command line argument. Skipping...", optType.getName());
                     }
@@ -219,6 +251,17 @@ public class FederateConfigParser {
             }
         }
 
+        // get TParam class' FederateParameter fields
+        Set<Field> federateParameterFields = FederateConfig.getMandatoryFederateParameterFields(clazz);
+
+        // warn if a field wasn't set by either a JSON field or a command line argument
+        for(Field field : federateParameterFields) {
+            if(!federateParameter.fieldsSet.contains(field.getName())) {
+                logger.warn("No config parameter was provided for \"{}\" (type: \"{}\"). Default value set by runtime environment...",
+                        field.getName(), field.getType());
+            }
+        }
+
         return federateParameter;
     }
 
@@ -230,26 +273,24 @@ public class FederateConfigParser {
     private Options getClassCLIOptions(Class<? extends FederateConfig> configClass) {
         Options options = new Options();
 
-        Field[] fields = configClass.getFields();
+        Set<Field> fields = FederateConfig.getFederateParameterFields(configClass);
 
         for (Field field : fields) {
-            if (field.getAnnotation(FederateParameter.class) != null) {
-                String fieldName = field.getName();
-                Class<?> fieldType = field.getType();
+            String fieldName = field.getName();
+            Class<?> fieldType = field.getType();
 
-                if (fieldType.isPrimitive()) {
-                    fieldType = ClassUtils.primitiveToWrapper(fieldType);
-                }
-
-                options.addOption(Option.builder()
-                        .longOpt(fieldName)
-                        .argName(fieldName)
-                        .hasArg()
-                        .required(false)
-                        .type(fieldType)
-                        .build()
-                );
+            if (fieldType.isPrimitive()) {
+                fieldType = ClassUtils.primitiveToWrapper(fieldType);
             }
+
+            options.addOption(Option.builder()
+                    .longOpt(fieldName)
+                    .argName(fieldName)
+                    .hasArg()
+                    .required(false)
+                    .type(fieldType)
+                    .build()
+            );
         }
 
         return options;
