@@ -50,12 +50,12 @@ dependencies {
     implementation(group = "joda-time", name = "joda-time", version = "2.10.10")
     implementation(group="com.fasterxml.jackson.core", name="jackson-annotations", version="2.13.0")
 
-    implementation(group = "org.cpswt", name = "coa", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "config", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "utils", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "federate-base", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "root", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "base-events", version = "0.7.0-SNAPSHOT")
+    implementation(group = "org.cpswt", name = "coa", version = version)
+    implementation(group = "org.cpswt", name = "config", version = version)
+    implementation(group = "org.cpswt", name = "utils", version = version)
+    implementation(group = "org.cpswt", name = "federate-base", version = version)
+    implementation(group = "org.cpswt", name = "root", version = version)
+    implementation(group = "org.cpswt", name = "base-events", version = version)
 
 //    implementation(group = "com.fasterxml.jackson.core", name = "jackson-annotations", version = "2.12.5")
 }

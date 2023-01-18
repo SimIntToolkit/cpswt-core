@@ -52,7 +52,7 @@ dependencies {
     implementation(group="commons-cli", name="commons-cli", version="1.5.0")
     implementation(group="org.apache.commons", name="commons-lang3", version="3.12.0")
 
-    implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="utils", version=version)
 }
 
 publishing {

@@ -48,10 +48,10 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.cpswt", name="utils", version="0.7.0-SNAPSHOT")
-    implementation(group="org.cpswt", name="config", version="0.7.0-SNAPSHOT")
-    implementation(group="org.cpswt", name="root", version="0.7.0-SNAPSHOT")
-    implementation(group="org.cpswt", name="base-events", version="0.7.0-SNAPSHOT")
+    implementation(group="org.cpswt", name="utils", version=version)
+    implementation(group="org.cpswt", name="config", version=version)
+    implementation(group="org.cpswt", name="root", version=version)
+    implementation(group="org.cpswt", name="base-events", version=version)
 
 
     testImplementation(group="junit", name="junit", version="4.13.2")

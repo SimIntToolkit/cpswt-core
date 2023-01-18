@@ -53,10 +53,10 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group = "org.cpswt", name = "coa", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "config", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "federate-base", version = "0.7.0-SNAPSHOT")
-    implementation(group = "org.cpswt", name = "federation-manager", version = "0.7.0-SNAPSHOT")
+    implementation(group = "org.cpswt", name = "coa", version = version)
+    implementation(group = "org.cpswt", name = "config", version = version)
+    implementation(group = "org.cpswt", name = "federate-base", version = version)
+    implementation(group = "org.cpswt", name = "federation-manager", version = version)
 
     runtimeOnly(group = "com.typesafe.akka", name = "akka-stream_2.13", version = "2.6.16")
 }
