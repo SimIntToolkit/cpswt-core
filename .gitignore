@@ -20,6 +20,8 @@ tmp/
 local.properties
 .settings/
 .loadpath
+**/.gradle/
+**/gradle/
 
 # Eclipse Core
 .project
