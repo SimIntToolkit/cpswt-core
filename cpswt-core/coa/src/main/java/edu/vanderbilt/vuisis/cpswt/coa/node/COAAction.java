@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.node;
+package edu.vanderbilt.vuisis.cpswt.coa.node;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;

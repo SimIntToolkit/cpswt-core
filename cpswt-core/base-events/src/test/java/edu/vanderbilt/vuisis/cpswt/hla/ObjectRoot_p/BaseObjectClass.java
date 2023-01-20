@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.ObjectRoot_p;
+package edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,10 +45,10 @@ import hla.rti.ReflectedAttributes;
 
 
 /**
- * Implements org.cpswt.hla.ObjectRoot_p.BaseObjectClass
+ * Implements edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass
  */
 @SuppressWarnings("unused")
-public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
+public class BaseObjectClass extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -61,7 +61,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -70,7 +70,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
      * @return the fully-qualified Java class name for this object class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.ObjectRoot_p.BaseObjectClass";
+        return "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass";
     }
 
     /**
@@ -86,7 +86,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      *
      * @return the name of this object class
      */
@@ -120,7 +120,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -138,7 +138,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -200,11 +200,11 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(""));
 
         logger.info(
-          "Class \"org.cpswt.hla.ObjectRoot_p.BaseObjectClass\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.ObjectRoot_p.BaseObjectClass\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -220,7 +220,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -234,7 +234,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "org.cpswt.hla.ObjectRoot_p.BaseObjectClass") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
@@ -269,7 +269,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -278,7 +278,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getLRC()} call
@@ -288,7 +288,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -297,7 +297,7 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -320,12 +320,12 @@ public class BaseObjectClass extends org.cpswt.hla.ObjectRoot {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass object class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();

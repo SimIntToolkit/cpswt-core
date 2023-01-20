@@ -28,12 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
 
-import org.cpswt.config.FederateConfig;
-import org.cpswt.hla.ObjectRoot;
-import static org.cpswt.hla.ObjectRoot.ObjectReflector;
-import org.cpswt.hla.ObjectRoot_p.TestObject;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot;
+import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

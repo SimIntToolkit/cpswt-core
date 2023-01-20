@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p;
+package edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,10 +44,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume
+ * Implements edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume
  */
 @SuppressWarnings("unused")
-public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl {
+public class SimResume extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -60,7 +60,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -69,7 +69,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume";
+        return "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume";
     }
 
     /**
@@ -85,7 +85,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      *
      * @return the name of this interaction class
      */
@@ -119,7 +119,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -137,7 +137,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -189,11 +189,11 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -209,7 +209,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -223,7 +223,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -242,7 +242,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -255,7 +255,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -265,7 +265,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -286,7 +286,7 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -312,12 +312,12 @@ public class SimResume extends org.cpswt.hla.InteractionRoot_p.C2WInteractionRoo
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();

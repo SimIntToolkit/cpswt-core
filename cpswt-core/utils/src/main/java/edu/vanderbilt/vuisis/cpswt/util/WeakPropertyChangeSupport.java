@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.util;
+package edu.vanderbilt.vuisis.cpswt.util;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

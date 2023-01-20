@@ -1,8 +1,8 @@
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.*;
 import static org.mockito.Mockito.*;
-import static org.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
+import static edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.portico.impl.hla13.types.DoubleTime;

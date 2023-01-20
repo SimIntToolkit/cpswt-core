@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.host;
+package edu.vanderbilt.vuisis.cpswt.host;
 
 import akka.actor.ActorSystem;
 import akka.http.javadsl.Http;
@@ -41,14 +41,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.config.FederateConfigParser;
-import org.cpswt.hla.FederateState;
-import org.cpswt.hla.FederationManager;
-import org.cpswt.hla.FederationManagerConfig;
-import org.cpswt.host.api.ControlAction;
-import org.cpswt.host.api.FederationManagerControlRequest;
-import org.cpswt.host.api.StateChangeResponse;
-import org.cpswt.host.api.StateResponse;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfigParser;
+import edu.vanderbilt.vuisis.cpswt.hla.FederateState;
+import edu.vanderbilt.vuisis.cpswt.hla.FederationManager;
+import edu.vanderbilt.vuisis.cpswt.hla.FederationManagerConfig;
+import edu.vanderbilt.vuisis.cpswt.host.api.ControlAction;
+import edu.vanderbilt.vuisis.cpswt.host.api.FederationManagerControlRequest;
+import edu.vanderbilt.vuisis.cpswt.host.api.StateChangeResponse;
+import edu.vanderbilt.vuisis.cpswt.host.api.StateResponse;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;

@@ -28,10 +28,10 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa;
+package edu.vanderbilt.vuisis.cpswt.coa;
 
-import org.cpswt.coa.edge.COAEdge;
-import org.cpswt.coa.node.COANode;
+import edu.vanderbilt.vuisis.cpswt.coa.edge.COAEdge;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COANode;
 
 import java.util.HashMap;
 

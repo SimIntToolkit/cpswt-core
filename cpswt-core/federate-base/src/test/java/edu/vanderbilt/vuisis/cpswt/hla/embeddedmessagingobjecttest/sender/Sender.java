@@ -28,13 +28,13 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.embeddedmessagingobjecttest.sender;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender;
 
-import org.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.hla.ObjectRoot_p.TestObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
 
 // Define the  type of federate for the federation.
@@ -46,8 +46,8 @@ public class Sender extends SenderBase {
 
     private final static Logger log = LogManager.getLogger();
 
-    org.cpswt.hla.ObjectRoot_p.TestObject TestObject_0 =
-            new org.cpswt.hla.ObjectRoot_p.TestObject();
+    edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject TestObject_0 =
+            new edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject();
 
     public Sender(FederateConfig params) throws Exception {
         super(params);

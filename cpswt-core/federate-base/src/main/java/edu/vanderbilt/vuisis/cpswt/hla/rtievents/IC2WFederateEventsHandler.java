@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.rtievents;
+package edu.vanderbilt.vuisis.cpswt.hla.rtievents;
 
 /**
  * Very simple interface to register a handler for federate events.

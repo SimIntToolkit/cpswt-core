@@ -28,16 +28,16 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
 
 import hla.rti.EventRetractionHandle;
 import hla.rti.LogicalTime;
 import hla.rti.ReceivedInteraction;
 
-import org.cpswt.hla.SubscribedInteractionFilter;
+import edu.vanderbilt.vuisis.cpswt.hla.SubscribedInteractionFilter;
 
-import org.cpswt.config.FederateConfig;
-import org.cpswt.hla.SynchronizedFederateMockRTI;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederateMockRTI;
 
 
 @SuppressWarnings("unused")
@@ -48,11 +48,11 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
     static {
         // FOR GENERIC INTERFACE, ALL MESSAGING CLASSES MUST BE ACTIVELY LOADED -- THE CALL TO THE load
         // STATIC METHOD FOR EACH LEAF CLASS (IN THE INHERITANCE HEIRARCHY) SHOULD DO THIS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
-        org.cpswt.hla.ObjectRoot_p.TestObject.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.load();
     }
 
     // constructor
@@ -67,30 +67,30 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
 
         // DIRECT INTERACTION SUBSCRIPTIONS
 
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.subscribe_interaction(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.subscribe_interaction(getRTI());
 
         // OBJECT SUBSCRIPTIONS
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_CharValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_DoubleValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_FloatValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_IntValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_LongValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_ShortValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_StringValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_CharValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_DoubleValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_FloatValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_IntValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_LongValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_ShortValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_StringValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
     }
 
     @Override
     public void receiveInteraction(
         int interactionClassHandle, ReceivedInteraction receivedInteraction, byte[] userSuppliedTag
     ) {
-        org.cpswt.hla.InteractionRoot interactionRoot = org.cpswt.hla.InteractionRoot.create_interaction(
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot = edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(
             interactionClassHandle, receivedInteraction
         );
 
-        if (interactionRoot instanceof org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
-            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
+        if (interactionRoot instanceof edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
 
             // Filter interaction if src/origin fed requirements (if any) are not met
             if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {
@@ -109,13 +109,13 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
         EventRetractionHandle retractionHandle
     ) {
 
-        org.cpswt.hla.InteractionRoot interactionRoot = org.cpswt.hla.InteractionRoot.create_interaction(
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot = edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(
             interactionClassHandle, receivedInteraction, logicalTime
         );
 
-        if (interactionRoot instanceof org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
-            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
+        if (interactionRoot instanceof edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
 
             // Filter interaction if src/origin fed requirements (if any) are not met
             if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {

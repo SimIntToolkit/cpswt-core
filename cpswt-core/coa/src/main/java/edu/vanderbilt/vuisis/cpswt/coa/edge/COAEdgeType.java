@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.edge;
+package edu.vanderbilt.vuisis.cpswt.coa.edge;
 
 import java.util.HashMap;
 

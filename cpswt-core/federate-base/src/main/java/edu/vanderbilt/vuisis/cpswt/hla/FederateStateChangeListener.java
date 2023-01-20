@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 /**
  * Change listener for FederateState changes

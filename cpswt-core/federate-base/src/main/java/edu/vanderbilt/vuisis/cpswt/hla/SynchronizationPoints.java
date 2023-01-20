@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 public class SynchronizationPoints {
     public static final String ReadyToPopulate = "readyToPopulate";

@@ -28,9 +28,9 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.host.api;
+package edu.vanderbilt.vuisis.cpswt.host.api;
 
-import org.cpswt.hla.FederateState;
+import edu.vanderbilt.vuisis.cpswt.hla.FederateState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

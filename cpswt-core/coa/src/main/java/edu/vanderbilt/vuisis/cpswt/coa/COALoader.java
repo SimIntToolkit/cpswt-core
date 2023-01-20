@@ -28,16 +28,16 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa;
+package edu.vanderbilt.vuisis.cpswt.coa;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.coa.edge.COAEdge;
-import org.cpswt.coa.edge.COAEdgeType;
-import org.cpswt.coa.node.*;
+import edu.vanderbilt.vuisis.cpswt.coa.edge.COAEdge;
+import edu.vanderbilt.vuisis.cpswt.coa.edge.COAEdgeType;
+import edu.vanderbilt.vuisis.cpswt.coa.node.*;
 
 import java.io.IOException;
 import java.nio.file.Files;

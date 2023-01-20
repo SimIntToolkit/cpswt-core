@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.base;
+package edu.vanderbilt.vuisis.cpswt.hla.base;
 
 /*
  * Synchronous Queue class that the AdvanceTimeThread uses to synchronize

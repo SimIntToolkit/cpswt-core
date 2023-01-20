@@ -28,9 +28,9 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.config;
+package edu.vanderbilt.vuisis.cpswt.config;
 
-import org.cpswt.utils.CpswtDefaults;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtDefaults;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.LogManager;

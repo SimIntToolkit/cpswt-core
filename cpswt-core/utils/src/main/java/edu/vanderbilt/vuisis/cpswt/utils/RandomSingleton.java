@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.utils;
+package edu.vanderbilt.vuisis.cpswt.utils;
 
 import java.util.Random;
 

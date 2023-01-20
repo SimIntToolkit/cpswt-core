@@ -28,14 +28,14 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
-import org.cpswt.hla.ObjectRoot_p.FederateObject;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
 
 import hla.rti.RTIambassador;
 

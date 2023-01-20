@@ -31,7 +31,7 @@
 /* THIS IS THE ROOT CLASS OF EITHER THE INTERACTION OR OBJECT-CLASS HIERARCHY
 (i.e. "InteractionRoot" OR "ObjectRoot") */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
@@ -59,7 +59,7 @@ import org.json.JSONTokener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 
 import org.portico.impl.hla13.types.DoubleTime;
 
@@ -1240,7 +1240,7 @@ public class InteractionRoot implements InteractionRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -1249,7 +1249,7 @@ public class InteractionRoot implements InteractionRootInterface {
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot";
+        return "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot";
     }
 
     /**
@@ -1265,7 +1265,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      *
      * @return the name of this interaction class
      */
@@ -1299,7 +1299,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1317,7 +1317,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -1357,11 +1357,11 @@ public class InteractionRoot implements InteractionRootInterface {
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -1377,7 +1377,7 @@ public class InteractionRoot implements InteractionRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -1391,7 +1391,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -1410,7 +1410,7 @@ public class InteractionRoot implements InteractionRootInterface {
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1423,7 +1423,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -1433,7 +1433,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot interaction class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1454,7 +1454,7 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -1480,12 +1480,12 @@ public class InteractionRoot implements InteractionRootInterface {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();

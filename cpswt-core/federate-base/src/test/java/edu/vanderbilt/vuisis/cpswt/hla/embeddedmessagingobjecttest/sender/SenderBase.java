@@ -28,16 +28,16 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.embeddedmessagingobjecttest.sender;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender;
 
 import hla.rti.EventRetractionHandle;
 import hla.rti.LogicalTime;
 import hla.rti.ReceivedInteraction;
 
-import org.cpswt.hla.SubscribedInteractionFilter;
+import edu.vanderbilt.vuisis.cpswt.hla.SubscribedInteractionFilter;
 
-import org.cpswt.config.FederateConfig;
-import org.cpswt.hla.SynchronizedFederateMockRTI;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederateMockRTI;
 
 
 @SuppressWarnings("unused")
@@ -48,12 +48,12 @@ public class SenderBase extends SynchronizedFederateMockRTI {
     static {
         // FOR GENERIC INTERFACE, ALL MESSAGING CLASSES MUST BE ACTIVELY LOADED -- THE CALL TO THE load
         // STATIC METHOD FOR EACH LEAF CLASS (IN THE INHERITANCE HEIRARCHY) SHOULD DO THIS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
-        org.cpswt.hla.ObjectRoot_p.TestObject.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.load();
     }
 
     // constructor
@@ -67,29 +67,29 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         enableTimeRegulation(getLookahead());
 
         // DIRECT INTERACTION PUBLICATIONS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.publish_interaction(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.publish_interaction(getRTI());
 
         // OBJECT PUBLICATIONS
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_BooleanValue1_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_BooleanValue2_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_ByteValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_CharValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_DoubleValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_FloatValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_IntValue_attribute();
-        org.cpswt.hla.ObjectRoot_p.TestObject.publish_object(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_BooleanValue1_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_BooleanValue2_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_ByteValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_CharValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_DoubleValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_FloatValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_IntValue_attribute();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_object(getRTI());
 
         // SOFT OBJECT PUBLICATIONS
-        org.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish("OmnetFederate");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish("OmnetFederate");
 
         // DIRECT OBJECT STATUS PUBLICATION
-        org.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish_direct("Receiver");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish_direct("Receiver");
     }
 
-    public org.cpswt.hla.ObjectRoot_p.TestObject create_ObjectRoot_TestObject() {
-        org.cpswt.hla.ObjectRoot_p.TestObject object =
-            new org.cpswt.hla.ObjectRoot_p.TestObject();
+    public edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject create_ObjectRoot_TestObject() {
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject object =
+            new edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject();
         return object;
     }
 
@@ -97,13 +97,13 @@ public class SenderBase extends SynchronizedFederateMockRTI {
     public void receiveInteraction(
         int interactionClassHandle, ReceivedInteraction receivedInteraction, byte[] userSuppliedTag
     ) {
-        org.cpswt.hla.InteractionRoot interactionRoot = org.cpswt.hla.InteractionRoot.create_interaction(
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot = edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(
             interactionClassHandle, receivedInteraction
         );
 
-        if (interactionRoot instanceof org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
-            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
+        if (interactionRoot instanceof edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
 
             // Filter interaction if src/origin fed requirements (if any) are not met
             if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {
@@ -122,13 +122,13 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         EventRetractionHandle retractionHandle
     ) {
 
-        org.cpswt.hla.InteractionRoot interactionRoot = org.cpswt.hla.InteractionRoot.create_interaction(
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot = edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(
             interactionClassHandle, receivedInteraction, logicalTime
         );
 
-        if (interactionRoot instanceof org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
-            org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
+        if (interactionRoot instanceof edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot) {
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot c2wInteractionRoot =
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot)interactionRoot;
 
             // Filter interaction if src/origin fed requirements (if any) are not met
             if (_subscribedInteractionFilter.filterC2WInteraction(getFederateId(), c2wInteractionRoot)) {

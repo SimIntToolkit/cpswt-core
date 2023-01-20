@@ -1,4 +1,4 @@
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

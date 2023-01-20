@@ -28,9 +28,9 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 
 import java.util.TreeMap;
 

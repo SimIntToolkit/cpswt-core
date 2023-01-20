@@ -28,10 +28,10 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.edge;
+package edu.vanderbilt.vuisis.cpswt.coa.edge;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cpswt.coa.node.COANode;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
 

@@ -28,12 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.config.ExperimentConfig;
-import org.cpswt.config.FederateJoinInfo;
+import edu.vanderbilt.vuisis.cpswt.config.ExperimentConfig;
+import edu.vanderbilt.vuisis.cpswt.config.FederateJoinInfo;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;

@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.math;
+package edu.vanderbilt.vuisis.cpswt.math;
 
 import java.io.Serializable;
 
@@ -70,7 +70,7 @@ public class Vec3D implements Serializable
         z = v.z;
     }
     
-    /*public Vec3D( org.cpswt.platform.Vec3D v )
+    /*public Vec3D( edu.vanderbilt.vuisis.cpswt.platform.Vec3D v )
     {
     	x = v.x;
     	y = v.y;
@@ -84,7 +84,7 @@ public class Vec3D implements Serializable
         z = v.z;        
     }
     
-    /*public void copy( org.cpswt.platform.Vec3D v )
+    /*public void copy( edu.vanderbilt.vuisis.cpswt.platform.Vec3D v )
     {
         x = v.x;
         y = v.y;
@@ -96,9 +96,9 @@ public class Vec3D implements Serializable
         return x + "\t" + y + "\t" + z;
     }
     
-    /*public org.cpswt.platform.Vec3D toPlatformVec3D()
+    /*public edu.vanderbilt.vuisis.cpswt.platform.Vec3D toPlatformVec3D()
     {
-    	return new org.cpswt.platform.Vec3D(x,y,z);
+    	return new edu.vanderbilt.vuisis.cpswt.platform.Vec3D(x,y,z);
     }*/
     
     public double getAzimuth()

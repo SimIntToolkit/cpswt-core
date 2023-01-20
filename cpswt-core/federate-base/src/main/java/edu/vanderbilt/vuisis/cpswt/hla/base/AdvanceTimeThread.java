@@ -28,14 +28,14 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.base;
+package edu.vanderbilt.vuisis.cpswt.hla.base;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.hla.SynchronizedFederate;
+import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederate;
 import hla.rti.FederationTimeAlreadyPassed;
 import hla.rti.RTIambassador;
-import org.cpswt.utils.CpswtUtils;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
 
 /**

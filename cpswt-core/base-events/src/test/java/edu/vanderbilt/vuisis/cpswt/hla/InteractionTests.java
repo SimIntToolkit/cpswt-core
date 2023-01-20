@@ -28,21 +28,21 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.*;
 import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 
-import org.cpswt.hla.ObjectRoot_p.FederateObject;
-import org.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 
 import java.util.*;
 

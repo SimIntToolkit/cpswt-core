@@ -28,28 +28,28 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.*;
-import org.cpswt.hla.base.AdvanceTimeRequest;
-import org.cpswt.hla.base.AdvanceTimeThread;
-import org.cpswt.hla.base.ATRComparator;
-import org.cpswt.hla.base.ATRQueue;
-import org.cpswt.hla.base.TimeAdvanceMode;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
-import org.cpswt.utils.CpswtDefaults;
-import org.cpswt.utils.CpswtUtils;
-import org.cpswt.utils.FederateIdUtility;
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeThread;
+import edu.vanderbilt.vuisis.cpswt.hla.base.ATRComparator;
+import edu.vanderbilt.vuisis.cpswt.hla.base.ATRQueue;
+import edu.vanderbilt.vuisis.cpswt.hla.base.TimeAdvanceMode;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtDefaults;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
+import edu.vanderbilt.vuisis.cpswt.utils.FederateIdUtility;
 import hla.rti.jlc.NullFederateAmbassador;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
-import static org.cpswt.hla.ObjectRoot.ObjectReflector;
-import static org.cpswt.hla.ObjectRoot.ObjectReflectorComparator;
+import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
+import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflectorComparator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import org.json.JSONObject;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;

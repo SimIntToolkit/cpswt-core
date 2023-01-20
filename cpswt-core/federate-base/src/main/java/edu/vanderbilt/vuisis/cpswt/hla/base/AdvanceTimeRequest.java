@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.base;
+package edu.vanderbilt.vuisis.cpswt.hla.base;
 
 /**
  * A thread in a federate uses an object of this class to request a federation

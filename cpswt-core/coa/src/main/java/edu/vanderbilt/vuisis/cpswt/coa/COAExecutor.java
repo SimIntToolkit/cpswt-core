@@ -28,27 +28,27 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa;
+package edu.vanderbilt.vuisis.cpswt.coa;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.coa.node.COAAction;
-import org.cpswt.coa.node.COAAwaitN;
-import org.cpswt.coa.node.COADuration;
-import org.cpswt.coa.node.COAFork;
-import org.cpswt.coa.COAGraph;
-import org.cpswt.coa.node.COANode;
-import org.cpswt.coa.node.COAOutcome;
-import org.cpswt.coa.node.COAOutcomeFilter;
-import org.cpswt.coa.node.COAProbabilisticChoice;
-import org.cpswt.coa.node.COARandomDuration;
-import org.cpswt.coa.node.COASyncPoint;
-import org.cpswt.coa.node.COANodeType;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAAction;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAAwaitN;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COADuration;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAFork;
+import edu.vanderbilt.vuisis.cpswt.coa.COAGraph;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COANode;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAOutcome;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAOutcomeFilter;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COAProbabilisticChoice;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COARandomDuration;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COASyncPoint;
+import edu.vanderbilt.vuisis.cpswt.coa.node.COANodeType;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
-import org.cpswt.hla.InteractionRoot;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import org.portico.impl.hla13.types.DoubleTime;
 
 import java.lang.reflect.Method;

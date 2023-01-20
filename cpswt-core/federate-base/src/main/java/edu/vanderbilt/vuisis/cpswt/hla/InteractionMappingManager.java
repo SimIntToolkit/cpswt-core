@@ -1,4 +1,4 @@
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import java.util.*;
 

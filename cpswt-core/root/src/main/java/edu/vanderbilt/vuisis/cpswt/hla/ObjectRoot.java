@@ -31,7 +31,7 @@
 /* THIS IS THE ROOT CLASS OF EITHER THE INTERACTION OR OBJECT-CLASS HIERARCHY
 (i.e. "InteractionRoot" OR "ObjectRoot") */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
@@ -60,7 +60,7 @@ import org.json.JSONTokener;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cpswt.utils.CpswtUtils;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 
 import org.portico.impl.hla13.types.DoubleTime;
 
@@ -2137,7 +2137,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.ObjectRoot object class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -2146,7 +2146,7 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return the fully-qualified Java class name for this object class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.ObjectRoot";
+        return "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot";
     }
 
     /**
@@ -2162,7 +2162,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.ObjectRoot object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      *
      * @return the name of this object class
      */
@@ -2196,7 +2196,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * org.cpswt.hla.ObjectRoot object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -2214,7 +2214,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * org.cpswt.hla.ObjectRoot object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -2254,11 +2254,11 @@ public class ObjectRoot implements ObjectRootInterface {
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
 
         logger.info(
-          "Class \"org.cpswt.hla.ObjectRoot\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.ObjectRoot\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -2274,7 +2274,7 @@ public class ObjectRoot implements ObjectRootInterface {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.ObjectRoot object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -2288,7 +2288,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "org.cpswt.hla.ObjectRoot") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
@@ -2323,7 +2323,7 @@ public class ObjectRoot implements ObjectRootInterface {
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -2336,7 +2336,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.ObjectRoot object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -2346,7 +2346,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.ObjectRoot object class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -2367,7 +2367,7 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.ObjectRoot object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -2429,12 +2429,12 @@ public class ObjectRoot implements ObjectRootInterface {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.ObjectRoot object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.ObjectRoot object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot object class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();

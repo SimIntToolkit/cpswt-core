@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.math;
+package edu.vanderbilt.vuisis.cpswt.math;
 
 /**
  * This class implements the interval arithmetics of real numbers.

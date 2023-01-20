@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.host.api;
+package edu.vanderbilt.vuisis.cpswt.host.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

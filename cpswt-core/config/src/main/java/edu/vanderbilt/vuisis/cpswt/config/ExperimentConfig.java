@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.config;
+package edu.vanderbilt.vuisis.cpswt.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa;
+package edu.vanderbilt.vuisis.cpswt.coa;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,12 +37,12 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.cpswt.coa.edge.*;
-import org.cpswt.coa.node.*;
-import org.cpswt.utils.RandomSingleton;
+import edu.vanderbilt.vuisis.cpswt.coa.edge.*;
+import edu.vanderbilt.vuisis.cpswt.coa.node.*;
+import edu.vanderbilt.vuisis.cpswt.utils.RandomSingleton;
 
 import hla.rti.RTIambassador;
-import org.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 import java.lang.reflect.Method;
 

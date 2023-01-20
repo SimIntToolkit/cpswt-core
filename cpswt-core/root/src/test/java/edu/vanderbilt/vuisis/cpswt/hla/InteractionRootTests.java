@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
-import static org.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
+import static edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
 
 import static org.mockito.Mockito.*;
 

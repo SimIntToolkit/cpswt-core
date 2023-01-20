@@ -1,7 +1,7 @@
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import hla.rti.RTIambassador;
-import org.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
 public class SynchronizedFederateMockRTI extends SynchronizedFederate {
 

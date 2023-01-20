@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.node;
+package edu.vanderbilt.vuisis.cpswt.coa.node;
 
 /**
  * Represents an outcome filter element in the sequence graph.

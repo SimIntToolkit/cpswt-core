@@ -27,7 +27,7 @@
  * ANY OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS,
  * OR MODIFICATIONS.
  */
-package org.cpswt.config;
+package edu.vanderbilt.vuisis.cpswt.config;
 
 import java.lang.annotation.*;
 

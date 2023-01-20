@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.joda.time.DateTime;

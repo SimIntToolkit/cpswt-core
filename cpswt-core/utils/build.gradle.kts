@@ -42,7 +42,7 @@ val archivaPort: String by project
 publishing {
     publications {
         create<MavenPublication>("utils") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "utils"
             from(components["java"])
         }

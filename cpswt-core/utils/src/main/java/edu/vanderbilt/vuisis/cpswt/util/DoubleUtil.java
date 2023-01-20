@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.util;
+package edu.vanderbilt.vuisis.cpswt.util;
 
 /**
  * Some utility methods for double numbers. Comparisons done up to fourth

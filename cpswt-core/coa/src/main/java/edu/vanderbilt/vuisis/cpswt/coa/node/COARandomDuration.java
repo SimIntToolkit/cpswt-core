@@ -28,12 +28,12 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.node;
+package edu.vanderbilt.vuisis.cpswt.coa.node;
 
 import java.util.Random;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cpswt.utils.RandomSingleton;
+import edu.vanderbilt.vuisis.cpswt.utils.RandomSingleton;
 
 /**
  * Represents a random duration element in the sequence graph.

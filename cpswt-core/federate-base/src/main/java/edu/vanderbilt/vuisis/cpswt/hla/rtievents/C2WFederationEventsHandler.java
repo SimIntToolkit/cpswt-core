@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.rtievents;
+package edu.vanderbilt.vuisis.cpswt.hla.rtievents;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -28,10 +28,10 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
-import org.cpswt.config.FederateConfig;
-import org.cpswt.config.FederateParameter;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.config.FederateParameter;
 
 public class FederationManagerConfig extends FederateConfig {
     /**

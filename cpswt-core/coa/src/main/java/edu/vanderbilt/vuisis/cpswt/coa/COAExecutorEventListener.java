@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa;
+package edu.vanderbilt.vuisis.cpswt.coa;
 
 /**
  * COAExecutorEventListeren

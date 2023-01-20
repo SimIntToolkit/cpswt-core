@@ -28,13 +28,13 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla;
+package edu.vanderbilt.vuisis.cpswt.hla;
 
-import org.cpswt.coa.COAExecutor;
-import org.cpswt.coa.COAExecutorEventListener;
-import org.cpswt.coa.COAGraph;
-import org.cpswt.coa.COALoader;
-import org.cpswt.utils.CpswtDefaults;
+import edu.vanderbilt.vuisis.cpswt.coa.COAExecutor;
+import edu.vanderbilt.vuisis.cpswt.coa.COAExecutorEventListener;
+import edu.vanderbilt.vuisis.cpswt.coa.COAGraph;
+import edu.vanderbilt.vuisis.cpswt.coa.COALoader;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtDefaults;
 import hla.rti.*;
 
 import java.io.File;
@@ -54,8 +54,8 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.cpswt.config.*;
-import org.cpswt.utils.CpswtUtils;
+import edu.vanderbilt.vuisis.cpswt.config.*;
+import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 import org.portico.bindings.IConnection;
 import org.portico.bindings.jgroups.Federation;
 import org.portico.bindings.jgroups.JGroupsConnection;
@@ -68,23 +68,23 @@ import org.portico.impl.hla13.types.HLA13ReflectedAttributes;
 import org.portico.lrc.services.object.msg.UpdateAttributes;
 
 
-import org.cpswt.util.RandomWithFixedSeed;
-import org.cpswt.hla.rtievents.IC2WFederationEventsHandler;
-import org.cpswt.hla.rtievents.C2WFederationEventsHandler;
+import edu.vanderbilt.vuisis.cpswt.util.RandomWithFixedSeed;
+import edu.vanderbilt.vuisis.cpswt.hla.rtievents.IC2WFederationEventsHandler;
+import edu.vanderbilt.vuisis.cpswt.hla.rtievents.C2WFederationEventsHandler;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimPause;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimResume;
 
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.MediumPrio;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 
-import org.cpswt.hla.ObjectRoot_p.FederateObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
 
 /**
  * Model class for the Federation Manager.

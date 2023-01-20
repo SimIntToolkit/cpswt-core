@@ -28,9 +28,9 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.coa.node;
+package edu.vanderbilt.vuisis.cpswt.coa.node;
 
-//import org.cpswt.hla.InteractionRoot;
+//import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

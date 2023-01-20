@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.hla.InteractionRoot_p;
+package edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,10 +55,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
+ * Implements edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot
  */
 @SuppressWarnings("unused")
-public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
+public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -71,7 +71,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -80,7 +80,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot";
+        return "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot";
     }
 
     /**
@@ -96,7 +96,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      *
      * @return the name of this interaction class
      */
@@ -130,7 +130,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -148,7 +148,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -220,11 +220,11 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         _classAndPropertyNameInitialValueMap.put(key, "");
 
         logger.info(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -240,7 +240,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -254,7 +254,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -273,7 +273,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     //-------------------------------------------------
 
     /**
-     * Publishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -286,7 +286,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     }
 
     /**
-     * Unpublishes the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -296,7 +296,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     }
 
     /**
-     * Subscribes a federate to the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -317,7 +317,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     }
 
     /**
-     * Unsubscribes a federate from the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -343,12 +343,12 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -515,7 +515,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return true;
     }
 
-    private static void update_federate_sequence_aux(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+    private static void update_federate_sequence_aux(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
 
         if (interactionRoot.getFederateAppendedToFederateSequence()) {
             return;
@@ -531,7 +531,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         interactionRoot.setParameter("federateSequence", jsonArray.toString());
     }
 
-    public static void update_federate_sequence(org.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+    public static void update_federate_sequence(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
         String instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
 
         if ( instanceHlaClassName.startsWith("InteractionRoot.C2WInteractionRoot") ) {
@@ -555,13 +555,13 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return retval;
     }
 
-    private static List<String> get_federate_sequence_list_aux(org.cpswt.hla.InteractionRoot interactionRoot) {
+    private static List<String> get_federate_sequence_list_aux(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot) {
         String federateSequence = (String)interactionRoot.getParameter("federateSequence");
 
         return get_federate_sequence_list(federateSequence);
     }
 
-    public static List<String> get_federate_sequence_list(org.cpswt.hla.InteractionRoot interactionRoot) {
+    public static List<String> get_federate_sequence_list(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot) {
 
         String instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
 
@@ -573,7 +573,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_federate_sequence_list_aux(this);
     }
 
-    public static String get_origin_federate_id(org.cpswt.hla.InteractionRoot interactionRoot) {
+    public static String get_origin_federate_id(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot) {
         List<String> federateSequenceList = get_federate_sequence_list(interactionRoot);
         return federateSequenceList.isEmpty() ? null : federateSequenceList.get(0);
     }
@@ -582,7 +582,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
         return get_origin_federate_id(this);
     }
 
-    public static String get_source_federate_id(org.cpswt.hla.InteractionRoot interactionRoot) {
+    public static String get_source_federate_id(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot) {
         List<String> federateSequenceList = get_federate_sequence_list(interactionRoot);
         return federateSequenceList.isEmpty() ? null : federateSequenceList.get(federateSequenceList.size() - 1);
     }
@@ -618,7 +618,7 @@ public class C2WInteractionRoot extends org.cpswt.hla.InteractionRoot {
     }
 
     public static boolean is_reject_source_federate_id(
-      org.cpswt.hla.InteractionRoot interactionRoot
+      edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot
     ) {
         return is_reject_source_federate_id(
           interactionRoot.getInstanceHlaClassName(), get_source_federate_id(interactionRoot)

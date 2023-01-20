@@ -28,14 +28,14 @@
  * OR MODIFICATIONS.
  */
 
-package org.cpswt.math;
+package edu.vanderbilt.vuisis.cpswt.math;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import org.cpswt.utils.RandomSingleton;
+import edu.vanderbilt.vuisis.cpswt.utils.RandomSingleton;
 
 //import Jama.Matrix;
 
