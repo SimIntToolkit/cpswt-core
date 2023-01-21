@@ -35,8 +35,8 @@ plugins {
 
 //dependencies {
 //
-//    implementation(group = "org.cpswt", name = "root", version = "0.6.0-SNAPSHOT")
-//    implementation(group = "org.cpswt", name = "base-events", version = "0.6.0-SNAPSHOT")
+//    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "root", version = "0.6.0-SNAPSHOT")
+//    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "base-events", version = "0.6.0-SNAPSHOT")
 //}
 
 val rtiHome = System.getenv("RTI_HOME")
@@ -55,15 +55,15 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.cpswt", name="root", version=version)
-    implementation(group="org.cpswt", name="utils", version=version)
-    implementation(group="org.cpswt", name="base-events", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="base-events", version=version)
 }
 
 publishing {
     publications {
         create<MavenPublication>("coa") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "coa"
             from(components["java"])
         }

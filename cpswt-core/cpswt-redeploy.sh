@@ -4,7 +4,7 @@ for package in utils root base-events coa config federate-base federation-manage
 
     echo "PLEASE REMOVE THE FOLLOWING PACKAGE FROM YOUR MAVEN REPOSITORY:"
     echo
-    echo "org.cpswt.$package"
+    echo "edu.vanderbilt.vuisis.cpswt.$package"
     echo
     echo -n "PRESS ENTER ONCE THIS PACKAGE HAS BEEN REMOVED: "
     read dummy

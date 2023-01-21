@@ -56,9 +56,9 @@ dependencies {
     implementation(files("$rtiHome/lib/portico.jar"))
 
     implementation(group="org.json", name="json", version="20210307")
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
 
-    implementation(group="org.cpswt", name="utils", version=version)
-    implementation(group="org.cpswt", name="root", version=version)
 
     testImplementation(group="junit", name="junit", version="4.13.2")
     testImplementation(group="org.mockito", name="mockito-core", version="4.1.0")
@@ -67,7 +67,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("base-events") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "base-events"
             from(components["java"])
         }

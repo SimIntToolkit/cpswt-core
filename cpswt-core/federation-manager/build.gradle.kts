@@ -50,25 +50,25 @@ dependencies {
     implementation(group = "joda-time", name = "joda-time", version = "2.10.10")
     implementation(group="com.fasterxml.jackson.core", name="jackson-annotations", version="2.13.0")
 
-    implementation(group = "org.cpswt", name = "coa", version = version)
-    implementation(group = "org.cpswt", name = "config", version = version)
-    implementation(group = "org.cpswt", name = "utils", version = version)
-    implementation(group = "org.cpswt", name = "federate-base", version = version)
-    implementation(group = "org.cpswt", name = "root", version = version)
-    implementation(group = "org.cpswt", name = "base-events", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "coa", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "config", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "utils", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "federate-base", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "root", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "base-events", version = version)
 
 //    implementation(group = "com.fasterxml.jackson.core", name = "jackson-annotations", version = "2.12.5")
 }
 
 tasks.named<JavaExec>("run") {
-    mainClass.set("org.cpswt.hla.FederationManager")
+    mainClass.set("edu.vanderbilt.vuisis.cpswt.hla.FederationManager")
     args = listOf("-configFile", "federationManagerConfig.json")
 }
 
 publishing {
     publications {
         create<MavenPublication>("federation-manager") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "federation-manager"
             from(components["java"])
         }

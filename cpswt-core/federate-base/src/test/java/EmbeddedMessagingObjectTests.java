@@ -1,13 +1,13 @@
 import hla.rti.ReceivedInteraction;
-import org.cpswt.config.FederateConfig;
-import org.cpswt.hla.InteractionRoot;
-import org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
-import org.cpswt.hla.ObjectRoot;
-import org.cpswt.hla.ObjectRootInterface;
-import org.cpswt.hla.ObjectRoot_p.TestObject;
-import org.cpswt.hla.RTIAmbassadorProxy2;
-import org.cpswt.hla.embeddedmessagingobjecttest.receiver.Receiver;
-import org.cpswt.hla.embeddedmessagingobjecttest.sender.Sender;
+import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRootInterface;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
+import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
+import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver.Receiver;
+import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender.Sender;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -116,13 +116,13 @@ public class EmbeddedMessagingObjectTests {
         // MAKE SURE THE CREATED LOCAL INTERACTION IS OF TYPE EmbeddedInteraction.Receiver
         Assert.assertTrue(
                 localEmbeddedMessagingReceiverInteractionRoot instanceof
-                        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
+                        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
         );
 
         // CAST THE LOCAL INTERACTION TO EmbeddedInteraction.Receiver
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
                 localEmbeddedMessagingReceiverInteraction =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver)
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver)
                         localEmbeddedMessagingReceiverInteractionRoot;
 
         // command FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE "discover"
@@ -217,13 +217,13 @@ public class EmbeddedMessagingObjectTests {
         // THE LOCAL INTERACTION SHOULD BE OF THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
         Assert.assertTrue(
                 localEmbeddedMessagingOmnetFederateInteractionRoot instanceof
-                        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
+                        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
         );
 
         // CAST THE LOCAL INTERACTION TO THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
-        org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
                 localEmbeddedMessagingOmnetFederateInteraction =
-                (org.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate)
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate)
                         localEmbeddedMessagingOmnetFederateInteractionRoot;
 
         // THE command FOR THE LOCAL EmbeddedMessaging.OmnetFederate INTERACTION SHOULD BE "object"
