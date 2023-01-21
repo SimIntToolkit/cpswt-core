@@ -52,13 +52,13 @@ dependencies {
     implementation(group="commons-cli", name="commons-cli", version="1.5.0")
     implementation(group="org.apache.commons", name="commons-lang3", version="3.12.0")
 
-    implementation(group="org.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
 }
 
 publishing {
     publications {
         create<MavenPublication>("config") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "config"
             from(components["java"])
         }

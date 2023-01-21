@@ -48,10 +48,10 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.cpswt", name="utils", version=version)
-    implementation(group="org.cpswt", name="config", version=version)
-    implementation(group="org.cpswt", name="root", version=version)
-    implementation(group="org.cpswt", name="base-events", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="config", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="base-events", version=version)
 
 
     testImplementation(group="junit", name="junit", version="4.13.2")
@@ -61,7 +61,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("federate-base") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "federate-base"
             from(components["java"])
         }

@@ -53,17 +53,17 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group = "org.cpswt", name = "coa", version = version)
-    implementation(group = "org.cpswt", name = "config", version = version)
-    implementation(group = "org.cpswt", name = "federate-base", version = version)
-    implementation(group = "org.cpswt", name = "federation-manager", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "coa", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "config", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "federate-base", version = version)
+    implementation(group = "edu.vanderbilt.vuisis.cpswt", name = "federation-manager", version = version)
 
     runtimeOnly(group = "com.typesafe.akka", name = "akka-stream_2.13", version = "2.6.16")
 }
 
 
 tasks.named<JavaExec>("run") {
-    mainClass.set("org.cpswt.host.FederationManagerHostApp")
+    mainClass.set("edu.vanderbilt.vuisis.cpswt.host.FederationManagerHostApp")
     args = listOf("--configFile", "/home/vagrant/cpswt/cpswt-cpp/Docker/Federation/federateManagerConfig.json")
 }
 
@@ -71,7 +71,7 @@ tasks.named<JavaExec>("run") {
 publishing {
     publications {
         create<MavenPublication>("fedmanager-host") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "fedmanager-host"
             from(components["java"])
         }

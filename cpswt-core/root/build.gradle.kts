@@ -56,8 +56,7 @@ dependencies {
     implementation(files("$rtiHome/lib/portico.jar"))
 
     implementation(group="org.json", name="json", version="20210307")
-
-    implementation(group="org.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
 
 
     testImplementation(group="junit", name="junit", version="4.13.2")
@@ -67,7 +66,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("root") {
-            groupId = "org.cpswt"
+            groupId = "edu.vanderbilt.vuisis.cpswt"
             artifactId = "root"
             from(components["java"])
         }
