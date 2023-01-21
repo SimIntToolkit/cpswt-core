@@ -32,6 +32,7 @@ rootProject.name = "cpswt-core"
 
 val archivaHostId: String by settings
 val archivaPort: String by settings
+val version: String by settings
 
 pluginManagement {
     repositories {
@@ -48,7 +49,9 @@ dependencyResolutionManagement {
 
         maven {
             isAllowInsecureProtocol = true
-            url = uri("http://$archivaHostId:$archivaPort/repository/snapshots")
+            val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
+            val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
         }
     }
 }
