@@ -82,7 +82,7 @@ public class RTIAmbassadorProxy2 {
         }
     }
 
-    static class ReflectedAttributeImpl implements ReflectedAttributes {
+    public static class ReflectedAttributeImpl implements ReflectedAttributes {
 
         private final SuppliedAttributes _suppliedAttributes;
 

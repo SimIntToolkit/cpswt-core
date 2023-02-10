@@ -249,6 +249,9 @@ public class ObjectRoot implements ObjectRootInterface {
 
             Set<ClassAndPropertyName> subscribedAttributeNameSet = new HashSet<>();
             _classNameSubscribedAttributeNameSetMap.put(localHlaClassName, subscribedAttributeNameSet);
+
+            Set<ClassAndPropertyName> softSubscribedAttributeNameSet = new HashSet<>();
+            _classNameSoftSubscribedAttributeNameSetMap.put(localHlaClassName, softSubscribedAttributeNameSet);
         }
     }
 
@@ -1120,6 +1123,9 @@ public class ObjectRoot implements ObjectRootInterface {
         pub_sub_class_and_property_name(
           _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
         );
+        pub_sub_class_and_property_name(
+          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+        );
     }
 
     /**
@@ -1167,6 +1173,101 @@ public class ObjectRoot implements ObjectRootInterface {
       */
     public static void unsubscribe_attribute( String className, String attributeName ) {
         unsubscribe_attribute(className, className, attributeName);
+    }
+
+    //---------------------------------------------
+    // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------
+
+    //----------------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //
+    // INITIALIZED BY:
+    // - init(RTIambassador) ABOVE
+    //----------------------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNameSoftSubscribedAttributeNameSetMap =
+            new HashMap<>();
+
+    //----------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //
+    // ALSO USED BY:
+    // - subscribe_object BELOW
+    //----------------------------------------------------------
+
+    public static Set<ClassAndPropertyName> get_soft_subscribed_attribute_name_set(String hlaClassName) {
+        return _classNameSoftSubscribedAttributeNameSetMap.getOrDefault(hlaClassName, null);
+    }
+
+    public static void soft_subscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
+        );
+        pub_sub_class_and_property_name(
+          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+        );
+    }
+
+    /**
+      * Soft subscribe a federate to the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the subscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * subscription.  The attribute doesn't actually get subscribed to until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void soft_subscribe_attribute( String className, String attributeName ) {
+        soft_subscribe_attribute(className, className, attributeName);
+    }
+
+    private static final Set<ClassAndPropertyName> dummyClassAndPropertyNameSet = new HashSet<>();
+
+    public static boolean is_soft_subscribed_attribute(String className, String attributeClassName, String attributeName) {
+        ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(attributeClassName, attributeName);
+
+        Set<ClassAndPropertyName> classAndPropertyNameSet = _classNameSoftSubscribedAttributeNameSetMap.getOrDefault(
+                className, dummyClassAndPropertyNameSet
+        );
+        return classAndPropertyNameSet.contains(classAndPropertyName);
+    }
+
+    public static boolean is_aoft_subscribed_attribute(String className, String attributeName) {
+        return is_soft_subscribed_attribute(className, className, attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+        );
+    }
+    /**
+      * Unsubscribe a federate from the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the unsubscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * unsubscription.  The attribute doesn't actually get unsubscribed from until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void soft_unsubscribe_attribute( String className, String attributeName ) {
+        soft_unsubscribe_attribute(className, className, attributeName);
     }
 
     //---------------------------------------------
@@ -2387,6 +2488,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
+    public static Set<ClassAndPropertyName> get_softSubscribed_attribute_name_set() {
+        return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
+    }
+
     public static void add_object_update_embedded_only_id(int id) {
         add_object_update_embedded_only_id(get_hla_class_name(), id);
     }
@@ -2925,6 +3030,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_subscribed_attribute_name_set( getInstanceHlaClassName() );
     }
 
+    public Set<ClassAndPropertyName> getSoftSubscribedAttributeNameSet() {
+        return get_soft_subscribed_attribute_name_set( getInstanceHlaClassName() );
+    }
+
     /**
      * Publishes the object class of this instance of the class for a federate.
      * Polymorphic equalivalent of publish_object static method.
@@ -3009,10 +3118,10 @@ public class ObjectRoot implements ObjectRootInterface {
         String className = jsonObject.getString("messaging_name");
         String federateSequence = jsonObject.getString("federateSequence");
 
-        Set<ClassAndPropertyName> subscribedAttributeNameSet = ObjectRoot.get_subscribed_attribute_name_set(
+        Set<ClassAndPropertyName> softSubscribedAttributeNameSet = ObjectRoot.get_soft_subscribed_attribute_name_set(
           className
         );
-        if (subscribedAttributeNameSet == null) {
+        if (softSubscribedAttributeNameSet == null) {
             logger.error("ObjectRoot:  fromJson:  no class \"{}\" is defined", className);
             return null;
         }
@@ -3021,7 +3130,7 @@ public class ObjectRoot implements ObjectRootInterface {
         JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
         for (String key : propertyJSONObject.keySet()) {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
-            if (subscribedAttributeNameSet.contains(classAndPropertyName)) {
+            if (softSubscribedAttributeNameSet.contains(classAndPropertyName)) {
                 Class<?> desiredType = ((Attribute<Object>)_classAndPropertyNameInitialValueMap.get(
                   classAndPropertyName
                 )).getValue().getClass();

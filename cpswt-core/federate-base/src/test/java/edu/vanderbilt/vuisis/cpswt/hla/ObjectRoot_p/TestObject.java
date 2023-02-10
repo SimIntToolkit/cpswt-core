@@ -917,6 +917,22 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         unsubscribe_attribute(get_hla_class_name(), attributeName);
     }
 
+    public static void soft_subscribe_attribute(String attributeClass, String attributeName) {
+        soft_subscribe_attribute(get_hla_class_name(), attributeClass, attributeName);
+    }
+
+    public static void soft_subscribe_attribute(String attributeName) {
+        soft_subscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String attributeClass, String attributeName) {
+        soft_unsubscribe_attribute(get_hla_class_name(), attributeClass, attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String attributeName) {
+        soft_unsubscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
     /**
     * Publishes the "BooleanValue1" attribute of the attribute's containing object
     * class for a federate.
@@ -963,6 +979,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_BooleanValue1_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    }
+
+    /**
+    * Soft subscribes a federate to the "BooleanValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "BooleanValue1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_BooleanValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "BooleanValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "BooleanValue1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_BooleanValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue1");
     }
 
     /**
@@ -1014,6 +1054,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "BooleanValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "BooleanValue2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_BooleanValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "BooleanValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "BooleanValue2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_BooleanValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    }
+
+    /**
     * Publishes the "ByteValue" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "ByteValue" attribute for publication.
@@ -1059,6 +1123,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_ByteValue_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "ByteValue");
+    }
+
+    /**
+    * Soft subscribes a federate to the "ByteValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "ByteValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_ByteValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "ByteValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "ByteValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "ByteValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_ByteValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "ByteValue");
     }
 
     /**
@@ -1110,6 +1198,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "CharValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "CharValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_CharValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "CharValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "CharValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "CharValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_CharValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "CharValue");
+    }
+
+    /**
     * Publishes the "DoubleValue" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "DoubleValue" attribute for publication.
@@ -1155,6 +1267,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_DoubleValue_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "DoubleValue");
+    }
+
+    /**
+    * Soft subscribes a federate to the "DoubleValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "DoubleValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_DoubleValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "DoubleValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "DoubleValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "DoubleValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_DoubleValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "DoubleValue");
     }
 
     /**
@@ -1206,6 +1342,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "FloatValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FloatValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_FloatValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "FloatValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "FloatValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FloatValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_FloatValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "FloatValue");
+    }
+
+    /**
     * Publishes the "IntValue" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "IntValue" attribute for publication.
@@ -1251,6 +1411,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_IntValue_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "IntValue");
+    }
+
+    /**
+    * Soft subscribes a federate to the "IntValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "IntValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_IntValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "IntValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "IntValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "IntValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_IntValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "IntValue");
     }
 
     /**
@@ -1302,6 +1486,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "LongValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "LongValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_LongValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "LongValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "LongValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "LongValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_LongValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "LongValue");
+    }
+
+    /**
     * Publishes the "ShortValue" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "ShortValue" attribute for publication.
@@ -1350,6 +1558,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "ShortValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "ShortValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_ShortValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "ShortValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "ShortValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "ShortValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_ShortValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "ShortValue");
+    }
+
+    /**
     * Publishes the "StringValue" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "StringValue" attribute for publication.
@@ -1395,6 +1627,30 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_StringValue_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "StringValue");
+    }
+
+    /**
+    * Soft subscribes a federate to the "StringValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringValue" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_StringValue_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "StringValue");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "StringValue" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringValue" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_StringValue_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "StringValue");
     }
 
     protected TestObject(NoInstanceInit noInstanceInit) {

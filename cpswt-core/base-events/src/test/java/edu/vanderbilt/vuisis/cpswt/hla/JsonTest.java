@@ -87,9 +87,9 @@ public class JsonTest {
         FederateObject.publish_FederateHost_attribute();
         FederateObject.publish_FederateHandle_attribute();
 
-        FederateObject.subscribe_FederateType_attribute();
-        FederateObject.subscribe_FederateHost_attribute();
-        FederateObject.subscribe_FederateHandle_attribute();
+        FederateObject.soft_subscribe_FederateType_attribute();
+        FederateObject.soft_subscribe_FederateHost_attribute();
+        FederateObject.soft_subscribe_FederateHandle_attribute();
 
         FederateObject federateObject1 = new FederateObject();
 

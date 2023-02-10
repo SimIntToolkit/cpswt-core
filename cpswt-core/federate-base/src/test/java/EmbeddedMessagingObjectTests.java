@@ -1,3 +1,4 @@
+import hla.rti.AttributeHandleSet;
 import hla.rti.ReceivedInteraction;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
@@ -8,6 +9,10 @@ import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver.Receiver;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender.Sender;
+import hla.rti.ReflectedAttributes;
+import hla.rti.SuppliedAttributes;
+import hla.rti.jlc.RtiFactory;
+import hla.rti.jlc.RtiFactoryFactory;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,9 +56,6 @@ public class EmbeddedMessagingObjectTests {
         //
         // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
         //
-        int embeddedMessagingReceiverInteractionClassHandle = InteractionRoot.get_class_handle(
-                EmbeddedMessaging.get_hla_class_name() + ".Receiver"
-        );
         int embeddedMessagingOmnetFederateInteractionClassHandle = InteractionRoot.get_class_handle(
                 EmbeddedMessaging.get_hla_class_name() + ".OmnetFederate"
         );
@@ -87,55 +89,9 @@ public class EmbeddedMessagingObjectTests {
         // MAKE SURE CLASS HANDLE OF REGISTERED OBJECT IS CORRECT
         Assert.assertEquals(TestObject.get_class_handle(), objectClassHandle);
 
-        // ALSO WHEN SENDER WAS CREATED, IT SENT OUT 2 INTERACTIONS
-        // * ONE FederateJoinInteraction
-        // * ONE EmbeddedMessaging.Receiver INTERACTION TO TELL THE RECEIVER ONLY TO RECEIVE ATTRIBUTE
-        //   UPDATES FOR THE OBJECT THROUGH A NETWORK (I.E. NOT DIRECTLY FROM THE RTI).
-        Assert.assertEquals(2, sentInteractionDataList.size());
-
-        // ONLY INTERESTED IN THE EmbeddedMessaging.Receiver INTERACTION
-        RTIAmbassadorProxy2.SentInteractionData objectUpdatesOnlyThroughNetworkInteractionData =
-                sentInteractionDataList.get(1);
-
-        // MAKE SURE CLASS HANDLE OF SENT EmbeddedMessaging.Receiver INTERACTION IS FOR
-        // EmbeddedMessaging.Receiver CLASS
-        int embeddedMessagingReceiverInteractionDataClassHandle =
-                objectUpdatesOnlyThroughNetworkInteractionData.getInteractionClassHandle();
-        Assert.assertEquals(
-                embeddedMessagingReceiverInteractionClassHandle, embeddedMessagingReceiverInteractionDataClassHandle
-        );
-
-        // CREATE A LOCAL INTERACTION INSTANCE FROM THE INTERACTION DATA OF THE SENT EmbeddedMessagingReceiver
-        // INTERACTION
-        ReceivedInteraction embeddedMessagingDiscoverReceivedInteraction =
-                objectUpdatesOnlyThroughNetworkInteractionData.getReceivedInteraction();
-        InteractionRoot localEmbeddedMessagingReceiverInteractionRoot = InteractionRoot.create_interaction(
-                embeddedMessagingReceiverInteractionDataClassHandle, embeddedMessagingDiscoverReceivedInteraction
-        );
-
-        // MAKE SURE THE CREATED LOCAL INTERACTION IS OF TYPE EmbeddedInteraction.Receiver
-        Assert.assertTrue(
-                localEmbeddedMessagingReceiverInteractionRoot instanceof
-                        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
-        );
-
-        // CAST THE LOCAL INTERACTION TO EmbeddedInteraction.Receiver
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
-                localEmbeddedMessagingReceiverInteraction =
-                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver)
-                        localEmbeddedMessagingReceiverInteractionRoot;
-
-        // command FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE "discover"
-        Assert.assertEquals(localEmbeddedMessagingReceiverInteraction.get_command(), "discover");
-        // hlaClassName FOR EmbeddedInteraction.Receiver INTERACTION SHOULD BE for TestOBject
-        Assert.assertEquals(
-                localEmbeddedMessagingReceiverInteraction.get_hlaClassName(), TestObject.get_hla_class_name())
-        ;
-
-        // messagingJson SHOULD CONTAIN THE OBJECT HANDLE FOR THE OBJECT REGISTERED BY THE SENDER
-        JSONObject jsonObject = new JSONObject(localEmbeddedMessagingReceiverInteraction.get_messagingJson());
-        Assert.assertEquals((int)jsonObject.get("object_handle"), sender.getTestObject().getObjectHandle());
-        Assert.assertEquals((int)jsonObject.get("object_handle"), objectHandle);
+        // ALSO WHEN SENDER WAS CREATED, IT SENT OUT 1 INTERACTION
+        // * FederateJoinInteraction
+        Assert.assertEquals(1, sentInteractionDataList.size());
 
         // THROW AWAY INTERACTION DATA SENT BY SENDER UP TO THIS POINT -- ALREADY TESTED
         sentInteractionDataList.clear();
@@ -159,7 +115,7 @@ public class EmbeddedMessagingObjectTests {
         // ReflectedAttributes SHOULD BE PRESENT IN THE UPDATED-OBJECT DATA, AND SHOULD ONLY
         // CONTAIN DATA FOR 7 ATTRIBUTE -- THE NUMBER THAT ARE PUBLISHED.
         Assert.assertNotNull(updatedObjectData.getReflectedAttributes());
-        Assert.assertEquals(updatedObjectData.getReflectedAttributes().size(), 7);
+        Assert.assertEquals(updatedObjectData.getReflectedAttributes().size(), 8);
 
         // CREATE A LOCAL OBJECT INSTANCE FROM THE OBJECT-DATA THAT WAS SENT OUT FROM THE "updateAttributes"
         // CALL
@@ -178,14 +134,14 @@ public class EmbeddedMessagingObjectTests {
         Assert.assertEquals(senderTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
         Assert.assertEquals(senderTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
         Assert.assertEquals(senderTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
-        Assert.assertEquals(senderTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
         Assert.assertEquals(senderTestObject.get_FloatValue(), localTestObjectObject.get_FloatValue(), 0.001);
         Assert.assertEquals(senderTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
+        Assert.assertEquals(senderTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
+        Assert.assertEquals(senderTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
 
         // THE ATTRIBUTES THAT ARE *NOT* PUBLISHED FOR THE REGISTERED OBJECT SHOULD *NOT* HAVE THE SAME VALUES
         // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
-        Assert.assertNotEquals(senderTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
-        Assert.assertNotEquals(senderTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
+        Assert.assertNotEquals(senderTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
         Assert.assertNotEquals(senderTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
 
         // WHEN THE SENDER CALLED "updateAttributes" FOR THE REGISTERED OBJECT, IT SHOULD ALSO HAVE
@@ -240,14 +196,14 @@ public class EmbeddedMessagingObjectTests {
                 ((JSONObject)objectReflectorJson.get("properties")).toMap();
 
         // THE messagingJson SHOULD BE FOR ALL OF THE PUBLISHED ATTRIBUTES
-        Assert.assertEquals(7, objectReflectorJsonPropertiesMap.size());
+        Assert.assertEquals(8, objectReflectorJsonPropertiesMap.size());
 
         // GET TestObject CLASS PUBLISHED ATTRIBUTE NAMES (ClassAndPropertyName SET)
         Set<ObjectRootInterface.ClassAndPropertyName> testObjectPublishedClassAndPropertyNameSet =
                 TestObject.get_published_attribute_name_set();
 
         // testObjectClassAndPropertyNameSet SHOULD HAVE 7 MEMBERS
-        Assert.assertEquals(7, testObjectPublishedClassAndPropertyNameSet.size());
+        Assert.assertEquals(8, testObjectPublishedClassAndPropertyNameSet.size());
 
         // MAKE SURE objectReflector HAS SAME JSON-ENCODED ATTRIBUTE VALUES AS VALUES OF ATTRIBUTES
         // FOR senderTestObject
@@ -279,19 +235,26 @@ public class EmbeddedMessagingObjectTests {
         // HAVE THE RECEIVER FEDERATE DISCOVER THE OBJECT INSTANCE SENT BY THE SENDER
         receiver.discoverObjectInstance(objectHandle, objectClassHandle, null);
 
-        // ALSO HAVE THE RECEIVER RECEIVE THE EmbeddedMessaging.Receiver INTERACTION THAT TELLS IS TO IGNORE
-        // ATTRIBUTE UPDATES FOR THE TestObject WHEN RECEIVED DIRECTLY FROM THE RTI, AND ONLY RECEIVE
-        // THEM THROUGH EmbeddedMessaging
-        receiver.receiveInteraction(
-                embeddedMessagingReceiverInteractionDataClassHandle,
-                embeddedMessagingDiscoverReceivedInteraction,
-                null
-        );
+        AttributeHandleSet attributeHandleSet = TestObject.get_subscribed_attribute_handle_set();
+        Assert.assertEquals(4, attributeHandleSet.size());
+
+        RtiFactory rtiFactory = RtiFactoryFactory.getRtiFactory( "org.portico.dlc.HLA13RTIFactory" );
+        SuppliedAttributes suppliedAttributes = rtiFactory.createSuppliedAttributes();
+
+        ReflectedAttributes reflectedAttributes = updatedObjectData.getReflectedAttributes();
+        for(int ix = 0 ; ix < reflectedAttributes.size() ; ++ix) {
+            int attributeHandle = reflectedAttributes.getAttributeHandle(ix);
+            if (attributeHandleSet.isMember(attributeHandle)) {
+                suppliedAttributes.add(attributeHandle, reflectedAttributes.getValue(ix));
+            }
+        }
+
+        reflectedAttributes = new RTIAmbassadorProxy2.ReflectedAttributeImpl(suppliedAttributes);
 
         // TRY TO UPDATE OBJECT IN RECEIVER DIRECTLY FROM RTI
         receiver.reflectAttributeValues(
                 objectHandle,
-                updatedObjectData.getReflectedAttributes(),
+                reflectedAttributes,
                 null,
                 updatedObjectData.getLogicalTime(),
                 null
@@ -300,9 +263,29 @@ public class EmbeddedMessagingObjectTests {
         // THE Receiver SHOULD IGNORE THE "reflectAttributeValues" CALL ABOVE, SO PERFORMED THE ACTIONS ASSOCIATED T
         receiver.execute();
 
-        // THE RECEIVER SHOULD *STILL* Not HAVE THE TestObject YET AS IT SHOULD NOT ACCEPT UPDATES FOR THE OBJECT
-        // DIRECTLY FROM THE RTI
-        Assert.assertNull(receiver.getTestObject());
+        // THE RECEIVER SHOULD NOW HAVE THE OBJECT
+        TestObject receivedTestObject = receiver.getTestObject();
+        Assert.assertNotNull(receivedTestObject);
+
+        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
+        // BUT localTestObjectObject.get_BooleanValue1 IS INCIDENTALLY false
+        Assert.assertEquals(receivedTestObject.get_BooleanValue1(), localTestObjectObject.get_BooleanValue1());
+        // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+        Assert.assertEquals(receivedTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
+        // NOT SUBSCRIBED BY Receiver
+        Assert.assertNotEquals(receivedTestObject.get_FloatValue(), localTestObjectObject.get_FloatValue(), 0.001);
+        // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+        Assert.assertEquals(receivedTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
+
+        // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
+        Assert.assertEquals(receivedTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
+        Assert.assertEquals(receivedTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
+        Assert.assertEquals(receivedTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
+
+        // THESE ARE UPDATED THROUGH THE NETWORK, SO NOT RECEIVED YET
+        Assert.assertNotEquals(receivedTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
+        Assert.assertNotEquals(receivedTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
+        Assert.assertNotEquals(receivedTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
 
         // SEND THE RECEIVER THE EmbeddedMessaging.Receiver INTERACTION THAT CONTAINS THE ATTRIBUTES UPDATE
         // FOR THE DISCOVERED OBJECT
@@ -318,22 +301,22 @@ public class EmbeddedMessagingObjectTests {
         // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
         receiver.execute();
 
-        // THE RECEIVER SHOULD NOW HAVE THE OBJECT
-        TestObject receivedTestObject = receiver.getTestObject();
-        Assert.assertNotNull(receivedTestObject);
+        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
+        // BUT localTestObjectObject.get_BooleanValue1 IS INCIDENTALLY false
+        Assert.assertEquals(receivedTestObject.get_BooleanValue1(), localTestObjectObject.get_BooleanValue1());
+        // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+        Assert.assertEquals(receivedTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
+        // NOT SUBSCRIBED BY Receiver
+        Assert.assertNotEquals(receivedTestObject.get_FloatValue(), localTestObjectObject.get_FloatValue(), 0.001);
+        // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
+        Assert.assertEquals(receivedTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
 
-        Assert.assertFalse(receivedTestObject.get_BooleanValue1());
-        Assert.assertFalse(receivedTestObject.get_BooleanValue2());
-
-        Assert.assertNotEquals(senderTestObject.get_ByteValue(), receivedTestObject.get_ByteValue());
-
-        Assert.assertEquals(senderTestObject.get_CharValue(), receivedTestObject.get_CharValue());
-        Assert.assertEquals(senderTestObject.get_DoubleValue(), receivedTestObject.get_DoubleValue(), 0.001);
-        Assert.assertEquals(senderTestObject.get_FloatValue(), receivedTestObject.get_FloatValue(), 0.001);
-        Assert.assertEquals(senderTestObject.get_IntValue(), receivedTestObject.get_IntValue());
-
-        Assert.assertNotEquals(senderTestObject.get_LongValue(), receivedTestObject.get_LongValue());
-        Assert.assertNotEquals(senderTestObject.get_ShortValue(), receivedTestObject.get_ShortValue());
-        Assert.assertNotEquals(senderTestObject.get_StringValue(), receivedTestObject.get_StringValue());
+        // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
+        Assert.assertEquals(receivedTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
+        Assert.assertEquals(receivedTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
+        Assert.assertEquals(receivedTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
+        Assert.assertEquals(receivedTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
+        Assert.assertEquals(receivedTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
+        Assert.assertEquals(receivedTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
     }
 }

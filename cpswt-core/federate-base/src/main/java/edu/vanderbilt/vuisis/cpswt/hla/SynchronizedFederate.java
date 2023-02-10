@@ -482,21 +482,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public void registerObject(ObjectRoot objectRoot) throws Exception {
         objectRoot.registerObject(getRTI());
-
-        if (objectRoot.getFederateNameSoftPublishDirectSet().size() > 0) {
-            for (String federateName : objectRoot.getFederateNameSoftPublishDirectSet()) {
-                String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
-                InteractionRoot embeddedMessagingDirect = new InteractionRoot(embeddedMessagingHlaClassName);
-                embeddedMessagingDirect.setParameter("command", "discover");
-                embeddedMessagingDirect.setParameter("hlaClassName", objectRoot.getInstanceHlaClassName());
-
-                JSONObject topLevelJSONObject = new JSONObject();
-                topLevelJSONObject.put("object_handle", objectRoot.getObjectHandle());
-                embeddedMessagingDirect.setParameter("messagingJson", topLevelJSONObject.toString(4));
-
-                sendInteraction(embeddedMessagingDirect);
-            }
-        }
     }
 
     public void unregisterObject(ObjectRoot objectRoot) {
@@ -1307,20 +1292,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         String hlaClassName = embeddedMessaging.get_hlaClassName();
         String federateSequence = embeddedMessaging.get_federateSequence();
 
-        if ("discover".equals(command)) {
-            JSONObject jsonObject = new JSONObject(embeddedMessaging.get_messagingJson());
-            int objectHandle = jsonObject.getInt("object_handle");
-            if (!ObjectRoot.get_object_hla_class_name_set().contains(hlaClassName)) {
-                logger.error(
-                        "SynchronizedFederate.receiveEmbeddedInteraction: Bad class name \"{}\" on discover",
-                        hlaClassName
-                );
-                return;
-            }
-            ObjectRoot.add_object_update_embedded_only_id(hlaClassName, objectHandle);
-            return;
-        }
-
         if ("interaction".equals(command)) {
             if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
@@ -1338,10 +1309,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         if ("object".equals(command)) {
-            if (!ObjectRoot.get_is_subscribed(hlaClassName) && !ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
+            if (!ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
                         "SynchronizedFederate.receiveEmbeddedInteraction:  object class \"{}\" " +
-                                "neither subscribed nor soft subscribed",
+                                "is not soft subscribed",
                         hlaClassName
                 );
                 return;

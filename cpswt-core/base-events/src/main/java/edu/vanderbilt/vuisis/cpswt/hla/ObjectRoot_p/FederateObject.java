@@ -343,6 +343,10 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
+    public static Set<ClassAndPropertyName> get_softSubscribed_attribute_name_set() {
+        return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
+    }
+
     public static void add_object_update_embedded_only_id(int id) {
         add_object_update_embedded_only_id(get_hla_class_name(), id);
     }
@@ -609,6 +613,22 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         unsubscribe_attribute(get_hla_class_name(), attributeName);
     }
 
+    public static void soft_subscribe_attribute(String attributeClass, String attributeName) {
+        soft_subscribe_attribute(get_hla_class_name(), attributeClass, attributeName);
+    }
+
+    public static void soft_subscribe_attribute(String attributeName) {
+        soft_subscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String attributeClass, String attributeName) {
+        soft_unsubscribe_attribute(get_hla_class_name(), attributeClass, attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String attributeName) {
+        soft_unsubscribe_attribute(get_hla_class_name(), attributeName);
+    }
+
     /**
     * Publishes the "FederateHandle" attribute of the attribute's containing object
     * class for a federate.
@@ -655,6 +675,30 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_FederateHandle_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "FederateHandle");
+    }
+
+    /**
+    * Soft subscribes a federate to the "FederateHandle" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateHandle" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_FederateHandle_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "FederateHandle");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "FederateHandle" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateHandle" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_FederateHandle_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "FederateHandle");
     }
 
     /**
@@ -706,6 +750,30 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
+    * Soft subscribes a federate to the "FederateHost" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateHost" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_FederateHost_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "FederateHost");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "FederateHost" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateHost" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_FederateHost_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "FederateHost");
+    }
+
+    /**
     * Publishes the "FederateType" attribute of the attribute's containing object
     * class for a federate.
     * Note:  This method only marks the "FederateType" attribute for publication.
@@ -751,6 +819,30 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void unsubscribe_FederateType_attribute() {
         unsubscribe_attribute(get_hla_class_name(), "FederateType");
+    }
+
+    /**
+    * Soft subscribes a federate to the "FederateType" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateType" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_FederateType_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "FederateType");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "FederateType" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "FederateType" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_FederateType_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "FederateType");
     }
 
     protected FederateObject(NoInstanceInit noInstanceInit) {

@@ -217,7 +217,7 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
         _classAndPropertyNameInitialValueMap.put(key, "");
 
         key = new ClassAndPropertyName(get_hla_class_name(), "federateSequence");
-        _classAndPropertyNameInitialValueMap.put(key, "");
+        _classAndPropertyNameInitialValueMap.put(key, "[]");
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
