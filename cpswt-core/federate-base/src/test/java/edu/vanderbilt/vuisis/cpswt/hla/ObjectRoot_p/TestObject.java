@@ -413,6 +413,10 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
+    public static Set<ClassAndPropertyName> get_softSubscribed_attribute_name_set() {
+        return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
+    }
+
     public static void add_object_update_embedded_only_id(int id) {
         add_object_update_embedded_only_id(get_hla_class_name(), id);
     }
