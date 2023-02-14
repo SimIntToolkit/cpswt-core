@@ -355,22 +355,6 @@ public class DerivedObjectClass extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRo
         return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
-    public static void add_object_update_embedded_only_id(int id) {
-        add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static void remove_object_update_embedded_only_id(int id) {
-        remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static Set<Integer> get_object_update_embedded_only_id_set() {
-        return get_object_update_embedded_only_id_set(get_hla_class_name());
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(int id) {
-        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
     public static void add_federate_name_soft_publish_direct(String federateName) {
         add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
     }

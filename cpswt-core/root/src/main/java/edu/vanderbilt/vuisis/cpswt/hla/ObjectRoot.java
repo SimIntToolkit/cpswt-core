@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 import java.io.File;
 import java.io.FileReader;
@@ -1005,46 +1006,162 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
 
+    private static class PubSubCacheEntry {
+        private final String _callingFunctionName;
+        private final String _primaryFunctionName;
+        private final Map<String, Set<ClassAndPropertyName>> _classNamePubSubAttributeNameSetMap;
+        private final String _hlaClassName;
+        private final String _attributeClassName;
+        private final String _attributeName;
+        private final boolean _publish;
+
+        public PubSubCacheEntry(
+                String callingFunctionName,
+                Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
+                String hlaClassName,
+                String attributeClassName,
+                String attributeName,
+                boolean publish
+        ) {
+            _callingFunctionName = callingFunctionName;
+            _primaryFunctionName = callingFunctionName.replace("un", "");
+            _classNamePubSubAttributeNameSetMap = classNamePubSubAttributeNameSetMap;
+            _hlaClassName = hlaClassName;
+            _attributeClassName = attributeClassName;
+            _attributeName = attributeName;
+            _publish = publish;
+        }
+
+        void replay() {
+            pub_sub_class_and_property_name(
+                    _callingFunctionName,
+                    _classNamePubSubAttributeNameSetMap,
+                    _hlaClassName,
+                    _attributeClassName,
+                    _attributeName,
+                    _publish,
+                    true
+            );
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PubSubCacheEntry that = (PubSubCacheEntry) o;
+            return _publish == that._publish &&
+                    _primaryFunctionName.equals(that._primaryFunctionName) &&
+                    _hlaClassName.equals(that._hlaClassName) &&
+                    _attributeClassName.equals(that._attributeClassName) &&
+                    _attributeName.equals(that._attributeName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(_primaryFunctionName, _hlaClassName, _attributeClassName, _attributeName, _publish);
+        }
+    }
+
+    private static final Map<String, Set<PubSubCacheEntry>> _hlaClassNameToPubSubCacheMap = new HashMap<>();
+
+    private static void add_to_pub_sub_cache(
+            String callingFunctionName,
+            Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
+            String hlaClassName,
+            String attributeClassName,
+            String attributeName,
+            boolean publish,
+            boolean insert
+    ) {
+        if (insert) {
+            if (!_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
+                _hlaClassNameToPubSubCacheMap.put(hlaClassName, new HashSet<>());
+            }
+            Set<PubSubCacheEntry> pubSubCacheEntrySet = _hlaClassNameToPubSubCacheMap.get(hlaClassName);
+            pubSubCacheEntrySet.add(new PubSubCacheEntry(
+                    callingFunctionName,
+                    classNamePubSubAttributeNameSetMap,
+                    hlaClassName,
+                    attributeClassName,
+                    attributeName,
+                    publish
+            ));
+        } else if (_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
+            Set<PubSubCacheEntry> pubSubCacheEntrySet = _hlaClassNameToPubSubCacheMap.get(hlaClassName);
+            pubSubCacheEntrySet.remove(new PubSubCacheEntry(
+                    callingFunctionName,
+                    classNamePubSubAttributeNameSetMap,
+                    hlaClassName,
+                    attributeClassName,
+                    attributeName,
+                    publish
+            ));
+            if (pubSubCacheEntrySet.isEmpty()) {
+                _hlaClassNameToPubSubCacheMap.remove(hlaClassName);
+            }
+        }
+    }
+
+    private static void replay_pub_sub(String hlaClassName) {
+        if (_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
+            for(PubSubCacheEntry pubSubCacheEntry : _hlaClassNameToPubSubCacheMap.get(hlaClassName)) {
+                pubSubCacheEntry.replay();
+            }
+            _hlaClassNameToPubSubCacheMap.remove(hlaClassName);
+        }
+    }
+
     private static void pub_sub_class_and_property_name(
+      String callingFunctionName,
       Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
-      String className,
+      String hlaClassName,
       String attributeClassName,
       String attributeName,
       boolean publish,
       boolean insert
     ) {
-        String prefix = insert ? "" : "un";
-        String pubsub = publish ? "publish" : "subscribe";
-        String operationName = prefix + pubsub;
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            add_to_pub_sub_cache(
+                    callingFunctionName,
+                    classNamePubSubAttributeNameSetMap,
+                    hlaClassName,
+                    attributeClassName,
+                    attributeName,
+                    publish,
+                    insert
+            );
+            return;
+        }
 
-        if (!className.startsWith(attributeClassName)) {
+        if (!hlaClassName.startsWith(attributeClassName)) {
             logger.error(
-                "{}_attribute(\"{}\", \"{}\", \"{}\"): the \"{}\" class cannot {} attribute of " +
-                "a class (\"{}\") that is out of its inheritance hierarchy.",
-                operationName, className, attributeClassName, attributeName,
-                className, operationName, attributeClassName
+                "{}(\"{}\", \"{}\", \"{}\"): the \"{}\" class cannot access an attribute of " +
+                "class (\"{}\") because it is out of its inheritance hierarchy.",
+                callingFunctionName, hlaClassName, attributeClassName, attributeName, hlaClassName, attributeClassName
             );
             return;
         }
         ClassAndPropertyName key = findProperty(attributeClassName, attributeName);
         if (key == null) {
             logger.error(
-                "{}_attribute(\"{}\", \"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                operationName, className, attributeClassName, attributeName, attributeName, attributeClassName
+                "{}(\"{}\", \"{}\", \"{}\"):  \"{}\" attribute does not exist in \"{}\" " +
+                "class or any of its base classes",
+                callingFunctionName, hlaClassName, attributeClassName, attributeName, attributeName, attributeClassName
             );
             return;
         }
 
         if (insert) {
-            classNamePubSubAttributeNameSetMap.get(className).add(key);
+            classNamePubSubAttributeNameSetMap.get(hlaClassName).add(key);
         } else {
-            classNamePubSubAttributeNameSetMap.get(className).remove(key);
+            classNamePubSubAttributeNameSetMap.get(hlaClassName).remove(key);
         }
     }
 
     public static void publish_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, true
+          "publish_attribute", _classNamePublishedAttributeNameSetMap,
+          className, attributeClassName, attributeName, true, true
         );
     }
 
@@ -1071,7 +1188,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void unpublish_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, false
+          "unpublish_attribute", _classNamePublishedAttributeNameSetMap,
+          className, attributeClassName, attributeName, true, false
         );
     }
 
@@ -1121,11 +1239,10 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void subscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
+          "subscribe_attribute", _classNameSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, true
         );
-        pub_sub_class_and_property_name(
-          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
-        );
+        soft_unsubscribe_attribute(className, attributeClassName, attributeName);
     }
 
     /**
@@ -1151,7 +1268,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+          "unsubscribe_attribute", _classNameSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, false
         );
     }
     /**
@@ -1201,11 +1319,10 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void soft_subscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
+          "soft_subscribe_attribute", _classNameSoftSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, true
         );
-        pub_sub_class_and_property_name(
-          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
-        );
+        unsubscribe_attribute(className, attributeClassName, attributeName);
     }
 
     /**
@@ -1246,7 +1363,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void soft_unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSoftSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+          "soft_unsubscribe_attribute", _classNameSoftSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, false
         );
     }
     /**
@@ -2492,22 +2610,6 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
-    public static void add_object_update_embedded_only_id(int id) {
-        add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static void remove_object_update_embedded_only_id(int id) {
-        remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static Set<Integer> get_object_update_embedded_only_id_set() {
-        return get_object_update_embedded_only_id_set(get_hla_class_name());
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(int id) {
-        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
     public static void add_federate_name_soft_publish_direct(String federateName) {
         add_federate_name_soft_publish_direct(get_hla_class_name(), federateName);
     }
@@ -3143,50 +3245,6 @@ public class ObjectRoot implements ObjectRootInterface {
         return objectReflector;
     }
 
-    private static final Map<String, Set<Integer>> _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap = new HashMap<>();
-
-    public static void add_object_update_embedded_only_id(String hlaClassName, int id) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
-            logger.warn(
-              "add_object_update_embedded_only_id(\"{}\", {}) -- no such object " +
-              "class \"{}\"", hlaClassName, id, hlaClassName
-            );
-            return;
-        }
-        if (!_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
-            _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.put(hlaClassName, new HashSet<>());
-        }
-        _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).add(id);
-    }
-
-    public static void remove_object_update_embedded_only_id(String hlaClassName, int id) {
-        if (_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
-            Set<Integer> integerSet = _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName);
-            integerSet.remove(id);
-            if (integerSet.isEmpty()) {
-                _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.remove(hlaClassName);
-            }
-        }
-    }
-
-    public static Set<Integer> get_object_update_embedded_only_id_set(String hlaClassName) {
-        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) ?
-            new HashSet<>(_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName)) : new HashSet<>();
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(String hlaClassName, int id) {
-        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) &&
-          _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).contains(id);
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(int classId, int id) {
-        if (_classHandleNameMap.containsKey(classId)) {
-            String hlaClassName = _classHandleNameMap.get(classId);
-            return get_is_object_update_embedded_only_id(hlaClassName, id);
-        }
-        return false;
-    }
-
     private static Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
@@ -3287,18 +3345,17 @@ public class ObjectRoot implements ObjectRootInterface {
     public static void readFederationJson(Reader reader) {
         federationJson = new JSONObject( new JSONTokener(reader) );
     }
-
-    private static final Map<String, Object> _typeInitialValueMap = new HashMap<>();
+    private static final Map<String, Attribute<Object>> _typeInitialValueMap = new HashMap<>();
     static {
-        _typeInitialValueMap.put("boolean", false);
-        _typeInitialValueMap.put("byte", (byte)0);
-        _typeInitialValueMap.put("char", (char)0);
-        _typeInitialValueMap.put("double", (double)0);
-        _typeInitialValueMap.put("float", (float)0);
-        _typeInitialValueMap.put("int", 0);
-        _typeInitialValueMap.put("long", (long)0);
-        _typeInitialValueMap.put("short", (short)0);
-        _typeInitialValueMap.put("String", "");
+        _typeInitialValueMap.put("boolean", new Attribute<>(false));
+        _typeInitialValueMap.put("byte", new Attribute<>((byte)0));
+        _typeInitialValueMap.put("char", new Attribute<>((char)0));
+        _typeInitialValueMap.put("double", new Attribute<>((double)0));
+        _typeInitialValueMap.put("float", new Attribute<>((float)0));
+        _typeInitialValueMap.put("int", new Attribute<>(0));
+        _typeInitialValueMap.put("long", new Attribute<>((long)0));
+        _typeInitialValueMap.put("short", new Attribute<>((short)0));
+        _typeInitialValueMap.put("String", new Attribute<>(""));
     }
 
     public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {
@@ -3423,6 +3480,7 @@ public class ObjectRoot implements ObjectRootInterface {
                 return false;
             }
             init(hlaClassName, rtiAmbassador);
+            replay_pub_sub(hlaClassName);
         }
         return true;
     }

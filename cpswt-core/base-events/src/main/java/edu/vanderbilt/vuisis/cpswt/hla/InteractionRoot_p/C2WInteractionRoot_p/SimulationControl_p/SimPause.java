@@ -402,18 +402,6 @@ public class SimPause extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    public static void add_reject_source_federate_id(String federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static boolean is_reject_source_federate_id(String federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static void remove_reject_source_federate_id(String federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
     protected SimPause(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }

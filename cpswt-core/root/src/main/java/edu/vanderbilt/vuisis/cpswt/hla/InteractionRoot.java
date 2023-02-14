@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 import java.io.File;
 import java.io.FileReader;
@@ -2052,7 +2053,6 @@ public class InteractionRoot implements InteractionRootInterface {
     public static void readFederationJson(Reader reader) {
         federationJson = new JSONObject( new JSONTokener(reader) );
     }
-
     private static final Map<String, Object> _typeInitialValueMap = new HashMap<>();
     static {
         _typeInitialValueMap.put("boolean", false);

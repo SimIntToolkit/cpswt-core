@@ -56,6 +56,10 @@ dependencies {
     testImplementation(group="org.mockito", name="mockito-core", version="4.1.0")
 }
 
+tasks.test {
+    setForkEvery(1)
+}
+
 publishing {
     publications {
         create<MavenPublication>("base-events") {

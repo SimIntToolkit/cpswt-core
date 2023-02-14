@@ -497,18 +497,6 @@ public class EmbeddedMessaging extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    public static void add_reject_source_federate_id(String federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static boolean is_reject_source_federate_id(String federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static void remove_reject_source_federate_id(String federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
     protected EmbeddedMessaging(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
