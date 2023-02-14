@@ -39,10 +39,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRootInterface.ClassAndPropertyName;
 import static org.mockito.Mockito.*;
@@ -295,6 +292,12 @@ public class DynamicPublishAttributesTest {
     public void publishObjectTest() {
 
         RTIambassador rtiambassador = get_rti_ambassador();
+
+        List<ClassAndPropertyName> testBaseClassAndPropertyNameList =
+                ObjectRoot.get_attribute_names(testBaseFullHlaClassName);
+        Set<ClassAndPropertyName> testBaseClassAndPropertyNameSet = new HashSet<>(testBaseClassAndPropertyNameList);
+
+        Assert.assertEquals(testBaseClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
         ObjectRoot.publish_attribute(
                 testBaseFullHlaClassName,

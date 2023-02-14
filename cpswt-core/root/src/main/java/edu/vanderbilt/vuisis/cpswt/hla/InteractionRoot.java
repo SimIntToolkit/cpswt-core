@@ -353,6 +353,13 @@ public class InteractionRoot implements InteractionRootInterface {
       * className interaction class
       */
     public static List<ClassAndPropertyName> get_parameter_names( String hlaClassName ) {
+
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            HashSet<String> hlaClassNameSet = new HashSet<>();
+            hlaClassNameSet.add(hlaClassName);
+            readFederateDynamicMessageClasses(hlaClassNameSet);
+        }
+
         List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(
           _classNamePropertyNameSetMap.get( hlaClassName )
         );
@@ -563,21 +570,21 @@ public class InteractionRoot implements InteractionRootInterface {
     public static InteractionRoot create_interaction(String hlaClassName) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new InteractionRoot( hlaClassName ) : null
           : instance.createInteraction();
     }
 
     public static InteractionRoot create_interaction(String hlaClassName, LogicalTime logicalTime) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName, logicalTime ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new InteractionRoot( hlaClassName, logicalTime ) : null
           : instance.createInteraction( logicalTime );
     }
 
     public static InteractionRoot create_interaction(String hlaClassName, ReceivedInteraction propertyMap) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new InteractionRoot( hlaClassName, propertyMap ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new InteractionRoot( hlaClassName, propertyMap ) : null
           : instance.createInteraction( propertyMap );
     }
 
@@ -586,7 +593,7 @@ public class InteractionRoot implements InteractionRootInterface {
     ) {
         InteractionRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName )
+          ? _classNameHandleMap.containsKey(hlaClassName)
             ? new InteractionRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createInteraction( propertyMap, logicalTime );
     }
@@ -1636,7 +1643,7 @@ public class InteractionRoot implements InteractionRootInterface {
      */
     public InteractionRoot( String hlaClassName ) {
         setInstanceHlaClassName(hlaClassName);
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.error("Constructor \"InteractionRoot( String hlaClassName )\": " +
               "hlaClassName \"{}\" is not defined -- creating dummy interaction with fictitious type \"{}\"",
               hlaClassName, hlaClassName
@@ -1992,7 +1999,7 @@ public class InteractionRoot implements InteractionRootInterface {
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish(String hlaClassName, String federateName) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.warn(
               "add_federate_name_soft_publish(\"{}\", \"{}\") -- no such interaction class \"{}\"",
               hlaClassName, federateName, hlaClassName
@@ -2182,10 +2189,12 @@ public class InteractionRoot implements InteractionRootInterface {
     }
 
     private static boolean loadDynamicHlaClass(String hlaClassName, RTIambassador rtiAmbassador) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
-            readFederateDynamicMessageClass(hlaClassName);
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             if (!_hlaClassNameSet.contains(hlaClassName)) {
-                return false;
+                readFederateDynamicMessageClass(hlaClassName);
+                if (!_hlaClassNameSet.contains(hlaClassName)) {
+                    return false;
+                }
             }
             init(hlaClassName, rtiAmbassador);
         }

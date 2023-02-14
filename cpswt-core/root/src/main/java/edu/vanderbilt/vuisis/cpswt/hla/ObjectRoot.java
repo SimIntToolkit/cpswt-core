@@ -514,6 +514,10 @@ public class ObjectRoot implements ObjectRootInterface {
             return ObjectRoot.get_object(this.objectHandle);
         }
 
+        public void setTime(double time) {
+            this.time = time;
+        }
+
         public double getTime() {
             return this.time;
         }
@@ -616,6 +620,13 @@ public class ObjectRoot implements ObjectRootInterface {
       * className object class
       */
     public static List<ClassAndPropertyName> get_attribute_names( String hlaClassName ) {
+
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            HashSet<String> hlaClassNameSet = new HashSet<>();
+            hlaClassNameSet.add(hlaClassName);
+            readFederateDynamicMessageClasses(hlaClassNameSet);
+        }
+
         List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(
           _classNamePropertyNameSetMap.get( hlaClassName )
         );
@@ -829,21 +840,21 @@ public class ObjectRoot implements ObjectRootInterface {
     public static ObjectRoot create_object(String hlaClassName) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName ) : null
           : instance.createObject();
     }
 
     public static ObjectRoot create_object(String hlaClassName, LogicalTime logicalTime) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, logicalTime ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName, logicalTime ) : null
           : instance.createObject( logicalTime );
     }
 
     public static ObjectRoot create_object(String hlaClassName, ReflectedAttributes propertyMap) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, propertyMap ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName, propertyMap ) : null
           : instance.createObject( propertyMap );
     }
 
@@ -852,7 +863,7 @@ public class ObjectRoot implements ObjectRootInterface {
     ) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName )
+          ? _classNameHandleMap.containsKey(hlaClassName)
             ? new ObjectRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createObject( propertyMap, logicalTime );
     }
@@ -1120,7 +1131,7 @@ public class ObjectRoot implements ObjectRootInterface {
       boolean publish,
       boolean insert
     ) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             add_to_pub_sub_cache(
                     callingFunctionName,
                     classNamePubSubAttributeNameSetMap,
@@ -2791,7 +2802,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public ObjectRoot( String hlaClassName ) {
         setInstanceHlaClassName(hlaClassName);
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.error("Constructor \"ObjectRoot( String hlaClassName )\": " +
               "hlaClassName \"{}\" is not defined -- creating dummy object with fictitious type \"{}\"",
               hlaClassName, hlaClassName
@@ -3248,7 +3259,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.warn(
               "add_federate_name_soft_publish_direct(\"{}\", \"{}\") -- no such object " +
               "class \"{}\"", hlaClassName, federateName, hlaClassName
@@ -3284,7 +3295,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish(String hlaClassName, String federateName) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.warn(
               "add_federate_name_soft_publish(\"{}\", \"{}\") -- no such object class \"{}\"",
               hlaClassName, federateName, hlaClassName
@@ -3474,10 +3485,12 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     private static boolean loadDynamicHlaClass(String hlaClassName, RTIambassador rtiAmbassador) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
-            readFederateDynamicMessageClass(hlaClassName);
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             if (!_hlaClassNameSet.contains(hlaClassName)) {
-                return false;
+                readFederateDynamicMessageClass(hlaClassName);
+                if (!_hlaClassNameSet.contains(hlaClassName)) {
+                    return false;
+                }
             }
             init(hlaClassName, rtiAmbassador);
             replay_pub_sub(hlaClassName);

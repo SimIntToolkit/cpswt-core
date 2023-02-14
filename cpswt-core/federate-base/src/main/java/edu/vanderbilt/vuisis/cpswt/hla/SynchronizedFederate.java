@@ -1309,6 +1309,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
             ObjectReflector objectReflector = ObjectRoot.fromJson(embeddedMessaging.get_messagingJson());
             objectReflector.setFederateSequence(federateSequence);
+            objectReflector.setTime(embeddedMessaging.getTime());
 
             _objectReflectionQueue.add(objectReflector);
             return;
