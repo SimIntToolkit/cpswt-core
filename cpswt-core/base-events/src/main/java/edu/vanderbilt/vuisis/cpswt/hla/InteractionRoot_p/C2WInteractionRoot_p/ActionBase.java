@@ -168,6 +168,7 @@ public class ActionBase extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -187,6 +188,8 @@ public class ActionBase extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.ActionBase\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -401,18 +404,6 @@ public class ActionBase extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
-
-    public static void add_reject_source_federate_id(String federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static boolean is_reject_source_federate_id(String federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static void remove_reject_source_federate_id(String federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
 
     protected ActionBase(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

@@ -112,15 +112,6 @@ public class FederateConfig {
     public String federateDynamicMessagingJsonFileName;
 
     /**
-     * Optional 'rejectSourceFederateIdJsonFileName' parameter that names the file that contains
-     * information on what dynamic messaging interactions should be rejected given their source federate id
-     * Use {@link FederateParameterOptional} to exclude the field from "isSet" check
-     */
-    @FederateParameter
-    @FederateParameterOptional
-    public String rejectSourceFederateIdJsonFileName;
-
-    /**
      * Default constructor for FederateConfig.
      */
     public FederateConfig() {}

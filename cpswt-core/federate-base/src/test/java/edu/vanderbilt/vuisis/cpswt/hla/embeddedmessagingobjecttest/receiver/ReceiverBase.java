@@ -69,14 +69,19 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
 
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.subscribe_interaction(getRTI());
 
-        // OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_CharValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_DoubleValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_FloatValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_IntValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_LongValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_ShortValue_attribute();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_StringValue_attribute();
+        // SOFT OBJECT SUBSCRIPTIONS
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_object(getRTI());
+
+        // DIRECT OBJECT SUBSCRIPTIONS
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "BooleanValue2");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "CharValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
+
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
     }
 

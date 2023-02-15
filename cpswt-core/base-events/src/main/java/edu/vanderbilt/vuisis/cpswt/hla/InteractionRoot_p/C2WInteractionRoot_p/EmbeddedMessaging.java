@@ -177,6 +177,7 @@ public class EmbeddedMessaging extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -219,6 +220,8 @@ public class EmbeddedMessaging extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
 
         key = new ClassAndPropertyName(get_hla_class_name(), "messagingJson");
         _classAndPropertyNameInitialValueMap.put(key, "");
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -496,18 +499,6 @@ public class EmbeddedMessaging extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
-
-    public static void add_reject_source_federate_id(String federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static boolean is_reject_source_federate_id(String federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static void remove_reject_source_federate_id(String federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
 
     protected EmbeddedMessaging(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

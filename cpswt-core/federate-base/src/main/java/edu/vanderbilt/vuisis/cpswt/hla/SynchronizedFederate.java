@@ -165,7 +165,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private final String federationJsonFileName;
     private final String federateDynamicMessagingJsonFileName;
-    private final String rejectSourceFederateIdJsonFileName;
 
     private final boolean isLateJoiner;
     public boolean isLateJoiner() { return this.isLateJoiner; }
@@ -230,7 +229,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         this.federationJsonFileName = federateConfig.federationJsonFileName;
         this.federateDynamicMessagingJsonFileName = federateConfig.federateDynamicMessagingJsonFileName;
-        this.rejectSourceFederateIdJsonFileName = federateConfig.rejectSourceFederateIdJsonFileName;
 
         this.lookahead = federateConfig.lookahead;
         this.stepSize = federateConfig.stepSize;
@@ -288,19 +286,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         ObjectRoot.init(getRTI());
     }
 
-    public void initializeDynamicMessaging(
-      File federationJsonFile, File federateDynamicMessagingClassesJsonFile, File rejectSourceFederateIdJsonFile
-    ) {
+    public void initializeDynamicMessaging(File federationJsonFile, File federateDynamicMessagingClassesJsonFile) {
         InteractionRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
         ObjectRoot.loadDynamicClassFederationData(federationJsonFile, federateDynamicMessagingClassesJsonFile);
-        C2WInteractionRoot.readRejectSourceFederateIdData(rejectSourceFederateIdJsonFile);
         initializeMessaging();
     }
 
     public void initializeDynamicMessaging(
             String federationJsonFileName,
-            String federateDynamicMessagingClassesJsonFileName,
-            String rejectSourceFederateIdJsonFileName
+            String federateDynamicMessagingClassesJsonFileName
     ) {
         if (
                 federationJsonFileName == null ||
@@ -313,11 +307,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
         File federationJsonFile = new File(federationJsonFileName);
         File federateDynamicMessagingClassesJsonFile = new File(federateDynamicMessagingClassesJsonFileName);
-        File rejectSourceFederateIdJsonFile = rejectSourceFederateIdJsonFileName == null ?
-          null : new File(rejectSourceFederateIdJsonFileName);
-        initializeDynamicMessaging(
-          federationJsonFile, federateDynamicMessagingClassesJsonFile, rejectSourceFederateIdJsonFile
-        );
+        initializeDynamicMessaging(federationJsonFile, federateDynamicMessagingClassesJsonFile);
     }
 
     public void notifyFederationOfJoin() {
@@ -405,7 +395,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         initializeDynamicMessaging(
-          federationJsonFileName, federateDynamicMessagingJsonFileName, rejectSourceFederateIdJsonFileName
+          federationJsonFileName, federateDynamicMessagingJsonFileName
         );
 
         this.ensureSimEndSubscription();
@@ -482,21 +472,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     public void registerObject(ObjectRoot objectRoot) throws Exception {
         objectRoot.registerObject(getRTI());
-
-        if (objectRoot.getFederateNameSoftPublishDirectSet().size() > 0) {
-            for (String federateName : objectRoot.getFederateNameSoftPublishDirectSet()) {
-                String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
-                InteractionRoot embeddedMessagingDirect = new InteractionRoot(embeddedMessagingHlaClassName);
-                embeddedMessagingDirect.setParameter("command", "discover");
-                embeddedMessagingDirect.setParameter("hlaClassName", objectRoot.getInstanceHlaClassName());
-
-                JSONObject topLevelJSONObject = new JSONObject();
-                topLevelJSONObject.put("object_handle", objectRoot.getObjectHandle());
-                embeddedMessagingDirect.setParameter("messagingJson", topLevelJSONObject.toString(4));
-
-                sendInteraction(embeddedMessagingDirect);
-            }
-        }
     }
 
     public void unregisterObject(ObjectRoot objectRoot) {
@@ -1287,7 +1262,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         receiveInteractionSFAux(interactionRoot);
     }
     private void receiveInteractionSFAux(InteractionRoot interactionRoot) {
-        if (!C2WInteractionRoot.is_reject_source_federate_id(interactionRoot) && !unmatchingFedFilterProvided(interactionRoot)) {
+        if (!unmatchingFedFilterProvided(interactionRoot)) {
             if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
                 receiveEmbeddedInteraction((EmbeddedMessaging)interactionRoot);
                 return;
@@ -1307,20 +1282,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         String hlaClassName = embeddedMessaging.get_hlaClassName();
         String federateSequence = embeddedMessaging.get_federateSequence();
 
-        if ("discover".equals(command)) {
-            JSONObject jsonObject = new JSONObject(embeddedMessaging.get_messagingJson());
-            int objectHandle = jsonObject.getInt("object_handle");
-            if (!ObjectRoot.get_object_hla_class_name_set().contains(hlaClassName)) {
-                logger.error(
-                        "SynchronizedFederate.receiveEmbeddedInteraction: Bad class name \"{}\" on discover",
-                        hlaClassName
-                );
-                return;
-            }
-            ObjectRoot.add_object_update_embedded_only_id(hlaClassName, objectHandle);
-            return;
-        }
-
         if ("interaction".equals(command)) {
             if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
@@ -1338,16 +1299,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         if ("object".equals(command)) {
-            if (!ObjectRoot.get_is_subscribed(hlaClassName) && !ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
+            if (!ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
                         "SynchronizedFederate.receiveEmbeddedInteraction:  object class \"{}\" " +
-                                "neither subscribed nor soft subscribed",
+                                "is not soft subscribed",
                         hlaClassName
                 );
                 return;
             }
             ObjectReflector objectReflector = ObjectRoot.fromJson(embeddedMessaging.get_messagingJson());
             objectReflector.setFederateSequence(federateSequence);
+            objectReflector.setTime(embeddedMessaging.getTime());
 
             _objectReflectionQueue.add(objectReflector);
             return;
@@ -1480,27 +1442,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         ObjectRoot.remove_object(theObject);
     }
 
-    private boolean checkNetworkReflect(int theObject) {
-        ObjectRoot objectRoot = ObjectRoot.get_object(theObject);
-        if (objectRoot == null) {
-            logger.warn(
-                    "Received \"reflectAttributeValues\" for object handle ({}) that has no corresponding object",
-                    theObject
-            );
-            return true;
-        }
-        String hlaClassName = objectRoot.getInstanceHlaClassName();
-        Set<Integer> objectHandleSet = ObjectRoot.get_object_update_embedded_only_id_set(hlaClassName);
-        if (objectHandleSet.contains(theObject)) {
-            logger.info(
-                    "Direct \"reflectAttributeValues\" for Object ({}) of class \"{}\" rejected as it should " +
-                            "only reflect via EmbeddedMessaging", theObject, hlaClassName
-            );
-            return true;
-        }
-        return false;
-    }
-
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchronizedFederate class uses this
      * method to receive receive-order attribute reflections for an object class
@@ -1525,10 +1466,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     @Override
     public void reflectAttributeValues(int theObject, ReflectedAttributes theAttributes, byte[] userSuppliedTag) {
-
-        if (checkNetworkReflect(theObject)) {
-            return;
-        }
 
         addObjectReflector(theObject, theAttributes);
 
@@ -1569,10 +1506,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
-        if (checkNetworkReflect(theObject)) {
-            return;
-        }
-
         addObjectReflector(theObject, theAttributes, theTime);
         // createLog(theObject, theAttributes, theTime);
     }

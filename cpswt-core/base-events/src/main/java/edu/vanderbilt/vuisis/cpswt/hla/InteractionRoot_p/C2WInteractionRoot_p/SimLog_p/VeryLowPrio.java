@@ -168,6 +168,7 @@ public class VeryLowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -199,6 +200,8 @@ public class VeryLowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.VeryLowPrio\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -413,18 +416,6 @@ public class VeryLowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
     //----------------------------------
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
-
-    public static void add_reject_source_federate_id(String federateId) {
-        add_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static boolean is_reject_source_federate_id(String federateId) {
-        return is_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
-
-    public static void remove_reject_source_federate_id(String federateId) {
-        remove_reject_source_federate_id(get_hla_class_name(), federateId);
-    }
 
     protected VeryLowPrio(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);

@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 import java.io.File;
 import java.io.FileReader;
@@ -220,37 +221,48 @@ public class ObjectRoot implements ObjectRootInterface {
                     }
                 }
             }
-
-            //-------------------------------------------------------
-            // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
-            //-------------------------------------------------------
-            _classNamePublishStatusMap.put(localHlaClassName, false);
-            _classNameSubscribeStatusMap.put(localHlaClassName, false);
-            _classNameSoftSubscribeStatusMap.put(localHlaClassName, false);
             //-------------------------------------------------------
             // FOR OBJECTS, INITIALIZE
             // - _classNamePublishedAttributeHandleSetMap
             // - _classNameSubscribedAttributeHandleSetMap
-            // - _classNamePublishedAttributeNameSetMap
-            // - _classNameSubscribedAttributeNameSetMap
-            //
-            // EACH localHlaClassName INITIALLY HAS
-            // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
-            // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
             //-------------------------------------------------------
             AttributeHandleSet publishedAttributeHandleSet = _rtiFactory.createAttributeHandleSet();
             _classNamePublishedAttributeHandleSetMap.put(localHlaClassName, publishedAttributeHandleSet);
 
             AttributeHandleSet subscribedAttributeHandleSet = _rtiFactory.createAttributeHandleSet();
             _classNameSubscribedAttributeHandleSetMap.put(localHlaClassName, subscribedAttributeHandleSet);
-
-            Set<ClassAndPropertyName> publishedAttributeNameSet = new HashSet<>();
-            _classNamePublishedAttributeNameSetMap.put(localHlaClassName, publishedAttributeNameSet);
-
-            Set<ClassAndPropertyName> subscribedAttributeNameSet = new HashSet<>();
-            _classNameSubscribedAttributeNameSetMap.put(localHlaClassName, subscribedAttributeNameSet);
         }
     }
+
+    protected static void commonInit(String hlaClassName) {
+        //-------------------------------------------------------
+        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+        //-------------------------------------------------------
+        _classNamePublishStatusMap.put(hlaClassName, false);
+        _classNameSubscribeStatusMap.put(hlaClassName, false);
+        _classNameSoftSubscribeStatusMap.put(hlaClassName, false);
+
+        //-------------------------------------------------------
+        // FOR OBJECTS, INITIALIZE
+        // - _classNamePublishedAttributeNameSetMap
+        // - _classNameSubscribedAttributeNameSetMap
+        // - _classNameSoftSubscribedAttributeNameSetMap
+        //
+        // EACH localHlaClassName INITIALLY HAS
+        // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
+        // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+        // - NO SOFT SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+        //-------------------------------------------------------
+        Set<ClassAndPropertyName> publishedAttributeNameSet = new HashSet<>();
+        _classNamePublishedAttributeNameSetMap.put(hlaClassName, publishedAttributeNameSet);
+
+        Set<ClassAndPropertyName> subscribedAttributeNameSet = new HashSet<>();
+        _classNameSubscribedAttributeNameSetMap.put(hlaClassName, subscribedAttributeNameSet);
+
+        Set<ClassAndPropertyName> softSubscribedAttributeNameSet = new HashSet<>();
+        _classNameSoftSubscribedAttributeNameSetMap.put(hlaClassName, softSubscribedAttributeNameSet);
+    }
+
 
     //-------------------------------------------------------------------------------------------
     // _instanceHlaClassName IS THE HLA CLASS NAME OF THIS MESSAGING OBJECT JAVA INSTANCE.
@@ -510,6 +522,10 @@ public class ObjectRoot implements ObjectRootInterface {
             return ObjectRoot.get_object(this.objectHandle);
         }
 
+        public void setTime(double time) {
+            this.time = time;
+        }
+
         public double getTime() {
             return this.time;
         }
@@ -540,6 +556,8 @@ public class ObjectRoot implements ObjectRootInterface {
     // - THE DYNAMIC-MESSAGE-CLASSES FILE
     //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
+
+    protected static Set<ClassAndPropertyName> _completeClassAndPropertyNameSet = new HashSet<>();
 
     //--------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
@@ -612,6 +630,13 @@ public class ObjectRoot implements ObjectRootInterface {
       * className object class
       */
     public static List<ClassAndPropertyName> get_attribute_names( String hlaClassName ) {
+
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            HashSet<String> hlaClassNameSet = new HashSet<>();
+            hlaClassNameSet.add(hlaClassName);
+            readFederateDynamicMessageClasses(hlaClassNameSet);
+        }
+
         List<ClassAndPropertyName> classAndPropertyNameList = new ArrayList<>(
           _classNamePropertyNameSetMap.get( hlaClassName )
         );
@@ -825,21 +850,21 @@ public class ObjectRoot implements ObjectRootInterface {
     public static ObjectRoot create_object(String hlaClassName) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName ) : null
           : instance.createObject();
     }
 
     public static ObjectRoot create_object(String hlaClassName, LogicalTime logicalTime) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, logicalTime ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName, logicalTime ) : null
           : instance.createObject( logicalTime );
     }
 
     public static ObjectRoot create_object(String hlaClassName, ReflectedAttributes propertyMap) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName ) ? new ObjectRoot( hlaClassName, propertyMap ) : null
+          ? _classNameHandleMap.containsKey(hlaClassName) ? new ObjectRoot( hlaClassName, propertyMap ) : null
           : instance.createObject( propertyMap );
     }
 
@@ -848,7 +873,7 @@ public class ObjectRoot implements ObjectRootInterface {
     ) {
         ObjectRoot instance = _hlaClassNameInstanceMap.getOrDefault(hlaClassName, null);
         return instance == null
-          ? _hlaClassNameSet.contains( hlaClassName )
+          ? _classNameHandleMap.containsKey(hlaClassName)
             ? new ObjectRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createObject( propertyMap, logicalTime );
     }
@@ -1001,47 +1026,50 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNamePublishedAttributeNameSetMap.getOrDefault(hlaClassName, null);
     }
 
-
     private static void pub_sub_class_and_property_name(
+      String callingFunctionName,
       Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
-      String className,
+      String hlaClassName,
       String attributeClassName,
       String attributeName,
       boolean publish,
       boolean insert
     ) {
-        String prefix = insert ? "" : "un";
-        String pubsub = publish ? "publish" : "subscribe";
-        String operationName = prefix + pubsub;
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            Set<String> singletonSet = new HashSet<>();
+            singletonSet.add(hlaClassName);
+            readFederateDynamicMessageClasses(singletonSet);
+        }
 
-        if (!className.startsWith(attributeClassName)) {
+        if (!hlaClassName.startsWith(attributeClassName)) {
             logger.error(
-                "{}_attribute(\"{}\", \"{}\", \"{}\"): the \"{}\" class cannot {} attribute of " +
-                "a class (\"{}\") that is out of its inheritance hierarchy.",
-                operationName, className, attributeClassName, attributeName,
-                className, operationName, attributeClassName
+                "{}(\"{}\", \"{}\", \"{}\"): the \"{}\" class cannot access an attribute of " +
+                "class (\"{}\") because it is out of its inheritance hierarchy.",
+                callingFunctionName, hlaClassName, attributeClassName, attributeName, hlaClassName, attributeClassName
             );
             return;
         }
         ClassAndPropertyName key = findProperty(attributeClassName, attributeName);
         if (key == null) {
             logger.error(
-                "{}_attribute(\"{}\", \"{}\", \"{}\"):  no such attribute \"{}\" for class \"{}\".",
-                operationName, className, attributeClassName, attributeName, attributeName, attributeClassName
+                "{}(\"{}\", \"{}\", \"{}\"):  \"{}\" attribute does not exist in \"{}\" " +
+                "class or any of its base classes",
+                callingFunctionName, hlaClassName, attributeClassName, attributeName, attributeName, attributeClassName
             );
             return;
         }
 
         if (insert) {
-            classNamePubSubAttributeNameSetMap.get(className).add(key);
+            classNamePubSubAttributeNameSetMap.get(hlaClassName).add(key);
         } else {
-            classNamePubSubAttributeNameSetMap.get(className).remove(key);
+            classNamePubSubAttributeNameSetMap.get(hlaClassName).remove(key);
         }
     }
 
     public static void publish_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, true
+          "publish_attribute", _classNamePublishedAttributeNameSetMap,
+          className, attributeClassName, attributeName, true, true
         );
     }
 
@@ -1068,7 +1096,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void unpublish_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNamePublishedAttributeNameSetMap, className, attributeClassName, attributeName, true, false
+          "unpublish_attribute", _classNamePublishedAttributeNameSetMap,
+          className, attributeClassName, attributeName, true, false
         );
     }
 
@@ -1118,8 +1147,10 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void subscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, true
+          "subscribe_attribute", _classNameSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, true
         );
+        soft_unsubscribe_attribute(className, attributeClassName, attributeName);
     }
 
     /**
@@ -1145,7 +1176,8 @@ public class ObjectRoot implements ObjectRootInterface {
 
     public static void unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
         pub_sub_class_and_property_name(
-          _classNameSubscribedAttributeNameSetMap, className, attributeClassName, attributeName, false, false
+          "unsubscribe_attribute", _classNameSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, false
         );
     }
     /**
@@ -1167,6 +1199,101 @@ public class ObjectRoot implements ObjectRootInterface {
       */
     public static void unsubscribe_attribute( String className, String attributeName ) {
         unsubscribe_attribute(className, className, attributeName);
+    }
+
+    //---------------------------------------------
+    // END CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //---------------------------------------------
+
+    //----------------------------------------------
+    // CLASS-NAME SOFT-SUBSCRIBED-ATTRIBUTE-NAME SET
+    //
+    // INITIALIZED BY:
+    // - init(RTIambassador) ABOVE
+    //----------------------------------------------
+    protected static Map<String, Set<ClassAndPropertyName>> _classNameSoftSubscribedAttributeNameSetMap =
+            new HashMap<>();
+
+    //----------------------------------------------------------
+    // METHODS THAT USE CLASS-NAME SUBSCRIBED-ATTRIBUTE-NAME SET
+    //
+    // ALSO USED BY:
+    // - subscribe_object BELOW
+    //----------------------------------------------------------
+
+    public static Set<ClassAndPropertyName> get_soft_subscribed_attribute_name_set(String hlaClassName) {
+        return _classNameSoftSubscribedAttributeNameSetMap.getOrDefault(hlaClassName, null);
+    }
+
+    public static void soft_subscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          "soft_subscribe_attribute", _classNameSoftSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, true
+        );
+        unsubscribe_attribute(className, attributeClassName, attributeName);
+    }
+
+    /**
+      * Soft subscribe a federate to the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the subscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * subscription.  The attribute doesn't actually get subscribed to until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void soft_subscribe_attribute( String className, String attributeName ) {
+        soft_subscribe_attribute(className, className, attributeName);
+    }
+
+    private static final Set<ClassAndPropertyName> dummyClassAndPropertyNameSet = new HashSet<>();
+
+    public static boolean is_soft_subscribed_attribute(String className, String attributeClassName, String attributeName) {
+        ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(attributeClassName, attributeName);
+
+        Set<ClassAndPropertyName> classAndPropertyNameSet = _classNameSoftSubscribedAttributeNameSetMap.getOrDefault(
+                className, dummyClassAndPropertyNameSet
+        );
+        return classAndPropertyNameSet.contains(classAndPropertyName);
+    }
+
+    public static boolean is_aoft_subscribed_attribute(String className, String attributeName) {
+        return is_soft_subscribed_attribute(className, className, attributeName);
+    }
+
+    public static void soft_unsubscribe_attribute(String className, String attributeClassName, String attributeName) {
+        pub_sub_class_and_property_name(
+          "soft_unsubscribe_attribute", _classNameSoftSubscribedAttributeNameSetMap,
+          className, attributeClassName, attributeName, false, false
+        );
+    }
+    /**
+      * Unsubscribe a federate from the attribute named by "attributeName" of the
+      * object class named by "className".  This can also be performed by calling
+      * the unsubscribe_<attributeName>() method directly on the object class named
+      * by "className".
+      *
+      * Note:  This method only marks the attribute named by "attributeName" for
+      * unsubscription.  The attribute doesn't actually get unsubscribed from until the
+      * "className" object class, of which it is a member, is (re)subscribed to.
+      * See {@link ObjectRoot#subscribe_object( String className, RTIambassador RTI )} and
+      * {@link ObjectRoot#subscribe_object( RTIambassador RTI )} for examples of how to
+      * subscribe to the object class.
+      *
+      * @param className name of object class for which the attribute named by
+      * "attributeName" is to be subcribed
+      * @param attributeName name of the attribute to be published
+      */
+    public static void soft_unsubscribe_attribute( String className, String attributeName ) {
+        soft_unsubscribe_attribute(className, className, attributeName);
     }
 
     //---------------------------------------------
@@ -1196,7 +1323,7 @@ public class ObjectRoot implements ObjectRootInterface {
             String localClassName = String.join(".", classNameComponents);
 
             ClassAndPropertyName key = new ClassAndPropertyName(localClassName, propertyName);
-            if (_classAndPropertyNameHandleMap.containsKey(key)) {
+            if (_completeClassAndPropertyNameSet.contains(key)) {
                 return key;
             }
 
@@ -2245,6 +2372,7 @@ public class ObjectRoot implements ObjectRootInterface {
         // IN ObjectRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -2252,6 +2380,8 @@ public class ObjectRoot implements ObjectRootInterface {
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -2387,20 +2517,8 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNameSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
-    public static void add_object_update_embedded_only_id(int id) {
-        add_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static void remove_object_update_embedded_only_id(int id) {
-        remove_object_update_embedded_only_id(get_hla_class_name(), id);
-    }
-
-    public static Set<Integer> get_object_update_embedded_only_id_set() {
-        return get_object_update_embedded_only_id_set(get_hla_class_name());
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(int id) {
-        return get_is_object_update_embedded_only_id(get_hla_class_name(), id);
+    public static Set<ClassAndPropertyName> get_softSubscribed_attribute_name_set() {
+        return _classNameSoftSubscribedAttributeNameSetMap.get(get_hla_class_name());
     }
 
     public static void add_federate_name_soft_publish_direct(String federateName) {
@@ -2584,7 +2702,7 @@ public class ObjectRoot implements ObjectRootInterface {
      */
     public ObjectRoot( String hlaClassName ) {
         setInstanceHlaClassName(hlaClassName);
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.error("Constructor \"ObjectRoot( String hlaClassName )\": " +
               "hlaClassName \"{}\" is not defined -- creating dummy object with fictitious type \"{}\"",
               hlaClassName, hlaClassName
@@ -2925,6 +3043,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return get_subscribed_attribute_name_set( getInstanceHlaClassName() );
     }
 
+    public Set<ClassAndPropertyName> getSoftSubscribedAttributeNameSet() {
+        return get_soft_subscribed_attribute_name_set( getInstanceHlaClassName() );
+    }
+
     /**
      * Publishes the object class of this instance of the class for a federate.
      * Polymorphic equalivalent of publish_object static method.
@@ -3009,10 +3131,10 @@ public class ObjectRoot implements ObjectRootInterface {
         String className = jsonObject.getString("messaging_name");
         String federateSequence = jsonObject.getString("federateSequence");
 
-        Set<ClassAndPropertyName> subscribedAttributeNameSet = ObjectRoot.get_subscribed_attribute_name_set(
+        Set<ClassAndPropertyName> softSubscribedAttributeNameSet = ObjectRoot.get_soft_subscribed_attribute_name_set(
           className
         );
-        if (subscribedAttributeNameSet == null) {
+        if (softSubscribedAttributeNameSet == null) {
             logger.error("ObjectRoot:  fromJson:  no class \"{}\" is defined", className);
             return null;
         }
@@ -3021,7 +3143,7 @@ public class ObjectRoot implements ObjectRootInterface {
         JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
         for (String key : propertyJSONObject.keySet()) {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
-            if (subscribedAttributeNameSet.contains(classAndPropertyName)) {
+            if (softSubscribedAttributeNameSet.contains(classAndPropertyName)) {
                 Class<?> desiredType = ((Attribute<Object>)_classAndPropertyNameInitialValueMap.get(
                   classAndPropertyName
                 )).getValue().getClass();
@@ -3034,54 +3156,10 @@ public class ObjectRoot implements ObjectRootInterface {
         return objectReflector;
     }
 
-    private static final Map<String, Set<Integer>> _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap = new HashMap<>();
-
-    public static void add_object_update_embedded_only_id(String hlaClassName, int id) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
-            logger.warn(
-              "add_object_update_embedded_only_id(\"{}\", {}) -- no such object " +
-              "class \"{}\"", hlaClassName, id, hlaClassName
-            );
-            return;
-        }
-        if (!_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
-            _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.put(hlaClassName, new HashSet<>());
-        }
-        _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).add(id);
-    }
-
-    public static void remove_object_update_embedded_only_id(String hlaClassName, int id) {
-        if (_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName)) {
-            Set<Integer> integerSet = _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName);
-            integerSet.remove(id);
-            if (integerSet.isEmpty()) {
-                _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.remove(hlaClassName);
-            }
-        }
-    }
-
-    public static Set<Integer> get_object_update_embedded_only_id_set(String hlaClassName) {
-        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) ?
-            new HashSet<>(_hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName)) : new HashSet<>();
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(String hlaClassName, int id) {
-        return _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.containsKey(hlaClassName) &&
-          _hlaClassNameToObjectUpdateEmbeddedOnlyIdSetMap.get(hlaClassName).contains(id);
-    }
-
-    public static boolean get_is_object_update_embedded_only_id(int classId, int id) {
-        if (_classHandleNameMap.containsKey(classId)) {
-            String hlaClassName = _classHandleNameMap.get(classId);
-            return get_is_object_update_embedded_only_id(hlaClassName, id);
-        }
-        return false;
-    }
-
     private static Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.warn(
               "add_federate_name_soft_publish_direct(\"{}\", \"{}\") -- no such object " +
               "class \"{}\"", hlaClassName, federateName, hlaClassName
@@ -3117,7 +3195,7 @@ public class ObjectRoot implements ObjectRootInterface {
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish(String hlaClassName, String federateName) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             logger.warn(
               "add_federate_name_soft_publish(\"{}\", \"{}\") -- no such object class \"{}\"",
               hlaClassName, federateName, hlaClassName
@@ -3178,18 +3256,17 @@ public class ObjectRoot implements ObjectRootInterface {
     public static void readFederationJson(Reader reader) {
         federationJson = new JSONObject( new JSONTokener(reader) );
     }
-
-    private static final Map<String, Object> _typeInitialValueMap = new HashMap<>();
+    private static final Map<String, Attribute<Object>> _typeInitialValueMap = new HashMap<>();
     static {
-        _typeInitialValueMap.put("boolean", false);
-        _typeInitialValueMap.put("byte", (byte)0);
-        _typeInitialValueMap.put("char", (char)0);
-        _typeInitialValueMap.put("double", (double)0);
-        _typeInitialValueMap.put("float", (float)0);
-        _typeInitialValueMap.put("int", 0);
-        _typeInitialValueMap.put("long", (long)0);
-        _typeInitialValueMap.put("short", (short)0);
-        _typeInitialValueMap.put("String", "");
+        _typeInitialValueMap.put("boolean", new Attribute<>(false));
+        _typeInitialValueMap.put("byte", new Attribute<>((byte)0));
+        _typeInitialValueMap.put("char", new Attribute<>((char)0));
+        _typeInitialValueMap.put("double", new Attribute<>((double)0));
+        _typeInitialValueMap.put("float", new Attribute<>((float)0));
+        _typeInitialValueMap.put("int", new Attribute<>(0));
+        _typeInitialValueMap.put("long", new Attribute<>((long)0));
+        _typeInitialValueMap.put("short", new Attribute<>((short)0));
+        _typeInitialValueMap.put("String", new Attribute<>(""));
     }
 
     public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {
@@ -3270,6 +3347,8 @@ public class ObjectRoot implements ObjectRootInterface {
             }
 
             _classNamePropertyNameSetMap.put(hlaClassName, classAndPropertyNameSet);
+
+            _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
         }
 
         for(String hlaClassName: localHlaClassNameSet) {
@@ -3285,6 +3364,8 @@ public class ObjectRoot implements ObjectRootInterface {
             }
 
             _allClassNamePropertyNameSetMap.put(hlaClassName, allClassAndPropertyNameSet);
+
+            commonInit(hlaClassName);
         }
     }
 
@@ -3308,10 +3389,12 @@ public class ObjectRoot implements ObjectRootInterface {
     }
 
     private static boolean loadDynamicHlaClass(String hlaClassName, RTIambassador rtiAmbassador) {
-        if (!_hlaClassNameSet.contains(hlaClassName)) {
-            readFederateDynamicMessageClass(hlaClassName);
+        if (!_classNameHandleMap.containsKey(hlaClassName)) {
             if (!_hlaClassNameSet.contains(hlaClassName)) {
-                return false;
+                readFederateDynamicMessageClass(hlaClassName);
+                if (!_hlaClassNameSet.contains(hlaClassName)) {
+                    return false;
+                }
             }
             init(hlaClassName, rtiAmbassador);
         }

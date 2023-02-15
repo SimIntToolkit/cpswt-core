@@ -61,20 +61,6 @@ public class Receiver extends ReceiverBase {
         testObject = (TestObject)objectRoot;
     }
 
-    private static void zeroOutTestObject(ObjectReflector reflector) {
-        TestObject testObject = (TestObject)reflector.getObjectRoot();
-        testObject.set_BooleanValue1(false);
-        testObject.set_BooleanValue2(false);
-        testObject.set_ByteValue((byte)0);
-        testObject.set_CharValue('\0');
-        testObject.set_DoubleValue(0.0);
-        testObject.set_FloatValue(0.0f);
-        testObject.set_IntValue(0);
-        testObject.set_LongValue(0L);
-        testObject.set_ShortValue((short)0);
-        testObject.set_StringValue("");
-    }
-
     private void checkReceivedSubscriptions() {
 
         ObjectReflector reflector;
