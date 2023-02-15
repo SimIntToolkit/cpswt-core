@@ -178,6 +178,7 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         // IN ObjectRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -208,6 +209,8 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         key = new ClassAndPropertyName(get_hla_class_name(), "FederateType");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(""));
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject\" (hla class \"{}\") loaded", get_hla_class_name()

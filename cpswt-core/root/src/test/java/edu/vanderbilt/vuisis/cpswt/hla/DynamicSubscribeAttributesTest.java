@@ -308,12 +308,9 @@ public class DynamicSubscribeAttributesTest {
 
         Set<ClassAndPropertyName> testBaseSubscribedClassAndPropertyNameSet =
                 ObjectRoot.get_subscribed_attribute_name_set(testBaseFullHlaClassName);
-        Assert.assertNull(testBaseSubscribedClassAndPropertyNameSet);
+        Assert.assertEquals(testBaseSubscribedClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
         ObjectRoot.subscribe_object(testBaseFullHlaClassName, rtiambassador);
-        testBaseSubscribedClassAndPropertyNameSet =
-                ObjectRoot.get_subscribed_attribute_name_set(testBaseFullHlaClassName);
-        Assert.assertEquals(testBaseSubscribedClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
 
         ObjectRoot.subscribe_attribute(
@@ -344,12 +341,9 @@ public class DynamicSubscribeAttributesTest {
 
         Set<ClassAndPropertyName> testDerivedSubscribedClassAndPropertyNameSet =
                 ObjectRoot.get_subscribed_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertNull(testDerivedSubscribedClassAndPropertyNameSet);
+        Assert.assertEquals(testDerivedSubscribedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
 
         ObjectRoot.subscribe_object(testDerivedFullHlaClassName, rtiambassador);
-        testDerivedSubscribedClassAndPropertyNameSet =
-                ObjectRoot.get_subscribed_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertEquals(testDerivedSubscribedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
 
 
         Assert.assertEquals(subscribedHlaClassNameAttributeHandleSetMap, localHlaClassNameAttributeHandleSetMap);

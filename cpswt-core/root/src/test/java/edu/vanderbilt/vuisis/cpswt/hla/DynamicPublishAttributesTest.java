@@ -312,13 +312,9 @@ public class DynamicPublishAttributesTest {
 
         Set<ClassAndPropertyName> testBasePublishedClassAndPropertyNameSet =
                 ObjectRoot.get_published_attribute_name_set(testBaseFullHlaClassName);
-        Assert.assertNull(testBasePublishedClassAndPropertyNameSet);
-
-        ObjectRoot.publish_object(testBaseFullHlaClassName, rtiambassador);
-        testBasePublishedClassAndPropertyNameSet =
-                ObjectRoot.get_published_attribute_name_set(testBaseFullHlaClassName);
         Assert.assertEquals(testBasePublishedClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
+        ObjectRoot.publish_object(testBaseFullHlaClassName, rtiambassador);
 
         ObjectRoot.publish_attribute(
                 testDerivedFullHlaClassName,
@@ -348,12 +344,9 @@ public class DynamicPublishAttributesTest {
 
         Set<ClassAndPropertyName> testDerivedPublishedClassAndPropertyNameSet =
                 ObjectRoot.get_published_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertNull(testDerivedPublishedClassAndPropertyNameSet);
+        Assert.assertEquals(testDerivedPublishedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
 
         ObjectRoot.publish_object(testDerivedFullHlaClassName, rtiambassador);
-        testDerivedPublishedClassAndPropertyNameSet =
-                ObjectRoot.get_published_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertEquals(testDerivedPublishedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
 
 
         Assert.assertEquals(publishedHlaClassNameAttributeHandleSetMap, localHlaClassNameAttributeHandleSetMap);

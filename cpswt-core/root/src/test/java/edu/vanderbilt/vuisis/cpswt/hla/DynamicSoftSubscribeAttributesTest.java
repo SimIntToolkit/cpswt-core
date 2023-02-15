@@ -308,12 +308,9 @@ public class DynamicSoftSubscribeAttributesTest {
 
         Set<ClassAndPropertyName> testBaseSoftSubscribedClassAndPropertyNameSet =
                 ObjectRoot.get_soft_subscribed_attribute_name_set(testBaseFullHlaClassName);
-        Assert.assertNull(testBaseSoftSubscribedClassAndPropertyNameSet);
+        Assert.assertEquals(testBaseSoftSubscribedClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
         ObjectRoot.soft_subscribe_object(testBaseFullHlaClassName, rtiambassador);
-        testBaseSoftSubscribedClassAndPropertyNameSet =
-                ObjectRoot.get_soft_subscribed_attribute_name_set(testBaseFullHlaClassName);
-        Assert.assertEquals(testBaseSoftSubscribedClassAndPropertyNameSet, classAndPropertyNameTestBaseSet);
 
 
         ObjectRoot.soft_subscribe_attribute(
@@ -344,12 +341,9 @@ public class DynamicSoftSubscribeAttributesTest {
 
         Set<ClassAndPropertyName> testDerivedSoftSubscribedClassAndPropertyNameSet =
                 ObjectRoot.get_soft_subscribed_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertNull(testDerivedSoftSubscribedClassAndPropertyNameSet);
+        Assert.assertEquals(testDerivedSoftSubscribedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
 
         ObjectRoot.soft_subscribe_object(testDerivedFullHlaClassName, rtiambassador);
-        testDerivedSoftSubscribedClassAndPropertyNameSet =
-                ObjectRoot.get_soft_subscribed_attribute_name_set(testDerivedFullHlaClassName);
-        Assert.assertEquals(testDerivedSoftSubscribedClassAndPropertyNameSet, classAndPropertyNameTestDerivedSet);
     }
 
 }

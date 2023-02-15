@@ -221,40 +221,48 @@ public class ObjectRoot implements ObjectRootInterface {
                     }
                 }
             }
-
-            //-------------------------------------------------------
-            // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
-            //-------------------------------------------------------
-            _classNamePublishStatusMap.put(localHlaClassName, false);
-            _classNameSubscribeStatusMap.put(localHlaClassName, false);
-            _classNameSoftSubscribeStatusMap.put(localHlaClassName, false);
             //-------------------------------------------------------
             // FOR OBJECTS, INITIALIZE
             // - _classNamePublishedAttributeHandleSetMap
             // - _classNameSubscribedAttributeHandleSetMap
-            // - _classNamePublishedAttributeNameSetMap
-            // - _classNameSubscribedAttributeNameSetMap
-            //
-            // EACH localHlaClassName INITIALLY HAS
-            // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
-            // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
             //-------------------------------------------------------
             AttributeHandleSet publishedAttributeHandleSet = _rtiFactory.createAttributeHandleSet();
             _classNamePublishedAttributeHandleSetMap.put(localHlaClassName, publishedAttributeHandleSet);
 
             AttributeHandleSet subscribedAttributeHandleSet = _rtiFactory.createAttributeHandleSet();
             _classNameSubscribedAttributeHandleSetMap.put(localHlaClassName, subscribedAttributeHandleSet);
-
-            Set<ClassAndPropertyName> publishedAttributeNameSet = new HashSet<>();
-            _classNamePublishedAttributeNameSetMap.put(localHlaClassName, publishedAttributeNameSet);
-
-            Set<ClassAndPropertyName> subscribedAttributeNameSet = new HashSet<>();
-            _classNameSubscribedAttributeNameSetMap.put(localHlaClassName, subscribedAttributeNameSet);
-
-            Set<ClassAndPropertyName> softSubscribedAttributeNameSet = new HashSet<>();
-            _classNameSoftSubscribedAttributeNameSetMap.put(localHlaClassName, softSubscribedAttributeNameSet);
         }
     }
+
+    protected static void commonInit(String hlaClassName) {
+        //-------------------------------------------------------
+        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+        //-------------------------------------------------------
+        _classNamePublishStatusMap.put(hlaClassName, false);
+        _classNameSubscribeStatusMap.put(hlaClassName, false);
+        _classNameSoftSubscribeStatusMap.put(hlaClassName, false);
+
+        //-------------------------------------------------------
+        // FOR OBJECTS, INITIALIZE
+        // - _classNamePublishedAttributeNameSetMap
+        // - _classNameSubscribedAttributeNameSetMap
+        // - _classNameSoftSubscribedAttributeNameSetMap
+        //
+        // EACH localHlaClassName INITIALLY HAS
+        // - NO PUBLISHED ATTRIBUTE HANDLES/NAMES
+        // - NO SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+        // - NO SOFT SUBSCRIBED ATTRIBUTE HANDLES/NAMES
+        //-------------------------------------------------------
+        Set<ClassAndPropertyName> publishedAttributeNameSet = new HashSet<>();
+        _classNamePublishedAttributeNameSetMap.put(hlaClassName, publishedAttributeNameSet);
+
+        Set<ClassAndPropertyName> subscribedAttributeNameSet = new HashSet<>();
+        _classNameSubscribedAttributeNameSetMap.put(hlaClassName, subscribedAttributeNameSet);
+
+        Set<ClassAndPropertyName> softSubscribedAttributeNameSet = new HashSet<>();
+        _classNameSoftSubscribedAttributeNameSetMap.put(hlaClassName, softSubscribedAttributeNameSet);
+    }
+
 
     //-------------------------------------------------------------------------------------------
     // _instanceHlaClassName IS THE HLA CLASS NAME OF THIS MESSAGING OBJECT JAVA INSTANCE.
@@ -548,6 +556,8 @@ public class ObjectRoot implements ObjectRootInterface {
     // - THE DYNAMIC-MESSAGE-CLASSES FILE
     //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
+
+    protected static Set<ClassAndPropertyName> _completeClassAndPropertyNameSet = new HashSet<>();
 
     //--------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
@@ -1016,112 +1026,6 @@ public class ObjectRoot implements ObjectRootInterface {
         return _classNamePublishedAttributeNameSetMap.getOrDefault(hlaClassName, null);
     }
 
-
-    private static class PubSubCacheEntry {
-        private final String _callingFunctionName;
-        private final String _primaryFunctionName;
-        private final Map<String, Set<ClassAndPropertyName>> _classNamePubSubAttributeNameSetMap;
-        private final String _hlaClassName;
-        private final String _attributeClassName;
-        private final String _attributeName;
-        private final boolean _publish;
-
-        public PubSubCacheEntry(
-                String callingFunctionName,
-                Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
-                String hlaClassName,
-                String attributeClassName,
-                String attributeName,
-                boolean publish
-        ) {
-            _callingFunctionName = callingFunctionName;
-            _primaryFunctionName = callingFunctionName.replace("un", "");
-            _classNamePubSubAttributeNameSetMap = classNamePubSubAttributeNameSetMap;
-            _hlaClassName = hlaClassName;
-            _attributeClassName = attributeClassName;
-            _attributeName = attributeName;
-            _publish = publish;
-        }
-
-        void replay() {
-            pub_sub_class_and_property_name(
-                    _callingFunctionName,
-                    _classNamePubSubAttributeNameSetMap,
-                    _hlaClassName,
-                    _attributeClassName,
-                    _attributeName,
-                    _publish,
-                    true
-            );
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            PubSubCacheEntry that = (PubSubCacheEntry) o;
-            return _publish == that._publish &&
-                    _primaryFunctionName.equals(that._primaryFunctionName) &&
-                    _hlaClassName.equals(that._hlaClassName) &&
-                    _attributeClassName.equals(that._attributeClassName) &&
-                    _attributeName.equals(that._attributeName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(_primaryFunctionName, _hlaClassName, _attributeClassName, _attributeName, _publish);
-        }
-    }
-
-    private static final Map<String, Set<PubSubCacheEntry>> _hlaClassNameToPubSubCacheMap = new HashMap<>();
-
-    private static void add_to_pub_sub_cache(
-            String callingFunctionName,
-            Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
-            String hlaClassName,
-            String attributeClassName,
-            String attributeName,
-            boolean publish,
-            boolean insert
-    ) {
-        if (insert) {
-            if (!_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
-                _hlaClassNameToPubSubCacheMap.put(hlaClassName, new HashSet<>());
-            }
-            Set<PubSubCacheEntry> pubSubCacheEntrySet = _hlaClassNameToPubSubCacheMap.get(hlaClassName);
-            pubSubCacheEntrySet.add(new PubSubCacheEntry(
-                    callingFunctionName,
-                    classNamePubSubAttributeNameSetMap,
-                    hlaClassName,
-                    attributeClassName,
-                    attributeName,
-                    publish
-            ));
-        } else if (_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
-            Set<PubSubCacheEntry> pubSubCacheEntrySet = _hlaClassNameToPubSubCacheMap.get(hlaClassName);
-            pubSubCacheEntrySet.remove(new PubSubCacheEntry(
-                    callingFunctionName,
-                    classNamePubSubAttributeNameSetMap,
-                    hlaClassName,
-                    attributeClassName,
-                    attributeName,
-                    publish
-            ));
-            if (pubSubCacheEntrySet.isEmpty()) {
-                _hlaClassNameToPubSubCacheMap.remove(hlaClassName);
-            }
-        }
-    }
-
-    private static void replay_pub_sub(String hlaClassName) {
-        if (_hlaClassNameToPubSubCacheMap.containsKey(hlaClassName)) {
-            for(PubSubCacheEntry pubSubCacheEntry : _hlaClassNameToPubSubCacheMap.get(hlaClassName)) {
-                pubSubCacheEntry.replay();
-            }
-            _hlaClassNameToPubSubCacheMap.remove(hlaClassName);
-        }
-    }
-
     private static void pub_sub_class_and_property_name(
       String callingFunctionName,
       Map<String, Set<ClassAndPropertyName>> classNamePubSubAttributeNameSetMap,
@@ -1131,17 +1035,10 @@ public class ObjectRoot implements ObjectRootInterface {
       boolean publish,
       boolean insert
     ) {
-        if (!_classNameHandleMap.containsKey(hlaClassName)) {
-            add_to_pub_sub_cache(
-                    callingFunctionName,
-                    classNamePubSubAttributeNameSetMap,
-                    hlaClassName,
-                    attributeClassName,
-                    attributeName,
-                    publish,
-                    insert
-            );
-            return;
+        if (!_hlaClassNameSet.contains(hlaClassName)) {
+            Set<String> singletonSet = new HashSet<>();
+            singletonSet.add(hlaClassName);
+            readFederateDynamicMessageClasses(singletonSet);
         }
 
         if (!hlaClassName.startsWith(attributeClassName)) {
@@ -1426,7 +1323,7 @@ public class ObjectRoot implements ObjectRootInterface {
             String localClassName = String.join(".", classNameComponents);
 
             ClassAndPropertyName key = new ClassAndPropertyName(localClassName, propertyName);
-            if (_classAndPropertyNameHandleMap.containsKey(key)) {
+            if (_completeClassAndPropertyNameSet.contains(key)) {
                 return key;
             }
 
@@ -2475,6 +2372,7 @@ public class ObjectRoot implements ObjectRootInterface {
         // IN ObjectRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -2482,6 +2380,8 @@ public class ObjectRoot implements ObjectRootInterface {
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN ObjectRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -3447,6 +3347,8 @@ public class ObjectRoot implements ObjectRootInterface {
             }
 
             _classNamePropertyNameSetMap.put(hlaClassName, classAndPropertyNameSet);
+
+            _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
         }
 
         for(String hlaClassName: localHlaClassNameSet) {
@@ -3462,6 +3364,8 @@ public class ObjectRoot implements ObjectRootInterface {
             }
 
             _allClassNamePropertyNameSetMap.put(hlaClassName, allClassAndPropertyNameSet);
+
+            commonInit(hlaClassName);
         }
     }
 
@@ -3493,7 +3397,6 @@ public class ObjectRoot implements ObjectRootInterface {
                 }
             }
             init(hlaClassName, rtiAmbassador);
-            replay_pub_sub(hlaClassName);
         }
         return true;
     }

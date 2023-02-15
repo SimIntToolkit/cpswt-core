@@ -177,6 +177,7 @@ public class SimLog extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -219,6 +220,8 @@ public class SimLog extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2
 
         key = new ClassAndPropertyName(get_hla_class_name(), "Time");
         _classAndPropertyNameInitialValueMap.put(key, (double)0);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog\" (hla class \"{}\") loaded", get_hla_class_name()

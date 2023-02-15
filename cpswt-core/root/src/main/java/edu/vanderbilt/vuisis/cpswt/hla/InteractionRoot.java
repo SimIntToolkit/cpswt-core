@@ -220,15 +220,18 @@ public class InteractionRoot implements InteractionRootInterface {
                     }
                 }
             }
-
-            //-------------------------------------------------------
-            // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
-            //-------------------------------------------------------
-            _classNamePublishStatusMap.put(localHlaClassName, false);
-            _classNameSubscribeStatusMap.put(localHlaClassName, false);
-            _classNameSoftSubscribeStatusMap.put(localHlaClassName, false);
         }
     }
+
+    protected static void commonInit(String hlaClassName) {
+        //-------------------------------------------------------
+        // INITIALIZE ALL CLASSES TO NOT-PUBLISHED NOT-SUBSCRIBED
+        //-------------------------------------------------------
+        _classNamePublishStatusMap.put(hlaClassName, false);
+        _classNameSubscribeStatusMap.put(hlaClassName, false);
+        _classNameSoftSubscribeStatusMap.put(hlaClassName, false);
+    }
+
 
     //-------------------------------------------------------------------------------------------
     // _instanceHlaClassName IS THE HLA CLASS NAME OF THIS MESSAGING OBJECT JAVA INSTANCE.
@@ -281,6 +284,8 @@ public class InteractionRoot implements InteractionRootInterface {
     // - THE DYNAMIC-MESSAGE-CLASSES FILE
     //-------------------------------------------------------------------------
     protected static Set<String> _hlaClassNameSet = new HashSet<>();
+
+    protected static Set<ClassAndPropertyName> _completeClassAndPropertyNameSet = new HashSet<>();
 
     //--------------------------------------------------------------
     // METHODS THAT USE HLA CLASS-NAME-SET
@@ -745,7 +750,7 @@ public class InteractionRoot implements InteractionRootInterface {
             String localClassName = String.join(".", classNameComponents);
 
             ClassAndPropertyName key = new ClassAndPropertyName(localClassName, propertyName);
-            if (_classAndPropertyNameHandleMap.containsKey(key)) {
+            if (_completeClassAndPropertyNameSet.contains(key)) {
                 return key;
             }
 
@@ -1356,6 +1361,7 @@ public class InteractionRoot implements InteractionRootInterface {
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -1363,6 +1369,8 @@ public class InteractionRoot implements InteractionRootInterface {
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot\" (hla class \"{}\") loaded", get_hla_class_name()
@@ -2151,6 +2159,8 @@ public class InteractionRoot implements InteractionRootInterface {
             }
 
             _classNamePropertyNameSetMap.put(hlaClassName, classAndPropertyNameSet);
+
+            _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
         }
 
         for(String hlaClassName: localHlaClassNameSet) {
@@ -2166,6 +2176,8 @@ public class InteractionRoot implements InteractionRootInterface {
             }
 
             _allClassNamePropertyNameSetMap.put(hlaClassName, allClassAndPropertyNameSet);
+
+            commonInit(hlaClassName);
         }
     }
 

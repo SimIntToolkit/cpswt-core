@@ -168,6 +168,7 @@ public class LowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -199,6 +200,8 @@ public class LowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
         _allClassNamePropertyNameSetMap.put(get_hla_class_name(), allClassAndPropertyNameSet);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.LowPrio\" (hla class \"{}\") loaded", get_hla_class_name()

@@ -177,6 +177,7 @@ public class FederateJoinInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Int
         // IN InteractionRoot
         _classNamePropertyNameSetMap.put(get_hla_class_name(), classAndPropertyNameSet);
 
+        _completeClassAndPropertyNameSet.addAll(classAndPropertyNameSet);
 
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
@@ -219,6 +220,8 @@ public class FederateJoinInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Int
 
         key = new ClassAndPropertyName(get_hla_class_name(), "IsLateJoiner");
         _classAndPropertyNameInitialValueMap.put(key, false);
+
+        commonInit(get_hla_class_name());
 
         logger.info(
           "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction\" (hla class \"{}\") loaded", get_hla_class_name()
