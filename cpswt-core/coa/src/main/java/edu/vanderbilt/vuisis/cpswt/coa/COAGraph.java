@@ -86,83 +86,11 @@ public class COAGraph {
 			for (COANode node: _allNodes.values()) {
 				if (COANodeType.Action == node.getNodeType()) {
 					COAAction actionNode = (COAAction) node;
-					loadPublishedInteractionAndConfigurePublish(actionNode.getInteractionClassName(), federationName, rti);
+					InteractionRoot.publish_interaction(actionNode.getInteractionClassName(), rti);
 				} else if (COANodeType.Outcome == node.getNodeType()) {
 					COAOutcome outcomeNode = (COAOutcome) node;
-					loadSubscribedInteractionAndConfigureSubscribe(outcomeNode.getInteractionClassName(), federationName, rti);
-					logger.trace("COAGraph: Before setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
-					outcomeNode.setInteractionClassHandle(InteractionRoot.get_class_handle(outcomeNode.getInteractionClassName()));
-					logger.trace("COAGraph: After setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
+					InteractionRoot.subscribe_interaction(outcomeNode.getInteractionClassName(), rti);
 				}
-			}
-		}
-	}
-
-	public Class loadInteractionClass(String intrFullyQualifiedName, String federationName) {
-		// Get class name for the fully qualified interaction name and try loading it
-		logger.trace("COAGraph: Interaction class name: {}... Now trying to load interaction class", intrFullyQualifiedName);
-		String intrClassName = federationName + "." + intrFullyQualifiedName.substring( intrFullyQualifiedName.lastIndexOf( '.' ) + 1 );
-		Class intrClass = null;
-		try {
-			intrClass = Class.forName(intrClassName);
-			logger.trace("COAGraph: Class loaded successfully: {}", intrClassName);
-			return intrClass;
-		} catch (Exception e) {
-			logger.error("COAGraph: Could not load class: {}", intrClassName);
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	public InteractionRoot createInteractionInstance(String intrFullyQualifiedName, String intrClassName) {
-		logger.trace("COAGraph: Trying to create interaction using class: {}", intrClassName);
-        InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrFullyQualifiedName);
-		logger.trace("COAGraph: Interaction created was: {}", interactionRoot);
-		return interactionRoot;
-	}
-
-	public void publishOrSubscribeAnInteractionClass(Class intrClass, RTIambassador rti, boolean bPublish) {
-		synchronized (rti) {
-			logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Got interaction class as: {}", intrClass);
-			if (intrClass == null)
-				return;
-			try {
-				Class[] pubSubMethodArgs = new Class[1];
-				pubSubMethodArgs[0] = hla.rti.RTIambassador.class;
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Getting Publish/Subscribe method to invoke");
-				Method pubSubMethod = null;
-				if (bPublish) {
-					pubSubMethod = intrClass.getDeclaredMethod("publish", pubSubMethodArgs);
-				} else {
-					pubSubMethod = intrClass.getDeclaredMethod("subscribe", pubSubMethodArgs);
-				}
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Invoking Publish/Subscribe method: {}", pubSubMethod);
-				pubSubMethod.invoke(null, rti);
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Publish/Subscribe method invokation was successful");
-			} catch (Exception e) {
-				logger.error("COAGraph:publishOrSubscribeAnInteractionClass: Failed to invoke Publish/Subscribe method");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void loadPublishedInteractionAndConfigurePublish(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
-		synchronized (rti) {
-			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
-			if ( intrClass != null ) {
-				logger.trace("COAGraph: For COAs, PUBLISHING interaction class: {}", intrClass);
-				publishOrSubscribeAnInteractionClass(intrClass, rti, true);
-			}
-		}
-	}
-
-	public void loadSubscribedInteractionAndConfigureSubscribe(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
-		synchronized(rti) {
-			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
-			if ( intrClass != null ) {
-				logger.trace("COAGraph: For COAs, SUBSCRIBING to interaction class: {}", intrClass);
-				publishOrSubscribeAnInteractionClass(intrClass, rti, false);
 			}
 		}
 	}

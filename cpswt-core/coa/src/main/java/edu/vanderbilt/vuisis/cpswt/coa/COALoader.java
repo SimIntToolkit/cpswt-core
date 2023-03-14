@@ -159,7 +159,7 @@ public class COALoader {
         }
 
         logger.info("Loaded COAGraph successfully");
-        logger.debug("Loaded the following COAGraph:\n{}" + coaGraph);
+        logger.debug("Loaded the following COAGraph:\n{}", coaGraph);
 
         return coaGraph;
     }

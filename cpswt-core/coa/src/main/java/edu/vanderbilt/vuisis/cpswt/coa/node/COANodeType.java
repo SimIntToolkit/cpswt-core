@@ -46,7 +46,7 @@ public enum COANodeType {
     TerminateSimulation("TerminateSimulation"),
     Unknown("Unknown");
 
-    static HashMap<COANodeType, Class> classMapping;
+    static final HashMap<COANodeType, Class<? extends COANode>> classMapping;
     static {
         classMapping = new HashMap<>();
         classMapping.put(COANodeType.Action, COAAction.class);
@@ -62,7 +62,7 @@ public enum COANodeType {
         classMapping.put(COANodeType.TerminateSimulation, COANode.class);
     }
 
-    private String name;
+    private final String name;
 
     COANodeType(String name) {
         this.name = name;
@@ -71,7 +71,7 @@ public enum COANodeType {
     public String getName() {
         return this.name;
     }
-    public Class<COANode> getCOANodeClass() {
+    public Class<? extends COANode> getCOANodeClass() {
         return classMapping.get(this);
     }
 }

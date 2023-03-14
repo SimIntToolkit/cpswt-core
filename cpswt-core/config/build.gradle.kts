@@ -53,6 +53,7 @@ dependencies {
     implementation(group="org.apache.commons", name="commons-lang3", version="3.12.0")
 
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
 }
 
 publishing {

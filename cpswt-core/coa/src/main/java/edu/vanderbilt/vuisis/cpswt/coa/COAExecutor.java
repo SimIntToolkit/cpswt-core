@@ -30,13 +30,14 @@
 
 package edu.vanderbilt.vuisis.cpswt.coa;
 
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface;
+import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COAAction;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COAAwaitN;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COADuration;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COAFork;
-import edu.vanderbilt.vuisis.cpswt.coa.COAGraph;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COANode;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COAOutcome;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COAOutcomeFilter;
@@ -44,12 +45,9 @@ import edu.vanderbilt.vuisis.cpswt.coa.node.COAProbabilisticChoice;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COARandomDuration;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COASyncPoint;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COANodeType;
-import hla.rti.LogicalTime;
-import hla.rti.RTIambassador;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
-import org.portico.impl.hla13.types.DoubleTime;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -63,41 +61,47 @@ public class COAExecutor {
     private COAGraph _coaGraph = new COAGraph();
 
     // Cache class and methods for COAOutcomeFilter evaluation
-    private Class outcomeFilterEvaluatorClass = null;
-    private HashMap<COAOutcomeFilter, Method> _outcomeFilter2EvalMethodMap = new HashMap<COAOutcomeFilter, Method>();
+    private Class<?> outcomeFilterEvaluatorClass = null;
+    private final HashMap<COAOutcomeFilter, Method> _outcomeFilter2EvalMethodMap = new HashMap<>();
 
     private final String federationId;
     private final String federateId;
     private final double lookahead;
     private final boolean terminateOnCoaFinish;
-    private RTIambassador rti;
+    private SynchronizedFederate synchronizedFederate;
 
-    private Map<Integer, ArrayList<ArrivedInteraction>> _arrived_interactions = new HashMap<Integer, ArrayList<ArrivedInteraction>>();
+    private final Map<String, ArrayList<ArrivedInteraction>> _arrived_interactions = new HashMap<>();
 
     private COAExecutorEventListener coaExecutorEventListener;
     public void setCoaExecutorEventListener(COAExecutorEventListener listener) {
         this.coaExecutorEventListener = listener;
     }
 
-    public COAExecutor(String federationId, String federateId, double lookahead, boolean terminateOnCoaFinish, RTIambassador rti) {
+    public COAExecutor(
+            String federationId,
+            String federateId,
+            double lookahead,
+            boolean terminateOnCoaFinish,
+            SynchronizedFederate synchronizedFederate
+    ) {
         this.federationId = federationId;
         this.federateId = federateId;
         this.lookahead = lookahead;
         this.terminateOnCoaFinish = terminateOnCoaFinish;
-        this.rti = rti;
+        this.synchronizedFederate = synchronizedFederate;
     }
 
     public void setCOAGraph(COAGraph graph) {
         this._coaGraph = graph;
     }
 
-    public void setRTIambassador(RTIambassador rti) {
-        this.rti = rti;
+    public void setSynchronizedFederate(SynchronizedFederate synchronizedFederate) {
+        this.synchronizedFederate = synchronizedFederate;
     }
 
     public void initializeCOAGraph() {
     // this._coaGraph.setCurrentRootNodesAsActive();
-        this._coaGraph.initialize(this.federationId, this.rti);
+        this._coaGraph.initialize(this.federationId, this.synchronizedFederate.getRTI());
     }
 
     private void terminateSimulation() {
@@ -118,24 +122,14 @@ public class COAExecutor {
         String interactionClassName = nodeAction.getInteractionClassName();
         logger.trace("COAExecutor:executeCOAAction: Got interaction class name: {}... now trying to create interaction..", interactionClassName);
 
-        String simpleClassName = this.federationId + "." + interactionClassName.substring( interactionClassName.lastIndexOf( '.' ) + 1 );
-        Class intrClass = null;
-        try {
-            intrClass = Class.forName(simpleClassName);
-            logger.trace("COAExecutor:executeCOAAction: Class loaded successfully: {}", simpleClassName);
-            Class[] publishMethodArgs = new Class[1];
-            publishMethodArgs[0] = hla.rti.RTIambassador.class;
-            logger.trace("COAExecutor:executeCOAAction: Getting publish method.");
-            Method publishMethod = intrClass.getDeclaredMethod("publish", publishMethodArgs);
-            logger.trace("COAExecutor:executeCOAAction: Invoking publish method.");
-            publishMethod.invoke(null, this.rti);
-            logger.trace("COAExecutor:executeCOAAction: Publish method invokation successful.");
-        } catch (Exception e) {
-            logger.error("COAExecutor:executeCOAAction: Could not load class: {}", simpleClassName);
-            e.printStackTrace();
-        }
-
         InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClassName);
+        interactionRoot.publishInteraction(synchronizedFederate.getRTI());
+        for(
+                Map.Entry<InteractionRootInterface.ClassAndPropertyName, Object> entry :
+                nodeAction.getNameValueParamPairs().entrySet()
+        ) {
+            interactionRoot.setParameter(entry.getKey(), entry.getValue());
+        }
 
         // First check for simulation termination
         if (SimEnd.match(interactionRoot.getClassHandle())) {
@@ -143,22 +137,13 @@ public class COAExecutor {
         }
 
 
-        // It is not a SimEnd interaction, send normally
-
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, this.federateId);
-        Map<String, String> nameValueParamPairs = nodeAction.getNameValueParamPairs();
-        for (String paramName : nameValueParamPairs.keySet()) {
-            String paramValue = nameValueParamPairs.get(paramName);
-            interactionRoot.setParameter(paramName, paramValue);
-        }
-
         // Create timestamp for the interaction
         double tmin = getCurrentTime() + lookahead + (lookahead / 10000.0);
 
         // Send the interaction
         try {
             C2WInteractionRoot.update_federate_sequence(interactionRoot, this.federateId);
-            interactionRoot.sendInteraction(this.rti, tmin);
+            synchronizedFederate.sendInteraction(interactionRoot, tmin);
             logger.info("Successfully sent interaction '{}' at time '{}'", interactionClassName, tmin);
         } catch (Exception e) {
             logger.error("Failed to send interaction: " + interactionRoot);
@@ -185,9 +170,7 @@ public class COAExecutor {
             if (nodeType == COANodeType.SyncPoint) {
                 COASyncPoint nodeSyncPt = (COASyncPoint) n;
                 double timeToReachSyncPt = nodeSyncPt.getSyncTime() - getCurrentTime();
-                if (timeToReachSyncPt > 0.0) {
-                    // SyncPt is not reached, nothing to be done
-                } else {
+                if (timeToReachSyncPt <= 0.0) {
                     // SyncPt reached, mark executed
                     _coaGraph.markNodeExecuted(n, getCurrentTime());
                     logger.trace("COAExecutor:executeCOAGraph: SyncPt node executed: {}", nodeSyncPt);
@@ -300,7 +283,7 @@ public class COAExecutor {
                             String method2Load = "evaluateFilter_" + filterID;
 
                             try {
-                                outcomeFilterEvalMethod = outcomeFilterEvaluatorClass.getMethod(method2Load, new Class[]{COAOutcome.class});
+                                outcomeFilterEvalMethod = outcomeFilterEvaluatorClass.getMethod(method2Load, COAOutcome.class);
                                 if (outcomeFilterEvalMethod == null) {
                                     logger.error("Cannot find evaluation method in {} for OutcomeFilter: {}", outcomeFilterEvaluatorClass.getName(), outcomeFilter);
                                 } else {
@@ -350,8 +333,8 @@ public class COAExecutor {
     private boolean checkIfOutcomeExecutableAndUpdateArrivedInteraction(COAOutcome nodeOutcome) {
         // Check if the outcome can be executed
         boolean outcomeExecutable = false;
-        if (_arrived_interactions.keySet().contains(nodeOutcome.getInteractionClassHandle())) {
-            ArrayList<ArrivedInteraction> arrivedIntrs = _arrived_interactions.get(nodeOutcome.getInteractionClassHandle());
+        if (_arrived_interactions.containsKey(nodeOutcome.getInteractionClassName())) {
+            ArrayList<ArrivedInteraction> arrivedIntrs = _arrived_interactions.get(nodeOutcome.getInteractionClassName());
             if (arrivedIntrs != null) {
                 for (ArrivedInteraction arrivedIntr : arrivedIntrs) {
                     if (arrivedIntr.getArrivalTime() > nodeOutcome.getAwaitStartTime()) {
@@ -380,25 +363,21 @@ public class COAExecutor {
 
     // This method and arrivalTimes are used by the COA Orchestrator while executing
     // Outcome elements of the COA sequence graph.
-    public void updateArrivedInteractions(int handle, LogicalTime time, InteractionRoot receivedIntr) throws Exception {
-        logger.trace("COAExecutor:updateArrivedInteractions: Received interaction with handle {} with time {} as: {}", handle, time, receivedIntr);
-        ArrayList<ArrivedInteraction> intrArrivalTimeList = null;
-        if (!_arrived_interactions.keySet().contains(handle)) {
-            intrArrivalTimeList = new ArrayList<ArrivedInteraction>();
-            _arrived_interactions.put(handle, intrArrivalTimeList);
+    public void updateArrivedInteractions(InteractionRoot interactionRoot) {
+        logger.trace("COAExecutor:updateArrivedInteractions: Received interaction: {}", interactionRoot.toString());
+        ArrayList<ArrivedInteraction> intrArrivalTimeList;
+        String interactionClassName = interactionRoot.getInstanceHlaClassName();
+        if (!_arrived_interactions.containsKey(interactionClassName)) {
+            intrArrivalTimeList = new ArrayList<>();
+            _arrived_interactions.put(interactionClassName, intrArrivalTimeList);
         } else {
-            intrArrivalTimeList = _arrived_interactions.get(handle);
+            intrArrivalTimeList = _arrived_interactions.get(interactionClassName);
         }
 
-        DoubleTime arrivalTime = new DoubleTime();
-        if (time != null) {
-            arrivalTime.setTo(time);
-        } else {
-            arrivalTime.setTime(getCurrentTime());
-        }
+        double time = interactionRoot.getTime() >= 0 ? interactionRoot.getTime() : getCurrentTime();
 
-        ArrivedInteraction arrivedIntr = new ArrivedInteraction(receivedIntr, arrivalTime.getTime());
+        ArrivedInteraction arrivedIntr = new ArrivedInteraction(interactionRoot, time);
         intrArrivalTimeList.add(arrivedIntr);
-        logger.trace("COAExecutor:updateArrivedInteractions: Adding interaction to arrived list: {}", receivedIntr);
+        logger.trace("COAExecutor:updateArrivedInteractions: Adding interaction to arrived list: {}", interactionRoot);
     }
 }

@@ -41,12 +41,17 @@ public class InteractionRootComparator implements Comparator<InteractionRoot> {
             return timeCompare;
         }
 
-        final int actualLogicalGenerationTimeCompare = Double.compare(
-                ((C2WInteractionRoot)interactionRoot1).get_actualLogicalGenerationTime(),
-                ((C2WInteractionRoot)interactionRoot2).get_actualLogicalGenerationTime()
-        );
-        if (actualLogicalGenerationTimeCompare != 0) {
-            return actualLogicalGenerationTimeCompare;
+        if (
+                interactionRoot1.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name()) &&
+                        interactionRoot2.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name())
+        ) {
+            final int actualLogicalGenerationTimeCompare = Double.compare(
+                    ((C2WInteractionRoot)interactionRoot1).get_actualLogicalGenerationTime(),
+                    ((C2WInteractionRoot)interactionRoot2).get_actualLogicalGenerationTime()
+            );
+            if (actualLogicalGenerationTimeCompare != 0) {
+                return actualLogicalGenerationTimeCompare;
+            }
         }
 
         return Integer.compare(interactionRoot1.getUniqueID(), interactionRoot2.getUniqueID());

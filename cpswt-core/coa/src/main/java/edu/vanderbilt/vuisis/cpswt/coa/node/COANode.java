@@ -58,8 +58,8 @@ public class COANode {
 	private double nodeExecutedTime;
 	private boolean enabledAsChoice;
 
-	private HashSet<COANode> predecessors = new HashSet<COANode>();
-	private HashSet<COANode> successors = new HashSet<COANode>();
+	private final HashSet<COANode> predecessors = new HashSet<>();
+	private final HashSet<COANode> successors = new HashSet<>();
 
 	COANode() {}
 
@@ -89,10 +89,10 @@ public class COANode {
 	}
 
 	public String getSuccessorGraphString(String prefix) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(prefix + name);
+		StringBuilder buffer = new StringBuilder();
+		buffer.append(prefix).append(name);
 		for (COANode n : successors) {
-			buffer.append(prefix + "\n\t");
+			buffer.append(prefix).append("\n\t");
 			buffer.append(n.getSuccessorGraphString(prefix + "\t"));
 		}
 		return buffer.toString();

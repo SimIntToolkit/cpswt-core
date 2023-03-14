@@ -127,12 +127,14 @@ public class FederateConfig {
     public FederateConfig(
             String federateType,
             String federationId,
+            String federationJsonFileName,
             boolean isLateJoiner,
             double lookahead,
             double stepSize
     ) {
         this.federateType = federateType;
         this.federationId = federationId;
+        this.federationJsonFileName = federationJsonFileName;
         this.isLateJoiner = isLateJoiner;
         this.lookahead = lookahead;
         this.stepSize = stepSize;

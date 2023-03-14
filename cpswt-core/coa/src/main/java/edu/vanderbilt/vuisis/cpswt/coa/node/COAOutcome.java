@@ -33,6 +33,7 @@ package edu.vanderbilt.vuisis.cpswt.coa.node;
 //import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 /**
  * Represents an Outcome element in the sequence graph.
@@ -42,10 +43,9 @@ public class COAOutcome extends COANode {
     @JsonProperty("interactionName")
 	private String interactionClassName;
 
-	private int interactionClassHandle = 0;
 	private double awaitStartTime = -1;
 	private boolean isTimerOn = false;
-	private Object lastArrivedInteraction = null;
+	private InteractionRoot lastArrivedInteraction = null;
 
 	COAOutcome() {
 	    super(COANodeType.Outcome);
@@ -68,13 +68,6 @@ public class COAOutcome extends COANode {
 		return interactionClassName;
 	}
 
-    public void setInteractionClassName(String interactionClassName) {
-        this.interactionClassName = interactionClassName;
-    }
-
-    public int getInteractionClassHandle() {
-		return interactionClassHandle;
-	}
 	public double getAwaitStartTime() {
 		return awaitStartTime;
 	}
@@ -85,21 +78,13 @@ public class COAOutcome extends COANode {
 		return lastArrivedInteraction;
 	}
 
-	public void setLastArrivedInteraction(Object interactionRoot) {
+	public void setLastArrivedInteraction(InteractionRoot interactionRoot) {
 		if (interactionRoot == null) {
 			throw new IllegalArgumentException(
 					"Error! NULL interaction was set in the COA Outcome!");
 		}
 
 		this.lastArrivedInteraction = interactionRoot;
-	}
-
-	public void setInteractionClassHandle(int interactionClassHandle) {
-		if (interactionClassHandle < 0) {
-			throw new IllegalArgumentException(
-					"Error! Negative values given while configuring: " + this);
-		}
-		this.interactionClassHandle = interactionClassHandle;
 	}
 
 	public void startTimer(double currentTime) {

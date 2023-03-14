@@ -55,6 +55,7 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
+    implementation(group="edu.vanderbilt.vuisis.cpswt", name="federate-base", version=version)
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="base-events", version=version)
