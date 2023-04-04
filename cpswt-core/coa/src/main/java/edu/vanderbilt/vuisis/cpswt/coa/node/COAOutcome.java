@@ -74,7 +74,7 @@ public class COAOutcome extends COANode {
 	public boolean getIsTimerOn() {
 		return isTimerOn;
 	}
-	public Object getLastArrivedInteraction() {
+	public InteractionRoot getLastArrivedInteraction() {
 		return lastArrivedInteraction;
 	}
 

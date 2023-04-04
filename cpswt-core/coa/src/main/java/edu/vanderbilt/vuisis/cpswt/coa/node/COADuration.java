@@ -41,7 +41,7 @@ public class COADuration extends COANode {
 	protected double duration = 0.0;
 
 	protected double endTime = -1.0;
-	protected boolean isTimerOn = false;
+	protected boolean isEndTimeSet = false;
 
 	COADuration() {
 	    super(COANodeType.Dur);
@@ -66,9 +66,14 @@ public class COADuration extends COANode {
 	@Override
 	public String toString() {
 		return super.toString() + ", Duration: " + duration + ", TimerON: "
-				+ isTimerOn;
+				+ isEndTimeSet;
 	}
 
+	@Override
+	public void initializeNode() {
+		super.initializeNode();
+		isEndTimeSet = false;
+	}
 	public double getDuration() {
 		return duration;
 	}
@@ -76,19 +81,19 @@ public class COADuration extends COANode {
         this.duration = duration;
     }
 
-    public void startTimer(double currentTime) {
+    public void setEndTime(double currentTime) {
 		if (currentTime < 0) {
 			throw new IllegalArgumentException("Error! Negative currentTime given for: " + this);
 		}
 		this.endTime = currentTime + this.duration;
-		this.isTimerOn = true;
+		this.isEndTimeSet = true;
 	}
 
 	public double getEndTime() {
 		return endTime;
 	}
 
-	public boolean getIsTimerOn() {
-		return isTimerOn;
+	public boolean isEndTimeSet() {
+		return isEndTimeSet;
 	}
 }

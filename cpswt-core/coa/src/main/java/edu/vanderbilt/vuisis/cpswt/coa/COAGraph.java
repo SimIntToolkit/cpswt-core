@@ -30,9 +30,7 @@
 
 package edu.vanderbilt.vuisis.cpswt.coa;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +42,6 @@ import edu.vanderbilt.vuisis.cpswt.utils.RandomSingleton;
 import hla.rti.RTIambassador;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
-import java.lang.reflect.Method;
-
 /**
  * This is the main class to represent the COA sequence graph.
  */
@@ -53,15 +49,21 @@ public class COAGraph {
 
 	private static final Logger logger = LogManager.getLogger(COAGraph.class);
 
-	private HashMap<String, COANode> _allNodes = new HashMap<String, COANode>();
+	private final Map<String, COANode> _allNodes = new HashMap<>();
 
-	private HashSet<COANode> _rootNodes = new HashSet<COANode>();
+	private final Set<COANode> _rootNodes = new HashSet<>();
 
-	private HashSet<COANode> _currentRootNodes = new HashSet<COANode>();
+	private final Set<COANode> _currentRootNodes = new HashSet<>();
 
-	private HashSet<COAEdge> _allEdges = new HashSet<COAEdge>();
+	private final Set<COAEdge> _allEdges = new HashSet<>();
 
-	private HashMap<COANode, HashSet<COAEdge>> _edgesFromNodeMap = new HashMap<COANode, HashSet<COAEdge>>();
+	private final Map<COANode, Set<COAEdge>> _edgesFromNodeMap = new HashMap<>();
+
+	private final Map<String, Set<String>> _coaIdToCOANodeIdSetMap = new HashMap<>();
+
+	private final Map<String, Set<String>> _coaIdToRootCOANodeIdSetMap = new HashMap<>();
+
+	private final Map<String, Boolean> _coaIdToRepeatMap = new HashMap<>();
 
 	public COAGraph() {
 	}
@@ -72,6 +74,11 @@ public class COAGraph {
 		for (COANode n : _currentRootNodes) {
 			n.setActive();
 		}
+	}
+
+	public void setCOAIdToRepeatMap(Map<String, Boolean> coaIdToRepeatMap) {
+		_coaIdToRepeatMap.clear();
+		_coaIdToRepeatMap.putAll(coaIdToRepeatMap);
 	}
 
 	public void initialize(String federationName, RTIambassador rti) {
@@ -97,7 +104,7 @@ public class COAGraph {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (COANode n : _rootNodes) {
 			buffer.append(n.getSuccessorGraphString(""));
 			buffer.append("\n");
@@ -105,19 +112,19 @@ public class COAGraph {
 		return buffer.toString();
 	}
 
-	public HashMap<String, COANode> getAllCOANodes() {
+	public Map<String, COANode> getAllCOANodes() {
 		return _allNodes;
 	}
 
-	public HashSet<COANode> getRootNodes() {
+	public Set<COANode> getRootNodes() {
 		return _rootNodes;
 	}
 
-	public HashSet<COANode> getCurrentRootNodes() {
+	public Set<COANode> getCurrentRootNodes() {
 		return _currentRootNodes;
 	}
 
-	public HashSet<COAEdge> getAllCOAEdges() {
+	public Set<COAEdge> getAllCOAEdges() {
 		return _allEdges;
 	}
 
@@ -189,10 +196,55 @@ public class COAGraph {
 		_allEdges.add(edge);
 
 		if (!_edgesFromNodeMap.containsKey(fromNode)) {
-			HashSet<COAEdge> fromNodeEdges = new HashSet<COAEdge>();
+			HashSet<COAEdge> fromNodeEdges = new HashSet<>();
 			_edgesFromNodeMap.put(fromNode, fromNodeEdges);
 		}
 		_edgesFromNodeMap.get(fromNode).add(edge);
+	}
+
+
+	public void initializeRepeatMaps() {
+		Set<COANode> allCOANodeSet = new HashSet<>(getAllCOANodes().values());
+
+		for(COANode coaNode: allCOANodeSet) {
+			String coaId = coaNode.getCOAId();
+			if (!_coaIdToCOANodeIdSetMap.containsKey(coaId)) {
+				_coaIdToCOANodeIdSetMap.put(coaId, new HashSet<>());
+			}
+			_coaIdToCOANodeIdSetMap.get(coaNode.getCOAId()).add(coaNode.getId());
+		}
+
+		for(COANode rootNode: _rootNodes) {
+			String rootNodeCOAId = rootNode.getCOAId();
+			if (!_coaIdToRootCOANodeIdSetMap.containsKey(rootNodeCOAId)) {
+				_coaIdToRootCOANodeIdSetMap.put(rootNodeCOAId, new HashSet<>());
+			}
+			_coaIdToRootCOANodeIdSetMap.get(rootNodeCOAId).add(rootNode.getId());
+		}
+	}
+
+	public void repeatCOAs() {
+		Set<String> coaIdSet = new HashSet<>(_coaIdToRootCOANodeIdSetMap.keySet());
+		for(COANode coaNode: _currentRootNodes) {
+			coaIdSet.remove(coaNode.getCOAId());
+		}
+		for(Map.Entry<String, Boolean> entry: _coaIdToRepeatMap.entrySet()) {
+			if (!entry.getValue()) {
+				coaIdSet.remove(entry.getKey());
+			}
+		}
+
+		for(String coaId: coaIdSet) {
+			Set<String> coaNodeIdSet = _coaIdToCOANodeIdSetMap.get(coaId);
+			for(String coaNodeId: coaNodeIdSet) {
+				COANode coaNode = _allNodes.get(coaNodeId);
+				coaNode.initializeNode();
+			}
+			Set<String> rootNodeIdSet = _coaIdToRootCOANodeIdSetMap.get(coaId);
+			for(String rootNodeId: rootNodeIdSet) {
+				_currentRootNodes.add(_allNodes.get(rootNodeId));
+			}
+		}
 	}
 
 	public void markNodeExecuted(COANode node, double nodeExecutedTime) {
@@ -216,8 +268,8 @@ public class COAGraph {
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
 		if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
-			HashMap<COANode, Double> successorsWithCumuProb = new HashMap<COANode, Double>();
-			HashSet<COAEdge> outEdges = _edgesFromNodeMap.get(node);
+			Map<COANode, Double> successorsWithCumuProb = new HashMap<>();
+			Set<COAEdge> outEdges = _edgesFromNodeMap.get(node);
 			COANode chosenSuccessor = null;
 
 			// Normalize probabilities on the successor elements
@@ -284,8 +336,7 @@ public class COAGraph {
 				// Also, before activating make sure that the chosen successor
 				// is enabled as choice.
 				logger.trace("COAGraph: Checking out the successor {}", succ);
-				boolean succAlreadyInCurrentRootNodes = _currentRootNodes
-						.contains(succ);
+				boolean succAlreadyInCurrentRootNodes = _currentRootNodes.contains(succ);
 				if (!succAlreadyInCurrentRootNodes
 						&& COANodeStatus.Executed != succ.getNodeStatus()) {
 					boolean aSuccPredecessorInCurrentRootNodes = false;
@@ -295,23 +346,15 @@ public class COAGraph {
 							break; // inner for-loop
 						}
 					}
-					if (!aSuccPredecessorInCurrentRootNodes
-							|| COANodeType.SyncPoint == succ.getNodeType()
-							|| COANodeType.AwaitN== succ.getNodeType()) {
-						if (COANodeType.SyncPoint == node.getNodeType()) {
-							// TODO: If node that executed is SyncPt, then
-							// enable only those successors that have valid
-							// branches finished (i.e., handle exceptions)
-							if (succ.enabledAsChoice()) {
-								_currentRootNodes.add(succ);
-								succ.setActive();
-							}
-						} else {
-							if (succ.enabledAsChoice()) {
-								_currentRootNodes.add(succ);
-								succ.setActive();
-							}
-						}
+					if (
+							succ.enabledAsChoice() && (
+									!aSuccPredecessorInCurrentRootNodes
+											|| COANodeType.SyncPoint == succ.getNodeType()
+											|| COANodeType.AwaitN== succ.getNodeType()
+							)
+					) {
+						_currentRootNodes.add(succ);
+						succ.setActive();
 					}
 				}
 

@@ -54,6 +54,9 @@ public class COANode {
     @JsonProperty("nodeType")
 	private COANodeType nodeType;
 
+	@JsonProperty("coaId")
+	private String coaId = "<NOT-SPECIFIED>";
+
 	private COANodeStatus nodeStatus;
 	private double nodeExecutedTime;
 	private boolean enabledAsChoice;
@@ -104,6 +107,10 @@ public class COANode {
 	void setName(String name) {
 	    this.name = name;
     }
+
+	public String getCOAId() {
+		return coaId;
+	}
 
 	public String getId() {
 		return id;

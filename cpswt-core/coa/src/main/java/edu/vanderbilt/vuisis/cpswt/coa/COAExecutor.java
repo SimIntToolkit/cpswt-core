@@ -46,11 +46,12 @@ import edu.vanderbilt.vuisis.cpswt.coa.node.COARandomDuration;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COASyncPoint;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COANodeType;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
-import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * COA executor for FederationManager
@@ -71,6 +72,8 @@ public class COAExecutor {
     private SynchronizedFederate synchronizedFederate;
 
     private final Map<String, ArrayList<ArrivedInteraction>> _arrived_interactions = new HashMap<>();
+
+    private final Map<String, InteractionRoot> _outcomeInteractionMap = new HashMap<>();
 
     private COAExecutorEventListener coaExecutorEventListener;
     public void setCoaExecutorEventListener(COAExecutorEventListener listener) {
@@ -109,14 +112,8 @@ public class COAExecutor {
             this.coaExecutorEventListener.onTerminateRequested();
         }
     }
-    private double getCurrentTime() {
-        if(this.coaExecutorEventListener != null) {
-            return this.coaExecutorEventListener.onCurrentTimeRequested();
-        }
-        return 0.0;
-    }
 
-    private void executeCOAAction(COAAction nodeAction) {
+    private void executeCOAAction(COAAction nodeAction, double currentTime) {
         // Create interaction to be sent
         logger.trace("COAExecutor:executeCOAAction: Trying to executed node: {}", nodeAction);
         String interactionClassName = nodeAction.getInteractionClassName();
@@ -128,7 +125,67 @@ public class COAExecutor {
                 Map.Entry<InteractionRootInterface.ClassAndPropertyName, Object> entry :
                 nodeAction.getNameValueParamPairs().entrySet()
         ) {
-            interactionRoot.setParameter(entry.getKey(), entry.getValue());
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                String stringValue = (String)value;
+
+                Pattern substitutionPatternWithBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$\\{(.+)}(.*)$");
+                Matcher substitutionMatcherWithBraces = substitutionPatternWithBraces.matcher(stringValue);
+
+                Pattern substitutionPatternWithoutBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$(.+)$");
+                Matcher substitutionMatcherWithoutBraces = substitutionPatternWithoutBraces.matcher(stringValue);
+
+                String beforeString = null;
+                String substitutionSpecifier = null;
+                String afterString = null;
+
+                if (substitutionMatcherWithBraces.matches()) {
+
+                    beforeString = substitutionMatcherWithBraces.group(1);
+                    substitutionSpecifier = substitutionMatcherWithBraces.group(2);
+                    afterString = substitutionMatcherWithBraces.group(3);
+
+                } else if (substitutionMatcherWithoutBraces.matches()) {
+
+                    beforeString = substitutionMatcherWithoutBraces.group(1);
+                    substitutionSpecifier = substitutionMatcherWithoutBraces.group(2);
+                    afterString = "";
+                }
+
+                if (substitutionSpecifier != null) {
+                    int periodPosition = substitutionSpecifier.indexOf('.');
+                    if (periodPosition >= 0) {
+                        String outcomeName = substitutionSpecifier.substring(0, periodPosition);
+
+                        if (_outcomeInteractionMap.containsKey(outcomeName)) {
+                            InteractionRoot outcomeInteraction = _outcomeInteractionMap.get(outcomeName);
+
+                            String parameterName = substitutionSpecifier.substring(periodPosition + 1);
+                            if (parameterName.startsWith("(") && parameterName.endsWith(")")) {
+                                parameterName = parameterName.substring(1, parameterName.length() - 1);
+                            }
+
+                            String className = outcomeInteraction.getInstanceHlaClassName();
+                            int commaPosition = parameterName.indexOf(',');
+                            if (commaPosition >= 0) {
+                                className = parameterName.substring(0, commaPosition);
+                                parameterName = parameterName.substring(commaPosition + 1);
+                            }
+                            if (outcomeInteraction.hasParameter(className, parameterName)) {
+                                if (beforeString.isEmpty() && afterString.isEmpty()) {
+                                    value = outcomeInteraction.getParameter(className, parameterName);
+                                } else {
+                                    value = beforeString + outcomeInteraction.getParameter(className, parameterName)
+                                            + afterString;
+                                }
+                            }
+                        }
+                    } else if (substitutionSpecifier.equalsIgnoreCase("time")) {
+                        value = synchronizedFederate.getCurrentTime();
+                    }
+                }
+            }
+            interactionRoot.setParameter(entry.getKey(), value);
         }
 
         // First check for simulation termination
@@ -138,11 +195,10 @@ public class COAExecutor {
 
 
         // Create timestamp for the interaction
-        double tmin = getCurrentTime() + lookahead + (lookahead / 10000.0);
+        double tmin = currentTime + lookahead + (lookahead / 10000.0);
 
         // Send the interaction
         try {
-            C2WInteractionRoot.update_federate_sequence(interactionRoot, this.federateId);
             synchronizedFederate.sendInteraction(interactionRoot, tmin);
             logger.info("Successfully sent interaction '{}' at time '{}'", interactionClassName, tmin);
         } catch (Exception e) {
@@ -152,118 +208,120 @@ public class COAExecutor {
     }
 
     public void executeCOAGraph() {
-        HashSet<COANode> currentRootNodes = new HashSet<COANode>(_coaGraph.getCurrentRootNodes());
 
-        // If at any point, there are no COA nodes remaining to execute, and
-        // the experiment was configured to terminate when all COA nodes have
-        // been executed, terminate the federation.
-        if (currentRootNodes.size() == 0 && terminateOnCoaFinish) {
-            terminateSimulation();
-        }
+        boolean nodeExecuted;
 
+        double currentTime = synchronizedFederate.getCurrentTime();
+        double nextTime = currentTime + synchronizedFederate.getStepSize();
 
-        // There may be COA nodes still to be executed, see if some root nodes
-        // can be executed.
-        boolean nodeExecuted = false;
-        for (COANode n : currentRootNodes) {
-            COANodeType nodeType = n.getNodeType();
-            if (nodeType == COANodeType.SyncPoint) {
-                COASyncPoint nodeSyncPt = (COASyncPoint) n;
-                double timeToReachSyncPt = nodeSyncPt.getSyncTime() - getCurrentTime();
-                if (timeToReachSyncPt <= 0.0) {
-                    // SyncPt reached, mark executed
-                    _coaGraph.markNodeExecuted(n, getCurrentTime());
-                    logger.trace("COAExecutor:executeCOAGraph: SyncPt node executed: {}", nodeSyncPt);
-                    nodeExecuted = true;
-                }
-            } else if (nodeType == COANodeType.AwaitN) {
-                COAAwaitN nodeAwaitN = (COAAwaitN) n;
-                if (!nodeAwaitN.getIsRequiredNumOfBranchesFinished()) {
-                    logger.trace("AwaitN is not reached, nothing to be done");
-                } else {
-                    logger.trace("AwaitN reached, mark executed");
-                    logger.trace("COAExecutor:executeCOAGraph: AwaitN node executed: {}", nodeAwaitN);
-                    _coaGraph.markNodeExecuted(n, getCurrentTime());
-                    nodeExecuted = true;
-                }
-            } else if (nodeType == COANodeType.Dur || nodeType == COANodeType.RandomDur) {
-                COADuration nodeDuration = null;
-                if (nodeType == COANodeType.Dur) {
-                    nodeDuration = (COADuration) n;
-                } else {
-                    nodeDuration = (COARandomDuration) n;
-                }
+        do {
+            nodeExecuted = false;
+            HashSet<COANode> currentRootNodes = new HashSet<>(_coaGraph.getCurrentRootNodes());
 
-                if (!nodeDuration.getIsTimerOn()) {
-                    logger.trace("Start executing duration element");
-                    nodeDuration.startTimer(getCurrentTime());
-                } else {
+            // If at any point, there are no COA nodes remaining to execute, and
+            // the experiment was configured to terminate when all COA nodes have
+            // been executed, terminate the federation.
+            if (currentRootNodes.size() == 0 && terminateOnCoaFinish) {
+                terminateSimulation();
+                break;
+            }
+
+            // There may be COA nodes still to be executed, see if some root nodes
+            // can be executed.
+            for (COANode n : currentRootNodes) {
+                COANodeType nodeType = n.getNodeType();
+                if (nodeType == COANodeType.SyncPoint) {
+                    COASyncPoint nodeSyncPt = (COASyncPoint) n;
+                    double timeToReachSyncPt = nodeSyncPt.getSyncTime() - currentTime;
+                    if (timeToReachSyncPt <= 0.0) {
+                        // SyncPt reached, mark executed
+                        _coaGraph.markNodeExecuted(n,  currentTime);
+                        logger.trace("COAExecutor:executeCOAGraph: SyncPt node executed: {}", nodeSyncPt);
+                        nodeExecuted = true;
+                    }
+                } else if (nodeType == COANodeType.AwaitN) {
+                    COAAwaitN nodeAwaitN = (COAAwaitN) n;
+                    if (!nodeAwaitN.getIsRequiredNumOfBranchesFinished()) {
+                        logger.trace("AwaitN is not reached, nothing to be done");
+                    } else {
+                        logger.trace("AwaitN reached, mark executed");
+                        logger.trace("COAExecutor:executeCOAGraph: AwaitN node executed: {}", nodeAwaitN);
+                        _coaGraph.markNodeExecuted(n,  currentTime);
+                        nodeExecuted = true;
+                    }
+                } else if (nodeType == COANodeType.Dur || nodeType == COANodeType.RandomDur) {
+                    COADuration nodeDuration;
+                    if (nodeType == COANodeType.Dur) {
+                        nodeDuration = (COADuration) n;
+                    } else {
+                        nodeDuration = (COARandomDuration) n;
+                    }
+
+                    if (!nodeDuration.isEndTimeSet()) {
+                        logger.trace("Start executing duration element");
+                        nodeDuration.setEndTime(currentTime);
+                    }
                     // Check if the duration node has executed
-                    if (getCurrentTime() >= nodeDuration.getEndTime()) {
+                    if ( nodeDuration.getEndTime() < nextTime) {
                         logger.trace("Duration node finished, mark executed: {}", nodeDuration);
-                        _coaGraph.markNodeExecuted(n, getCurrentTime());
+                        currentTime = nodeDuration.getEndTime();
+                        _coaGraph.markNodeExecuted(n,  currentTime);
                         nodeExecuted = true;
                     }
-                }
-            } else if (nodeType == COANodeType.Fork) {
-                COAFork nodeFork = (COAFork) n;
-                boolean isDecisionPoint = nodeFork.isDecisionPoint(); // TODO: handle decision points
+                } else if (nodeType == COANodeType.Fork) {
+                    COAFork nodeFork = (COAFork) n;
+                    boolean isDecisionPoint = nodeFork.isDecisionPoint(); // TODO: handle decision points
 
-                // As of now Fork is always executed as soon as it is encountered
-                _coaGraph.markNodeExecuted(n, getCurrentTime());
-                logger.trace("COAExecutor:executeCOAGraph: Fork node executed: {}", nodeFork);
-                nodeExecuted = true;
-            } else if (nodeType == COANodeType.ProbabilisticChoice) {
-                COAProbabilisticChoice nodeProbChoice = (COAProbabilisticChoice) n;
-                boolean isDecisionPoint = nodeProbChoice.isDecisionPoint(); // TODO: handle decision points
+                    // As of now Fork is always executed as soon as it is encountered
+                    _coaGraph.markNodeExecuted(n,  currentTime);
+                    logger.trace("COAExecutor:executeCOAGraph: Fork node executed: {}", nodeFork);
+                    nodeExecuted = true;
+                } else if (nodeType == COANodeType.ProbabilisticChoice) {
+                    COAProbabilisticChoice nodeProbChoice = (COAProbabilisticChoice) n;
+                    boolean isDecisionPoint = nodeProbChoice.isDecisionPoint(); // TODO: handle decision points
 
-                // As of now Probabilistic Choice is always executed as soon as it is encountered
-                _coaGraph.markNodeExecuted(n, getCurrentTime());
-                logger.trace("COAExecutor:executeCOAGraph: ProbabilisticChoice node executed: {}", nodeProbChoice);
-                nodeExecuted = true;
-            } else if (nodeType == COANodeType.Action) {
-                COAAction nodeAction = (COAAction) n;
+                    // As of now Probabilistic Choice is always executed as soon as it is encountered
+                    _coaGraph.markNodeExecuted(n,  currentTime);
+                    logger.trace("COAExecutor:executeCOAGraph: ProbabilisticChoice node executed: {}", nodeProbChoice);
+                    nodeExecuted = true;
+                } else if (nodeType == COANodeType.Action) {
+                    COAAction nodeAction = (COAAction) n;
 
-                // As of now Action is always executed as soon as it is encountered
-                logger.trace("COAExecutor:executeCOAGraph: Trying to execute action node: {}", nodeAction);
-                executeCOAAction(nodeAction);
-                logger.trace("COAExecutor:executeCOAGraph: Action node executed: {}", nodeAction);
-                _coaGraph.markNodeExecuted(n, getCurrentTime());
-                nodeExecuted = true;
-            } else if (nodeType == COANodeType.Outcome) {
-                COAOutcome nodeOutcome = (COAOutcome) n;
-                if (!nodeOutcome.getIsTimerOn()) {
-                    // Start executing Outcome element
-                    nodeOutcome.startTimer(getCurrentTime());
-                } else {
-                    boolean outcomeExecutable = checkIfOutcomeExecutableAndUpdateArrivedInteraction(nodeOutcome);
-                    logger.trace("COAExecutor:executeCOAGraph: Checking if outcome node is executable: {}", nodeOutcome);
-                    if (outcomeExecutable) {
-                        _coaGraph.markNodeExecuted(n, getCurrentTime());
-                        logger.trace("COAExecutor:executeCOAGraph: Outcome node executed: {}", nodeOutcome);
-                        nodeExecuted = true;
+                    // As of now Action is always executed as soon as it is encountered
+                    logger.trace("COAExecutor:executeCOAGraph: Trying to execute action node: {}", nodeAction);
+                    executeCOAAction(nodeAction, currentTime);
+                    logger.trace("COAExecutor:executeCOAGraph: Action node executed: {}", nodeAction);
+                    _coaGraph.markNodeExecuted(n,  currentTime);
+                    nodeExecuted = true;
+                } else if (nodeType == COANodeType.Outcome) {
+                    COAOutcome nodeOutcome = (COAOutcome) n;
+                    if (!nodeOutcome.getIsTimerOn()) {
+                        _outcomeInteractionMap.remove(nodeOutcome.getName());
+                        // Start executing Outcome element
+                        nodeOutcome.startTimer(currentTime);
+                    } else {
+                        boolean outcomeExecutable = checkIfOutcomeExecutableAndUpdateArrivedInteraction(nodeOutcome);
+                        logger.trace("COAExecutor:executeCOAGraph: Checking if outcome node is executable: {}", nodeOutcome);
+                        if (outcomeExecutable) {
+                            _coaGraph.markNodeExecuted(n, currentTime);
+                            _outcomeInteractionMap.put(nodeOutcome.getName(), nodeOutcome.getLastArrivedInteraction());
+                            logger.trace("COAExecutor:executeCOAGraph: Outcome node executed: {}", nodeOutcome);
+                            nodeExecuted = true;
+                        }
                     }
-                }
-            } else if (nodeType == COANodeType.OutcomeFilter) {
-                COAOutcomeFilter outcomeFilter = (COAOutcomeFilter) n;
-                COAOutcome outcomeToFilter = outcomeFilter.getOutcome();
+                } else if (nodeType == COANodeType.OutcomeFilter) {
+                    COAOutcomeFilter outcomeFilter = (COAOutcomeFilter) n;
+                    COAOutcome outcomeToFilter = outcomeFilter.getOutcome();
 
-                // Update last arrived interaction in the corresponding Outcome node
-                checkIfOutcomeExecutableAndUpdateArrivedInteraction(outcomeToFilter);
+                    // Update last arrived interaction in the corresponding Outcome node
+                    checkIfOutcomeExecutableAndUpdateArrivedInteraction(outcomeToFilter);
 
-                boolean filterEvaluation = false;
-                if (outcomeToFilter == null) {
-                    logger.warn("OutcomeFilter not connected to an Outcome: {}", outcomeFilter);
-                    filterEvaluation = true;
-                } else {
+                    boolean filterEvaluation = false;
                     // Evaluate filter, first get evaluator class
                     if (outcomeFilterEvaluatorClass == null) {
                         String class2Load = this.federationId + ".COAOutcomeFilterEvaluator";
                         try {
                             outcomeFilterEvaluatorClass = Class.forName(class2Load);
-                            if (outcomeFilterEvaluatorClass == null) {
-                                logger.error("Cannot find evaluator class for OutcomeFilter: {}", outcomeFilter);
-                            }
                         } catch (Exception e) {
                             logger.error("Exception caught while evaluating OutcomeFilter: {}", outcomeFilter);
                             logger.error(e);
@@ -309,24 +367,21 @@ public class COAExecutor {
                             logger.error("ERROR! Failed to load OutcomeFilter evaluation method for OutcomeFilter: {}", outcomeFilter);
                         }
                     }
-                }
 
-                if (filterEvaluation) {
-                    _coaGraph.markNodeExecuted(n, getCurrentTime());
-                    logger.trace("COAExecutor:executeCOAGraph: OutcomeFilter node executed: {}", outcomeFilter);
-                    nodeExecuted = true;
+                    if (filterEvaluation) {
+                        _coaGraph.markNodeExecuted(n, currentTime);
+                        logger.trace("COAExecutor:executeCOAGraph: OutcomeFilter node executed: {}", outcomeFilter);
+                        nodeExecuted = true;
+                    }
+                    logger.trace("Result of evaluation of filter for outcome: {} = {}. Interaction it contained was: {}",
+                            outcomeToFilter.getName(), filterEvaluation, outcomeToFilter.getLastArrivedInteraction());
                 }
-                logger.trace("Result of evaluation of filter for outcome: {} = {}. Interaction it contained was: {}",
-                        outcomeToFilter.getName(), filterEvaluation, outcomeToFilter.getLastArrivedInteraction());
             }
-        }
-
-        if (nodeExecuted) {
-            // Some paths were executed, execute more enabled nodes, if any
-            executeCOAGraph();
-        }
+        } while (nodeExecuted);
 
         // Clear arrived interactions that we no longer need to keep in memory
+        _coaGraph.repeatCOAs();
+
         clearUnusedArrivedInteractionsForOutcomes();
     }
 
@@ -374,7 +429,7 @@ public class COAExecutor {
             intrArrivalTimeList = _arrived_interactions.get(interactionClassName);
         }
 
-        double time = interactionRoot.getTime() >= 0 ? interactionRoot.getTime() : getCurrentTime();
+        double time = interactionRoot.getTime() >= 0 ? interactionRoot.getTime() : synchronizedFederate.getCurrentTime();
 
         ArrivedInteraction arrivedIntr = new ArrivedInteraction(interactionRoot, time);
         intrArrivalTimeList.add(arrivedIntr);

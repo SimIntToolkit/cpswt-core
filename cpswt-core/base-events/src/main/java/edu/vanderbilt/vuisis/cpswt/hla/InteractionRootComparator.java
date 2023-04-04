@@ -46,8 +46,8 @@ public class InteractionRootComparator implements Comparator<InteractionRoot> {
                         interactionRoot2.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name())
         ) {
             final int actualLogicalGenerationTimeCompare = Double.compare(
-                    ((C2WInteractionRoot)interactionRoot1).get_actualLogicalGenerationTime(),
-                    ((C2WInteractionRoot)interactionRoot2).get_actualLogicalGenerationTime()
+                    (double)interactionRoot1.getParameter("actualLogicalGenerationTime"),
+                    (double)interactionRoot2.getParameter("actualLogicalGenerationTime")
             );
             if (actualLogicalGenerationTimeCompare != 0) {
                 return actualLogicalGenerationTimeCompare;
