@@ -32,6 +32,7 @@ package edu.vanderbilt.vuisis.cpswt.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,6 +47,8 @@ public class ExperimentConfig {
     public String coaSelection;
     public boolean terminateOnCOAFinish;
     public String COASelectionToExecute;
+    public List<InjectedInteractionInfo> InjectedInteractions = new ArrayList<>();
+    public List<String> MonitoredInteractions = new ArrayList<>();
 
     @JsonIgnore
     public int expectedFederateItemsCount() {

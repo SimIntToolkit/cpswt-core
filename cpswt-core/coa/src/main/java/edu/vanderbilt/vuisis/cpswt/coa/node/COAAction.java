@@ -30,24 +30,37 @@
 
 package edu.vanderbilt.vuisis.cpswt.coa.node;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
+
 
 /**
  * Represents an action element in the sequence graph.
  */
 public class COAAction extends COANode {
 
+	public static class ClassAndPropertyNameDeserializer extends KeyDeserializer {
+
+		@Override
+		public ClassAndPropertyName deserializeKey(String key, DeserializationContext ctxt) {
+			return new ClassAndPropertyName(key);
+		}
+	}
+
     @JsonProperty("interactionName")
 	private String interactionClassName;
 
-    @JsonIgnore
-	private HashMap<String, String> nameValueParamPairs = new HashMap<String, String>();
+	@JsonProperty("nameValueParamPairs")
+	@JsonDeserialize(keyUsing = ClassAndPropertyNameDeserializer.class)
+//	@JsonIgnore
+	private final Map<ClassAndPropertyName, Object> nameValueParamPairs = new HashMap<>();
 
 	COAAction() {
         super(COANodeType.Action);
@@ -68,13 +81,13 @@ public class COAAction extends COANode {
 		return interactionClassName;
 	}
 
-	@JsonAnyGetter
-	public Map<String, String> getNameValueParamPairs() {
+	@JsonGetter("nameValueParamPairs")
+	public Map<ClassAndPropertyName, Object> getNameValueParamPairs() {
 		return nameValueParamPairs;
 	}
 
-	@JsonAnySetter
-	public void addNameValueParamPair(String name, String value) {
+	@JsonProperty("nameValueParamPairs")
+	public void addNameValueParamPair(ClassAndPropertyName name, Object value) {
 		nameValueParamPairs.put(name, value);
 	}
 }

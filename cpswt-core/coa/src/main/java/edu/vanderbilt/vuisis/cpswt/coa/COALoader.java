@@ -42,9 +42,7 @@ import edu.vanderbilt.vuisis.cpswt.coa.node.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ArrayList;
+import java.util.*;
 
 public class COALoader {
 
@@ -54,16 +52,18 @@ public class COALoader {
     Path coaSelectionPath;
     String coaSelectionToExecute;
 
+    List<String> coaNameList = new ArrayList<>();
+    Map<String, Boolean> coaIdRepeatMap = new HashMap<>();
+
     public COALoader(Path coaDefinitionPath, Path coaSelectionPath, String coaSelectionToExecute) {
         this.coaDefinitionPath = coaDefinitionPath;
         this.coaSelectionPath = coaSelectionPath;
         this.coaSelectionToExecute = coaSelectionToExecute;
     }
 
-    public ArrayList<String> getListOfIDsofCOAsToExecute() throws IOException {
-        ArrayList<String> coaIDs = new ArrayList<>();
+    public void processCoaSelections() throws IOException {
         if (coaSelectionToExecute == null || "".equals(coaSelectionToExecute)) {
-            return null;
+            return;
         }
 
         byte[] jsonData = Files.readAllBytes(this.coaSelectionPath);
@@ -83,37 +83,39 @@ public class COALoader {
                     for(JsonNode coa : coaArray) {
                         // Has only 1 COA in it, so break after processing
                         logger.trace("Got COA as : {}", coa);
-                        String coaID = coa.get("Name").asText("");
-                        logger.trace("Got COA's ID as {}", coaID);
-                        coaIDs.add(coaID);
+                        String coaName = coa.get("Name").asText("");
+                        String coaId = coa.get("ID").asText("");
+                        boolean repeat = coa.get("repeat").asBoolean(false);
+                        coaIdRepeatMap.put(coaId, repeat);
+                        logger.trace("Got COA's ID as {}", coaName);
+                        coaNameList.add(coaName);
 
                         break;
                     }
                 }
 
-                return coaIDs.size() > 0 ? coaIDs : null;
+                return;
             }
         }
-
-        return null;
     }
 
     public COAGraph loadGraph() throws IOException {
 
         COAGraph coaGraph = new COAGraph();
 
-        ArrayList<String> idsOfCoasToExecute = null;
         boolean coaSelectionSpecified = false;
 
         if(coaSelectionToExecute != null && !"".equals(coaSelectionToExecute)) {
             coaSelectionSpecified = true;
             logger.trace("COASelection was specified as: {}", coaSelectionToExecute);
-            idsOfCoasToExecute = getListOfIDsofCOAsToExecute();
-            if(idsOfCoasToExecute == null || idsOfCoasToExecute.size() == 0) {
+            processCoaSelections();
+            if(coaNameList.size() == 0) {
                 logger.trace("COASelection was specified, couldn't find IDs");
                 return coaGraph; // If COA-Selection given, but wrongly, return empty graph
             }
         }
+
+        coaGraph.setCOAIdToRepeatMap(coaIdRepeatMap);
 
         byte[] jsonData = Files.readAllBytes(this.coaDefinitionPath);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -124,7 +126,7 @@ public class COALoader {
             Map.Entry<String, JsonNode> coaKV = iter.next();
 
             String coaName = coaKV.getKey();
-            if(coaSelectionSpecified && !idsOfCoasToExecute.contains(coaName)) {
+            if(coaSelectionSpecified && !coaNameList.contains(coaName)) {
                 continue;
             }
 
@@ -158,8 +160,10 @@ public class COALoader {
             }
         }
 
+        coaGraph.initializeRepeatMaps();
+
         logger.info("Loaded COAGraph successfully");
-        logger.debug("Loaded the following COAGraph:\n{}" + coaGraph);
+        logger.debug("Loaded the following COAGraph:\n{}", coaGraph);
 
         return coaGraph;
     }

@@ -81,7 +81,7 @@ public class COARandomDuration extends COADuration {
 	public String toString() {
 		return super.toString() + ", RandomDuration: " + this.duration + "["
 				+ this.lowerBound + "," + this.upperBound + "], TimerON: "
-				+ this.isTimerOn;
+				+ this.isEndTimeSet;
 	}
 
     public double getLowerBound() {

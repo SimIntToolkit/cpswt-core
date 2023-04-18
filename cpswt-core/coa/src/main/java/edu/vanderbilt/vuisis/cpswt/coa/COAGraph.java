@@ -30,9 +30,7 @@
 
 package edu.vanderbilt.vuisis.cpswt.coa;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +42,6 @@ import edu.vanderbilt.vuisis.cpswt.utils.RandomSingleton;
 import hla.rti.RTIambassador;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
-import java.lang.reflect.Method;
-
 /**
  * This is the main class to represent the COA sequence graph.
  */
@@ -53,15 +49,21 @@ public class COAGraph {
 
 	private static final Logger logger = LogManager.getLogger(COAGraph.class);
 
-	private HashMap<String, COANode> _allNodes = new HashMap<String, COANode>();
+	private final Map<String, COANode> _coaNodeIdToCOANodeMap = new HashMap<>();
 
-	private HashSet<COANode> _rootNodes = new HashSet<COANode>();
+	private final Set<COANode> _rootNodeSet = new HashSet<>();
 
-	private HashSet<COANode> _currentRootNodes = new HashSet<COANode>();
+	private final Set<COANode> _currentRootNodeSet = new HashSet<>();
 
-	private HashSet<COAEdge> _allEdges = new HashSet<COAEdge>();
+	private final Map<String, COAEdge> _coaEdgeIdToCOAEdgeMap = new HashMap<>();
 
-	private HashMap<COANode, HashSet<COAEdge>> _edgesFromNodeMap = new HashMap<COANode, HashSet<COAEdge>>();
+	private final Map<COANode, Set<COAEdge>> _edgesFromNodeMap = new HashMap<>();
+
+	private final Map<String, Set<String>> _coaIdToCOANodeIdSetMap = new HashMap<>();
+
+	private final Map<String, Set<String>> _coaIdToCOAEdgeIdSetMap = new HashMap<>();
+
+	private final Map<String, Boolean> _coaIdToRepeatMap = new HashMap<>();
 
 	public COAGraph() {
 	}
@@ -69,128 +71,49 @@ public class COAGraph {
 	public void setCurrentRootNodesAsActive() {
 		// Mark COA nodes at the beginning of the graph as active from the
 		// beginning
-		for (COANode n : _currentRootNodes) {
-			n.setActive();
+		for (COANode coaNode : _currentRootNodeSet) {
+			coaNode.setActive();
 		}
 	}
 
-	public void initialize(String federationName, RTIambassador rti) {
+	public void setCOAIdToRepeatMap(Map<String, Boolean> coaIdToRepeatMap) {
+		_coaIdToRepeatMap.clear();
+		_coaIdToRepeatMap.putAll(coaIdToRepeatMap);
+	}
+
+	public void initialize(RTIambassador rti) {
 		synchronized(rti) {
 			// Mark COA nodes at the beginning of the graph as active from the
 			// beginning
-			for (COANode n : _currentRootNodes) {
-				n.setActive();
+			for (COANode coaNode : _currentRootNodeSet) {
+				coaNode.setActive();
 			}
 
 			// Make sure all interaction classes are loaded and pub-sub is configured
-			for (COANode node: _allNodes.values()) {
-				if (COANodeType.Action == node.getNodeType()) {
-					COAAction actionNode = (COAAction) node;
-					loadPublishedInteractionAndConfigurePublish(actionNode.getInteractionClassName(), federationName, rti);
-				} else if (COANodeType.Outcome == node.getNodeType()) {
-					COAOutcome outcomeNode = (COAOutcome) node;
-					loadSubscribedInteractionAndConfigureSubscribe(outcomeNode.getInteractionClassName(), federationName, rti);
-					logger.trace("COAGraph: Before setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
-					outcomeNode.setInteractionClassHandle(InteractionRoot.get_class_handle(outcomeNode.getInteractionClassName()));
-					logger.trace("COAGraph: After setting interaction class handle outcome node's handle value is: {}", outcomeNode.getInteractionClassHandle());
+			for (COANode coaNode: _coaNodeIdToCOANodeMap.values()) {
+				if (COANodeType.Action == coaNode.getNodeType()) {
+					COAAction actionNode = (COAAction) coaNode;
+					InteractionRoot.publish_interaction(actionNode.getInteractionClassName(), rti);
+				} else if (COANodeType.Outcome == coaNode.getNodeType()) {
+					COAOutcome outcomeNode = (COAOutcome) coaNode;
+					InteractionRoot.subscribe_interaction(outcomeNode.getInteractionClassName(), rti);
 				}
-			}
-		}
-	}
-
-	public Class loadInteractionClass(String intrFullyQualifiedName, String federationName) {
-		// Get class name for the fully qualified interaction name and try loading it
-		logger.trace("COAGraph: Interaction class name: {}... Now trying to load interaction class", intrFullyQualifiedName);
-		String intrClassName = federationName + "." + intrFullyQualifiedName.substring( intrFullyQualifiedName.lastIndexOf( '.' ) + 1 );
-		Class intrClass = null;
-		try {
-			intrClass = Class.forName(intrClassName);
-			logger.trace("COAGraph: Class loaded successfully: {}", intrClassName);
-			return intrClass;
-		} catch (Exception e) {
-			logger.error("COAGraph: Could not load class: {}", intrClassName);
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	public InteractionRoot createInteractionInstance(String intrFullyQualifiedName, String intrClassName) {
-		logger.trace("COAGraph: Trying to create interaction using class: {}", intrClassName);
-        InteractionRoot interactionRoot = InteractionRoot.create_interaction(intrFullyQualifiedName);
-		logger.trace("COAGraph: Interaction created was: {}", interactionRoot);
-		return interactionRoot;
-	}
-
-	public void publishOrSubscribeAnInteractionClass(Class intrClass, RTIambassador rti, boolean bPublish) {
-		synchronized (rti) {
-			logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Got interaction class as: {}", intrClass);
-			if (intrClass == null)
-				return;
-			try {
-				Class[] pubSubMethodArgs = new Class[1];
-				pubSubMethodArgs[0] = hla.rti.RTIambassador.class;
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Getting Publish/Subscribe method to invoke");
-				Method pubSubMethod = null;
-				if (bPublish) {
-					pubSubMethod = intrClass.getDeclaredMethod("publish", pubSubMethodArgs);
-				} else {
-					pubSubMethod = intrClass.getDeclaredMethod("subscribe", pubSubMethodArgs);
-				}
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Invoking Publish/Subscribe method: {}", pubSubMethod);
-				pubSubMethod.invoke(null, rti);
-				logger.trace("COAGraph:publishOrSubscribeAnInteractionClass: Publish/Subscribe method invokation was successful");
-			} catch (Exception e) {
-				logger.error("COAGraph:publishOrSubscribeAnInteractionClass: Failed to invoke Publish/Subscribe method");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void loadPublishedInteractionAndConfigurePublish(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
-		synchronized (rti) {
-			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
-			if ( intrClass != null ) {
-				logger.trace("COAGraph: For COAs, PUBLISHING interaction class: {}", intrClass);
-				publishOrSubscribeAnInteractionClass(intrClass, rti, true);
-			}
-		}
-	}
-
-	public void loadSubscribedInteractionAndConfigureSubscribe(String intrFullyQualifiedName, String federationName, RTIambassador rti) {
-		synchronized(rti) {
-			Class intrClass = loadInteractionClass(intrFullyQualifiedName, federationName);
-			if ( intrClass != null ) {
-				logger.trace("COAGraph: For COAs, SUBSCRIBING to interaction class: {}", intrClass);
-				publishOrSubscribeAnInteractionClass(intrClass, rti, false);
 			}
 		}
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		for (COANode n : _rootNodes) {
-			buffer.append(n.getSuccessorGraphString(""));
+		StringBuilder buffer = new StringBuilder();
+		for (COANode coaNode : _rootNodeSet) {
+			buffer.append(coaNode.getSuccessorGraphString(""));
 			buffer.append("\n");
 		}
 		return buffer.toString();
 	}
 
-	public HashMap<String, COANode> getAllCOANodes() {
-		return _allNodes;
-	}
-
-	public HashSet<COANode> getRootNodes() {
-		return _rootNodes;
-	}
-
-	public HashSet<COANode> getCurrentRootNodes() {
-		return _currentRootNodes;
-	}
-
-	public HashSet<COAEdge> getAllCOAEdges() {
-		return _allEdges;
+	public Set<COANode> getCurrentRootNodes() {
+		return _currentRootNodeSet;
 	}
 
 	public void addNode(COANode node) {
@@ -198,17 +121,18 @@ public class COAGraph {
 			throw new RuntimeException("(" + this
 					+ "): Node supplied to add is NULL");
 		}
-		_allNodes.put(node.getId(), node);
-		_rootNodes.add(node);
-		_currentRootNodes.add(node);
+		_coaNodeIdToCOANodeMap.put(node.getId(), node);
+		_rootNodeSet.add(node);
+		_currentRootNodeSet.add(node);
 	}
 
 	public COANode getNode(String nodeUniqueID) {
-		if (_allNodes.isEmpty() || !_allNodes.containsKey(nodeUniqueID)) {
+		if (_coaNodeIdToCOANodeMap.isEmpty() || !_coaNodeIdToCOANodeMap.containsKey(nodeUniqueID)) {
 			throw new IllegalStateException(
-					"Searched node was not found - make sure all nodes are added before being referred.");
+					"Searched node was not found - make sure all nodes are added before being referred."
+			);
 		}
-		return _allNodes.get(nodeUniqueID);
+		return _coaNodeIdToCOANodeMap.get(nodeUniqueID);
 	}
 
 	public void addEdge(COAEdge edge) {
@@ -228,9 +152,9 @@ public class COAGraph {
 		COANode fromNode = edge.getFromNode();
 		COANode toNode = edge.getToNode();
 
-		if (_allNodes.isEmpty()
-				|| !_allNodes.containsKey(fromNode.getId())
-				|| !_allNodes.containsKey(toNode.getId())) {
+		if (_coaNodeIdToCOANodeMap.isEmpty()
+				|| !_coaNodeIdToCOANodeMap.containsKey(fromNode.getId())
+				|| !_coaNodeIdToCOANodeMap.containsKey(toNode.getId())) {
 			throw new RuntimeException(
 					"All nodes must be added before edges are added in the graph.");
 		}
@@ -253,22 +177,46 @@ public class COAGraph {
 			((COAOutcomeFilter) toNode).setOutcome((COAOutcome) fromNode);
 		}
 
-		_rootNodes.remove(toNode);
-		_currentRootNodes.remove(toNode);
+		_rootNodeSet.remove(toNode);
+		_currentRootNodeSet.remove(toNode);
 		fromNode.addSuccessor(toNode);
 		toNode.addPredecessor(fromNode);
 
-		_allEdges.add(edge);
+		_coaEdgeIdToCOAEdgeMap.put(edge.getId(), edge);
 
 		if (!_edgesFromNodeMap.containsKey(fromNode)) {
-			HashSet<COAEdge> fromNodeEdges = new HashSet<COAEdge>();
+			HashSet<COAEdge> fromNodeEdges = new HashSet<>();
 			_edgesFromNodeMap.put(fromNode, fromNodeEdges);
 		}
 		_edgesFromNodeMap.get(fromNode).add(edge);
 	}
 
-	public void markNodeExecuted(COANode node, double nodeExecutedTime) {
-		if (node == null) {
+
+	public void initializeRepeatMaps() {
+
+		for(COANode coaNode: _coaNodeIdToCOANodeMap.values()) {
+			String coaId = coaNode.getCOAId();
+			if (!_coaIdToCOANodeIdSetMap.containsKey(coaId)) {
+				_coaIdToCOANodeIdSetMap.put(coaId, new HashSet<>());
+			}
+			_coaIdToCOANodeIdSetMap.get(coaId).add(coaNode.getId());
+		}
+
+		for(COANode rootNode: _rootNodeSet) {
+			rootNode.setIsRootCOANode(true);
+		}
+
+		for(COAEdge coaEdge: _coaEdgeIdToCOAEdgeMap.values()) {
+			String coaId = coaEdge.getCOAId();
+			if (!_coaIdToCOAEdgeIdSetMap.containsKey(coaId)) {
+				_coaIdToCOAEdgeIdSetMap.put(coaId, new HashSet<>());
+			}
+			_coaIdToCOAEdgeIdSetMap.get(coaId).add(coaEdge.getId());
+		}
+	}
+
+	public void markNodeExecuted(COANode origNode, double nodeExecutedTime) {
+		if (origNode == null) {
 			throw new RuntimeException(
 					"Node give to be marked as executed is NULL.");
 		}
@@ -276,20 +224,26 @@ public class COAGraph {
 			throw new RuntimeException(
 					"Time of node execution given as negative.");
 		}
-		if (_currentRootNodes.isEmpty() || !_currentRootNodes.contains(node)) {
-			throw new RuntimeException(
-					"Invalid node give to be marked as executed: " + node);
+		if (_currentRootNodeSet.isEmpty() || !_currentRootNodeSet.contains(origNode)) {
+			throw new RuntimeException("Invalid node give to be marked as executed: " + origNode);
+		}
+
+		COANode node = origNode;
+		if (origNode.getIsRootCOANode() && _coaIdToRepeatMap.get(origNode.getCOAId())) {
+			node = copyCOA(origNode);
+			origNode.initializeNode();
+		} else {
+			_currentRootNodeSet.remove(node);
 		}
 
 		node.setExecuted(nodeExecutedTime);
-		_currentRootNodes.remove(node);
 		logger.debug("Node executed in sequence graph: {}", node);
 
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
 		if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
-			HashMap<COANode, Double> successorsWithCumuProb = new HashMap<COANode, Double>();
-			HashSet<COAEdge> outEdges = _edgesFromNodeMap.get(node);
+			Map<COANode, Double> successorsWithCumuProb = new HashMap<>();
+			Set<COAEdge> outEdges = _edgesFromNodeMap.get(node);
 			COANode chosenSuccessor = null;
 
 			// Normalize probabilities on the successor elements
@@ -343,7 +297,7 @@ public class COAGraph {
 		}
 
 		// Successor status updates and graph updates
-		HashSet<COANode> successors = node.getSuccessors();
+		Set<COANode> successors = node.getSuccessors();
 		logger.trace("COAGraph: Node {} has {} successors", node, successors.size());
 		if (successors.size() > 0) {
 			for (COANode succ : successors) {
@@ -356,34 +310,25 @@ public class COAGraph {
 				// Also, before activating make sure that the chosen successor
 				// is enabled as choice.
 				logger.trace("COAGraph: Checking out the successor {}", succ);
-				boolean succAlreadyInCurrentRootNodes = _currentRootNodes
-						.contains(succ);
+				boolean succAlreadyInCurrentRootNodes = _currentRootNodeSet.contains(succ);
 				if (!succAlreadyInCurrentRootNodes
 						&& COANodeStatus.Executed != succ.getNodeStatus()) {
 					boolean aSuccPredecessorInCurrentRootNodes = false;
 					for (COANode succPred : succ.getPredecessors()) {
-						if (_currentRootNodes.contains(succPred)) {
+						if (_currentRootNodeSet.contains(succPred)) {
 							aSuccPredecessorInCurrentRootNodes = true;
 							break; // inner for-loop
 						}
 					}
-					if (!aSuccPredecessorInCurrentRootNodes
-							|| COANodeType.SyncPoint == succ.getNodeType()
-							|| COANodeType.AwaitN== succ.getNodeType()) {
-						if (COANodeType.SyncPoint == node.getNodeType()) {
-							// TODO: If node that executed is SyncPt, then
-							// enable only those successors that have valid
-							// branches finished (i.e., handle exceptions)
-							if (succ.enabledAsChoice()) {
-								_currentRootNodes.add(succ);
-								succ.setActive();
-							}
-						} else {
-							if (succ.enabledAsChoice()) {
-								_currentRootNodes.add(succ);
-								succ.setActive();
-							}
-						}
+					if (
+							succ.enabledAsChoice() && (
+									!aSuccPredecessorInCurrentRootNodes
+											|| COANodeType.SyncPoint == succ.getNodeType()
+											|| COANodeType.AwaitN== succ.getNodeType()
+							)
+					) {
+						_currentRootNodeSet.add(succ);
+						succ.setActive();
 					}
 				}
 
@@ -398,4 +343,76 @@ public class COAGraph {
 			}
 		}
 	}
+
+	private static int suffixNumber = 0;
+
+	private static String getSuffix() {
+		return Integer.toString(suffixNumber++);
+	}
+
+	private COANode copyCOA(COANode coaNode) {
+		String coaId = coaNode.getCOAId();
+		Map<String, COANode> originalCOANodeIdToCOANodeCopyMap = new HashMap<>();
+		String idSuffix = getSuffix();
+
+		for(String coaNodeId: _coaIdToCOANodeIdSetMap.get(coaId)) {
+			COANode originalCOANode = _coaNodeIdToCOANodeMap.get(coaNodeId);
+			COANode coaNodeCopy = originalCOANode.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix);
+
+			String coaNodeCopyId = coaNodeCopy.getId();
+			_coaNodeIdToCOANodeMap.put(coaNodeCopyId, coaNodeCopy);
+
+			String newCOAId = coaNodeCopy.getCOAId();
+			if (!_coaIdToCOANodeIdSetMap.containsKey(newCOAId)) {
+				_coaIdToCOANodeIdSetMap.put(newCOAId, new HashSet<>());
+			}
+			_coaIdToCOANodeIdSetMap.get(newCOAId).add(coaNodeCopyId);
+		}
+
+		for(String coaEdgeId: _coaIdToCOAEdgeIdSetMap.get(coaId)) {
+			COAEdge originalCOAEdge = _coaEdgeIdToCOAEdgeMap.get(coaEdgeId);
+			COAEdge coaEdgeCopy = originalCOAEdge.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix);
+
+			String coaEdgeCopyId = coaEdgeCopy.getId();
+			_coaEdgeIdToCOAEdgeMap.put(coaEdgeCopyId, coaEdgeCopy);
+
+			String newCOAId = coaEdgeCopy.getCOAId();
+			if (!_coaIdToCOAEdgeIdSetMap.containsKey(newCOAId)) {
+				_coaIdToCOAEdgeIdSetMap.put(newCOAId, new HashSet<>());
+			}
+			_coaIdToCOAEdgeIdSetMap.get(newCOAId).add(coaEdgeCopyId);
+
+			COANode fromNode = coaEdgeCopy.getFromNode();
+			if (!_edgesFromNodeMap.containsKey(fromNode)) {
+				_edgesFromNodeMap.put(fromNode, new HashSet<>());
+			}
+			_edgesFromNodeMap.get(fromNode).add(coaEdgeCopy);
+		}
+
+		return originalCOANodeIdToCOANodeCopyMap.get(coaNode.getId());
+	}
+
+	public void purgeCOAs() {
+		Set<String> coaIdSet = new HashSet<>(_coaIdToCOANodeIdSetMap.keySet());
+		for(COANode coaNode: _currentRootNodeSet) {
+			coaIdSet.remove(coaNode.getCOAId());
+		}
+
+		for(String coaId: coaIdSet) {
+			Set<String> coaNodeIdSet = _coaIdToCOANodeIdSetMap.get(coaId);
+			for(String coaNodeId: coaNodeIdSet) {
+				COANode coaNode = _coaNodeIdToCOANodeMap.get(coaNodeId);
+				_edgesFromNodeMap.remove(coaNode);
+				_coaNodeIdToCOANodeMap.remove(coaNodeId);
+			}
+			_coaIdToCOANodeIdSetMap.remove(coaId);
+
+			Set<String> coaEdgeIdSet = _coaIdToCOAEdgeIdSetMap.get(coaId);
+			for(String codeEdgeId: coaEdgeIdSet) {
+				_coaEdgeIdToCOAEdgeMap.remove(codeEdgeId);
+			}
+			_coaIdToCOAEdgeIdSetMap.remove(coaId);
+		}
+	}
+
 }

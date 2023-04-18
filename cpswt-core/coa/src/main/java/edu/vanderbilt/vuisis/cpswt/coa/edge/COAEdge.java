@@ -35,11 +35,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.vanderbilt.vuisis.cpswt.coa.node.COANode;
 
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A simple class for a COA edge in the COA sequence graph.
  */
-public class COAEdge {
+public class COAEdge implements Cloneable {
 
     @JsonProperty("type")
 	private COAEdgeType edgeType;
@@ -48,7 +50,7 @@ public class COAEdge {
 	private String id;
 
 	@JsonIgnore
-	private HashSet<String> branchesFinishedCondition = new HashSet<String>();
+	private final Set<String> branchesFinishedCondition = new HashSet<>();
 
 	@JsonProperty("name")
     private String name;
@@ -58,6 +60,9 @@ public class COAEdge {
 
 	@JsonProperty("toNode")
     private String toNodeId;
+
+	@JsonProperty("coaId")
+	private String coaId = "<NOT-SPECIFIED>";
 
 	@JsonIgnore
 	private COANode fromNode;
@@ -91,6 +96,34 @@ public class COAEdge {
 		}
 	}
 
+	protected COAEdge clone() throws CloneNotSupportedException {
+		return (COAEdge)super.clone();
+	}
+
+	public COAEdge copy(
+			Map<String, COANode> originalCOANodeIdToCOANodeCopyMap, String idSuffix
+	) {
+
+		COAEdge coaEdgeCopy;
+
+		try {
+			coaEdgeCopy = clone();
+		} catch(Exception e) {
+			return null; // SHOULD NEVER BE REACHED
+		}
+
+		coaEdgeCopy.id += "-" + idSuffix;
+		coaEdgeCopy.coaId +=  "-" + idSuffix;
+
+		coaEdgeCopy.fromNodeId += "-" + idSuffix;
+		coaEdgeCopy.toNodeId += "-" + idSuffix;
+
+		coaEdgeCopy.fromNode = originalCOANodeIdToCOANodeCopyMap.get(fromNode.getId());
+		coaEdgeCopy.toNode = originalCOANodeIdToCOANodeCopyMap.get(toNode.getId());
+
+		return coaEdgeCopy;
+	}
+
 	@Override
 	public String toString() {
 	    return String.format("[%s] %s --to--> %s", name, fromNode.getName(), toNode.getName());
@@ -104,7 +137,11 @@ public class COAEdge {
         this.edgeType = edgeType;
     }
 
-    public String getId() {
+	public String getCOAId() {
+		return coaId;
+	}
+
+	public String getId() {
 		return id;
 	}
 	public void setId(String id) {
@@ -135,7 +172,7 @@ public class COAEdge {
         this.toNodeId = toNodeId;
     }
 
-    public HashSet<String> getBranchesFinishedCondition() {
+    public Set<String> getBranchesFinishedCondition() {
 		return branchesFinishedCondition;
 	}
 

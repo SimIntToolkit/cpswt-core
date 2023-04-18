@@ -52,17 +52,12 @@ import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
 import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflectorComparator;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
-import org.json.JSONObject;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
 
@@ -112,6 +107,121 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
 
 @SuppressWarnings("unused")
 public class SynchronizedFederate extends NullFederateAmbassador {
+
+    private static class UniquePriorityBlockingQueue<T> extends PriorityBlockingQueue<T> {
+
+        private static int _unique_num = 0;
+
+        private static int get_unique_num() {
+            return _unique_num++;
+        }
+
+        public UniquePriorityBlockingQueue() {
+            super();
+        }
+
+        public UniquePriorityBlockingQueue(Collection<? extends T> c) {
+            super(c);
+        }
+
+        public UniquePriorityBlockingQueue(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        public UniquePriorityBlockingQueue(int initialCapacity, Comparator<T> comparator) {
+            super(initialCapacity, comparator);
+        }
+
+        private final int _uniqueNum = get_unique_num();
+
+        public int getUniqueNum() {
+            return _uniqueNum;
+        }
+    }
+
+    private static class UniquePriorityBlockingQueueComparator<T> implements Comparator<UniquePriorityBlockingQueue<T>> {
+
+        @Override
+        public int compare(
+                UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue1,
+                UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue2
+        ) {
+            return uniquePriorityBlockingQueue1.getUniqueNum() - uniquePriorityBlockingQueue2.getUniqueNum();
+        }
+    }
+
+    private static class PriorityBlockingMultiQueue<T> {
+        private final Set<Integer> _uniqueNumSet = new HashSet<>();
+        private final PriorityBlockingQueue<UniquePriorityBlockingQueue<T>> _priorityBlockingQueue =
+                new PriorityBlockingQueue<>(2, new UniquePriorityBlockingQueueComparator<T>());
+
+        public int size() {
+            int size = 0;
+            for (UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue : _priorityBlockingQueue) {
+                size += uniquePriorityBlockingQueue.size();
+            }
+            return size;
+        }
+
+        public boolean isEmpty() {
+            for (UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue : _priorityBlockingQueue) {
+                if (!uniquePriorityBlockingQueue.isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public synchronized boolean add(UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue) {
+            if (_uniqueNumSet.contains(uniquePriorityBlockingQueue.getUniqueNum())) {
+                return true;
+            }
+            _uniqueNumSet.add(uniquePriorityBlockingQueue.getUniqueNum());
+            return _priorityBlockingQueue.add(uniquePriorityBlockingQueue);
+        }
+
+        public T poll() {
+            for (UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue : _priorityBlockingQueue) {
+                T item = uniquePriorityBlockingQueue.poll();
+                if (item != null) {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        public T peek() {
+            for (UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue : _priorityBlockingQueue) {
+                T item = uniquePriorityBlockingQueue.peek();
+                if (item != null) {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        public synchronized T take() {
+
+            while(true) {
+                boolean notTaken = true;
+                while(notTaken) {
+                    try {
+                        UniquePriorityBlockingQueue<T> uniquePriorityBlockingQueue = _priorityBlockingQueue.take();
+                        notTaken = false;
+                        T item = uniquePriorityBlockingQueue.poll();
+                        if (item != null) {
+                            _priorityBlockingQueue.add(uniquePriorityBlockingQueue);
+                            return item;
+                        }
+                        _uniqueNumSet.remove(uniquePriorityBlockingQueue.getUniqueNum());
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+    }
+
+
     private static final Logger logger = LogManager.getLogger(SynchronizedFederate.class);
     public static final int internalThreadWaitTimeMs = 250;
 
@@ -242,6 +352,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public FederateState getFederateState() {
         return this.federateState;
     }
+
     public boolean setFederateState(FederateState newState) {
 
         // TODO: add Mutex
@@ -279,6 +390,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public void destroyRTI() {
         rti = null;
+    }
+
+    public void readFederationJson(String federationJsonFileName) {
+        if (federationJsonFileName == null || federationJsonFileName.isEmpty()) {
+            return;
+        }
+        File federationJsonFile = new File(federationJsonFileName);
+        InteractionRoot.readFederationJson(federationJsonFile);
+        ObjectRoot.readFederationJson(federationJsonFile);
     }
 
     public void initializeMessaging() {
@@ -1075,9 +1195,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    private static final PriorityBlockingQueue<InteractionRoot> _interactionQueue = new PriorityBlockingQueue<>(
-            10, new InteractionRootComparator()
-    );
+    private static final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithoutTime =
+            new UniquePriorityBlockingQueue<>(10, new InteractionRootComparator());
+
+    private static final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithTime =
+            new UniquePriorityBlockingQueue<>(10, new InteractionRootComparator());
+
+    private static final PriorityBlockingMultiQueue<InteractionRoot> _fullInteractionQueue =
+            new PriorityBlockingMultiQueue<>();
 
     /**
      * DO NOT USE -- Should only be used directly by the SynchronizedFederate class.
@@ -1093,7 +1218,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     public static void addInteraction(InteractionRoot interactionRoot) {
         logger.trace("Received: {}", interactionRoot);
-        _interactionQueue.add(interactionRoot);
+        if (interactionRoot.getTime() >= 0) {
+            _interactionQueueWithTime.add(interactionRoot);
+            _fullInteractionQueue.add(_interactionQueueWithTime);
+        } else {
+            _interactionQueueWithoutTime.add(interactionRoot);
+            _fullInteractionQueue.add(_interactionQueueWithoutTime);
+        }
     }
 
     /**
@@ -1114,17 +1245,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * where receive-order interactions have a timestamp of -1.
      */
     public static InteractionRoot getNextInteraction() {
-        InteractionRoot interactionRoot = null;
-        boolean takeNotComplete = true;
-        while (takeNotComplete) {
-            try {
-                interactionRoot = _interactionQueue.take();
-                takeNotComplete = false;
-            } catch (InterruptedException ignored) {
-            }
-
-        }
-        return interactionRoot;
+        return _fullInteractionQueue.take();
     }
 
     /**
@@ -1136,7 +1257,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * to the {@link InteractionRoot} class.  False, otherwise.
      */
     public static boolean isNotEmpty() {
-        return !_interactionQueue.isEmpty();
+        return !_fullInteractionQueue.isEmpty();
     }
 
     /**
@@ -1148,8 +1269,55 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * are no interactions currently available
      */
     public static InteractionRoot getNextInteractionNoWait() {
-        InteractionRoot interactionRoot = _interactionQueue.poll();
-        logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueue.size());
+        InteractionRoot interactionRoot = _fullInteractionQueue.poll();
+        logger.trace("Removed interaction from queue (poll), size now = {}", _fullInteractionQueue.size());
+        return interactionRoot;
+    }
+
+    public static InteractionRoot getNextInteractionWithTime() {
+        InteractionRoot interactionRoot = null;
+        boolean takeNotComplete = true;
+        while (takeNotComplete) {
+            try {
+                interactionRoot = _interactionQueueWithTime.take();
+                takeNotComplete = false;
+            } catch (InterruptedException ignored) {
+            }
+        }
+        return interactionRoot;
+    }
+
+    public static boolean isNotEmptyWithTime() {
+        return !_interactionQueueWithTime.isEmpty();
+    }
+
+    public static InteractionRoot getNextInteractionWithTimeNoWait() {
+        InteractionRoot interactionRoot = _interactionQueueWithTime.poll();
+        logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueueWithTime.size());
+        return interactionRoot;
+    }
+
+    public static InteractionRoot getNextInteractionWithoutTime() {
+        InteractionRoot interactionRoot = null;
+        boolean takeNotComplete = true;
+        while (takeNotComplete) {
+            try {
+                interactionRoot = _interactionQueueWithoutTime.take();
+                takeNotComplete = false;
+            } catch (InterruptedException ignored) {
+            }
+
+        }
+        return interactionRoot;
+    }
+
+    public static boolean isNotEmptyWithoutTime() {
+        return !_interactionQueueWithoutTime.isEmpty();
+    }
+
+    public static InteractionRoot getNextInteractionWithoutTimeNoWait() {
+        InteractionRoot interactionRoot = _interactionQueueWithoutTime.poll();
+        logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueueWithoutTime.size());
         return interactionRoot;
     }
 
@@ -1161,9 +1329,11 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     private boolean unmatchingFedFilterProvided(InteractionRoot interactionRoot) {
-        if (!isMapperFederate()) {
-            C2WInteractionRoot c2wInteractionRoot = (C2WInteractionRoot) interactionRoot;
-            String fedFilter = c2wInteractionRoot.get_federateFilter();
+        if (
+                !isMapperFederate() &&
+                interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name())
+        ) {
+            String fedFilter = (String) interactionRoot.getParameter("federateFilter");
             if (fedFilter != null) {
                 fedFilter = fedFilter.trim();
                 if ((fedFilter.length() > 0) && (fedFilter.compareTo(getFederateId()) != 0)) {
