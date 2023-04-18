@@ -49,19 +49,19 @@ public class COAGraph {
 
 	private static final Logger logger = LogManager.getLogger(COAGraph.class);
 
-	private final Map<String, COANode> _allNodes = new HashMap<>();
+	private final Map<String, COANode> _coaNodeIdToCOANodeMap = new HashMap<>();
 
-	private final Set<COANode> _rootNodes = new HashSet<>();
+	private final Set<COANode> _rootNodeSet = new HashSet<>();
 
-	private final Set<COANode> _currentRootNodes = new HashSet<>();
+	private final Set<COANode> _currentRootNodeSet = new HashSet<>();
 
-	private final Set<COAEdge> _allEdges = new HashSet<>();
+	private final Map<String, COAEdge> _coaEdgeIdToCOAEdgeMap = new HashMap<>();
 
 	private final Map<COANode, Set<COAEdge>> _edgesFromNodeMap = new HashMap<>();
 
 	private final Map<String, Set<String>> _coaIdToCOANodeIdSetMap = new HashMap<>();
 
-	private final Map<String, Set<String>> _coaIdToRootCOANodeIdSetMap = new HashMap<>();
+	private final Map<String, Set<String>> _coaIdToCOAEdgeIdSetMap = new HashMap<>();
 
 	private final Map<String, Boolean> _coaIdToRepeatMap = new HashMap<>();
 
@@ -71,8 +71,8 @@ public class COAGraph {
 	public void setCurrentRootNodesAsActive() {
 		// Mark COA nodes at the beginning of the graph as active from the
 		// beginning
-		for (COANode n : _currentRootNodes) {
-			n.setActive();
+		for (COANode coaNode : _currentRootNodeSet) {
+			coaNode.setActive();
 		}
 	}
 
@@ -81,21 +81,21 @@ public class COAGraph {
 		_coaIdToRepeatMap.putAll(coaIdToRepeatMap);
 	}
 
-	public void initialize(String federationName, RTIambassador rti) {
+	public void initialize(RTIambassador rti) {
 		synchronized(rti) {
 			// Mark COA nodes at the beginning of the graph as active from the
 			// beginning
-			for (COANode n : _currentRootNodes) {
-				n.setActive();
+			for (COANode coaNode : _currentRootNodeSet) {
+				coaNode.setActive();
 			}
 
 			// Make sure all interaction classes are loaded and pub-sub is configured
-			for (COANode node: _allNodes.values()) {
-				if (COANodeType.Action == node.getNodeType()) {
-					COAAction actionNode = (COAAction) node;
+			for (COANode coaNode: _coaNodeIdToCOANodeMap.values()) {
+				if (COANodeType.Action == coaNode.getNodeType()) {
+					COAAction actionNode = (COAAction) coaNode;
 					InteractionRoot.publish_interaction(actionNode.getInteractionClassName(), rti);
-				} else if (COANodeType.Outcome == node.getNodeType()) {
-					COAOutcome outcomeNode = (COAOutcome) node;
+				} else if (COANodeType.Outcome == coaNode.getNodeType()) {
+					COAOutcome outcomeNode = (COAOutcome) coaNode;
 					InteractionRoot.subscribe_interaction(outcomeNode.getInteractionClassName(), rti);
 				}
 			}
@@ -105,27 +105,15 @@ public class COAGraph {
 	@Override
 	public String toString() {
 		StringBuilder buffer = new StringBuilder();
-		for (COANode n : _rootNodes) {
-			buffer.append(n.getSuccessorGraphString(""));
+		for (COANode coaNode : _rootNodeSet) {
+			buffer.append(coaNode.getSuccessorGraphString(""));
 			buffer.append("\n");
 		}
 		return buffer.toString();
 	}
 
-	public Map<String, COANode> getAllCOANodes() {
-		return _allNodes;
-	}
-
-	public Set<COANode> getRootNodes() {
-		return _rootNodes;
-	}
-
 	public Set<COANode> getCurrentRootNodes() {
-		return _currentRootNodes;
-	}
-
-	public Set<COAEdge> getAllCOAEdges() {
-		return _allEdges;
+		return _currentRootNodeSet;
 	}
 
 	public void addNode(COANode node) {
@@ -133,17 +121,18 @@ public class COAGraph {
 			throw new RuntimeException("(" + this
 					+ "): Node supplied to add is NULL");
 		}
-		_allNodes.put(node.getId(), node);
-		_rootNodes.add(node);
-		_currentRootNodes.add(node);
+		_coaNodeIdToCOANodeMap.put(node.getId(), node);
+		_rootNodeSet.add(node);
+		_currentRootNodeSet.add(node);
 	}
 
 	public COANode getNode(String nodeUniqueID) {
-		if (_allNodes.isEmpty() || !_allNodes.containsKey(nodeUniqueID)) {
+		if (_coaNodeIdToCOANodeMap.isEmpty() || !_coaNodeIdToCOANodeMap.containsKey(nodeUniqueID)) {
 			throw new IllegalStateException(
-					"Searched node was not found - make sure all nodes are added before being referred.");
+					"Searched node was not found - make sure all nodes are added before being referred."
+			);
 		}
-		return _allNodes.get(nodeUniqueID);
+		return _coaNodeIdToCOANodeMap.get(nodeUniqueID);
 	}
 
 	public void addEdge(COAEdge edge) {
@@ -163,9 +152,9 @@ public class COAGraph {
 		COANode fromNode = edge.getFromNode();
 		COANode toNode = edge.getToNode();
 
-		if (_allNodes.isEmpty()
-				|| !_allNodes.containsKey(fromNode.getId())
-				|| !_allNodes.containsKey(toNode.getId())) {
+		if (_coaNodeIdToCOANodeMap.isEmpty()
+				|| !_coaNodeIdToCOANodeMap.containsKey(fromNode.getId())
+				|| !_coaNodeIdToCOANodeMap.containsKey(toNode.getId())) {
 			throw new RuntimeException(
 					"All nodes must be added before edges are added in the graph.");
 		}
@@ -188,12 +177,12 @@ public class COAGraph {
 			((COAOutcomeFilter) toNode).setOutcome((COAOutcome) fromNode);
 		}
 
-		_rootNodes.remove(toNode);
-		_currentRootNodes.remove(toNode);
+		_rootNodeSet.remove(toNode);
+		_currentRootNodeSet.remove(toNode);
 		fromNode.addSuccessor(toNode);
 		toNode.addPredecessor(fromNode);
 
-		_allEdges.add(edge);
+		_coaEdgeIdToCOAEdgeMap.put(edge.getId(), edge);
 
 		if (!_edgesFromNodeMap.containsKey(fromNode)) {
 			HashSet<COAEdge> fromNodeEdges = new HashSet<>();
@@ -204,51 +193,30 @@ public class COAGraph {
 
 
 	public void initializeRepeatMaps() {
-		Set<COANode> allCOANodeSet = new HashSet<>(getAllCOANodes().values());
 
-		for(COANode coaNode: allCOANodeSet) {
+		for(COANode coaNode: _coaNodeIdToCOANodeMap.values()) {
 			String coaId = coaNode.getCOAId();
 			if (!_coaIdToCOANodeIdSetMap.containsKey(coaId)) {
 				_coaIdToCOANodeIdSetMap.put(coaId, new HashSet<>());
 			}
-			_coaIdToCOANodeIdSetMap.get(coaNode.getCOAId()).add(coaNode.getId());
+			_coaIdToCOANodeIdSetMap.get(coaId).add(coaNode.getId());
 		}
 
-		for(COANode rootNode: _rootNodes) {
-			String rootNodeCOAId = rootNode.getCOAId();
-			if (!_coaIdToRootCOANodeIdSetMap.containsKey(rootNodeCOAId)) {
-				_coaIdToRootCOANodeIdSetMap.put(rootNodeCOAId, new HashSet<>());
+		for(COANode rootNode: _rootNodeSet) {
+			rootNode.setIsRootCOANode(true);
+		}
+
+		for(COAEdge coaEdge: _coaEdgeIdToCOAEdgeMap.values()) {
+			String coaId = coaEdge.getCOAId();
+			if (!_coaIdToCOAEdgeIdSetMap.containsKey(coaId)) {
+				_coaIdToCOAEdgeIdSetMap.put(coaId, new HashSet<>());
 			}
-			_coaIdToRootCOANodeIdSetMap.get(rootNodeCOAId).add(rootNode.getId());
+			_coaIdToCOAEdgeIdSetMap.get(coaId).add(coaEdge.getId());
 		}
 	}
 
-	public void repeatCOAs() {
-		Set<String> coaIdSet = new HashSet<>(_coaIdToRootCOANodeIdSetMap.keySet());
-		for(COANode coaNode: _currentRootNodes) {
-			coaIdSet.remove(coaNode.getCOAId());
-		}
-		for(Map.Entry<String, Boolean> entry: _coaIdToRepeatMap.entrySet()) {
-			if (!entry.getValue()) {
-				coaIdSet.remove(entry.getKey());
-			}
-		}
-
-		for(String coaId: coaIdSet) {
-			Set<String> coaNodeIdSet = _coaIdToCOANodeIdSetMap.get(coaId);
-			for(String coaNodeId: coaNodeIdSet) {
-				COANode coaNode = _allNodes.get(coaNodeId);
-				coaNode.initializeNode();
-			}
-			Set<String> rootNodeIdSet = _coaIdToRootCOANodeIdSetMap.get(coaId);
-			for(String rootNodeId: rootNodeIdSet) {
-				_currentRootNodes.add(_allNodes.get(rootNodeId));
-			}
-		}
-	}
-
-	public void markNodeExecuted(COANode node, double nodeExecutedTime) {
-		if (node == null) {
+	public void markNodeExecuted(COANode origNode, double nodeExecutedTime) {
+		if (origNode == null) {
 			throw new RuntimeException(
 					"Node give to be marked as executed is NULL.");
 		}
@@ -256,13 +224,19 @@ public class COAGraph {
 			throw new RuntimeException(
 					"Time of node execution given as negative.");
 		}
-		if (_currentRootNodes.isEmpty() || !_currentRootNodes.contains(node)) {
-			throw new RuntimeException(
-					"Invalid node give to be marked as executed: " + node);
+		if (_currentRootNodeSet.isEmpty() || !_currentRootNodeSet.contains(origNode)) {
+			throw new RuntimeException("Invalid node give to be marked as executed: " + origNode);
+		}
+
+		COANode node = origNode;
+		if (origNode.getIsRootCOANode() && _coaIdToRepeatMap.get(origNode.getCOAId())) {
+			node = copyCOA(origNode);
+			origNode.initializeNode();
+		} else {
+			_currentRootNodeSet.remove(node);
 		}
 
 		node.setExecuted(nodeExecutedTime);
-		_currentRootNodes.remove(node);
 		logger.debug("Node executed in sequence graph: {}", node);
 
 		// If the node is a probabilistic choice node, choose one successor
@@ -323,7 +297,7 @@ public class COAGraph {
 		}
 
 		// Successor status updates and graph updates
-		HashSet<COANode> successors = node.getSuccessors();
+		Set<COANode> successors = node.getSuccessors();
 		logger.trace("COAGraph: Node {} has {} successors", node, successors.size());
 		if (successors.size() > 0) {
 			for (COANode succ : successors) {
@@ -336,12 +310,12 @@ public class COAGraph {
 				// Also, before activating make sure that the chosen successor
 				// is enabled as choice.
 				logger.trace("COAGraph: Checking out the successor {}", succ);
-				boolean succAlreadyInCurrentRootNodes = _currentRootNodes.contains(succ);
+				boolean succAlreadyInCurrentRootNodes = _currentRootNodeSet.contains(succ);
 				if (!succAlreadyInCurrentRootNodes
 						&& COANodeStatus.Executed != succ.getNodeStatus()) {
 					boolean aSuccPredecessorInCurrentRootNodes = false;
 					for (COANode succPred : succ.getPredecessors()) {
-						if (_currentRootNodes.contains(succPred)) {
+						if (_currentRootNodeSet.contains(succPred)) {
 							aSuccPredecessorInCurrentRootNodes = true;
 							break; // inner for-loop
 						}
@@ -353,7 +327,7 @@ public class COAGraph {
 											|| COANodeType.AwaitN== succ.getNodeType()
 							)
 					) {
-						_currentRootNodes.add(succ);
+						_currentRootNodeSet.add(succ);
 						succ.setActive();
 					}
 				}
@@ -369,4 +343,76 @@ public class COAGraph {
 			}
 		}
 	}
+
+	private static int suffixNumber = 0;
+
+	private static String getSuffix() {
+		return Integer.toString(suffixNumber++);
+	}
+
+	private COANode copyCOA(COANode coaNode) {
+		String coaId = coaNode.getCOAId();
+		Map<String, COANode> originalCOANodeIdToCOANodeCopyMap = new HashMap<>();
+		String idSuffix = getSuffix();
+
+		for(String coaNodeId: _coaIdToCOANodeIdSetMap.get(coaId)) {
+			COANode originalCOANode = _coaNodeIdToCOANodeMap.get(coaNodeId);
+			COANode coaNodeCopy = originalCOANode.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix);
+
+			String coaNodeCopyId = coaNodeCopy.getId();
+			_coaNodeIdToCOANodeMap.put(coaNodeCopyId, coaNodeCopy);
+
+			String newCOAId = coaNodeCopy.getCOAId();
+			if (!_coaIdToCOANodeIdSetMap.containsKey(newCOAId)) {
+				_coaIdToCOANodeIdSetMap.put(newCOAId, new HashSet<>());
+			}
+			_coaIdToCOANodeIdSetMap.get(newCOAId).add(coaNodeCopyId);
+		}
+
+		for(String coaEdgeId: _coaIdToCOAEdgeIdSetMap.get(coaId)) {
+			COAEdge originalCOAEdge = _coaEdgeIdToCOAEdgeMap.get(coaEdgeId);
+			COAEdge coaEdgeCopy = originalCOAEdge.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix);
+
+			String coaEdgeCopyId = coaEdgeCopy.getId();
+			_coaEdgeIdToCOAEdgeMap.put(coaEdgeCopyId, coaEdgeCopy);
+
+			String newCOAId = coaEdgeCopy.getCOAId();
+			if (!_coaIdToCOAEdgeIdSetMap.containsKey(newCOAId)) {
+				_coaIdToCOAEdgeIdSetMap.put(newCOAId, new HashSet<>());
+			}
+			_coaIdToCOAEdgeIdSetMap.get(newCOAId).add(coaEdgeCopyId);
+
+			COANode fromNode = coaEdgeCopy.getFromNode();
+			if (!_edgesFromNodeMap.containsKey(fromNode)) {
+				_edgesFromNodeMap.put(fromNode, new HashSet<>());
+			}
+			_edgesFromNodeMap.get(fromNode).add(coaEdgeCopy);
+		}
+
+		return originalCOANodeIdToCOANodeCopyMap.get(coaNode.getId());
+	}
+
+	public void purgeCOAs() {
+		Set<String> coaIdSet = new HashSet<>(_coaIdToCOANodeIdSetMap.keySet());
+		for(COANode coaNode: _currentRootNodeSet) {
+			coaIdSet.remove(coaNode.getCOAId());
+		}
+
+		for(String coaId: coaIdSet) {
+			Set<String> coaNodeIdSet = _coaIdToCOANodeIdSetMap.get(coaId);
+			for(String coaNodeId: coaNodeIdSet) {
+				COANode coaNode = _coaNodeIdToCOANodeMap.get(coaNodeId);
+				_edgesFromNodeMap.remove(coaNode);
+				_coaNodeIdToCOANodeMap.remove(coaNodeId);
+			}
+			_coaIdToCOANodeIdSetMap.remove(coaId);
+
+			Set<String> coaEdgeIdSet = _coaIdToCOAEdgeIdSetMap.get(coaId);
+			for(String codeEdgeId: coaEdgeIdSet) {
+				_coaEdgeIdToCOAEdgeMap.remove(codeEdgeId);
+			}
+			_coaIdToCOAEdgeIdSetMap.remove(coaId);
+		}
+	}
+
 }

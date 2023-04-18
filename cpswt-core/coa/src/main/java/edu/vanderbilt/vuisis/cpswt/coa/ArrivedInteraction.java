@@ -32,14 +32,19 @@ package edu.vanderbilt.vuisis.cpswt.coa;
 
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
+import java.util.Set;
+import java.util.HashSet;
+
 /**
  * Stores last arrived interaction in the Federation Manager and is used by
  * OutcomeFilters of sequence model orchestrator to check the last arrived
  * interaction of the Outcome it filters.
  */
 public class ArrivedInteraction {
-    private InteractionRoot _ir;
-    private Double _arrTime;
+    private final InteractionRoot _ir;
+    private final Double _arrTime;
+
+    private final Set<String> coaIdSet = new HashSet<>();
 
     public ArrivedInteraction(InteractionRoot ir, Double arrTime) {
         if (ir == null) {
@@ -62,5 +67,13 @@ public class ArrivedInteraction {
 
     public Double getArrivalTime() {
         return _arrTime;
+    }
+
+    public void addCoaId(String coaId) {
+        coaIdSet.add(coaId);
+    }
+
+    public boolean hasCoaId(String coaId) {
+        return coaIdSet.contains(coaId);
     }
 }

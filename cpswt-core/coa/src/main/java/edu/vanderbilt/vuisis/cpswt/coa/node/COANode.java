@@ -35,12 +35,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * A simple base class for a COA node in the COA sequence graph.
  */
-public class COANode {
+public class COANode implements Cloneable {
 
     @JsonIgnore
     private static final Logger logger = LogManager.getLogger(COANode.class);
@@ -57,12 +59,14 @@ public class COANode {
 	@JsonProperty("coaId")
 	private String coaId = "<NOT-SPECIFIED>";
 
+	private boolean isRootCOANode = false;
+
 	private COANodeStatus nodeStatus;
 	private double nodeExecutedTime;
 	private boolean enabledAsChoice;
 
-	private final HashSet<COANode> predecessors = new HashSet<>();
-	private final HashSet<COANode> successors = new HashSet<>();
+	private Set<COANode> predecessors = new HashSet<>();
+	private Set<COANode> successors = new HashSet<>();
 
 	COANode() {}
 
@@ -83,6 +87,48 @@ public class COANode {
 		this.nodeStatus = COANodeStatus.Inactive;
 		this.enabledAsChoice = true;
 		this.nodeExecutedTime = -1;
+	}
+
+	public void setIsRootCOANode(boolean isRootCOANode) {
+		this.isRootCOANode = isRootCOANode;
+	}
+
+	public boolean getIsRootCOANode() {
+		return isRootCOANode;
+	}
+
+	@Override
+	protected COANode clone() throws CloneNotSupportedException{
+		return (COANode)super.clone();
+	}
+
+	public COANode copy(Map<String, COANode> originalCOANodeIdToCOANodeCopyMap, String idSuffix) {
+		if (originalCOANodeIdToCOANodeCopyMap.containsKey(getId())) {
+			return originalCOANodeIdToCOANodeCopyMap.get(getId());
+		}
+		COANode coaNodeCopy;
+		try {
+			coaNodeCopy = clone();
+		} catch (Exception e) {
+			return null;  // SHOULD NEVER BE REACHED
+		}
+
+		originalCOANodeIdToCOANodeCopyMap.put(getId(), coaNodeCopy);
+
+		coaNodeCopy.id += "-" + idSuffix;
+		coaNodeCopy.coaId +=  "-" + idSuffix;
+
+		coaNodeCopy.predecessors = new HashSet<>();
+		for(COANode coaNodePredecessor: predecessors) {
+			coaNodeCopy.predecessors.add(coaNodePredecessor.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix));
+		}
+
+		coaNodeCopy.successors = new HashSet<>();
+		for(COANode coaNodeSuccessor: successors) {
+			coaNodeCopy.successors.add(coaNodeSuccessor.copy(originalCOANodeIdToCOANodeCopyMap, idSuffix));
+		}
+
+		return coaNodeCopy;
 	}
 
 	@Override
@@ -128,10 +174,10 @@ public class COANode {
 		return nodeExecutedTime;
 	}
 
-	public HashSet<COANode> getPredecessors() {
+	public Set<COANode> getPredecessors() {
 		return predecessors;
 	}
-	public HashSet<COANode> getSuccessors() {
+	public Set<COANode> getSuccessors() {
 		return successors;
 	}
 
