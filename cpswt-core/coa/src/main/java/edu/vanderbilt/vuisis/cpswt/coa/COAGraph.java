@@ -31,7 +31,10 @@
 package edu.vanderbilt.vuisis.cpswt.coa;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -64,6 +67,8 @@ public class COAGraph {
 	private final Map<String, Set<String>> _coaIdToCOAEdgeIdSetMap = new HashMap<>();
 
 	private final Map<String, Boolean> _coaIdToRepeatMap = new HashMap<>();
+
+	private final Map<String, Map<String, InteractionRoot>> _coaIdToCOAOutcomeInteractionMapMap = new HashMap<>();
 
 	public COAGraph() {
 	}
@@ -241,7 +246,13 @@ public class COAGraph {
 
 		// If the node is a probabilistic choice node, choose one successor
 		// and remove the rest, if any.
-		if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
+		if (COANodeType.Outcome == node.getNodeType()) {
+
+			COAOutcome coaOutcome = (COAOutcome)node;
+			registerCOAOutcome(coaOutcome);
+
+		} else if (COANodeType.ProbabilisticChoice == node.getNodeType()) {
+
 			Map<COANode, Double> successorsWithCumuProb = new HashMap<>();
 			Set<COAEdge> outEdges = _edgesFromNodeMap.get(node);
 			COANode chosenSuccessor = null;
@@ -344,6 +355,95 @@ public class COAGraph {
 		}
 	}
 
+	public void registerCOAOutcome(COAOutcome coaOutcome) {
+		String coaId = coaOutcome.getCOAId();
+		if (!_coaIdToCOAOutcomeInteractionMapMap.containsKey(coaId)) {
+			_coaIdToCOAOutcomeInteractionMapMap.put(coaId, new HashMap<>());
+		}
+		Map<String, InteractionRoot> outcomeInteractionMap = _coaIdToCOAOutcomeInteractionMapMap.get(coaId);
+		outcomeInteractionMap.put(coaOutcome.getName(), coaOutcome.getLastArrivedInteraction());
+	}
+
+	public InteractionRoot getCOAActionInteraction(COAAction coaAction, double currentTime) {
+		String interactionClassName = coaAction.getInteractionClassName();
+		logger.trace("COAExecutor:executeCOAAction: Got interaction class name: {}... now trying to create interaction..", interactionClassName);
+
+		String coaId = coaAction.getCOAId();
+
+		InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClassName);
+		for(
+				Map.Entry<InteractionRootInterface.ClassAndPropertyName, Object> entry :
+				coaAction.getNameValueParamPairs().entrySet()
+		) {
+			Object value = entry.getValue();
+			if (value instanceof String) {
+				String stringValue = (String)value;
+
+				Pattern substitutionPatternWithBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$\\{(.+)}(.*)$");
+				Matcher substitutionMatcherWithBraces = substitutionPatternWithBraces.matcher(stringValue);
+
+				Pattern substitutionPatternWithoutBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$(.+)$");
+				Matcher substitutionMatcherWithoutBraces = substitutionPatternWithoutBraces.matcher(stringValue);
+
+				String beforeString = null;
+				String substitutionSpecifier = null;
+				String afterString = null;
+
+				if (substitutionMatcherWithBraces.matches()) {
+
+					beforeString = substitutionMatcherWithBraces.group(1);
+					substitutionSpecifier = substitutionMatcherWithBraces.group(2);
+					afterString = substitutionMatcherWithBraces.group(3);
+
+				} else if (substitutionMatcherWithoutBraces.matches()) {
+
+					beforeString = substitutionMatcherWithoutBraces.group(1);
+					substitutionSpecifier = substitutionMatcherWithoutBraces.group(2);
+					afterString = "";
+				}
+
+				if (substitutionSpecifier != null) {
+					int periodPosition = substitutionSpecifier.indexOf('.');
+					if (periodPosition >= 0) {
+						String outcomeName = substitutionSpecifier.substring(0, periodPosition);
+						if (_coaIdToCOAOutcomeInteractionMapMap.containsKey(coaId)) {
+							Map<String, InteractionRoot> coaOutcomeInteractionMap =
+									_coaIdToCOAOutcomeInteractionMapMap.get(coaId);
+							if (coaOutcomeInteractionMap.containsKey(outcomeName)) {
+								InteractionRoot outcomeInteraction = coaOutcomeInteractionMap.get(outcomeName);
+
+								String parameterName = substitutionSpecifier.substring(periodPosition + 1);
+								if (parameterName.startsWith("(") && parameterName.endsWith(")")) {
+									parameterName = parameterName.substring(1, parameterName.length() - 1);
+								}
+
+								String className = outcomeInteraction.getInstanceHlaClassName();
+								int commaPosition = parameterName.indexOf(',');
+								if (commaPosition >= 0) {
+									className = parameterName.substring(0, commaPosition);
+									parameterName = parameterName.substring(commaPosition + 1);
+								}
+								if (outcomeInteraction.hasParameter(className, parameterName)) {
+									if (beforeString.isEmpty() && afterString.isEmpty()) {
+										value = outcomeInteraction.getParameter(className, parameterName);
+									} else {
+										value = beforeString + outcomeInteraction.getParameter(className, parameterName)
+												+ afterString;
+									}
+								}
+							}
+						}
+					} else if (substitutionSpecifier.equalsIgnoreCase("time")) {
+						value = currentTime;
+					}
+				}
+			}
+			interactionRoot.setParameter(entry.getKey(), value);
+		}
+
+		return interactionRoot;
+	}
+
 	private static int suffixNumber = 0;
 
 	private static String getSuffix() {
@@ -399,6 +499,8 @@ public class COAGraph {
 		}
 
 		for(String coaId: coaIdSet) {
+			_coaIdToCOAOutcomeInteractionMapMap.remove(coaId);
+
 			Set<String> coaNodeIdSet = _coaIdToCOANodeIdSetMap.get(coaId);
 			for(String coaNodeId: coaNodeIdSet) {
 				COANode coaNode = _coaNodeIdToCOANodeMap.get(coaNodeId);

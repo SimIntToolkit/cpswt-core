@@ -72,8 +72,6 @@ public class COAExecutor {
 
     private final Map<String, ArrayList<ArrivedInteraction>> _arrived_interactions = new HashMap<>();
 
-    private final Map<String, InteractionRoot> _outcomeInteractionMap = new HashMap<>();
-
     private COAExecutorEventListener coaExecutorEventListener;
     public void setCoaExecutorEventListener(COAExecutorEventListener listener) {
         this.coaExecutorEventListener = listener;
@@ -114,83 +112,13 @@ public class COAExecutor {
     private void executeCOAAction(COAAction nodeAction, double currentTime) {
         // Create interaction to be sent
         logger.trace("COAExecutor:executeCOAAction: Trying to executed node: {}", nodeAction);
-        String interactionClassName = nodeAction.getInteractionClassName();
-        logger.trace("COAExecutor:executeCOAAction: Got interaction class name: {}... now trying to create interaction..", interactionClassName);
-
-        InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClassName);
+        InteractionRoot interactionRoot = _coaGraph.getCOAActionInteraction(nodeAction, currentTime);
         interactionRoot.publishInteraction(synchronizedFederate.getRTI());
-        for(
-                Map.Entry<InteractionRootInterface.ClassAndPropertyName, Object> entry :
-                nodeAction.getNameValueParamPairs().entrySet()
-        ) {
-            Object value = entry.getValue();
-            if (value instanceof String) {
-                String stringValue = (String)value;
-
-                Pattern substitutionPatternWithBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$\\{(.+)}(.*)$");
-                Matcher substitutionMatcherWithBraces = substitutionPatternWithBraces.matcher(stringValue);
-
-                Pattern substitutionPatternWithoutBraces = Pattern.compile("^((?:.*[^\\\\])?(?:\\\\\\\\)*)\\$(.+)$");
-                Matcher substitutionMatcherWithoutBraces = substitutionPatternWithoutBraces.matcher(stringValue);
-
-                String beforeString = null;
-                String substitutionSpecifier = null;
-                String afterString = null;
-
-                if (substitutionMatcherWithBraces.matches()) {
-
-                    beforeString = substitutionMatcherWithBraces.group(1);
-                    substitutionSpecifier = substitutionMatcherWithBraces.group(2);
-                    afterString = substitutionMatcherWithBraces.group(3);
-
-                } else if (substitutionMatcherWithoutBraces.matches()) {
-
-                    beforeString = substitutionMatcherWithoutBraces.group(1);
-                    substitutionSpecifier = substitutionMatcherWithoutBraces.group(2);
-                    afterString = "";
-                }
-
-                if (substitutionSpecifier != null) {
-                    int periodPosition = substitutionSpecifier.indexOf('.');
-                    if (periodPosition >= 0) {
-                        String outcomeName = substitutionSpecifier.substring(0, periodPosition);
-
-                        if (_outcomeInteractionMap.containsKey(outcomeName)) {
-                            InteractionRoot outcomeInteraction = _outcomeInteractionMap.get(outcomeName);
-
-                            String parameterName = substitutionSpecifier.substring(periodPosition + 1);
-                            if (parameterName.startsWith("(") && parameterName.endsWith(")")) {
-                                parameterName = parameterName.substring(1, parameterName.length() - 1);
-                            }
-
-                            String className = outcomeInteraction.getInstanceHlaClassName();
-                            int commaPosition = parameterName.indexOf(',');
-                            if (commaPosition >= 0) {
-                                className = parameterName.substring(0, commaPosition);
-                                parameterName = parameterName.substring(commaPosition + 1);
-                            }
-                            if (outcomeInteraction.hasParameter(className, parameterName)) {
-                                if (beforeString.isEmpty() && afterString.isEmpty()) {
-                                    value = outcomeInteraction.getParameter(className, parameterName);
-                                } else {
-                                    value = beforeString + outcomeInteraction.getParameter(className, parameterName)
-                                            + afterString;
-                                }
-                            }
-                        }
-                    } else if (substitutionSpecifier.equalsIgnoreCase("time")) {
-                        value = synchronizedFederate.getCurrentTime();
-                    }
-                }
-            }
-            interactionRoot.setParameter(entry.getKey(), value);
-        }
 
         // First check for simulation termination
         if (SimEnd.match(interactionRoot.getClassHandle())) {
             terminateSimulation();
         }
-
 
         // Create timestamp for the interaction
         double tmin = currentTime + lookahead + (lookahead / 10000.0);
@@ -198,7 +126,9 @@ public class COAExecutor {
         // Send the interaction
         try {
             synchronizedFederate.sendInteraction(interactionRoot, tmin);
-            logger.info("Successfully sent interaction '{}' at time '{}'", interactionClassName, tmin);
+            logger.info(
+                    "Successfully sent interaction '{}' at time '{}'", interactionRoot.getInstanceHlaClassName(), tmin
+            );
         } catch (Exception e) {
             logger.error("Failed to send interaction: " + interactionRoot);
             logger.error(e);
@@ -294,7 +224,6 @@ public class COAExecutor {
                 } else if (nodeType == COANodeType.Outcome) {
                     COAOutcome nodeOutcome = (COAOutcome) coaNode;
                     if (!nodeOutcome.getIsTimerOn()) {
-                        _outcomeInteractionMap.remove(nodeOutcome.getName());
                         // Start executing Outcome element
                         nodeOutcome.startTimer(currentTime);
                     } else {
@@ -303,8 +232,7 @@ public class COAExecutor {
                                 "COAExecutor:executeCOAGraph: Checking if outcome node is executable: {}", nodeOutcome
                         );
                         if (outcomeExecutable) {
-                            _coaGraph.markNodeExecuted(coaNode, currentTime);
-                            _outcomeInteractionMap.put(nodeOutcome.getName(), nodeOutcome.getLastArrivedInteraction());
+                            _coaGraph.markNodeExecuted(nodeOutcome, currentTime);
                             logger.trace("COAExecutor:executeCOAGraph: Outcome node executed: {}", nodeOutcome);
                             nodeExecuted = true;
                         }
