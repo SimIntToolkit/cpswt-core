@@ -144,7 +144,7 @@ public class COAExecutor {
 
         do {
             nodeExecuted = false;
-            HashSet<COANode> currentRootNodes = new HashSet<>(_coaGraph.getCurrentRootNodes());
+            List<COANode> currentRootNodes = _coaGraph.getCurrentRootNodes();
 
             // If at any point, there are no COA nodes remaining to execute, and
             // the experiment was configured to terminate when all COA nodes have
@@ -325,6 +325,7 @@ public class COAExecutor {
                 for (ArrivedInteraction arrivedIntr : arrivedIntrs) {
                     if (
                             !arrivedIntr.hasCoaId(nodeOutcome.getCOAId()) &&
+                                    !(_coaGraph.isRootCOANode(nodeOutcome) && arrivedIntr.getUsedByNonRootCOANode()) &&
                                     arrivedIntr.getArrivalTime() > nodeOutcome.getAwaitStartTime()
                     ) {
                         // Awaited interaction arrived after outcome was initiated
@@ -334,6 +335,9 @@ public class COAExecutor {
                         );
                         nodeOutcome.setLastArrivedInteraction(arrivedIntr.getInteractionRoot());
                         arrivedIntr.addCoaId(nodeOutcome.getCOAId());
+                        if (!_coaGraph.isRootCOANode(nodeOutcome)) {
+                            arrivedIntr.setUsedByNonRootCOANode();
+                        }
                         outcomeExecutable = true;
                         break;
                     }

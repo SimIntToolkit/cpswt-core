@@ -44,6 +44,8 @@ public class ArrivedInteraction {
     private final InteractionRoot _ir;
     private final Double _arrTime;
 
+    private boolean _usedByNonRootCOANode = false;
+
     private final Set<String> coaIdSet = new HashSet<>();
 
     public ArrivedInteraction(InteractionRoot ir, Double arrTime) {
@@ -67,6 +69,14 @@ public class ArrivedInteraction {
 
     public Double getArrivalTime() {
         return _arrTime;
+    }
+
+    public void setUsedByNonRootCOANode() {
+        _usedByNonRootCOANode = true;
+    }
+
+    public boolean getUsedByNonRootCOANode() {
+        return _usedByNonRootCOANode;
     }
 
     public void addCoaId(String coaId) {

@@ -117,8 +117,19 @@ public class COAGraph {
 		return buffer.toString();
 	}
 
-	public Set<COANode> getCurrentRootNodes() {
-		return _currentRootNodeSet;
+	public List<COANode> getCurrentRootNodes() {
+
+		LinkedList<COANode> currentRootNodeList = new LinkedList<>();
+
+		for(COANode currentRootNode: _currentRootNodeSet) {
+			if (isRootCOANode(currentRootNode)) {
+				currentRootNodeList.addLast(currentRootNode);
+			} else {
+				currentRootNodeList.addFirst(currentRootNode);
+			}
+		}
+
+		return currentRootNodeList;
 	}
 
 	public void addNode(COANode node) {
@@ -196,6 +207,9 @@ public class COAGraph {
 		_edgesFromNodeMap.get(fromNode).add(edge);
 	}
 
+	public boolean isRootCOANode(COANode coaNode) {
+		return _rootNodeSet.contains(coaNode);
+	}
 
 	public void initializeRepeatMaps() {
 
