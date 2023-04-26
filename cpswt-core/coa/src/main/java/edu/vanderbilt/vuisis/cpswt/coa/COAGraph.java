@@ -375,7 +375,7 @@ public class COAGraph {
 			_coaIdToCOAOutcomeInteractionMapMap.put(coaId, new HashMap<>());
 		}
 		Map<String, InteractionRoot> outcomeInteractionMap = _coaIdToCOAOutcomeInteractionMapMap.get(coaId);
-		outcomeInteractionMap.put(coaOutcome.getName(), coaOutcome.getLastArrivedInteraction());
+		outcomeInteractionMap.put(coaOutcome.getName(), coaOutcome.getLastInteraction());
 	}
 
 	public InteractionRoot getCOAActionInteraction(COAAction coaAction, double currentTime) {
@@ -462,6 +462,16 @@ public class COAGraph {
 
 	private static String getSuffix() {
 		return Integer.toString(suffixNumber++);
+	}
+
+	// PACKAGE PRIVATE
+	void resetCOAOutcome(COAOutcome coaOutcome, COAOutcomeFilter coaOutcomeFilter) {
+		coaOutcomeFilter.initializeNode();
+		coaOutcome.getLastArrivedInteraction().removeCoaId(coaOutcome.getCOAId());
+		coaOutcome.initializeNode();
+		coaOutcome.setActive();
+		_currentRootNodeSet.add(coaOutcome);
+
 	}
 
 	private COANode copyCOA(COANode coaNode) {

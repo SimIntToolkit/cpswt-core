@@ -242,7 +242,9 @@ public class COAExecutor {
                     COAOutcome outcomeToFilter = outcomeFilter.getOutcome();
 
                     // Update last arrived interaction in the corresponding Outcome node
-                    checkIfOutcomeExecutableAndUpdateArrivedInteraction(outcomeToFilter);
+                    // THIS SHOULDN'T BE NEEDED -- ALREADY HAPPENED WHEN outcomeToFilter
+                    // WAS EXECUTED IN THE COA GRAPH
+                    //checkIfOutcomeExecutableAndUpdateArrivedInteraction(outcomeToFilter);
 
                     boolean filterEvaluation = false;
                     // Evaluate filter, first get evaluator class
@@ -303,9 +305,11 @@ public class COAExecutor {
                         _coaGraph.markNodeExecuted(coaNode, currentTime);
                         logger.trace("COAExecutor:executeCOAGraph: OutcomeFilter node executed: {}", outcomeFilter);
                         nodeExecuted = true;
+                    } else {
+                        _coaGraph.resetCOAOutcome(outcomeToFilter, outcomeFilter);
                     }
                     logger.trace("Result of evaluation of filter for outcome: {} = {}. Interaction it contained was: {}",
-                            outcomeToFilter.getName(), filterEvaluation, outcomeToFilter.getLastArrivedInteraction());
+                            outcomeToFilter.getName(), filterEvaluation, outcomeToFilter.getLastInteraction());
                 }
             }
         } while (nodeExecuted);
@@ -325,6 +329,7 @@ public class COAExecutor {
                 for (ArrivedInteraction arrivedIntr : arrivedIntrs) {
                     if (
                             !arrivedIntr.hasCoaId(nodeOutcome.getCOAId()) &&
+                                    !arrivedIntr.hasCoaNodeId(nodeOutcome.getId()) &&
                                     !(_coaGraph.isRootCOANode(nodeOutcome) && arrivedIntr.getUsedByNonRootCOANode()) &&
                                     arrivedIntr.getArrivalTime() > nodeOutcome.getAwaitStartTime()
                     ) {
@@ -333,8 +338,9 @@ public class COAExecutor {
                                 "Setting last arrived interaction in outcome node {}: {}",
                                 nodeOutcome.getName(), arrivedIntr.getInteractionRoot()
                         );
-                        nodeOutcome.setLastArrivedInteraction(arrivedIntr.getInteractionRoot());
+                        nodeOutcome.setLastArrivedInteraction(arrivedIntr);
                         arrivedIntr.addCoaId(nodeOutcome.getCOAId());
+                        arrivedIntr.addCoaNodeId(nodeOutcome.getId());
                         if (!_coaGraph.isRootCOANode(nodeOutcome)) {
                             arrivedIntr.setUsedByNonRootCOANode();
                         }
