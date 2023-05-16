@@ -33,6 +33,7 @@ package edu.vanderbilt.vuisis.cpswt.coa.node;
 //import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.vanderbilt.vuisis.cpswt.coa.ArrivedInteraction;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 /**
@@ -45,7 +46,7 @@ public class COAOutcome extends COANode {
 
 	private double awaitStartTime = -1;
 	private boolean isTimerOn = false;
-	private InteractionRoot lastArrivedInteraction = null;
+	private ArrivedInteraction lastArrivedInteraction = null;
 
 	COAOutcome() {
 	    super(COANodeType.Outcome);
@@ -74,17 +75,22 @@ public class COAOutcome extends COANode {
 	public boolean getIsTimerOn() {
 		return isTimerOn;
 	}
-	public InteractionRoot getLastArrivedInteraction() {
+
+	public ArrivedInteraction getLastArrivedInteraction() {
 		return lastArrivedInteraction;
 	}
 
-	public void setLastArrivedInteraction(InteractionRoot interactionRoot) {
-		if (interactionRoot == null) {
+	public InteractionRoot getLastInteraction() {
+		return lastArrivedInteraction.getInteractionRoot();
+	}
+
+	public void setLastArrivedInteraction(ArrivedInteraction arrivedInteraction) {
+		if (arrivedInteraction == null) {
 			throw new IllegalArgumentException(
 					"Error! NULL interaction was set in the COA Outcome!");
 		}
 
-		this.lastArrivedInteraction = interactionRoot;
+		this.lastArrivedInteraction = arrivedInteraction;
 	}
 
 	public void startTimer(double currentTime) {

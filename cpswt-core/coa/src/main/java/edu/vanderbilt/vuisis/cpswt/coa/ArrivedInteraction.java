@@ -46,7 +46,9 @@ public class ArrivedInteraction {
 
     private boolean _usedByNonRootCOANode = false;
 
-    private final Set<String> coaIdSet = new HashSet<>();
+    private final Set<String> _coaIdSet = new HashSet<>();
+
+    private final Set<String> _coaNodeIdSet = new HashSet<>();
 
     public ArrivedInteraction(InteractionRoot ir, Double arrTime) {
         if (ir == null) {
@@ -80,10 +82,22 @@ public class ArrivedInteraction {
     }
 
     public void addCoaId(String coaId) {
-        coaIdSet.add(coaId);
+        _coaIdSet.add(coaId);
+    }
+
+    public void removeCoaId(String coaId) {
+        _coaIdSet.remove(coaId);
     }
 
     public boolean hasCoaId(String coaId) {
-        return coaIdSet.contains(coaId);
+        return _coaIdSet.contains(coaId);
+    }
+
+    public void addCoaNodeId(String coaNodeId) {
+        _coaNodeIdSet.add(coaNodeId);
+    }
+
+    public boolean hasCoaNodeId(String coaNodeId) {
+        return _coaNodeIdSet.contains(coaNodeId);
     }
 }
