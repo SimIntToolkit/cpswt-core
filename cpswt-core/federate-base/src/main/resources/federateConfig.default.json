@@ -3,6 +3,6 @@
   "federateType": "DefaultFederateType",
   "federationId": "DefaultFederationId",
   "isLateJoiner": false,
-  "lookAhead": 0.1,
+  "lookahead": 0.1,
   "stepSize": 1.0
 }
