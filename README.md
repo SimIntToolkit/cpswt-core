@@ -1,6 +1,6 @@
 # CPSWT Java Core
 
-The core implementation of the Cyber-Physical Systems WindTunnel (CPSWT), including integration of Java federates,
+The core implementation of the Cyber-Physical Systems Wind Tunnel (CPSWT), including integration of Java federates,
 the federation manager, and COA management.
 
 Any Java-based federate will use the classes in this repository in order to execute.
@@ -37,6 +37,8 @@ HLA Interactions:
               SimResume
               SimEnd
 
+HLA Objects:
+
         ObjectRoot
           FederateObject
 
@@ -50,7 +52,7 @@ be propagated through a simulated network in a network federate.
 
 ## cpswt-core/coa
 
-This project contains the Java classes necessary to implement **Courses of Action**, i.e. behavior that is designed
+This project contains the Java classes necessary to implement **Courses of Action (COA)**, i.e. behavior that is designed
 into a federation via its federation model.
 
 ## cpswt-core/config
