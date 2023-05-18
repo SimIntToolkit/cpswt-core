@@ -1,0 +1,155 @@
+{
+    "interactions": {
+        "InteractionRoot": {},
+        "InteractionRoot.C2WInteractionRoot": {
+            "actualLogicalGenerationTime": {
+                "Hidden": false,
+                "ParameterType": "double",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot",
+                "property_name": "actualLogicalGenerationTime"
+            },
+            "federateFilter": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot",
+                "property_name": "federateFilter"
+            },
+            "federateSequence": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot",
+                "property_name": "federateSequence"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.ActionBase": {},
+        "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging": {
+            "command": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging",
+                "property_name": "command"
+            },
+            "hlaClassName": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging",
+                "property_name": "hlaClassName"
+            },
+            "messagingJson": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging",
+                "property_name": "messagingJson"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction": {
+            "FederateId": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction",
+                "property_name": "FederateId"
+            },
+            "FederateType": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction",
+                "property_name": "FederateType"
+            },
+            "IsLateJoiner": {
+                "Hidden": false,
+                "ParameterType": "boolean",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateJoinInteraction",
+                "property_name": "IsLateJoiner"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.FederateResignInteraction": {
+            "FederateId": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateResignInteraction",
+                "property_name": "FederateId"
+            },
+            "FederateType": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateResignInteraction",
+                "property_name": "FederateType"
+            },
+            "IsLateJoiner": {
+                "Hidden": false,
+                "ParameterType": "boolean",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.FederateResignInteraction",
+                "property_name": "IsLateJoiner"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.OutcomeBase": {},
+        "InteractionRoot.C2WInteractionRoot.Ping": {},
+        "InteractionRoot.C2WInteractionRoot.SimLog": {
+            "Comment": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.SimLog",
+                "property_name": "Comment"
+            },
+            "FedName": {
+                "Hidden": false,
+                "ParameterType": "String",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.SimLog",
+                "property_name": "FedName"
+            },
+            "Time": {
+                "Hidden": false,
+                "ParameterType": "double",
+                "full_hla_class_name": "InteractionRoot.C2WInteractionRoot.SimLog",
+                "property_name": "Time"
+            }
+        },
+        "InteractionRoot.C2WInteractionRoot.SimLog.HighPrio": {},
+        "InteractionRoot.C2WInteractionRoot.SimLog.LowPrio": {},
+        "InteractionRoot.C2WInteractionRoot.SimLog.MediumPrio": {},
+        "InteractionRoot.C2WInteractionRoot.SimLog.VeryLowPrio": {},
+        "InteractionRoot.C2WInteractionRoot.SimulationControl": {},
+        "InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd": {},
+        "InteractionRoot.C2WInteractionRoot.SimulationControl.SimPause": {},
+        "InteractionRoot.C2WInteractionRoot.SimulationControl.SimResume": {}
+    },
+    "objects": {
+        "ObjectRoot": {},
+        "ObjectRoot.FederateObject": {
+            "FederateHandle": {
+                "Delivery": "reliable",
+                "Hidden": false,
+                "Order": "timestamp",
+                "ParameterType": "int",
+                "full_hla_class_name": "ObjectRoot.FederateObject",
+                "property_name": "FederateHandle"
+            },
+            "FederateHost": {
+                "Delivery": "reliable",
+                "Hidden": false,
+                "Order": "timestamp",
+                "ParameterType": "String",
+                "full_hla_class_name": "ObjectRoot.FederateObject",
+                "property_name": "FederateHost"
+            },
+            "FederateType": {
+                "Delivery": "reliable",
+                "Hidden": false,
+                "Order": "timestamp",
+                "ParameterType": "String",
+                "full_hla_class_name": "ObjectRoot.FederateObject",
+                "property_name": "FederateType"
+            }
+        },
+        "ObjectRoot.PingCounter": {
+            "pingCount": {
+                "Delivery": "reliable",
+                "Hidden": false,
+                "Order": "timestamp",
+                "ParameterType": "int",
+                "full_hla_class_name": "ObjectRoot.PingCounter",
+                "property_name": "pingCount"
+            }
+        }
+    }
+}
