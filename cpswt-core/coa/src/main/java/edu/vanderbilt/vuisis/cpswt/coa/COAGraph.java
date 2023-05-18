@@ -117,8 +117,19 @@ public class COAGraph {
 		return buffer.toString();
 	}
 
-	public Set<COANode> getCurrentRootNodes() {
-		return _currentRootNodeSet;
+	public List<COANode> getCurrentRootNodes() {
+
+		LinkedList<COANode> currentRootNodeList = new LinkedList<>();
+
+		for(COANode currentRootNode: _currentRootNodeSet) {
+			if (isRootCOANode(currentRootNode)) {
+				currentRootNodeList.addLast(currentRootNode);
+			} else {
+				currentRootNodeList.addFirst(currentRootNode);
+			}
+		}
+
+		return currentRootNodeList;
 	}
 
 	public void addNode(COANode node) {
@@ -196,6 +207,9 @@ public class COAGraph {
 		_edgesFromNodeMap.get(fromNode).add(edge);
 	}
 
+	public boolean isRootCOANode(COANode coaNode) {
+		return _rootNodeSet.contains(coaNode);
+	}
 
 	public void initializeRepeatMaps() {
 
@@ -361,7 +375,7 @@ public class COAGraph {
 			_coaIdToCOAOutcomeInteractionMapMap.put(coaId, new HashMap<>());
 		}
 		Map<String, InteractionRoot> outcomeInteractionMap = _coaIdToCOAOutcomeInteractionMapMap.get(coaId);
-		outcomeInteractionMap.put(coaOutcome.getName(), coaOutcome.getLastArrivedInteraction());
+		outcomeInteractionMap.put(coaOutcome.getName(), coaOutcome.getLastInteraction());
 	}
 
 	public InteractionRoot getCOAActionInteraction(COAAction coaAction, double currentTime) {
@@ -448,6 +462,16 @@ public class COAGraph {
 
 	private static String getSuffix() {
 		return Integer.toString(suffixNumber++);
+	}
+
+	// PACKAGE PRIVATE
+	void resetCOAOutcome(COAOutcome coaOutcome, COAOutcomeFilter coaOutcomeFilter) {
+		coaOutcomeFilter.initializeNode();
+		coaOutcome.getLastArrivedInteraction().removeCoaId(coaOutcome.getCOAId());
+		coaOutcome.initializeNode();
+		coaOutcome.setActive();
+		_currentRootNodeSet.add(coaOutcome);
+
 	}
 
 	private COANode copyCOA(COANode coaNode) {

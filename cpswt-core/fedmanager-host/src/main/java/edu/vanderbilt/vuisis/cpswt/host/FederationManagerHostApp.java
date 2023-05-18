@@ -50,7 +50,7 @@ import edu.vanderbilt.vuisis.cpswt.host.api.FederationManagerControlRequest;
 import edu.vanderbilt.vuisis.cpswt.host.api.StateChangeResponse;
 import edu.vanderbilt.vuisis.cpswt.host.api.StateResponse;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.concurrent.CompletionStage;
 
 /**
@@ -165,9 +165,9 @@ public class FederationManagerHostApp extends AllDirectives {
                                                     this.terminateSimulationAsync();
                                                     break;
                                             }
-                                        } catch (IOException ioEx) {
-                                            logger.error("Closing ChunkedOutput encountered a problem.");
-                                            logger.error(ioEx);
+//                                        } catch (IOException ioEx) {
+//                                            logger.error("Closing ChunkedOutput encountered a problem.");
+//                                            logger.error(ioEx);
                                         } catch (Exception ex) {
                                             logger.error("There was an error while trying to transition FederationManager for action {}", action);
                                             logger.error(ex);
