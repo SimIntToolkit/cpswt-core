@@ -1,0 +1,10 @@
+{
+    "experimentConfig": "conf/default_experiment/default_experiment.json",
+    "fedFile": "HelloWorldJava.fed",
+    "federationEndTime": 0,
+    "federationId": "HelloWorldJava",
+    "federationJsonFileName": "messaging.json",
+    "lookahead": 0.01,
+    "realTimeMode": false,
+    "stepSize": 0.1
+}
