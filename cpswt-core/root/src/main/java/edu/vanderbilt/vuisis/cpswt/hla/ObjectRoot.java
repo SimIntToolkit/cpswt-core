@@ -408,11 +408,11 @@ public class ObjectRoot implements ObjectRootInterface {
      * to retrieve this instance.
      */
     public static class ObjectReflector {
-        private final int objectHandle;
-        private String hlaClassName = "";
-        private String federateSequence = "[]";
-        private final Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap;
-        private double time;
+        private final int _objectHandle;
+        private String _hlaClassName = "";
+        private String _federateSequence = "[]";
+        private final Map<ClassAndPropertyName, Object> _classAndPropertyNameValueMap;
+        private double _time;
 
         /**
          * DO NOT USE -- Should only be used directly by the SyncronizedFederate class.
@@ -421,16 +421,26 @@ public class ObjectRoot implements ObjectRootInterface {
          */
 
         private void initHlaClassName() {
-            ObjectRoot objectRoot = _objectHandleInstanceMap.get( objectHandle );
+            ObjectRoot objectRoot = _objectHandleInstanceMap.get( _objectHandle );
             if ( objectRoot == null ) return;
-            hlaClassName = objectRoot.getInstanceHlaClassName();
+            _hlaClassName = objectRoot.getInstanceHlaClassName();
         }
 
         public ObjectReflector(int objectHandle, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap) {
-            this.objectHandle = objectHandle;
-            this.classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
-            this.time = -1;
+            _objectHandle = objectHandle;
+            _classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
+            _time = -1;
             initHlaClassName();
+        }
+
+        public ObjectReflector(
+                int objectHandle, String hlaClassName, Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap
+        ) {
+            this(objectHandle, classAndPropertyNameValueMap);
+            if (_hlaClassName == null || _hlaClassName.isEmpty()) {
+                _hlaClassName = hlaClassName;
+                ObjectRoot.discover(_hlaClassName, _objectHandle);
+            }
         }
 
         public ObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
@@ -447,11 +457,11 @@ public class ObjectRoot implements ObjectRootInterface {
                 Map<ClassAndPropertyName, Object> classAndPropertyNameValueMap,
                 LogicalTime logicalTime
         ) {
-            this.objectHandle = objectHandle;
-            this.classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
+            _objectHandle = objectHandle;
+            _classAndPropertyNameValueMap = new HashMap<>(classAndPropertyNameValueMap);
             DoubleTime doubleTime = new DoubleTime();
             doubleTime.setTo(logicalTime);
-            this.time = doubleTime.getTime();
+            _time = doubleTime.getTime();
             initHlaClassName();
         }
 
@@ -465,39 +475,39 @@ public class ObjectRoot implements ObjectRootInterface {
          * instance contained by this ObjectReflector object.
          */
         public void reflect() {
-            if (this.time < 0) {
-                ObjectRoot.reflect(this.objectHandle, this.classAndPropertyNameValueMap);
+            if (_time < 0) {
+                ObjectRoot.reflect(_objectHandle, _classAndPropertyNameValueMap);
             }
             else {
-                ObjectRoot.reflect(this.objectHandle, this.classAndPropertyNameValueMap, this.time);
+                ObjectRoot.reflect(_objectHandle, _classAndPropertyNameValueMap, _time);
             }
         }
 
         public Map<ClassAndPropertyName, Object> getClassAndPropertyNameValueMap() {
-            return classAndPropertyNameValueMap;
+            return _classAndPropertyNameValueMap;
         }
 
         public String getHlaClassName() {
-            return hlaClassName;
+            return _hlaClassName;
         }
 
         public void setFederateSequence(String federateSequence) {
-            this.federateSequence = federateSequence;
+            _federateSequence = federateSequence;
         }
 
         public String getFederateSequence() {
-            return federateSequence;
+            return _federateSequence;
         }
 
         public String toJson() {
             JSONObject topLevelJSONObject = new JSONObject();
             topLevelJSONObject.put("messaging_type", "object");
-            topLevelJSONObject.put("messaging_name", hlaClassName);
-            topLevelJSONObject.put("object_handle", objectHandle);
-            topLevelJSONObject.put("federateSequence", federateSequence);
+            topLevelJSONObject.put("messaging_name", _hlaClassName);
+            topLevelJSONObject.put("object_handle", _objectHandle);
+            topLevelJSONObject.put("federateSequence", _federateSequence);
 
             JSONObject propertyJSONObject = new JSONObject();
-            for(Map.Entry<ClassAndPropertyName, Object> entry : classAndPropertyNameValueMap.entrySet()) {
+            for(Map.Entry<ClassAndPropertyName, Object> entry : _classAndPropertyNameValueMap.entrySet()) {
                 propertyJSONObject.put(entry.getKey().toString(), entry.getValue());
             }
             topLevelJSONObject.put("properties", propertyJSONObject);
@@ -519,15 +529,15 @@ public class ObjectRoot implements ObjectRootInterface {
          * @return the object class instance contained by the ObjectReflector object.
          */
         public ObjectRoot getObjectRoot() {
-            return ObjectRoot.get_object(this.objectHandle);
+            return ObjectRoot.get_object(_objectHandle);
         }
 
         public void setTime(double time) {
-            this.time = time;
+            _time = time;
         }
 
         public double getTime() {
-            return this.time;
+            return _time;
         }
 
         public int getUniqueID() {
@@ -1900,6 +1910,22 @@ public class ObjectRoot implements ObjectRootInterface {
     //--------------------------------------------
     // METHODS THAT USE OBJECT-HANDLE INSTANCE MAP
     //--------------------------------------------
+
+    public static ObjectRoot discover( String full_hla_class_name, int object_handle ) {
+        if (_objectHandleInstanceMap.containsKey(object_handle)) {
+            return _objectHandleInstanceMap.get(object_handle);
+        }
+
+        ObjectRoot instance = create_object( full_hla_class_name );
+
+        if (instance != null) {
+            instance.setObjectHandle( object_handle );
+            _objectHandleInstanceMap.put(object_handle, instance);
+        }
+
+        return instance;
+    }
+
     /**
      * Creates a new instance of the object class corresponding to "class_handle",
      * registers it in an map internal to the ObjectRoot class using "object_handle"
@@ -1922,14 +1948,8 @@ public class ObjectRoot implements ObjectRootInterface {
      * @return new instance of the object class corresponding to class_handle
      */
     public static ObjectRoot discover( int class_handle, int object_handle ) {
-        ObjectRoot instance = create_object( class_handle );
-
-        if (instance != null) {
-            instance.setObjectHandle( object_handle );
-            _objectHandleInstanceMap.put(object_handle, instance);
-        }
-
-        return instance;
+        String className = _classHandleNameMap.get( class_handle );
+        return className == null ? null : discover(className, object_handle);
     }
 
     //----------------------------------------------------------------------------------------------------------
@@ -3151,7 +3171,7 @@ public class ObjectRoot implements ObjectRootInterface {
                 classAndPropertyNameValueMap.put(classAndPropertyName, new Attribute<>(object));
             }
         }
-        ObjectReflector objectReflector = new ObjectReflector(objectHandle, classAndPropertyNameValueMap);
+        ObjectReflector objectReflector = new ObjectReflector(objectHandle, className, classAndPropertyNameValueMap);
         objectReflector.setFederateSequence(federateSequence);
         return objectReflector;
     }
