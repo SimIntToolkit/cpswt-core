@@ -254,7 +254,7 @@ However, if this link does not work, you should be able to download the Portico 
 
 ```bash
 cd
-tar xf <YOUR-HOME-DIRECTORY>/Downloads/portico-2.1.0-linux64.tar.gz
+tar xf \<YOUR-HOME-DIRECTORY>/Downloads/portico-2.1.0-linux64.tar.gz
 ```
 
 
@@ -441,7 +441,7 @@ mkdir .gradle
 ```
 
 
-2. Edit the <YOUR-HOME-DIRECTORY>/.gradle/gradle.properties file using your favorite editor and give it the contents below:
+2. Edit the \<YOUR-HOME-DIRECTORY>/.gradle/gradle.properties file using your favorite editor and give it the contents below:
 
 ```bash
 archivaUser=admin
@@ -499,7 +499,7 @@ represents “`<YOUR-HOME-DIRECTORY>/cpswt`”.
 1. Clone the cpswt-core git repository:
 
 
-    1. Change your directory to <CPSWT-HOME>:
+    1. Change your directory to \<CPSWT-HOME>:
 
 ```bash
 cd <CPSWT-HOME>
