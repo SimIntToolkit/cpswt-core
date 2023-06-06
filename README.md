@@ -79,3 +79,6 @@ This project contains the Java classes that implement the FederationManager, whi
 ## cpswt-core/utils
 
 This project contains various utility classes used by other projects.
+
+## jenkins support
+Ref: [youtube video](https://www.youtube.com/watch?v=6YZvp2GwT0A&t=457s)
