@@ -35,21 +35,7 @@ pipeline {
             }
         }
     }
-    options {
-        //Configure GitHub Webhook SCM polling
-        scm {	
-	    git {
-    	        remote {
-    	            url 'https://github.com/justinyeh1995/cpswt-core.git'
-    	            credentials('github')
-    	        }
-    	        branch('*/develop')
-    	        extensions {
-    	    	    webhook('http://172.18.0.2:8080/github-webhook/')
-    	        }
-    	    }
-        }
-    }
+
     post {
         always {
     	echo 'This will always run'
@@ -57,5 +43,5 @@ pipeline {
             recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
             subject: "${DEFAULT_SUBJECT}"
         }
-}	
+    }	
 }
