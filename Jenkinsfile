@@ -4,9 +4,9 @@ pipeline {
     	    label 'docker-agent-latest'
     	}
     }
-    //triggers {
-    //    pollSCM('H/5 * * * *') // poll the SCM every 5 minutes
-    //}
+    triggers {
+        pollSCM('H/3 * * * *') // poll the SCM every 5 minutes
+    }
 
     stages {
         stage('Clone the repo') {
