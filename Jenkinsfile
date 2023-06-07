@@ -41,7 +41,7 @@ pipeline {
     	echo 'This will always run'
 	emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
         recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-	to: "justinyeh1995@gmail.com",
+	to: "chihtingyeh1995@gmail.com",
         subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
 	attachLog: true
     	//emailext body: "${DEFAULT_CONTENT}",
