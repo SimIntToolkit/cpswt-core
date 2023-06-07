@@ -1,9 +1,10 @@
 pipeline {
-    agent { 
-    	node {
-    	    label 'docker-agent-latest'
-    	}
-    }
+    agent any
+    //agent { 
+    //	node {
+    //	    label 'docker-agent-latest'
+    //	}
+    //}
     triggers {
         pollSCM('H/1 * * * *') // poll the SCM every 5 minutes
     }
