@@ -18,9 +18,14 @@ pipeline {
             }
         }
         stage('Build') {
+	    //agent {
+	    //	node {
+	    //	    label 'docker-agent-latest'// should be able to support the environment for the docker container in this stage
+	    //	}
+	    //}
             steps {
                 echo 'Building projects..'
-                sh 'echo "doing test stuff.."'
+                sh 'echo "Start a Docker Container for this experiment, which should start the experiment and a archiva server, a inet server, and a omnet++ server.."'
             }
         }
         stage('Test') {
