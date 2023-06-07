@@ -5,7 +5,7 @@ pipeline {
     	}
     }
     triggers {
-        pollSCM('H/3 * * * *') // poll the SCM every 5 minutes
+        pollSCM('H/1 * * * *') // poll the SCM every 5 minutes
     }
 
     stages {
@@ -40,11 +40,13 @@ pipeline {
         always {
     	echo 'This will always run'
 	mail to: "justinyeh1995@gmail.com",
-	body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
+	body: "Test",
+	subject: "Test"
+	//body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
 	//emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
         //recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
 	//to: "chihtingyeh1995@gmail.com",
-        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}"
+        //subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}"
 	//attachLog: true
         }
     }	
