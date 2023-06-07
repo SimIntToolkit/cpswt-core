@@ -106,11 +106,11 @@ public class AdvanceTimeThread extends Thread {
 
     // private double _atrStepSize = 0.2;
 
-    private ATRQueue _atrQueue;
+    private final ATRQueue _atrQueue;
 
-    private SynchronizedFederate _synchronizedFederate;
-    private RTIambassador _rti;
-    private TimeAdvanceMode _timeAdvanceMode = TimeAdvanceMode.TimeAdvanceRequest;
+    private final SynchronizedFederate _synchronizedFederate;
+    private final RTIambassador _rti;
+    private final TimeAdvanceMode _timeAdvanceMode;
 
     public AdvanceTimeThread(SynchronizedFederate synchronizedFederate, ATRQueue atrQueue, TimeAdvanceMode timeAdvanceMode) {
         _synchronizedFederate = synchronizedFederate;
@@ -151,35 +151,33 @@ public class AdvanceTimeThread extends Thread {
                 continue;
             }
 
-            if (timeRequest != null) {
-                _synchronizedFederate.setTimeAdvanceNotGranted(true);
+            _synchronizedFederate.setTimeAdvanceNotGranted(true);
 
-                boolean tarNotCalled = true;
-                while (tarNotCalled) {
-                    try {
-                        // System.out.println( "TimeAdvanceThread: Using " + _timeAdvanceMode + " to request time: " + timeRequest.getTime() );
-                        synchronized (_rti) {
-                            if (_timeAdvanceMode == TimeAdvanceMode.TimeAdvanceRequest) {
-                                _rti.timeAdvanceRequest(timeRequest);
-                                // System.out.println( "TimeAdvanceThread: Called timeAdvanceRequest() to go to: " + timeRequest.getTime() );
-                            } else if (_timeAdvanceMode == TimeAdvanceMode.NextEventRequest) {
-                                _rti.nextEventRequest(timeRequest);
-                                // System.out.println( "TimeAdvanceThread: Using nextEventRequest() to go to: " + timeRequest.getTime() );
-                            } else if (_timeAdvanceMode == TimeAdvanceMode.TimeAdvanceRequestAvailable) {
-                                _rti.timeAdvanceRequestAvailable(timeRequest);
-                                // System.out.println( "TimeAdvanceThread: Using timeAdvanceRequestAvailable() to go to: " + timeRequest.getTime() );
-                            } else if (_timeAdvanceMode == TimeAdvanceMode.NextEventRequestAvailable) {
-                                _rti.nextEventRequestAvailable(timeRequest);
-                                // System.out.println( "TimeAdvanceThread: Using nextEventRequestAvailable() to go to: " + timeRequest.getTime() );
-                            }
+            boolean tarNotCalled = true;
+            while (tarNotCalled) {
+                try {
+                    // System.out.println( "TimeAdvanceThread: Using " + _timeAdvanceMode + " to request time: " + timeRequest.getTime() );
+                    synchronized (_rti) {
+                        if (_timeAdvanceMode == TimeAdvanceMode.TimeAdvanceRequest) {
+                            _rti.timeAdvanceRequest(timeRequest);
+                            // System.out.println( "TimeAdvanceThread: Called timeAdvanceRequest() to go to: " + timeRequest.getTime() );
+                        } else if (_timeAdvanceMode == TimeAdvanceMode.NextEventRequest) {
+                            _rti.nextEventRequest(timeRequest);
+                            // System.out.println( "TimeAdvanceThread: Using nextEventRequest() to go to: " + timeRequest.getTime() );
+                        } else if (_timeAdvanceMode == TimeAdvanceMode.TimeAdvanceRequestAvailable) {
+                            _rti.timeAdvanceRequestAvailable(timeRequest);
+                            // System.out.println( "TimeAdvanceThread: Using timeAdvanceRequestAvailable() to go to: " + timeRequest.getTime() );
+                        } else if (_timeAdvanceMode == TimeAdvanceMode.NextEventRequestAvailable) {
+                            _rti.nextEventRequestAvailable(timeRequest);
+                            // System.out.println( "TimeAdvanceThread: Using nextEventRequestAvailable() to go to: " + timeRequest.getTime() );
                         }
-                        tarNotCalled = false;
-                    } catch (FederationTimeAlreadyPassed f) {
-                        logger.error("Time already passed detected.");
-                        _synchronizedFederate.setTimeAdvanceNotGranted(false);
-                        tarNotCalled = false;
-                    } catch (Exception e) {
                     }
+                    tarNotCalled = false;
+                } catch (FederationTimeAlreadyPassed f) {
+                    logger.error("Time already passed detected.");
+                    _synchronizedFederate.setTimeAdvanceNotGranted(false);
+                    tarNotCalled = false;
+                } catch (Exception e) {
                 }
 
                 while (_synchronizedFederate.getTimeAdvanceNotGranted()) {
@@ -195,10 +193,8 @@ public class AdvanceTimeThread extends Thread {
                 currentTime = _synchronizedFederate.getCurrentTime();
             }
 
-            if (advanceTimeRequest != null) {
-                advanceTimeRequest.threadSyncStart(currentTime);
-                advanceTimeRequest.threadSyncEnd();
-            }
+            advanceTimeRequest.threadSyncStart(currentTime);
+            advanceTimeRequest.threadSyncEnd();
         }
     }
 
