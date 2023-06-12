@@ -55,8 +55,6 @@ RUN python3 -m pip install --system --upgrade \
     webgme-bindings 
 
 # Set up Java 8 (do we need this?)
-# RUN update-java-alternatives -s java-1.8.0-openjdk-amd64
-# ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 # Download and extract portico
 WORKDIR /home
@@ -99,6 +97,13 @@ RUN git clone git@github.com:SimIntToolkit/cpswt-core.git && \
     ./gradlew :fedmanager-host:publish
 
 WORKDIR /home/cpswt/cpswt-core
-RUN ./gradlew 
+RUN ./gradlew :utils && \
+    ./gradlew :root && \
+    ./gradlew :base-events && \
+    ./gradlew :coa && \
+    ./gradlew :config && \
+    ./gradlew :federate-base && \
+    ./gradlew :federation-manager && \
+    ./gradlew :fedmanager-host
  
 
