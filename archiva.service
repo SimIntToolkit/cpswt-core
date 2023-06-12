@@ -1,0 +1,14 @@
+[Unit]
+Description=Archiva Server
+Documentation=https://archiva.apache.org/docs/2.2.5/
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/opt/apache-archiva-2.2.5/logs/archiva.pid
+WorkingDirectory=/opt/apache-archiva-2.2.5
+ExecStart=/opt/apache-archiva-2.2.5/bin/archiva start
+ExecStop=/opt/apache-archiva-2.2.5/bin/archiva stop
+
+[Install]
+WantedBy=multi-user.target
