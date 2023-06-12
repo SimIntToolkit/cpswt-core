@@ -65,11 +65,6 @@ RUN wget -O portico.tar.gz https://master.dl.sourceforge.net/project/portico/Por
     rm portico.tar.gz
 ENV RTI_HOME="/home/portico-2.1.0"
 
-
-# Set environment variables
-ENV ARCHIVA_VERSION=2.2.5 \
-    ARCHIVA_BASE=/opt/apache-archiva
-
 # Download and set up Apache Archiva
 # USER root
 WORKDIR /opt
@@ -77,12 +72,9 @@ RUN wget -O archiva.tar.gz https://archive.apache.org/dist/archiva/2.2.5/binarie
     tar xf archiva.tar.gz && \
     rm archiva.tar.gz
 
-# Copy Archiva files from the local machine to the container
-COPY archiva-files /opt/apache-archiva
-
-# COPY archiva.service /etc/systemd/system/
-# RUN systemctl enable archiva && \
-#     systemctl start archiva
+COPY archiva.service /etc/systemd/system/
+RUN systemctl enable archiva && \
+    systemctl start archiva
 
 # Expose the Archiva port
 EXPOSE 8080 
@@ -106,15 +98,7 @@ RUN git clone git@github.com:SimIntToolkit/cpswt-core.git && \
     ./gradlew :federation-manager:publish && \
     ./gradlew :fedmanager-host:publish
 
-# CMD ["/bin/bash"]
-
-#Set the working directory
-WORKDIR ${ARCHIVA_BASE}
-
-# Start Archiva
-CMD ["./bin/archiva", "run"]
-
 WORKDIR /home/cpswt/cpswt-core
 RUN ./gradlew 
-
+ 
 
