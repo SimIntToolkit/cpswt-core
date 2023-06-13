@@ -1,47 +1,11 @@
 # Base image: Ubuntu 20.04
 FROM ubuntu:20.04
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 # Install necessary packages
-RUN apt-get update && apt-get install -y \
-    apt-transport-https \
-    bison \
-    build-essential \
-    ca-certificates \
-    clang \
-    curl \
-    doxygen \
-    flex \
-    gcc \ 
-    gdb \
-    git \
-    gradle \
-    graphviz \
-    libboost1.71-all-dev \
-    libcppunit-dev \
-    libjsoncpp-dev \
-    libosgearth-dev \
-    libqt5opengl5-dev \
-    libwebkit2gtk-4.0-37 \
-    libxml2-dev \
-    lld \
-    make \
-    mongodb \
-    mpi-default-dev \
-    openjdk-8-jdk \
-    openscenegraph-plugin-osgearth \
-    perl \
-    python2 \
-    python3 \
-    python3-pip \
-    python-is-python2 \
-    qt5-qmake \
-    qtbase5-dev \
-    qtbase5-dev-tools \
-    qtchooser \
-    software-properties-common \
-    wget \
-    xterm \
-    zlib1g-dev
+RUN apt-get update 
+RUN apt-get install -y apt-transport-https bison build-essential ca-certificates clang curl doxygen flex gcc gdb git gradle graphviz libboost1.71-all-dev libcppunit-dev libjsoncpp-dev libosgearth-dev libqt5opengl5-dev libwebkit2gtk-4.0-37 libxml2-dev lld make mongodb mpi-default-dev openjdk-8-jdk openscenegraph-plugin-osgearth perl python2 python3 python3-pip python-is-python2 qt5-qmake qtbase5-dev qtbase5-dev-tools qtchooser software-properties-common wget xterm zlib1g-dev
 
 # Install Python packages
 RUN python3 -m pip install --system --upgrade \
@@ -97,13 +61,13 @@ RUN git clone git@github.com:SimIntToolkit/cpswt-core.git && \
     ./gradlew :fedmanager-host:publish
 
 WORKDIR /home/cpswt/cpswt-core
-RUN ./gradlew :utils && \
-    ./gradlew :root && \
-    ./gradlew :base-events && \
-    ./gradlew :coa && \
-    ./gradlew :config && \
-    ./gradlew :federate-base && \
-    ./gradlew :federation-manager && \
-    ./gradlew :fedmanager-host
+RUN ./gradlew :utils:build && \
+    ./gradlew :root:build && \
+    ./gradlew :base-events:build && \
+    ./gradlew :coa:build && \
+    ./gradlew :config:build && \
+    ./gradlew :federate-base:build && \
+    ./gradlew :federation-manager:build && \
+    ./gradlew :fedmanager-host:build
  
 
