@@ -49,8 +49,8 @@ dependencyResolutionManagement {
 
         maven {
             isAllowInsecureProtocol = true
-            val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
-            val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
+            val internalRepoUrl = "http://localhost:8080/repository/internal"
+            val snapshotsRepoUrl = "http://localhost:8080/repository/snapshots"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
         }
     }
