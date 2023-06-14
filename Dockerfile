@@ -60,7 +60,9 @@ RUN python3 -m pip install --system --upgrade \
     seaborn \
     webgme-bindings 
 
-# Set up Java 8 (do we need this?)
+# Set up Java 8 (do we need this?) -> YES
+ENV JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-arm64"
+ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Download and extract portico
 WORKDIR /home
@@ -82,9 +84,6 @@ EXPOSE 8080/tcp
 
 # Use SIGINT for stopping
 STOPSIGNAL SIGINT
-
-ENV JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-arm64"
-ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Set up Gradle
 # RUN mkdir /home/gradle/ && \
