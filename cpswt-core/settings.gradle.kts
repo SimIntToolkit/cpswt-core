@@ -30,9 +30,9 @@
 
 rootProject.name = "cpswt-core"
 
-val archivaHostId: localhost
-val archivaPort: 8080
-val version: 0.7.0-SNAPSHOT
+val archivaHostId: String by settings
+val archivaPort: String by settings
+val version: String by settings
 
 pluginManagement {
     repositories {
