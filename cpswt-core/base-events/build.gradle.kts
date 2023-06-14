@@ -80,8 +80,8 @@ publishing {
                 create<BasicAuthentication>("basic")
             }
             credentials {
-                username = admin
-                password = adminpass123
+                username = "admin"
+                password = "adminpass123"
             }
         }
     }
