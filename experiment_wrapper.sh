@@ -1,5 +1,5 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
-/opt/apache-archiva-2.2.5/bin/archiva start
+/opt/apache-archiva-2.2.5/bin/archiva console 
 cd /home/cpswt
 git clone https://github.com/justinyeh1995/cpswt-core.git
 cd cpswt-core/cpswt-core

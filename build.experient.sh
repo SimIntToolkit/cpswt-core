@@ -1,7 +1,7 @@
 # docker network create cpswt-core
 docker run \
   --name cpswt-core \
-  --restart=always \
+  --restart=on-failure \
   --detach \
   --network cpswt-core \
   --env DOCKER_HOST=tcp://docker:2376 \
