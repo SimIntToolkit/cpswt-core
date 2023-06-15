@@ -1,5 +1,5 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
-/opt/apache-archiva-2.2.5/bin/archiva start
+/home/testuser/apache-archiva-2.2.5/bin/archiva start
 cd /home/cpswt
 git clone https://github.com/justinyeh1995/cpswt-core.git
 cd cpswt-core/cpswt-core
@@ -23,3 +23,7 @@ gradle wrapper --gradle-version=7.3
 ./gradlew :federate-base:build 
 ./gradlew :federation-manager:build 
 ./gradlew :fedmanager-host:build
+
+cd /home/cpswt/examples/HelloWorldJava
+gradle wrapper --gradle-version=7.4
+./gradlew :runFederation
