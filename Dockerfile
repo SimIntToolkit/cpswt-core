@@ -46,8 +46,7 @@ RUN apt-get update && \
         software-properties-common \
         wget \
         xterm \
-        zlib1g-dev \
-        supervisor
+        zlib1g-dev 
 
 # Install Python packages
 RUN python3 -m pip install --system --upgrade \
@@ -77,6 +76,7 @@ RUN wget -O archiva.tar.gz https://archive.apache.org/dist/archiva/2.2.5/binarie
     tar xf archiva.tar.gz && \
     rm archiva.tar.gz
 COPY wrapper-linux-aarch64-64 /opt/apache-archiva-2.2.5/bin/./
+COPY archiva.xml /opt/apache-archiva-2.2.5/conf/
 RUN chmod +x /opt/apache-archiva-2.2.5/bin/wrapper-linux-aarch64-64
 
 # Expose the Archiva port
@@ -86,9 +86,10 @@ EXPOSE 8080/tcp
 STOPSIGNAL SIGINT
 
 # Set up Gradle
-# RUN mkdir /home/gradle/ && \
-#     mkdir /home/gradle/.gradle/
-COPY gradle.properties /root/.gradle/gradle.properties
+RUN mkdir /home/testuser/ && \
+    mkdir /home/testuser/.gradle/
+ENV HOME="/home/testuser"
+COPY gradle.properties ${HOME}/.gradle/gradle.properties
 
 # # Clone and build CPSWT packages
 RUN mkdir /home/cpswt
