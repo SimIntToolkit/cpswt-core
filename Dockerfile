@@ -76,7 +76,6 @@ RUN wget -O archiva.tar.gz https://archive.apache.org/dist/archiva/2.2.5/binarie
     tar xf archiva.tar.gz && \
     rm archiva.tar.gz
 COPY wrapper-linux-aarch64-64 /opt/apache-archiva-2.2.5/bin/./
-COPY archiva.xml /opt/apache-archiva-2.2.5/conf/
 RUN chmod +x /opt/apache-archiva-2.2.5/bin/wrapper-linux-aarch64-64
 
 # Expose the Archiva port
@@ -86,11 +85,12 @@ EXPOSE 8080/tcp
 STOPSIGNAL SIGINT
 
 # Set up Gradle
-RUN mkdir /home/testuser/ && \
-    mkdir /home/testuser/.gradle/
-ENV HOME="/home/testuser"
+# RUN mkdir /home/testuser/ && \
+#     mkdir /home/testuser/.gradle/
+ENV HOME="/root"
+RUN mkdir ${HOME}/.gradle/
 COPY gradle.properties ${HOME}/.gradle/gradle.properties
-
+RUN chmod 600 ${HOME}/.gradle/gradle.properties
 # # Clone and build CPSWT packages
 RUN mkdir /home/cpswt
 COPY experiment_wrapper.sh /home/cpswt
