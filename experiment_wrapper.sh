@@ -1,5 +1,6 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
 /opt/apache-archiva-2.2.5/bin/archiva start
+sleep 10
 # localhost=$(hostname -I | awk '{print $1}')
 curl --no-progress-meter -X POST -H "Content-Type: application/json" -H "Origin: http://localhost:8080" -d @- \
  http://localhost:8080/restServices/redbackServices/userService/createAdminUser <<'TERMINUS'
