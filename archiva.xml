@@ -200,7 +200,7 @@
 </ldap>
 <rest>
 <csrffilter>
-<enabled>true</enabled>
+<enabled>false</enabled>
 <disableTokenValidation>false</disableTokenValidation>
 <absentorigin>
 <deny>true</deny>
