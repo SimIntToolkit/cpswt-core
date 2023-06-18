@@ -28,6 +28,10 @@
  * OR MODIFICATIONS.
  */
 
+import java.io.PrintWriter
+import java.nio.file.Files
+
+
 plugins {
     java
     application
@@ -53,41 +57,104 @@ tasks.named<JavaExec>("run") {
     args = listOf("-configFile", "federationManagerConfig.json")
 }
 
-var spawnedProcess: Process? = null
-
-fun spawnProcess() {
+fun getCommandList(): List<String> {
     val runTask = tasks.named<JavaExec>("run").get()
 
     val mainClass: String = runTask.mainClass.get()
     val jvmArgs: List<String>? = runTask.jvmArgs
     val argList: List<String>? = runTask.args
-    val classPath = runTask.classpath.asPath
 
     val commandList: List<String> = listOf("java") + (jvmArgs ?: listOf()) + listOf(mainClass) + (argList ?: listOf())
 
+    return commandList
+}
+
+fun getXTermCommandList(): List<String> {
+    val commandList = getCommandList()
+
     val xtermCommandList = listOf(
-        "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
+            "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
     )
 
-    val processBuilder = ProcessBuilder(xtermCommandList)
+    return xtermCommandList
+}
+
+var spawnedProcess: Process? = null
+
+fun configureProcessBuilder(processBuilder: ProcessBuilder) {
+    val runTask = tasks.named<JavaExec>("run").get()
+    val classPath = runTask.classpath.asPath
+
     val environment = processBuilder.environment()
     environment.put("CLASSPATH", classPath)
+}
+
+fun spawnProcess() {
+    val xtermCommandList = getXTermCommandList()
+
+    val processBuilder = ProcessBuilder(xtermCommandList)
+    configureProcessBuilder(processBuilder)
 
     spawnedProcess = processBuilder.start()
 }
 
-val runAsynchronous = tasks.register("runAsynchronous") {
+fun spawnProcessBatch() {
+    val commandList = getCommandList()
+
+    val processBuilder = ProcessBuilder(commandList)
+    configureProcessBuilder(processBuilder)
+
+    val statusDirectory = File(projectDir, "StatusDirectory")
+    if (!statusDirectory.exists()) {
+        Files.createDirectory(statusDirectory.toPath());
+    }
+    val stdoutFile = File(statusDirectory, "stdout")
+    val stderrFile = File(statusDirectory, "stderr")
+
+    processBuilder.redirectOutput(stdoutFile)
+    processBuilder.redirectError(stderrFile)
+    spawnedProcess = processBuilder.start()
+
+    val pid = spawnedProcess?.pid()
+
+    PrintWriter(File(statusDirectory, "pid")).use {
+        it.println(pid)
+    }
+}
+
+val runFederationManagerAsynchronous = tasks.register("runFederationManagerAsynchronous") {
     doLast {
         spawnProcess()
         Thread.sleep(10000)
     }
 }
 
-val runFederates = tasks.register("runFederates") {
-    mustRunAfter(runAsynchronous)
+val runFederationManagerAsynchronousBatch = tasks.register("runFederationManagerAsynchronousBatch") {
+    doLast {
+        spawnProcessBatch()
+        Thread.sleep(15000)
+    }
+}
+
+val runFederatesAsynchronous = tasks.register("runFederatesAsynchronous") {
+    mustRunAfter(runFederationManagerAsynchronous)
+    dependsOn(runFederationManagerAsynchronous)
     dependsOn(":PingCounter:runAsynchronous")
     dependsOn(":Source:runAsynchronous")
     dependsOn(":Sink:runAsynchronous")
+}
+
+val runFederatesAsynchronousBatch = tasks.register("runFederatesAsynchronousBatch") {
+    mustRunAfter(runFederationManagerAsynchronousBatch)
+    dependsOn(runFederationManagerAsynchronousBatch)
+    dependsOn(":PingCounter:runAsynchronousBatch")
+    dependsOn(":Source:runAsynchronousBatch")
+    dependsOn(":Sink:runAsynchronousBatch")
+}
+
+val runFederatesInteractive = tasks.register("runFederatesInteractive") {
+    mustRunAfter(runFederatesAsynchronous)
+    dependsOn(runFederatesAsynchronous)
 
     doLast {
         print("Press ENTER to terminate: ")
@@ -98,15 +165,21 @@ val runFederates = tasks.register("runFederates") {
     }
 }
 
-tasks.register("killFederates") {
-    mustRunAfter(runFederates)
+tasks.register("runFederation") {
+    mustRunAfter(runFederatesInteractive)
+    dependsOn(runFederatesInteractive)
     dependsOn(":PingCounter:killFederate")
     dependsOn(":Source:killFederate")
     dependsOn(":Sink:killFederate")
 }
 
-tasks.register("runFederation") {
-    dependsOn(":runAsynchronous")
-    dependsOn(":runFederates")
-    dependsOn(":killFederates")
+val runFederationBatch = tasks.register("runFederationBatch") {
+    mustRunAfter(runFederatesAsynchronousBatch)
+    dependsOn(runFederatesAsynchronousBatch)
+    dependsOn(":PingCounter:waitForFederate")
+    dependsOn(":Sink:waitForFederate")
+    dependsOn(":Source:waitForFederate")
+    doLast {
+        spawnedProcess?.waitFor()
+    }
 }

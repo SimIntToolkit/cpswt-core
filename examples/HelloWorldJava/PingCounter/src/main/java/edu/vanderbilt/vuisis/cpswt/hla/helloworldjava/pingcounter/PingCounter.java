@@ -60,7 +60,6 @@ public class PingCounter extends PingCounterBase {
             (edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter)objectRoot;
 
         if (++counter >= 5) {
-            setStatus(1);
             exitCondition = true;
         }
 
