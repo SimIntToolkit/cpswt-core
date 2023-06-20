@@ -1,7 +1,8 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
 /opt/apache-archiva-2.2.5/bin/archiva start
-sleep 10
-# localhost=$(hostname -I | awk '{print $1}')
+# nc -zv localhost 8080
+sleep 20
+# create admin user
 curl --no-progress-meter -X POST -H "Content-Type: application/json" -H "Origin: http://localhost:8080" -d @- \
  http://localhost:8080/restServices/redbackServices/userService/createAdminUser <<'TERMINUS'
 {
@@ -25,14 +26,14 @@ cd cpswt-core/cpswt-core
 
 gradle wrapper --gradle-version=7.3
 
-./gradlew :utils:publish
+./gradlew :utils:publish 
 ./gradlew :root:publish
-./gradlew :base-events:publish
-./gradlew :coa:publish
+./gradlew :base-events:publish 
+./gradlew :coa:publish 
 ./gradlew :config:publish
-./gradlew :federate-base:publish
-./gradlew :federation-manager:publish
-./gradlew :fedmanager-host:publish
+./gradlew :federate-base:publish 
+./gradlew :federation-manager:publish 
+./gradlew :fedmanager-host:publish 
 
 ./gradlew :utils:build 
 ./gradlew :root:build 
@@ -40,8 +41,8 @@ gradle wrapper --gradle-version=7.3
 ./gradlew :coa:build 
 ./gradlew :config:build 
 ./gradlew :federate-base:build 
-./gradlew :federation-manager:build 
-./gradlew :fedmanager-host:build
+./gradlew :federation-manager:build
+./gradlew :fedmanager-host:build 
 
 cd /home/cpswt/cpswt-core/examples/HelloWorldJava
 gradle wrapper --gradle-version=7.4
