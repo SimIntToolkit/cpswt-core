@@ -59,6 +59,8 @@ pipeline {
                 echo 'Tearing Down the image & container....'
                 sh 'docker rm -f cpswt-core'
                 sh 'docker rmi cpswt-core:latest'
+                sh 'docker network rm cpswt-core'
+                sh 'rm -rf cpswt-core'
             }
         }
     }
