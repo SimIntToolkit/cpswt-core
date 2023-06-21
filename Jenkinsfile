@@ -23,9 +23,6 @@ pipeline {
             steps {
                 echo 'Checking if cpswt-core network is in docker network....'
                 sh 'docker network create --driver bridge cpswt-core || true'
-                // sh 'set +e'
-                // sh 'docker network ls | grep cpswt-core'
-                // sh 'if [ $? -eq 0 ]; then echo "cpswt-core network exists"; else docker network create cpswt-core; fi'
             }
         }
         stage('Deploy image') {
@@ -42,6 +39,12 @@ pipeline {
                         --publish 8081:8080 \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         cpswt-core:latest'
+            }
+        }
+        stage('Wait for container to stop') {
+            steps {
+                echo 'Wait for container to stop'
+                sh 'docker wait cpswt-core'
             }
         }
         stage('Archive loggings') {
