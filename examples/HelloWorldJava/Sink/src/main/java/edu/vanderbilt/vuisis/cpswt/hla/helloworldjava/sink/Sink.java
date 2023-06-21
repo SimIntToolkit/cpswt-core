@@ -126,7 +126,6 @@ public class Sink extends SinkBase {
 
         while (!exitCondition) {
             atr.requestSyncStart();
-            enteredTimeGrantedState();
 
             checkReceivedSubscriptions();
 
@@ -136,6 +135,8 @@ public class Sink extends SinkBase {
                 putAdvanceTimeRequest(newATR);
                 atr.requestSyncEnd();
                 atr = newATR;
+            } else {
+                terminateAdvanceTimeThread(atr);
             }
         }
 

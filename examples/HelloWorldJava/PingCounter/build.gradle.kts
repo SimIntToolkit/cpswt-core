@@ -28,6 +28,10 @@
  * OR MODIFICATIONS.
  */
 
+import java.io.PrintWriter
+import java.nio.file.Files
+
+
 plugins {
     java
     application
@@ -65,36 +69,89 @@ tasks.named<JavaExec>("run") {
     args = listOf("-configFile", "conf/PingCounter.json")
 }
 
-var spawnedProcess: Process? = null
-
-fun spawnProcess() {
+fun getCommandList(): List<String> {
     val runTask = tasks.named<JavaExec>("run").get()
 
     val mainClass: String = runTask.mainClass.get()
     val jvmArgs: List<String>? = runTask.jvmArgs
     val argList: List<String>? = runTask.args
-    val classPath = runTask.classpath.asPath
-    val workingDir = runTask.workingDir
 
     val commandList: List<String> = listOf("java") + (jvmArgs ?: listOf()) + listOf(mainClass) + (argList ?: listOf())
 
+    return commandList
+}
+
+fun getXTermCommandList(): List<String> {
+    val commandList = getCommandList()
+
     val xtermCommandList = listOf(
-        "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
+            "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
     )
 
-    val processBuilder = ProcessBuilder(xtermCommandList)
-    processBuilder.directory(workingDir)
+    return xtermCommandList
+}
+
+var spawnedProcess: Process? = null
+
+fun configureProcessBuilder(processBuilder: ProcessBuilder) {
+    val runTask = tasks.named<JavaExec>("run").get()
+    val classPath = runTask.classpath.asPath
+
+    processBuilder.directory(projectDir)
 
     val environment = processBuilder.environment()
     environment.put("CLASSPATH", classPath)
+}
+
+fun spawnProcess() {
+    val xtermCommandList = getXTermCommandList()
+
+    val processBuilder = ProcessBuilder(xtermCommandList)
+    configureProcessBuilder(processBuilder)
 
     spawnedProcess = processBuilder.start()
 }
 
+fun spawnProcessBatch() {
+    val commandList = getCommandList()
+
+    val processBuilder = ProcessBuilder(commandList)
+    configureProcessBuilder(processBuilder)
+
+    val statusDirectory = File(projectDir, "StatusDirectory")
+    if (!statusDirectory.exists()) {
+        Files.createDirectory(statusDirectory.toPath());
+    }
+    val stdoutFile = File(statusDirectory, "stdout")
+    val stderrFile = File(statusDirectory, "stderr")
+
+    processBuilder.redirectOutput(stdoutFile)
+    processBuilder.redirectError(stderrFile)
+
+    spawnedProcess = processBuilder.start()
+
+    val pid = spawnedProcess?.pid()
+
+    PrintWriter(File(statusDirectory, "pid")).use {
+        it.println(pid)
+    }
+}
+
 tasks.register("runAsynchronous") {
-    dependsOn("classes")
     doLast {
         spawnProcess()
+    }
+}
+
+val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
+    doLast {
+        spawnProcessBatch()
+    }
+}
+
+tasks.register("waitForFederate") {
+    doLast {
+        spawnedProcess?.waitFor()
     }
 }
 

@@ -53,9 +53,15 @@ public class PingCounter extends PingCounterBase {
         super(params);
     }
 
+    int counter = 0;
+
     private void handleObjectClass_ObjectRoot_PingCounter(ObjectRoot objectRoot) {
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter pingCounter0 =
             (edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter)objectRoot;
+
+        if (++counter >= 5) {
+            exitCondition = true;
+        }
 
         System.out.println("PingCounter:  ping count is now " + pingCounter0.get_pingCount());
     }
@@ -111,7 +117,6 @@ public class PingCounter extends PingCounterBase {
 
         while (!exitCondition) {
             atr.requestSyncStart();
-            enteredTimeGrantedState();
 
             checkReceivedSubscriptions();
 
@@ -125,6 +130,8 @@ public class PingCounter extends PingCounterBase {
                 putAdvanceTimeRequest(newATR);
                 atr.requestSyncEnd();
                 atr = newATR;
+            } else {
+                terminateAdvanceTimeThread(atr);
             }
         }
 

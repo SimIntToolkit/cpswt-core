@@ -601,7 +601,6 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 while (_running && !exitCondition) {
                     if (!_paused) {
                         atr.requestSyncStart();
-                        enteredTimeGrantedState();
                     }
 
                     if (_realTimeMode) {
@@ -657,7 +656,9 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                         terminateSimulation();
                     }
 
-                    if (_running && !exitCondition && !_paused) {
+                    if (exitCondition) {
+                        terminateAdvanceTimeThread(atr);
+                    } else if (_running && !_paused) {
                         double previousTime = _currentTime;
                         _currentTime += super.getStepSize();
 
@@ -675,7 +676,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                         IC2WFederationEventsHandler.C2W_FEDERATION_EVENTS.FEDERATION_SIMULATION_FINISHED,
                         _federationId
                 );
-                prepareForFederatesToResign();
+//                prepareForFederatesToResign();
 
                 if(_useSyncPoints) {
                     _logger.info("Waiting for \"ReadyToResign\" ... ");
@@ -683,7 +684,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                     _logger.info("Done with resign");
                 }
 
-                waitForFederatesToResign();
+//                waitForFederatesToResign();
 
                 while(getFederateState() != FederateState.TERMINATED) {
                     CpswtUtils.sleepDefault();
@@ -696,7 +697,7 @@ public class FederationManager extends SynchronizedFederate implements COAExecut
                 _logLevelNum = 0;
 
                 // In case some federate is still hanging around
-                killEntireFederation();
+//                killEntireFederation();
             } catch (Exception e) {
                 _logger.error(e.getMessage());
             }

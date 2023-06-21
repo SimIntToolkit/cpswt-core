@@ -52,6 +52,8 @@ import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
 import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflectorComparator;
 
 import java.io.File;
+import java.io.PrintWriter;
+
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -107,6 +109,10 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
 
 @SuppressWarnings("unused")
 public class SynchronizedFederate extends NullFederateAmbassador {
+
+    static {
+        SimEnd.load();
+    }
 
     private static class UniquePriorityBlockingQueue<T> extends PriorityBlockingQueue<T> {
 
@@ -246,6 +252,16 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return rti;
     }
 
+    private int _status = 0;
+
+    protected void setStatus(int status) {
+        _status = status;
+    }
+
+    protected int getStatus() {
+        return _status;
+    }
+
     /**
      * General federate parameters
      */
@@ -307,7 +323,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         _timeAdvanceNotGranted = timeAdvanceNotGranted;
     }
 
-    private boolean _simEndNotSubscribed = true;
+    private boolean _simEndNotPubsub = true;
 
     private double lookahead;
     public double getLookahead() {
@@ -453,32 +469,16 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    public void notifyFederationOfResign() {
-        synchronized (rti) {
-            FederateResignInteraction resignInteraction = new FederateResignInteraction();
-            resignInteraction.set_FederateId(this.federateId);
-            resignInteraction.set_FederateType(this.federateType);
-            resignInteraction.set_IsLateJoiner(this.isLateJoiner);
-
-            try {
-                logger.trace("Sending FederateResignInteraction for federate {}", this.federateId);
-                sendInteraction(resignInteraction);
-            }
-            catch(Exception ex) {
-                logger.error("Error while sending FederateResignInteraction for federate {}", this.federateId);
-            }
-        }
-    }
-
     /**
      * Ensures that the federate is subscribed to SimEnd interaction.
      */
-    private void ensureSimEndSubscription() {
+    private void ensureSimEndPubsub() {
 
-        if (_simEndNotSubscribed) {
+        if (_simEndNotPubsub) {
+            SimEnd.publish_interaction(getRTI());
             // Auto-subscribing also ensures that there is no filter set for SimEnd
             SimEnd.subscribe_interaction(getRTI());
-            _simEndNotSubscribed = false;
+            _simEndNotPubsub = false;
         }
     }
 
@@ -518,7 +518,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
           federationJsonFileName, federateDynamicMessagingJsonFileName
         );
 
-        this.ensureSimEndSubscription();
+        this.ensureSimEndPubsub();
 
         this.notifyFederationOfJoin();
     }
@@ -715,17 +715,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     public void enableTimeConstrained() throws FederateNotExecutionMember {
         if (!_timeConstrainedNotEnabled) return;
 
-        boolean timeConstrainedEnabledNotCalled = true;
-        while (timeConstrainedEnabledNotCalled) {
+        boolean enableTimeConstrainedNotCalled = true;
+        while (enableTimeConstrainedNotCalled) {
             try {
                 synchronized (rti) {
                     rti.enableTimeConstrained();
                 }
-                timeConstrainedEnabledNotCalled = false;
+                enableTimeConstrainedNotCalled = false;
             } catch (TimeConstrainedAlreadyEnabled t) {
                 return;
             } catch (EnableTimeConstrainedPending e) {
-                timeConstrainedEnabledNotCalled = false;
+                enableTimeConstrainedNotCalled = false;
             } catch (FederateNotExecutionMember f) {
                 throw f;
             } catch (Exception e) {
@@ -749,6 +749,59 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
         }
     }
+
+    // DISABLING TIME CONSTRAINED IN PORTICO IS PROBLEMATIC.
+    // IF THE FEDERATE (A) THAT CALLS THIS METHOD EXITS RIGHT AFTER CALLING, THE OTHER
+    // FEDERATES (b) WILL INCUR AN EXCEPTION, SPEC. IN THE "TimeManager.class" FILE,
+    // LINE 150.  HERE, THERE IS A TABLE THAT NEEDS TO CONTAIN INFO ABOUT THE
+    // FEDERATE (A) THAT HAS DISABLED ITS TIME-REGULATION, BUT THIS INFORMATION IS
+    // NO LONGER AVAILABLE AS THE FEDERATE (A) HAS EXITED, SO THE FEDERATES (B) INCUR
+    // AN NPE.
+    // EVEN IF FEDERATE (A) WAITS BEFORE EXITING AFTER CALLING THIS METHOD, THE
+    // OTHER FEDERATES (B) NEVER RECEIVED A TIME-ADVANCE-GRANT FOR SOME REASON.
+//    public void disableTimeConstrained() throws FederateNotExecutionMember {
+//        if (_timeConstrainedNotEnabled) {
+//            return;
+//        }
+//
+//        boolean disableTimeConstrainedNotCalled = true;
+//        while(disableTimeConstrainedNotCalled) {
+//            try {
+//                synchronized (rti) {
+//                    rti.disableTimeConstrained();
+//                }
+//                disableTimeConstrainedNotCalled = false;
+//            } catch (TimeConstrainedWasNotEnabled t) {
+//                break;
+//            } catch (FederateNotExecutionMember f) {
+//                throw f;
+//            } catch (Exception e) {
+//                logger.warn("Exception encountered on \"disableTimeConstrained\"", e);
+//                e.printStackTrace();
+//                CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+//            }
+//        }
+//
+//        try {
+//            synchronized (rti) {
+//                rti.tick();
+//            }
+//        } catch (Exception ignored) {
+//        }
+//        int counter = 0;
+//        while (counter < 40) {
+//            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
+//            try {
+//                synchronized (rti) {
+//                    rti.tick();
+//                }
+//            } catch (Exception ignored) {
+//            }
+//            ++counter;
+//        }
+//
+//        _timeConstrainedNotEnabled = true;
+//    }
 
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchronizedFederate class uses this
@@ -821,23 +874,32 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * When a federate calls this method, it stops time-regulating within
      * its federation.
      */
-    public void disableTimeRegulation()
-            throws RTIinternalError , FederateNotExecutionMember {
+    // DISABLING TIME REGULATION IN PORTICO IS PROBLEMATIC.
+    // IF THE FEDERATE (A) THAT CALLS THIS METHOD EXITS RIGHT AFTER CALLING, THE OTHER
+    // FEDERATES (b) WILL INCUR AN EXCEPTION, SPEC. IN THE "TimeManager.class" FILE,
+    // LINE 150.  HERE, THERE IS A TABLE THAT NEEDS TO CONTAIN INFO ABOUT THE
+    // FEDERATE (A) THAT HAS DISABLED ITS TIME-REGULATION, BUT THIS INFORMATION IS
+    // NO LONGER AVAILABLE AS THE FEDERATE (A) HAS EXITED, SO THE FEDERATES (B) INCUR
+    // AN NPE.
+    // EVEN IF FEDERATE (A) WAITS BEFORE EXITING AFTER CALLING THIS METHOD, THE
+    // OTHER FEDERATES (B) NEVER RECEIVED A TIME-ADVANCE-GRANT FOR SOME REASON.
+    public void disableTimeRegulation() throws FederateNotExecutionMember {
 
-        if (_timeRegulationNotEnabled) return;
+        if (_timeRegulationNotEnabled) {
+            return;
+        }
 
         boolean timeRegulationDisabledNotCalled = true;
         while (timeRegulationDisabledNotCalled) {
             try {
                 synchronized (rti) {
                     rti.disableTimeRegulation();
-                    _timeRegulationNotEnabled = true;
                 }
                 timeRegulationDisabledNotCalled = false;
-            } catch (SaveInProgress | RestoreInProgress | ConcurrentAccessAttempted e) {
-                timeRegulationDisabledNotCalled = false;
-            } catch (FederateNotExecutionMember | RTIinternalError ex) {
-                throw ex;
+            } catch (TimeRegulationWasNotEnabled t) {
+                break;
+            } catch (FederateNotExecutionMember f) {
+                throw f;
             } catch (Exception e) {
                 CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
             }
@@ -849,15 +911,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             }
         } catch (Exception ignored) {
         }
-        while (!_timeRegulationNotEnabled) {
-            CpswtUtils.sleep(SynchronizedFederate.internalThreadWaitTimeMs);
-            try {
-                synchronized (rti) {
-                    rti.tick();
-                }
-            } catch (Exception ignored) {
-            }
-        }
+
+        _timeRegulationNotEnabled = true;
     }
 
     /**
@@ -959,7 +1014,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @throws RTIinternalError Thrown if there is an error in the RTI
      */
     public void readyToPopulate() throws FederateNotExecutionMember, RTIinternalError {
-        ensureSimEndSubscription();
+        ensureSimEndPubsub();
 
         achieveSynchronizationPoint(SynchronizationPoints.ReadyToPopulate);
     }
@@ -1144,6 +1199,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     private final ATRQueue _atrQueue = new ATRQueue(100, new ATRComparator());
 
+    private AdvanceTimeThread _advanceTimeThread = null;
+
     /**
      * DO NOT USE -- Should only be used directly by the SynchronizedFederate class.
      * This method is used to access a queue of AdvanceTimeRequest objects.
@@ -1174,7 +1231,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     protected void startAdvanceTimeThread() {
         if (_advanceTimeThreadNotStarted) {
-            (new AdvanceTimeThread(this, this._atrQueue, TimeAdvanceMode.TimeAdvanceRequest)).start();
+            _advanceTimeThread = new AdvanceTimeThread(this, this._atrQueue, TimeAdvanceMode.TimeAdvanceRequest);
+            _advanceTimeThread.start();
             _advanceTimeThreadNotStarted = false;
         }
     }
@@ -1190,9 +1248,31 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     protected void startAdvanceTimeThread(TimeAdvanceMode timeAdvanceMode) {
         if (_advanceTimeThreadNotStarted) {
-            (new AdvanceTimeThread(this, this._atrQueue, timeAdvanceMode)).start();
+            _advanceTimeThread = new AdvanceTimeThread(this, this._atrQueue, timeAdvanceMode);
+            _advanceTimeThread.start();
             _advanceTimeThreadNotStarted = false;
         }
+    }
+
+    private void waitForAdvanceTimeThreadToTerminate() {
+        boolean advanceTimeThreadNotExited = true;
+        while(advanceTimeThreadNotExited) {
+            try {
+                _advanceTimeThread.join();
+                advanceTimeThreadNotExited = false;
+            } catch(InterruptedException interruptedException) {
+                CpswtUtils.sleep(500);
+            } catch(Exception e) {
+                logger.error("Exception caught on waiting for AdvanceTimeThread to terminate", e);
+                e.printStackTrace();
+                advanceTimeThreadNotExited = false;
+            }
+        }
+    }
+
+    protected void terminateAdvanceTimeThread(AdvanceTimeRequest advanceTimeRequest) {
+        advanceTimeRequest.requestSyncEnd();
+        waitForAdvanceTimeThreadToTerminate();
     }
 
     private static final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithoutTime =
@@ -1382,6 +1462,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 "SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", interactionRoot
         );
 
+        if (interactionRoot.isInstanceOfHlaClass(SimEnd.get_hla_class_name())) {
+            exitImmediately();
+        }
+
         receiveInteractionSFAux(interactionRoot);
     }
 
@@ -1438,10 +1522,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 return;
             }
 
-            if(SimEnd.match(interactionRoot.getClassHandle())) {
-                _receivedSimEnd = interactionRoot;
-            }
-            // handleIfSimEnd(interactionClass, theInteraction, assumedTimestamp);
             addInteraction(interactionRoot);
             // createLog(interactionClass, theInteraction, assumedTimestamp);
         }
@@ -1486,22 +1566,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         logger.warn("SynchronizedFederate.receiveEmbeddedInteraction, unrecognized command \"{}\"", command);
-    }
-
-
-    protected void enteredTimeGrantedState() {
-        if(_receivedSimEnd != null) {
-            handleIfSimEnd(_receivedSimEnd);
-        }
-    }
-
-    protected void handleIfSimEnd(InteractionRoot interactionRoot) {
-        if (SimEnd.match(interactionRoot.getClassHandle())) {
-            logger.info("{}: SimEnd interaction received, exiting...", getFederateId());
-
-            // this one will set flag allowing foreground federate to gracefully shut down
-            exitCondition = true;
-        }
     }
 
     private static final PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue =
@@ -1700,7 +1764,34 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             listener.federateStateChanged(e);
         }
     }
-    
+
+    private void notifyFederationOfSimEnd() {
+        SimEnd simEnd = new SimEnd();
+
+        try {
+            logger.trace("Sending SimEnd for federate {}", this.federateId);
+            sendInteraction(simEnd);
+        }
+        catch(Exception ex) {
+            logger.error("Error while sending SimEnd for federate {}", this.federateId);
+        }
+    }
+
+    private void writeStatus() {
+        // WRITE STATUS
+        File statusDirectory = new File("StatusDirectory");
+        statusDirectory.mkdirs();
+        File statusFile = new File(statusDirectory, "exitStatus");
+        try (
+                PrintWriter printWriter = new PrintWriter(statusFile, "UTF-8")
+        ) {
+            printWriter.print(getStatus());
+        } catch(Exception e) {
+            logger.error("Error writing status to file \"" + statusFile.getAbsolutePath() + "\"", e);
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Processes graceful shut-down of hla federate
      *
@@ -1709,16 +1800,41 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     {
         logger.info("Exiting gracefully ....");
 
-        // notify FederationManager about resign
-        notifyFederationOfResign();
+        notifyFederationOfSimEnd();
 
-        // Wait for 10 seconds for Federation Manager to recognize that the federate has resigned.
-        try {
-            Thread.sleep(CpswtDefaults.SimEndWaitingTimeMillis);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+//        try {
+//            disableTimeConstrained();
+//        } catch (Exception e) {
+//            logger.warn("Exception encountered in \"disableTimeConstrained\"", e);
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            disableTimeRegulation();
+//        } catch (Exception e) {
+//            logger.warn("Exception encountered in \"disableTimeRegulation\"", e);
+//            e.printStackTrace();
+//        }
 
-        resignFederationExecution(ResignAction.DELETE_OBJECTS);
+        writeStatus();
+//        if (!isLateJoiner()) {
+//            try {
+//                readyToResign();
+//            } catch (Exception e) {
+//                logger.error("Exception on ready-to-resign synch-point", e);
+//                e.printStackTrace();
+//            }
+//        }
+
+//        resignFederationExecution(ResignAction.DELETE_OBJECTS);
+
+        // SLEEP 3 SECONDS TO ALLOW SimEnd TO BE SENT
+        CpswtUtils.sleep(3000);
+    }
+
+    public void exitImmediately() {
+        writeStatus();
+//        resignFederationExecution(ResignAction.DELETE_OBJECTS);
+        System.exit(0);
     }
 }
