@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Deploy image') {
             steps {
-                echo 'Run the Docker Container....'
+                echo 'Run the Docker Container inside Jenkins container'
                 sh 'docker run \
                         --name cpswt-core \
                         --restart=on-failure \
