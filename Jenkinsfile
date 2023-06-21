@@ -80,7 +80,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                 echo 'Cloning Forked CPSWT-Core..'
-                //deleteDir() // Delete workspace before cloning
+                sh 'rm -rf cpswt-core'
                 git url: 'https://github.com/justinyeh1995/cpswt-core.git', branch: 'develop'
             }
         }
