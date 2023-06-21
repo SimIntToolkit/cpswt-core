@@ -22,9 +22,10 @@ pipeline {
         stage('Check network') {
             steps {
                 echo 'Checking if cpswt-core network is in docker network....'
-                sh 'set +e'
-                sh 'docker network ls | grep cpswt-core'
-                sh 'if [ $? -eq 0 ]; then echo "cpswt-core network exists"; else docker network create cpswt-core; fi'
+                sh 'docker create network --driver bridge cpswt-core || true'
+                // sh 'set +e'
+                // sh 'docker network ls | grep cpswt-core'
+                // sh 'if [ $? -eq 0 ]; then echo "cpswt-core network exists"; else docker network create cpswt-core; fi'
             }
         }
         stage('Deploy image') {
