@@ -80,7 +80,8 @@ pipeline {
             steps {
                 echo 'Cloning Forked CPSWT-Core..'
                 deleteDir() // Delete workspace before cloning
-                git url: 'https://github.com/justinyeh1995/cpswt-core.git', branch: 'develop'
+                // git url: 'https://github.com/justinyeh1995/cpswt-core.git', branch: 'develop'
+                sh 'git clone https://github.com/justinyeh1995/cpswt-core.git'
             }
         }
         stage('Build image') {
