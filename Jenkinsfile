@@ -14,38 +14,51 @@ pipeline {
         }
         stage('Build image') {
             steps {
-                echo 'Start a Docker Container for this experiment, which should start the experiment and a archiva server, a inet server, and a omnet++ server..'
-                sh 'cd cpswt-core'
-                sh 'docker build -t cpswt-core:latest -f Dockerfile .'
+                echo 'Start a Docker Container for this experiment, which should start the experiment and an Archiva server, an Inet server, and an OMNeT++ server..'
+                dir('cpswt-core') {
+                    docker.build('cpswt-core:latest')
+                }
             }
         }
         stage('Check network') {
             steps {
-                echo 'Checking if cpswt-core network is in docker network....'
-                sh 'docker network ls | grep cpswt-core'
-                sh 'if [ $? -eq 0 ]; then echo "cpswt-core network exists"; else docker network create cpswt-core; fi'
+                echo 'Checking if cpswt-core network is in Docker network....'
+                script {
+                    def networkExists = sh(script: 'docker network ls | grep cpswt-core', returnStatus: true)
+                    if (networkExists == 0) {
+                        echo "cpswt-core network exists"
+                    } else {
+                        sh 'docker network create cpswt-core'
+                    }
+                }
             }
         }
         stage('Deploy image') {
             steps {
                 echo 'Run the Docker Container....'
-                sh 'docker run \
-                        --name cpswt-core \
-                        --restart=on-failure \
-                        --detach \
-                        --network cpswt-core \
-                        --env DOCKER_HOST=tcp://docker:2376 \
-                        --env DOCKER_CERT_PATH=/certs/client \
-                        --env DOCKER_TLS_VERIFY=1 \
-                        --publish 8081:8080 \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        cpswt-core:latest'
+                script {
+                    docker.image('cpswt-core:latest').withRun('--name cpswt-core \
+                            --restart=on-failure \
+                            --detach \
+                            --network cpswt-core \
+                            --env DOCKER_HOST=tcp://docker:2376 \
+                            --env DOCKER_CERT_PATH=/certs/client \
+                            --env DOCKER_TLS_VERIFY=1 \
+                            --publish 8081:8080 \
+                            -v /var/run/docker.sock:/var/run/docker.sock') {
+                        // Additional setup or commands inside the container if needed
+                    }
+                }
             }
         }
         stage('Archive loggings') {
             steps {
                 echo 'Archiving the results...'
-                sh 'docker logs cpswt-core > cpswt-core.log'
+                script {
+                    docker.image('cpswt-core:latest').inside('-v $PWD:/app') {
+                        sh 'docker logs cpswt-core > cpswt-core.log'
+                    }
+                }
                 archiveArtifacts artifacts: 'cpswt-core.log', fingerprint: true
             }
         }
@@ -60,14 +73,14 @@ pipeline {
 
     post {
         always {
-    	echo 'This will always run'
-	emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
-        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-	attachLog: true,
-    attachmentsPattern: 'cpswt-core.log'
+            echo 'This will always run'
+            emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+            subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+            attachLog: true,
+            attachmentsPattern: 'cpswt-core.log'
         }
-    }	
+    }   
 }
 
 // pipeline {
