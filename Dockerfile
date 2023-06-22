@@ -33,6 +33,7 @@ RUN apt-get update && \
         mongodb \
         mpi-default-dev \
         openjdk-8-jdk \
+        openjdk-17-jdk \
         openscenegraph-plugin-osgearth \
         perl \
         python2 \
