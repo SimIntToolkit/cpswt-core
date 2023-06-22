@@ -1,5 +1,7 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
-/opt/apache-archiva-2.2.5/bin/archiva start
+exec /opt/apache-archiva-2.2.5/bin/archiva start
+
+# wait for archiva to start
 # nc -zv localhost 8080
 sleep 20
 # create admin user
@@ -18,6 +20,10 @@ curl --no-progress-meter -X POST -H "Content-Type: application/json" -H "Origin:
     "confirmPassword": "adminpass123"
 }
 TERMINUS
+
+# switch to java 17
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
+export PATH=$JAVA_HOME/bin:$PATH
 
 # clone cpswt-core and build it
 cd /home/cpswt
