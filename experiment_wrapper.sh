@@ -1,5 +1,8 @@
 # this script is used to build cpswt-core and its dependencies in the docker container 
-exec /opt/apache-archiva-2.2.5/bin/archiva start
+ORIGINAL_PATH=$PATH
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-arm64
+export PATH=$JAVA_HOME/bin:$PATH
+/opt/apache-archiva-2.2.5/bin/archiva start
 
 # wait for archiva to start
 # nc -zv localhost 8080
@@ -22,15 +25,16 @@ curl --no-progress-meter -X POST -H "Content-Type: application/json" -H "Origin:
 TERMINUS
 
 # switch to java 17
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-arm64
-export PATH=$JAVA_HOME/bin:$PATH
+unset JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-arm64
+export PATH=$JAVA_HOME/bin:$ORIGINAL_PATH
 
 # clone cpswt-core and build it
 cd /home/cpswt
 git clone https://github.com/justinyeh1995/cpswt-core.git
 cd cpswt-core/cpswt-core
 
-gradle wrapper --gradle-version=7.3
+gradle wrapper --gradle-version=7.5
 
 ./gradlew :utils:publish 
 ./gradlew :root:publish
@@ -51,5 +55,5 @@ gradle wrapper --gradle-version=7.3
 ./gradlew :fedmanager-host:build 
 
 cd /home/cpswt/cpswt-core/examples/HelloWorldJava
-gradle wrapper --gradle-version=7.4
-./gradlew :runFederation
+gradle wrapper --gradle-version=7.5
+./gradlew :runFederationBatch
