@@ -19,7 +19,6 @@ RUN apt-get update && \
         gcc \
         gdb \
         git \
-        gradle \
         graphviz \
         libboost1.71-all-dev \
         libcppunit-dev \
@@ -47,7 +46,19 @@ RUN apt-get update && \
         software-properties-common \
         wget \
         xterm \
-        zlib1g-dev 
+        zlib1g-dev \
+        unzip \
+        zip
+
+#install Gradle
+ARG GRADLE_VERSION=7.5
+RUN wget -O gradle.zip https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
+    mkdir /opt/gradle && \
+    unzip -d /opt/gradle gradle.zip && \
+    rm gradle.zip
+# Set Gradle in the environment variables
+ENV GRADLE_HOME="/opt/gradle/gradle-${GRADLE_VERSION}"
+ENV PATH="${GRADLE_HOME}/bin:${PATH}"
 
 # Install Python packages
 RUN python3 -m pip install --system --upgrade \
@@ -59,10 +70,6 @@ RUN python3 -m pip install --system --upgrade \
     scipy \
     seaborn \
     webgme-bindings 
-
-# Set up Java 8 (do we need this?) -> YES
-ENV JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-arm64"
-ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Download and extract portico
 WORKDIR /home
@@ -85,13 +92,11 @@ EXPOSE 8080/tcp
 # Use SIGINT for stopping
 STOPSIGNAL SIGINT
 
-# Set up Gradle
-# RUN mkdir /home/testuser/ && \
-#     mkdir /home/testuser/.gradle/
-ENV HOME="/root"
-RUN mkdir ${HOME}/.gradle/
-COPY gradle.properties ${HOME}/.gradle/gradle.properties
-RUN chmod 600 ${HOME}/.gradle/gradle.properties
+# Set up Gradle properties
+# ENV HOME="/root"
+# RUN mkdir ${HOME}/.gradle/
+COPY gradle.properties ${GRADLE_HOME}/init.d/
+RUN chmod 600 ${GRADLE_HOME}/init.d/gradle.properties
 # # Clone and build CPSWT packages
 RUN mkdir /home/cpswt
 COPY experiment_wrapper.sh /home/cpswt
