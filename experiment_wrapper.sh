@@ -56,4 +56,4 @@ gradle wrapper --gradle-version=7.5
 
 cd /home/cpswt/cpswt-core/examples/HelloWorldJava
 gradle wrapper --gradle-version=7.5
-./gradlew :runFederationBatch
+./gradlew :runFederation
