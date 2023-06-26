@@ -93,11 +93,10 @@ EXPOSE 8080/tcp
 STOPSIGNAL SIGINT
 
 # Set up Gradle properties
-# ENV HOME="/root"
-# RUN mkdir ${HOME}/.gradle/
-COPY gradle.properties ${GRADLE_HOME}/init.d/
-RUN chmod 600 ${GRADLE_HOME}/init.d/gradle.properties
-# # Clone and build CPSWT packages
+COPY gradle.properties /root/.gradle/
+RUN chmod 600 /root/.gradle/gradle.properties
+
+# Clone and build CPSWT packages
 RUN mkdir /home/cpswt
 COPY experiment_wrapper.sh /home/cpswt
 
