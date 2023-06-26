@@ -39,21 +39,24 @@ gradle wrapper --gradle-version=7.5
 ./gradlew :utils:publish 
 ./gradlew :root:publish
 ./gradlew :base-events:publish 
-./gradlew :coa:publish 
 ./gradlew :config:publish
 ./gradlew :federate-base:publish 
+./gradlew :coa:publish 
 ./gradlew :federation-manager:publish 
 ./gradlew :fedmanager-host:publish 
 
 ./gradlew :utils:build 
 ./gradlew :root:build 
 ./gradlew :base-events:build 
-./gradlew :coa:build 
 ./gradlew :config:build 
 ./gradlew :federate-base:build 
+./gradlew :coa:build 
 ./gradlew :federation-manager:build
 ./gradlew :fedmanager-host:build 
 
 cd /home/cpswt/cpswt-core/examples/HelloWorldJava
 gradle wrapper --gradle-version=7.5
+./gradlew :Source:build
+./gradlew :Sink:build
+./gradlew :PingCounter:build
 ./gradlew :runFederationBatch
