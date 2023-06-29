@@ -43,7 +43,7 @@ pipeline {
         }
         stage('Wait for container to stop') {
             options {
-                timeout(time: 30, unit: 'MINUTES')
+                timeout(time: 1, unit: 'MINUTES')
             }
             steps {
                 echo 'Wait for container to stop'
