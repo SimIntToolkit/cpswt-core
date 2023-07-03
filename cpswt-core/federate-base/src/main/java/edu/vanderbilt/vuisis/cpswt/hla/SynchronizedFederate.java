@@ -559,6 +559,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction(InteractionRoot interactionRoot, String federateName, double time) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
+
         Set<String> stringSet = new HashSet<>();
         stringSet.add(federateName);
         sendInteraction(interactionRoot, stringSet, time);
@@ -585,6 +587,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction(InteractionRoot interactionRoot, String federateName) throws Exception {
+        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
+
         Set<String> stringSet = new HashSet<>();
         stringSet.add(federateName);
         sendInteraction(interactionRoot, stringSet, -1);
