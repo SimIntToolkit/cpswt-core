@@ -28,7 +28,7 @@
  * OR MODIFICATIONS.
  */
 
-package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender;
 
 import hla.rti.EventRetractionHandle;
 import hla.rti.LogicalTime;
@@ -41,7 +41,7 @@ import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederateMockRTI;
 
 
 @SuppressWarnings("unused")
-public class ReceiverBase extends SynchronizedFederateMockRTI {
+public class SenderBase extends SynchronizedFederateMockRTI {
 
     private final SubscribedInteractionFilter _subscribedInteractionFilter = new SubscribedInteractionFilter();
 
@@ -51,12 +51,13 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.load();
     }
 
     // constructor
-    public ReceiverBase(FederateConfig config) throws Exception {
+    public SenderBase(FederateConfig config) throws Exception {
         super(config);
 
         createRTI();
@@ -65,26 +66,17 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
         enableTimeConstrained();
         enableTimeRegulation(getLookahead());
 
-        // DIRECT INTERACTION SUBSCRIPTIONS
+        // DIRECT INTERACTION PUBLICATIONS
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
 
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.subscribe_interaction(getRTI());
+        // SOFT INTERACTION PUBLICATIONS
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.add_federate_name_soft_publish("OmnetFederate");
+    }
 
-        // SOFT OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringListValue2");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_object(getRTI());
-
-        // DIRECT OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "BooleanValue2");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "CharValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "StringListValue1");
-
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
+    public edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction create_InteractionRoot_C2WInteractionRoot_TestInteraction() {
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction interaction =
+            new edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction();
+        return interaction;
     }
 
     @Override

@@ -77,6 +77,8 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "IntValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "LongValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "ShortValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "StringListValue1");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "StringListValue2");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_object(getRTI());
 
         // SOFT OBJECT PUBLICATIONS

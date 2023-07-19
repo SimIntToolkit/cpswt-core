@@ -36,14 +36,11 @@ import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Si
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class ObjectTests {
@@ -56,6 +53,8 @@ public class ObjectTests {
         SimEnd.load();
         FederateObject.load();
         DerivedObjectClass.load();
+        StringListTestObject.load();
+
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
     }
@@ -68,6 +67,7 @@ public class ObjectTests {
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass.DerivedObjectClass");
+        expectedObjectClassNameSet.add("ObjectRoot.StringListTestObject");
 
         Set<String> actualObjectClassNameSet = ObjectRoot.get_object_hla_class_name_set();
         Assert.assertEquals(expectedObjectClassNameSet, actualObjectClassNameSet);
@@ -318,7 +318,9 @@ public class ObjectTests {
         Assert.assertEquals(FederateObject.get_class_handle(), mock.getCurrentClassHandle());
 
         // DISCOVER OBJECT INSTANCE TO CREATE A SECOND INSTANCE
-        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentObjectHandle());
+        ObjectRoot objectRoot1 = ObjectRoot.discover(
+                mock.getCurrentClassHandle(), mock.getCurrentDiscoverObjectHandle()
+        );
         Assert.assertTrue(objectRoot1 instanceof FederateObject);
 
         // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
@@ -339,7 +341,7 @@ public class ObjectTests {
         Assert.assertEquals(3, currentSuppliedAttributes.size());
 
         // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        ObjectRoot.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("test", federateObject2.get_FederateType());
@@ -357,9 +359,52 @@ public class ObjectTests {
         Assert.assertEquals(1, currentSuppliedAttributes.size());
 
         // REFLECT CHANGED ATTRIBUTE INTO SECOND INSTANCE, CHECK VALUES
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("foobar", federateObject2.get_FederateType());
+    }
+
+    @Test
+    public void stringListTest() {
+        ObjectRoot stringListTestObjectRoot = ObjectRoot.create_object(
+                "ObjectRoot.StringListTestObject"
+        );
+
+        List<String> emptyList = new ArrayList<>();
+
+        List<String> stringListAttributeGetAttributeEmptyList =
+                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
+
+        Assert.assertEquals(emptyList, stringListAttributeGetAttributeEmptyList);
+
+        StringListTestObject stringListTestObject = (StringListTestObject)stringListTestObjectRoot;
+
+        List<String> stringListAttributeGetAttributeDirectEmptyList =
+                stringListTestObject.get_stringListAttribute();
+
+        Assert.assertEquals(emptyList, stringListAttributeGetAttributeDirectEmptyList);
+
+        List<String> thingList = Arrays.asList("this", "that", "other");
+        stringListTestObjectRoot.setAttribute("stringListAttribute", thingList);
+
+        List<String> stringListAttributeGetAttributeThingList =
+                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
+        Assert.assertEquals(thingList, stringListAttributeGetAttributeThingList);
+
+        List<String> stringListAttributeGetAttributeDirectThingList =
+                stringListTestObject.get_stringListAttribute();
+        Assert.assertEquals(thingList, stringListAttributeGetAttributeDirectThingList);
+
+        List<String> stoogeList = Arrays.asList("Moe", "Larry", "Curly");
+        stringListTestObject.set_stringListAttribute(stoogeList);
+
+        List<String> stringListAttributeGetAttributeStoogeList =
+                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
+        Assert.assertEquals(stoogeList, stringListAttributeGetAttributeStoogeList);
+
+        List<String> stringListAttributeGetAttributeDirectStoogeList =
+                stringListTestObject.get_stringListAttribute();
+        Assert.assertEquals(stoogeList, stringListAttributeGetAttributeDirectStoogeList);
     }
 }

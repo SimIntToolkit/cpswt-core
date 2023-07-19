@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
 
 import java.io.File;
 import java.io.FileReader;
@@ -1377,6 +1376,8 @@ public class ObjectRoot implements ObjectRootInterface {
                     stringValue = (Boolean)value ? "1" : "0";
                 } else if (value instanceof Character) {
                     stringValue = String.valueOf((short) ((Character) value).charValue());
+                } else if (value instanceof List) {
+                    stringValue = new JSONArray((List<Object>)value).toString();
                 } else {
                     stringValue = value.toString();
                 }
@@ -2164,6 +2165,8 @@ public class ObjectRoot implements ObjectRootInterface {
                 if (newValue == null) {
                     newValue = Boolean.valueOf(stringValue);
                 }
+            } else if (initialValueForType instanceof List) {
+                newValue = new JSONArray(stringValue).toList();
             }
 
             if (newValue != null) {
@@ -2171,7 +2174,12 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        if (initialValueForType.getClass() != value.getClass()) {
+        if (
+                initialValueForType.getClass() != value.getClass() && (
+                        !List.class.isAssignableFrom(initialValueForType.getClass()) ||
+                                !List.class.isAssignableFrom(value.getClass())
+                )
+        ) {
             logger.error(
                     "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" " +
                             "attribute, should be of type \"{}\".",
@@ -2959,11 +2967,22 @@ public class ObjectRoot implements ObjectRootInterface {
         return new ObjectRoot();
     }
 
-    private static Object castNumber(Object object, Class<?> desiredType) {
+    public static Object convertToDesiredType(Object object, Class<?> desiredType) {
+        if (List.class.isAssignableFrom(desiredType)) {
+            if (object instanceof JSONArray) {
+                return ((JSONArray)object).toList();
+            }
+            if (object instanceof List) {
+                return object;
+            }
+            List<String> stringList = new ArrayList<>();
+            stringList.add(object.toString());
+            return stringList;
+        }
         if (!desiredType.isInstance(object)) {
             if (Number.class.isAssignableFrom(desiredType)) {
                 if (object instanceof Character) {
-                    object = (int)((Character)object).charValue();
+                    object = (int) (Character) object;
                 }
                 if (object instanceof Number) {
                     String desiredTypeName = desiredType.getSimpleName().toLowerCase();
@@ -2971,7 +2990,7 @@ public class ObjectRoot implements ObjectRootInterface {
                     try {
                         conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
                         return conversionMethod.invoke(object);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
                     }
                 }
             } else if (Character.class.equals(desiredType)) {
@@ -3167,7 +3186,7 @@ public class ObjectRoot implements ObjectRootInterface {
                 Class<?> desiredType = ((Attribute<Object>)_classAndPropertyNameInitialValueMap.get(
                   classAndPropertyName
                 )).getValue().getClass();
-                Object object = castNumber(propertyJSONObject.get(key), desiredType);
+                Object object = convertToDesiredType(propertyJSONObject.get(key), desiredType);
                 classAndPropertyNameValueMap.put(classAndPropertyName, new Attribute<>(object));
             }
         }

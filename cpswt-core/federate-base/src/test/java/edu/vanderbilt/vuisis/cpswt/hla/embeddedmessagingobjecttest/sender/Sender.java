@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
+import java.util.List;
 
 // Define the  type of federate for the federation.
 
@@ -53,11 +54,11 @@ public class Sender extends SenderBase {
         super(params);
 
         registerObject(TestObject_0);
-    }
+        }
 
     public TestObject getTestObject() {
         return TestObject_0;
-    }
+        }
 
     public void execute() throws Exception {
 
@@ -68,9 +69,11 @@ public class Sender extends SenderBase {
         TestObject_0.set_DoubleValue(2.7181);
         TestObject_0.set_FloatValue(3.14f);
         TestObject_0.set_IntValue(1000000);
-        TestObject_0.set_ShortValue((short)300);
         TestObject_0.set_LongValue(1000000000000000000L);
+        TestObject_0.set_ShortValue((short)300);
         TestObject_0.set_StringValue("Hello");
+        TestObject_0.set_StringListValue1(List.of());
+        TestObject_0.set_StringListValue2(List.of("this", "that", "other"));
         updateAttributeValues(TestObject_0, 0.0);
     }
 }

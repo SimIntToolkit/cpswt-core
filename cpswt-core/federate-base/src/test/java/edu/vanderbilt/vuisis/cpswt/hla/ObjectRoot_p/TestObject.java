@@ -42,7 +42,7 @@ import hla.rti.AttributeHandleSet;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import hla.rti.ReflectedAttributes;
-
+import java.util.ArrayList;
 
 /**
  * Implements edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject
@@ -192,6 +192,12 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
             "ObjectRoot.TestObject", "ShortValue"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "StringListValue1"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "StringListValue2"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "StringValue"
         ));
 
@@ -240,6 +246,14 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "StringListValue1"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "StringListValue2"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "StringValue"
         ));
 
@@ -276,6 +290,12 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         key = new ClassAndPropertyName(get_hla_class_name(), "ShortValue");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>((short)0));
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue1");
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new ArrayList<String>()));
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue2");
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new ArrayList<String>()));
 
         key = new ClassAndPropertyName(get_hla_class_name(), "StringValue");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(""));
@@ -835,6 +855,74 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     public double get_ShortValue_time() {
         return ((Attribute<Object>)classAndPropertyNameValueMap.get(
           new ClassAndPropertyName(get_hla_class_name(), "ShortValue")
+        )).getTime();
+    }
+
+
+    /**
+     * Set the value of the "StringListValue1" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "StringListValue1" parameter
+     */
+    public void set_StringListValue1(List<String> value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue1");
+        Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+        attribute.setValue(value);
+        attribute.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "StringListValue1" parameter of this interaction.
+     *
+     * @return the value of the "StringListValue1" parameter
+     */
+    public List<String> get_StringListValue1() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue1");
+        return (List<String>)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+    }
+
+    /**
+     * Returns the current timestamp of the "StringListValue1" attribute of this object.
+     *
+     * @return the current timestamp of the "StringListValue1" attribute
+     */
+    public double get_StringListValue1_time() {
+        return ((Attribute<Object>)classAndPropertyNameValueMap.get(
+          new ClassAndPropertyName(get_hla_class_name(), "StringListValue1")
+        )).getTime();
+    }
+
+
+    /**
+     * Set the value of the "StringListValue2" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "StringListValue2" parameter
+     */
+    public void set_StringListValue2(List<String> value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue2");
+        Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+        attribute.setValue(value);
+        attribute.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "StringListValue2" parameter of this interaction.
+     *
+     * @return the value of the "StringListValue2" parameter
+     */
+    public List<String> get_StringListValue2() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue2");
+        return (List<String>)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+    }
+
+    /**
+     * Returns the current timestamp of the "StringListValue2" attribute of this object.
+     *
+     * @return the current timestamp of the "StringListValue2" attribute
+     */
+    public double get_StringListValue2_time() {
+        return ((Attribute<Object>)classAndPropertyNameValueMap.get(
+          new ClassAndPropertyName(get_hla_class_name(), "StringListValue2")
         )).getTime();
     }
 
@@ -1570,6 +1658,150 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void soft_unsubscribe_ShortValue_attribute() {
         soft_unsubscribe_attribute(get_hla_class_name(), "ShortValue");
+    }
+
+    /**
+    * Publishes the "StringListValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue1" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_StringListValue1_attribute() {
+        publish_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Unpublishes the "StringListValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue1" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_StringListValue1_attribute() {
+        unpublish_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Subscribes a federate to the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_StringListValue1_attribute() {
+        subscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Unsubscribes a federate from the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_StringListValue1_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Soft subscribes a federate to the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_StringListValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "StringListValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_StringListValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "StringListValue1");
+    }
+
+    /**
+    * Publishes the "StringListValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue2" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_StringListValue2_attribute() {
+        publish_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Unpublishes the "StringListValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "StringListValue2" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_StringListValue2_attribute() {
+        unpublish_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Subscribes a federate to the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_StringListValue2_attribute() {
+        subscribe_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Unsubscribes a federate from the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_StringListValue2_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Soft subscribes a federate to the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_StringListValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "StringListValue2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "StringListValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "StringListValue2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_StringListValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "StringListValue2");
     }
 
     /**

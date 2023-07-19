@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
 
 import java.io.File;
 import java.io.FileReader;
@@ -791,6 +790,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 stringValue = (Boolean)value ? "1" : "0";
             } else if (value instanceof Character) {
                 stringValue = String.valueOf((short) ((Character) value).charValue());
+            } else if (value instanceof List) {
+                stringValue = new JSONArray((List<Object>)value).toString();
             } else {
                 stringValue = value.toString();
             }
@@ -1135,6 +1136,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 if (newValue == null) {
                     newValue = Boolean.valueOf(stringValue);
                 }
+            } else if (initialValueForType instanceof List) {
+                newValue = new JSONArray(stringValue).toList();
             }
 
             if (newValue != null) {
@@ -1142,7 +1145,12 @@ public class InteractionRoot implements InteractionRootInterface {
             }
         }
 
-        if (initialValueForType.getClass() != value.getClass()) {
+        if (
+                initialValueForType.getClass() != value.getClass() && (
+                        !List.class.isAssignableFrom(initialValueForType.getClass()) ||
+                                !List.class.isAssignableFrom(value.getClass())
+                )
+        ) {
             logger.error(
                     "setParameter(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" " +
                             "parameter, should be of type \"{}\".",
@@ -1826,11 +1834,22 @@ public class InteractionRoot implements InteractionRootInterface {
         return new InteractionRoot();
     }
 
-    private static Object castNumber(Object object, Class<?> desiredType) {
+    public static Object convertToDesiredType(Object object, Class<?> desiredType) {
+        if (List.class.isAssignableFrom(desiredType)) {
+            if (object instanceof JSONArray) {
+                return ((JSONArray)object).toList();
+            }
+            if (object instanceof List) {
+                return object;
+            }
+            List<String> stringList = new ArrayList<>();
+            stringList.add(object.toString());
+            return stringList;
+        }
         if (!desiredType.isInstance(object)) {
             if (Number.class.isAssignableFrom(desiredType)) {
                 if (object instanceof Character) {
-                    object = (int)((Character)object).charValue();
+                    object = (int) (Character) object;
                 }
                 if (object instanceof Number) {
                     String desiredTypeName = desiredType.getSimpleName().toLowerCase();
@@ -1838,7 +1857,7 @@ public class InteractionRoot implements InteractionRootInterface {
                     try {
                         conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
                         return conversionMethod.invoke(object);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
                     }
                 }
             } else if (Character.class.equals(desiredType)) {
@@ -1997,7 +2016,7 @@ public class InteractionRoot implements InteractionRootInterface {
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
 
             Class<?> desiredType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName).getClass();
-            Object object = castNumber(propertyJSONObject.get(key), desiredType);
+            Object object = convertToDesiredType(propertyJSONObject.get(key), desiredType);
             interactionRoot.classAndPropertyNameValueMap.put(classAndPropertyName, object);
         }
 

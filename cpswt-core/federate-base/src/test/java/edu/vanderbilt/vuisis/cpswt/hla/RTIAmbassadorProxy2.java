@@ -148,13 +148,14 @@ public class RTIAmbassadorProxy2 {
     private static int uniqueNo = 0;
 
     private static final HashMap<String, Integer> interactionClassNameHandleMap = new HashMap<>();
-    static{
+    static {
         interactionClassNameHandleMap.put("InteractionRoot", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", uniqueNo++);
+        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.TestInteraction", uniqueNo++);
     }
     public HashMap<String, Integer> getInteractionClassNameHandleMap(){
         return interactionClassNameHandleMap;
@@ -209,6 +210,50 @@ public class RTIAmbassadorProxy2 {
         );
         interactionClassAndPropertyNameHandleMap.put(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", "isLateJoiner"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue1"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "BoolValue2"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "ByteValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "CharValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "DoubleValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "FloatValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "StringListValue"),
                 uniqueNo++
         );
     }
@@ -299,7 +344,14 @@ public class RTIAmbassadorProxy2 {
         objectClassAndPropertyNameHandleMap.put(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringValue"), uniqueNo++
         );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue1"), uniqueNo++
+        );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue2"), uniqueNo++
+        );
     }
+
     public HashMap<ObjectRootInterface.ClassAndPropertyName, Integer> getObjectClassAndPropertyNameHandleMap() {
         return objectClassAndPropertyNameHandleMap;
     }

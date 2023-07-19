@@ -40,9 +40,11 @@ import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Si
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.StringListTestInteraction;
 
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject;
 
 import java.util.*;
 
@@ -55,7 +57,9 @@ public class InteractionTests {
         HighPrio.load();
         SimEnd.load();
         FederateObject.load();
+        StringListTestInteraction.load();
         DerivedObjectClass.load();
+        StringListTestObject.load();
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
     }
@@ -70,6 +74,7 @@ public class InteractionTests {
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio");
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimulationControl");
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd");
+        expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.StringListTestInteraction");
 
         Set<String> actualInteractionClassNameSet = InteractionRoot.get_interaction_hla_class_name_set();
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
@@ -488,5 +493,48 @@ public class InteractionTests {
         List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
 
         Assert.assertEquals(federateNameList, federateSequenceList3);
+    }
+
+    @Test
+    public void stringListTest() {
+        InteractionRoot stringListTestInteractionRoot = InteractionRoot.create_interaction(
+                "InteractionRoot.C2WInteractionRoot.StringListTestInteraction"
+        );
+
+        List<String> emptyList = new ArrayList<>();
+
+        List<String> stringListParameterGetParameterEmptyList =
+                (List<String>)stringListTestInteractionRoot.getParameter("stringListParameter");
+
+        Assert.assertEquals(emptyList, stringListParameterGetParameterEmptyList);
+
+        StringListTestInteraction stringListTestInteraction = (StringListTestInteraction)stringListTestInteractionRoot;
+
+        List<String> stringListParameterGetParameterDirectEmptyList =
+                stringListTestInteraction.get_stringListParameter();
+
+        Assert.assertEquals(emptyList, stringListParameterGetParameterDirectEmptyList);
+
+        List<String> thingList = Arrays.asList("this", "that", "other");
+        stringListTestInteractionRoot.setParameter("stringListParameter", thingList);
+
+        List<String> stringListParameterGetParameterThingList =
+                (List<String>)stringListTestInteractionRoot.getParameter("stringListParameter");
+        Assert.assertEquals(thingList, stringListParameterGetParameterThingList);
+
+        List<String> stringListParameterGetParameterDirectThingList =
+                stringListTestInteraction.get_stringListParameter();
+        Assert.assertEquals(thingList, stringListParameterGetParameterDirectThingList);
+
+        List<String> stoogeList = Arrays.asList("Moe", "Larry", "Curly");
+        stringListTestInteraction.set_stringListParameter(stoogeList);
+
+        List<String> stringListParameterGetParameterStoogeList =
+                (List<String>)stringListTestInteractionRoot.getParameter("stringListParameter");
+        Assert.assertEquals(stoogeList, stringListParameterGetParameterStoogeList);
+
+        List<String> stringListParameterGetParameterDirectStoogeList =
+                stringListTestInteraction.get_stringListParameter();
+        Assert.assertEquals(stoogeList, stringListParameterGetParameterDirectStoogeList);
     }
 }

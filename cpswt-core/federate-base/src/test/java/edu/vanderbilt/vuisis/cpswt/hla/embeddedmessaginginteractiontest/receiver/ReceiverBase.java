@@ -28,13 +28,14 @@
  * OR MODIFICATIONS.
  */
 
-package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.receiver;
 
 import hla.rti.EventRetractionHandle;
 import hla.rti.LogicalTime;
 import hla.rti.ReceivedInteraction;
 
 import edu.vanderbilt.vuisis.cpswt.hla.SubscribedInteractionFilter;
+import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederate;
 
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederateMockRTI;
@@ -51,8 +52,9 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.load();
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.load();
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.load();
     }
 
     // constructor
@@ -69,22 +71,14 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
 
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver.subscribe_interaction(getRTI());
 
-        // SOFT OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringListValue2");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_object(getRTI());
+        // SOFT INTERACTION SUBSCRIPTIONS
 
-        // DIRECT OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "BooleanValue2");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "CharValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "StringListValue1");
-
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.soft_subscribe_interaction(getRTI());
+        _subscribedInteractionFilter.setFedFilters(
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.get_class_handle(),
+            SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED,
+            SubscribedInteractionFilter.SourceFedFilter.SOURCE_FILTER_DISABLED
+        );
     }
 
     @Override
