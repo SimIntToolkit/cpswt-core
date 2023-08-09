@@ -318,7 +318,7 @@ public class ObjectTests {
         Assert.assertEquals(FederateObject.get_class_handle(), mock.getCurrentClassHandle());
 
         // DISCOVER OBJECT INSTANCE TO CREATE A SECOND INSTANCE
-        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentObjectHandle());
+        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentDiscoverObjectHandle());
         Assert.assertTrue(objectRoot1 instanceof FederateObject);
 
         // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
@@ -339,7 +339,7 @@ public class ObjectTests {
         Assert.assertEquals(3, currentSuppliedAttributes.size());
 
         // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("test", federateObject2.get_FederateType());
@@ -357,7 +357,7 @@ public class ObjectTests {
         Assert.assertEquals(1, currentSuppliedAttributes.size());
 
         // REFLECT CHANGED ATTRIBUTE INTO SECOND INSTANCE, CHECK VALUES
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("foobar", federateObject2.get_FederateType());

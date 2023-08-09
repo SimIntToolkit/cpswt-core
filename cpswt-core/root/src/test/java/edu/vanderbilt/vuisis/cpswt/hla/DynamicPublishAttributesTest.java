@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
 
@@ -167,9 +168,13 @@ public class DynamicPublishAttributesTest {
 
             StringReader federationJsonStringReader = new StringReader(federationJson);
             StringReader dynamicMessagingTypesStringReader = new StringReader(dynamicMessageTypes);
-            ObjectRoot.loadDynamicClassFederationData(
-                    federationJsonStringReader, dynamicMessagingTypesStringReader
-            );
+            try {
+                ObjectRoot.loadDynamicClassFederationData(
+                        federationJsonStringReader, dynamicMessagingTypesStringReader
+                );
+            } catch (IOException ioException) {
+                System.err.println("Caught exception: " + ioException);
+            }
         }
     }
 
