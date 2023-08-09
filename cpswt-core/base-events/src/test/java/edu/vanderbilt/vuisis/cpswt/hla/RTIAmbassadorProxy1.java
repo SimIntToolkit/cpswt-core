@@ -174,15 +174,20 @@ public class RTIAmbassadorProxy1 {
 
     private int uniqueObjectHandle = 0;
     private int currentObjectHandle = 0;
+    private int currentDiscoverObjectHandle = 0;
 
     public void setCurrentObjectHandle(int objectHandle) {
         currentObjectHandle = objectHandle;
     }
     public void setCurrentObjectHandle() {
         currentObjectHandle = uniqueObjectHandle++;
+        currentDiscoverObjectHandle = uniqueObjectHandle++;
     }
     public int getCurrentObjectHandle() {
         return currentObjectHandle;
+    }
+    public int getCurrentDiscoverObjectHandle() {
+        return currentDiscoverObjectHandle;
     }
 
 

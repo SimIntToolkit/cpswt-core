@@ -35,16 +35,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
-import org.json.JSONTokener;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -501,17 +495,17 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
 
     private static boolean is_federate_sequence(String federateSequence) {
 
-        JSONArray jsonArray;
+        ArrayNode jsonArray;
 
         try {
-            jsonArray = new JSONArray( federateSequence );
-        } catch (JSONException jsonException) {
+            jsonArray = (ArrayNode)objectMapper.readTree(federateSequence);
+        } catch (JsonProcessingException jsonProcessingException) {
             return false;
         }
 
-        int jsonArrayLength = jsonArray.length();
+        int jsonArrayLength = jsonArray.size();
         for(int ix = 0 ; ix < jsonArrayLength ; ++ix) {
-            if (!(jsonArray.get(ix) instanceof String)) {
+            if (!jsonArray.get(ix).isTextual()) {
                 return false;
             }
         }
@@ -527,10 +521,15 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
 
         String federateSequence = (String)interactionRoot.getParameter("federateSequence");
 
-        JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
-            new JSONArray( federateSequence ) : new JSONArray();
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+        if (is_federate_sequence(federateSequence)) {
+            try {
+                jsonArray = (ArrayNode) objectMapper.readTree(federateSequence);
+            } catch (Exception ignore) {
+            }
+        }
 
-        jsonArray.put( federateId );
+        jsonArray.add(federateId);
         interactionRoot.setParameter("federateSequence", jsonArray.toString());
     }
 
@@ -547,12 +546,17 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
     }
 
     public static List<String> get_federate_sequence_list(String federateSequence) {
-        JSONArray jsonArray = is_federate_sequence( federateSequence ) ?
-            new JSONArray( federateSequence ) : new JSONArray();
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+        if (is_federate_sequence(federateSequence)) {
+            try {
+                jsonArray = (ArrayNode) objectMapper.readTree(federateSequence);
+            } catch (Exception ignore) {
+            }
+        }
 
         ArrayList<String> retval = new ArrayList<String>();
-        for(Object federateId: jsonArray.toList()) {
-            retval.add( (String)federateId );
+        for(JsonNode federateId: jsonArray) {
+            retval.add( federateId.asText() );
         }
 
         return retval;

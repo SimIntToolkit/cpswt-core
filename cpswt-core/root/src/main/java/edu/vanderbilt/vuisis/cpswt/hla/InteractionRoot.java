@@ -37,7 +37,7 @@ import hla.rti.*;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -48,15 +48,20 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.Iterator;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONTokener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -119,6 +124,15 @@ public class InteractionRoot implements InteractionRootInterface {
                 CpswtUtils.sleep(100);
             }
         }
+    }
+
+    protected static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
+        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
+        defaultPrettyPrinter.indentArraysWith(indenter);
+        defaultPrettyPrinter.indentObjectsWith(indenter);
+        objectMapper.setDefaultPrettyPrinter(defaultPrettyPrinter);
     }
 
     private static final Map<String, Boolean> _hlaClassNameIsInitializedMap = new HashMap<>();
@@ -1826,29 +1840,46 @@ public class InteractionRoot implements InteractionRootInterface {
         return new InteractionRoot();
     }
 
-    private static Object castNumber(Object object, Class<?> desiredType) {
-        if (!desiredType.isInstance(object)) {
-            if (Number.class.isAssignableFrom(desiredType)) {
-                if (object instanceof Character) {
-                    object = (int)((Character)object).charValue();
-                }
-                if (object instanceof Number) {
-                    String desiredTypeName = desiredType.getSimpleName().toLowerCase();
-                    Method conversionMethod;
-                    try {
-                        conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
-                        return conversionMethod.invoke(object);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    }
-                }
-            } else if (Character.class.equals(desiredType)) {
-                if (object instanceof Number) {
-                    return (char)((Number)object).doubleValue();
-                } else if (object instanceof String) {
-                    return ((String)object).charAt(0);
-                }
+    private static Object castJsonToType(JsonNode jsonNode, Class<?> desiredType) {
+        Object object = null;
+
+        // FOR ANY OF THE INTEGRAL TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS LONG
+        // (THE INTEGRAL TYPE WITH THE HIGHEST PRECISION), AND CAST TO THE DESIRED TYPE
+        if (desiredType.equals(Byte.class)) {
+            object = (byte) jsonNode.asLong();
+        } else if (desiredType.equals(Short.class)) {
+            object = (short) jsonNode.asLong();
+        } else if (desiredType.equals(Integer.class)) {
+            object = (int) jsonNode.asLong();
+        } else if (desiredType.equals(Long.class)) {
+            object = jsonNode.asLong();
+
+        // CHARACTER TYPE SHOULD ALSO BE JSON ENCODED AS AN INTEGRAL TYPE
+        } else if (desiredType.equals(Character.class)) {
+            object = jsonNode.asBoolean();
+
+        // FOR THE FLOATING-POINT TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS DOUBLE
+        // (THE FLOATING-POINT TYPE WITH THE HIGHEST PRECISION), AND CAST TO THE DESIRED TYPE
+        } else if (desiredType.equals(Float.class)) {
+            object = (float) jsonNode.asDouble();
+        } else if (desiredType.equals(Double.class)) {
+            object = jsonNode.asDouble();
+
+        // FOR BOOLEAN, THE ENCODING SHOULD BE EITHER true OR false (NO QUOTES).  INTEGER
+        // AND STRING ENCODINGS ARE ACCEPTED
+        } else if (desiredType.equals(Boolean.class)) {
+            switch(jsonNode.getNodeType()) {
+                case BOOLEAN -> object = jsonNode.asBoolean();
+                case NUMBER  -> object = jsonNode.asDouble() != 0;
+                case STRING  -> object = jsonNode.asText().equalsIgnoreCase("true");
+                default -> object = jsonNode.getNodeType() != JsonNodeType.NULL;
             }
+
+        // FOR A STRINGS, JUST RETRIEVE AS STRING (TEXT)
+        } else if (desiredType.equals(String.class)) {
+            object = jsonNode.asText();
         }
+
         return object;
     }
 
@@ -1970,34 +2001,44 @@ public class InteractionRoot implements InteractionRootInterface {
     //-------------------------------------------------------------------
 
     public String toJson() {
-        JSONObject topLevelJSONObject = new JSONObject();
+        ObjectNode topLevelJSONObject = objectMapper.createObjectNode();
         topLevelJSONObject.put("messaging_type", "interaction");
         topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
 
-        JSONObject propertyJSONObject = new JSONObject();
-        topLevelJSONObject.put("properties", propertyJSONObject);
+        ObjectNode propertyJSONObject = objectMapper.createObjectNode();
+        topLevelJSONObject.set("properties", propertyJSONObject);
         for(ClassAndPropertyName key : classAndPropertyNameValueMap.keySet()) {
             Object value = classAndPropertyNameValueMap.get(key);
-            propertyJSONObject.put(key.toString(), value);
+            propertyJSONObject.putPOJO(key.toString(), value);
         }
-        return topLevelJSONObject.toString(4);
+
+        return topLevelJSONObject.toPrettyString();
     }
 
     public static InteractionRoot fromJson(String jsonString) {
-        JSONObject jsonObject = new JSONObject(jsonString);
-        String className = jsonObject.getString("messaging_name");
+        ObjectNode jsonObject;
+        try {
+            jsonObject = (ObjectNode)objectMapper.readTree(jsonString);
+        } catch (JsonProcessingException jsonProcessingException) {
+            logger.error("Exception parsing JSON for interaction: ", jsonProcessingException);
+            return null;
+        }
+
+        String className = jsonObject.get("messaging_name").asText();
         InteractionRoot interactionRoot = create_interaction(className);
         if (interactionRoot == null) {
             logger.error("InteractionRoot:  fromJson(String):  no such interaction class \"{}\"", className);
             return null;
         }
 
-        JSONObject propertyJSONObject = jsonObject.getJSONObject("properties");
-        for (String key : propertyJSONObject.keySet()) {
+        ObjectNode propertyJSONObject = (ObjectNode)jsonObject.get("properties");
+        Iterator<String> keyIterator = propertyJSONObject.fieldNames();
+        while(keyIterator.hasNext()) {
+            String key = keyIterator.next();
             ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(key);
 
             Class<?> desiredType = _classAndPropertyNameInitialValueMap.get(classAndPropertyName).getClass();
-            Object object = castNumber(propertyJSONObject.get(key), desiredType);
+            Object object = castJsonToType(propertyJSONObject.get(key), desiredType);
             interactionRoot.classAndPropertyNameValueMap.put(classAndPropertyName, object);
         }
 
@@ -2049,7 +2090,7 @@ public class InteractionRoot implements InteractionRootInterface {
         return get_federate_name_soft_publish_set(getInstanceHlaClassName());
     }
 
-    private static JSONObject federationJson = null;
+    private static ObjectNode federationJson = null;
 
     public static void readFederationJson(File federationJsonFile) {
         try (
@@ -2065,9 +2106,10 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    public static void readFederationJson(Reader reader) {
-        federationJson = new JSONObject( new JSONTokener(reader) );
+    public static void readFederationJson(Reader reader) throws IOException {
+        federationJson = (ObjectNode)objectMapper.readTree(reader);
     }
+
     private static final Map<String, Object> _typeInitialValueMap = new HashMap<>();
     static {
         _typeInitialValueMap.put("boolean", false);
@@ -2095,15 +2137,15 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    public static void readFederateDynamicMessageClasses(Reader reader) {
+    public static void readFederateDynamicMessageClasses(Reader reader) throws IOException {
 
-        JSONObject dynamicMessageTypes = new JSONObject(new JSONTokener(reader));
+        ObjectNode dynamicMessageTypes = (ObjectNode)objectMapper.readTree(reader);
 
-        JSONArray dynamicHlaClassNames = dynamicMessageTypes.getJSONArray("interactions");
+        ArrayNode dynamicHlaClassNames = (ArrayNode)dynamicMessageTypes.get("interactions");
 
         Set<String> dynamicHlaClassNameSet = new HashSet<>();
-        for(Object object: dynamicHlaClassNames) {
-            dynamicHlaClassNameSet.add((String)object);
+        for(JsonNode jsonNode: dynamicHlaClassNames) {
+            dynamicHlaClassNameSet.add(jsonNode.asText());
         }
 
         readFederateDynamicMessageClasses(dynamicHlaClassNameSet);
@@ -2116,7 +2158,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        JSONObject federationMessaging = federationJson.getJSONObject("interactions");
+        ObjectNode federationMessaging = (ObjectNode)federationJson.get("interactions");
         Set<String> localHlaClassNameSet = new HashSet<>();
 
         for(String hlaClassName: dynamicHlaClassNameSet) {
@@ -2145,14 +2187,16 @@ public class InteractionRoot implements InteractionRootInterface {
 
             Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
 
-            JSONObject messagingPropertyDataMap = federationMessaging.getJSONObject(hlaClassName);
-            for(String propertyName: messagingPropertyDataMap.keySet()) {
+            ObjectNode messagingPropertyDataMap = (ObjectNode)federationMessaging.get(hlaClassName);
+            Iterator<String> fieldNameIterator = messagingPropertyDataMap.fieldNames();
+            while(fieldNameIterator.hasNext()) {
+                String propertyName = fieldNameIterator.next();
                 ClassAndPropertyName classAndPropertyName = new ClassAndPropertyName(hlaClassName, propertyName);
                 classAndPropertyNameSet.add(classAndPropertyName);
 
-                JSONObject typeDataMap = messagingPropertyDataMap.getJSONObject(propertyName);
-                if (!typeDataMap.getBoolean("Hidden")) {
-                    String propertyTypeString = typeDataMap.getString("ParameterType");
+                ObjectNode typeDataMap = (ObjectNode)messagingPropertyDataMap.get(propertyName);
+                if (!typeDataMap.get("Hidden").asBoolean()) {
+                    String propertyTypeString = typeDataMap.get("ParameterType").asText();
                     Object initialValue = _typeInitialValueMap.get(propertyTypeString);
                     _classAndPropertyNameInitialValueMap.put(classAndPropertyName, initialValue);
                 }
@@ -2190,7 +2234,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
     public static void loadDynamicClassFederationData(
       Reader federationJsonReader, Reader federateDynamicMessageClassesReader
-    ) {
+    ) throws IOException {
         readFederationJson(federationJsonReader);
         readFederateDynamicMessageClasses(federateDynamicMessageClassesReader);
     }

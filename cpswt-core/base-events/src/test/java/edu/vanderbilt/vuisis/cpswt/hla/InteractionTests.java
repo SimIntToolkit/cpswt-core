@@ -30,8 +30,11 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import hla.rti.*;
-import org.json.JSONArray;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -48,6 +51,15 @@ import java.util.*;
 
 
 public class InteractionTests {
+
+    protected static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
+        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
+        defaultPrettyPrinter.indentArraysWith(indenter);
+        defaultPrettyPrinter.indentObjectsWith(indenter);
+        objectMapper.setDefaultPrettyPrinter(defaultPrettyPrinter);
+    }
 
     private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
     private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
@@ -342,8 +354,8 @@ public class InteractionTests {
         String string1 = "string1";
         double doubleValue1 = 1.2;
 
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put(string1);
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+        jsonArray.add(string1);
         dynamicSimLogInteraction.setParameter("InteractionRoot.C2WInteractionRoot", "federateSequence", jsonArray.toString());
         dynamicSimLogInteraction.setParameter("Time", doubleValue1);
 
@@ -469,7 +481,10 @@ public class InteractionTests {
 
         List<String> federateNameList = new ArrayList<>(Arrays.asList("federateName2", "federateName3"));
 
-        JSONArray jsonArray = new JSONArray(federateNameList);
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+        for(String federateName: federateNameList) {
+            jsonArray.add(federateName);
+        }
         interactionRoot2.setParameter("federateSequence", jsonArray.toString());
 
         // ADD federateName1 TO federateSequence

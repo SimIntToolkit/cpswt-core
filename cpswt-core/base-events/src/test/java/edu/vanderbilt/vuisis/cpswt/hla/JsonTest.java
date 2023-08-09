@@ -30,7 +30,10 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
-import org.json.JSONArray;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.Test;
 import org.junit.Assert;
 
@@ -40,6 +43,15 @@ import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
 import hla.rti.RTIambassador;
 
 public class JsonTest {
+
+    protected static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
+        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
+        defaultPrettyPrinter.indentArraysWith(indenter);
+        defaultPrettyPrinter.indentObjectsWith(indenter);
+        objectMapper.setDefaultPrettyPrinter(defaultPrettyPrinter);
+    }
 
     private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
 
@@ -60,9 +72,9 @@ public class JsonTest {
     public void interactionJsonTest() {
 
         SimEnd simEnd1 = new SimEnd();
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put("Federate1");
-        jsonArray.put("Federate2");
+        ArrayNode jsonArray = objectMapper.createArrayNode();
+        jsonArray.add("Federate1");
+        jsonArray.add("Federate2");
         simEnd1.set_federateSequence(jsonArray.toString());
         simEnd1.set_actualLogicalGenerationTime(5.0);
         simEnd1.set_federateFilter("Filter1");
