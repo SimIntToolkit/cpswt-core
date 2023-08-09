@@ -341,7 +341,7 @@ public class ObjectTests {
         Assert.assertEquals(3, currentSuppliedAttributes.size());
 
         // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        ObjectRoot.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("test", federateObject2.get_FederateType());
