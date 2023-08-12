@@ -35,7 +35,6 @@ import hla.rti.LogicalTime;
 import hla.rti.ReceivedInteraction;
 
 import edu.vanderbilt.vuisis.cpswt.hla.SubscribedInteractionFilter;
-import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederate;
 
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederateMockRTI;

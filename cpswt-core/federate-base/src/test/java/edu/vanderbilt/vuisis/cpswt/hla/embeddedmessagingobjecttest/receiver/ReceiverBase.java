@@ -73,16 +73,16 @@ public class ReceiverBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "IntValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "LongValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "ShortValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringListValue2");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "JSONValue2");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_attribute("ObjectRoot.TestObject", "StringValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.soft_subscribe_object(getRTI());
 
         // DIRECT OBJECT SUBSCRIPTIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "BooleanValue2");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "BoolValue2");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "ByteValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "CharValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "DoubleValue");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "StringListValue1");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_attribute("ObjectRoot.TestObject", "JSONValue1");
 
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.subscribe_object(getRTI());
     }

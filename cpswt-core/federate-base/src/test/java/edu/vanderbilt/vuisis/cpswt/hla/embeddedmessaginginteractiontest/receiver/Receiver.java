@@ -67,7 +67,7 @@ public class Receiver extends ReceiverBase {
 
         InteractionRoot interactionRoot;
         while ((interactionRoot = getNextInteractionNoWait()) != null) {
-
+        
             if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass("InteractionRoot.C2WInteractionRoot.TestInteraction")) {
 
                 handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(interactionRoot);
@@ -80,6 +80,6 @@ public class Receiver extends ReceiverBase {
 
     public void execute() throws Exception {
 
-        checkReceivedSubscriptions();
+            checkReceivedSubscriptions();
     }
 }

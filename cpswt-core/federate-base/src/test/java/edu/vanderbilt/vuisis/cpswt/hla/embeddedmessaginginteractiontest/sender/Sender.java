@@ -30,19 +30,24 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
-
-import java.util.List;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 
 // Define the  type of federate for the federation.
 
 @SuppressWarnings("unused")
 public class Sender extends SenderBase {
+
+    public static ObjectMapper objectMapper = InteractionRoot.objectMapper;
+
+
     private final static Logger log = LogManager.getLogger();
 
     private final TestInteraction _testInteraction = create_InteractionRoot_C2WInteractionRoot_TestInteraction();
@@ -65,7 +70,13 @@ public class Sender extends SenderBase {
         _testInteraction.set_IntValue(1000000);
         _testInteraction.set_LongValue(1000000000000000000L);
         _testInteraction.set_ShortValue((short) 300);
-        _testInteraction.set_StringListValue(List.of("this", "that", "other"));
+
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add("this");
+        arrayNode.add("that");
+        arrayNode.add("other");
+        _testInteraction.set_JSONValue(arrayNode);
+
         _testInteraction.set_StringValue("Hello");
         _testInteraction.set_actualLogicalGenerationTime(0.0);
         _testInteraction.set_federateFilter("");

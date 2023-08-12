@@ -30,13 +30,19 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import hla.rti.RTIambassador;
 import hla.rti.SuppliedAttributes;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
-import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,6 +50,15 @@ import java.util.*;
 
 
 public class ObjectTests {
+
+    protected static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
+        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
+        defaultPrettyPrinter.indentArraysWith(indenter);
+        defaultPrettyPrinter.indentObjectsWith(indenter);
+        objectMapper.setDefaultPrettyPrinter(defaultPrettyPrinter);
+    }
 
     private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
     private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
@@ -53,7 +68,7 @@ public class ObjectTests {
         SimEnd.load();
         FederateObject.load();
         DerivedObjectClass.load();
-        StringListTestObject.load();
+        JSONTestObject.load();
 
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
@@ -67,7 +82,7 @@ public class ObjectTests {
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass.DerivedObjectClass");
-        expectedObjectClassNameSet.add("ObjectRoot.StringListTestObject");
+        expectedObjectClassNameSet.add("ObjectRoot.JSONTestObject");
 
         Set<String> actualObjectClassNameSet = ObjectRoot.get_object_hla_class_name_set();
         Assert.assertEquals(expectedObjectClassNameSet, actualObjectClassNameSet);
@@ -366,45 +381,51 @@ public class ObjectTests {
     }
 
     @Test
-    public void stringListTest() {
-        ObjectRoot stringListTestObjectRoot = ObjectRoot.create_object(
-                "ObjectRoot.StringListTestObject"
+    public void jsonTest() {
+        ObjectRoot jsonTestObjectRoot = ObjectRoot.create_object(
+                "ObjectRoot.JSONTestObject"
         );
 
-        List<String> emptyList = new ArrayList<>();
+        JsonNode emptyList = new TextNode("");
 
-        List<String> stringListAttributeGetAttributeEmptyList =
-                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
+        JsonNode jsonAttributeGetAttributeEmptyList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
 
-        Assert.assertEquals(emptyList, stringListAttributeGetAttributeEmptyList);
+        Assert.assertEquals(emptyList, jsonAttributeGetAttributeEmptyList);
 
-        StringListTestObject stringListTestObject = (StringListTestObject)stringListTestObjectRoot;
+        JSONTestObject jsonTestObject = (JSONTestObject)jsonTestObjectRoot;
 
-        List<String> stringListAttributeGetAttributeDirectEmptyList =
-                stringListTestObject.get_stringListAttribute();
+        JsonNode jsonAttributeGetAttributeDirectEmptyList =
+                jsonTestObject.get_JSONAttribute();
 
-        Assert.assertEquals(emptyList, stringListAttributeGetAttributeDirectEmptyList);
+        Assert.assertEquals(emptyList, jsonAttributeGetAttributeDirectEmptyList);
 
-        List<String> thingList = Arrays.asList("this", "that", "other");
-        stringListTestObjectRoot.setAttribute("stringListAttribute", thingList);
+        ArrayNode thingList = objectMapper.createArrayNode();
+        thingList.add("this");
+        thingList.add("that");
+        thingList.add("other");
+        jsonTestObjectRoot.setAttribute("JSONAttribute", thingList);
 
-        List<String> stringListAttributeGetAttributeThingList =
-                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
-        Assert.assertEquals(thingList, stringListAttributeGetAttributeThingList);
+       JsonNode jsonAttributeGetAttributeThingList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
+        Assert.assertEquals(thingList, jsonAttributeGetAttributeThingList);
 
-        List<String> stringListAttributeGetAttributeDirectThingList =
-                stringListTestObject.get_stringListAttribute();
-        Assert.assertEquals(thingList, stringListAttributeGetAttributeDirectThingList);
+        JsonNode jsonAttributeGetAttributeDirectThingList =
+                jsonTestObject.get_JSONAttribute();
+        Assert.assertEquals(thingList, jsonAttributeGetAttributeDirectThingList);
 
-        List<String> stoogeList = Arrays.asList("Moe", "Larry", "Curly");
-        stringListTestObject.set_stringListAttribute(stoogeList);
+        ArrayNode stoogeList = objectMapper.createArrayNode();
+        stoogeList.add("Moe");
+        stoogeList.add("Larry");
+        stoogeList.add("Curly");
+        jsonTestObject.set_JSONAttribute(stoogeList);
 
-        List<String> stringListAttributeGetAttributeStoogeList =
-                (List<String>)stringListTestObjectRoot.getAttribute("stringListAttribute");
-        Assert.assertEquals(stoogeList, stringListAttributeGetAttributeStoogeList);
+        JsonNode jsonAttributeGetAttributeStoogeList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
+        Assert.assertEquals(stoogeList, jsonAttributeGetAttributeStoogeList);
 
-        List<String> stringListAttributeGetAttributeDirectStoogeList =
-                stringListTestObject.get_stringListAttribute();
-        Assert.assertEquals(stoogeList, stringListAttributeGetAttributeDirectStoogeList);
+        JsonNode jsonAttributeGetAttributeDirectStoogeList =
+                jsonTestObject.get_JSONAttribute();
+        Assert.assertEquals(stoogeList, jsonAttributeGetAttributeDirectStoogeList);
     }
 }

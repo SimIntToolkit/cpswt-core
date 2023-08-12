@@ -1,15 +1,17 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
-import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
 import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.receiver.Receiver;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender.Sender;
 import hla.rti.SuppliedParameters;
 import hla.rti.ReceivedInteraction;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class EmbeddedMessagingInteractionTests {
+
+    public static ObjectMapper objectMapper = InteractionRoot.objectMapper;
 
     static {
         Sender.load();
@@ -52,7 +56,7 @@ public class EmbeddedMessagingInteractionTests {
         // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
         //
         int embeddedMessagingOmnetFederateInteractionClassHandle = InteractionRoot.get_class_handle(
-                EmbeddedMessaging.get_hla_class_name() + ".OmnetFederate"
+                EmbeddedMessaging.get_hla_class_name() + ".TestOmnetFederate"
         );
 
         //
@@ -87,7 +91,7 @@ public class EmbeddedMessagingInteractionTests {
                 sentInteractionDataList.get(0);
 
         // THE CLASS HANDLE OF THE INTERACTION ASSOCIATED WITH THE SENT TESTINTERACTION SHOULD BE
-        // THAT OF THE OmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
+        // THAT OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
         int sentInteractionEmbeddedMessagingOmnetFederateClassHandle =
                 sentInteractionEmbeddedMessagingOmnetFederateData.getInteractionClassHandle();
         Assert.assertEquals(
@@ -116,13 +120,13 @@ public class EmbeddedMessagingInteractionTests {
         );
 
         // THE LOCAL OBJECT SHOULD BE A TestObject
-        Assert.assertTrue(localEmbeddedMessagingOmnetFederateInteractionRoot instanceof OmnetFederate);
+        Assert.assertTrue(localEmbeddedMessagingOmnetFederateInteractionRoot instanceof TestOmnetFederate);
 
         // CAST THE LOCAL OBJECT TO A TestObject
-        OmnetFederate localEmbeddedMessagingOmnetFederateInteraction =
-                (OmnetFederate)localEmbeddedMessagingOmnetFederateInteractionRoot;
+        TestOmnetFederate localEmbeddedMessagingOmnetFederateInteraction =
+                (TestOmnetFederate)localEmbeddedMessagingOmnetFederateInteractionRoot;
 
-        // THE command FOR THE LOCAL EmbeddedMessaging.OmnetFederate INTERACTION SHOULD BE "object"
+        // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
         Assert.assertEquals(localEmbeddedMessagingOmnetFederateInteraction.get_command(), "interaction");
 
         // THE hlaClassName SHOULD BE FOR TestObject
@@ -130,10 +134,9 @@ public class EmbeddedMessagingInteractionTests {
                 localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestInteraction.get_hla_class_name()
         );
 
-        JSONObject sentInteractionJson =
-                new JSONObject(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
-        Map<String, Object> sentInteractionJsonPropertiesMap =
-                ((JSONObject)sentInteractionJson.get("properties")).toMap();
+        ObjectNode sentInteractionJson =
+                (ObjectNode)objectMapper.readTree(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
+        ObjectNode sentInteractionJsonPropertiesMap = (ObjectNode)sentInteractionJson.get("properties");
 
         // THE messagingJson SHOULD BE FOR ALL OF THE PARAMETERS, INCLUDING THOSE INHERITED FROM C2WINTERACTIONROOT
         Assert.assertEquals(14, sentInteractionJsonPropertiesMap.size());
@@ -153,8 +156,8 @@ public class EmbeddedMessagingInteractionTests {
                 testInteractionClassAndPropertyNameList
         ) {
             Object parameterObject = senderTestInteraction.getParameter(classAndPropertyName);
-            Object jsonObject = sentInteractionJsonPropertiesMap.get(classAndPropertyName.toString());
-            Object jsonObjectConversion = InteractionRoot.convertToDesiredType(jsonObject, parameterObject.getClass());
+            JsonNode jsonNode = sentInteractionJsonPropertiesMap.get(classAndPropertyName.toString());
+            Object jsonObjectConversion = InteractionRoot.castJsonToType(jsonNode, parameterObject.getClass());
             Assert.assertEquals(parameterObject, jsonObjectConversion);
         }
 
@@ -184,8 +187,8 @@ public class EmbeddedMessagingInteractionTests {
         TestInteraction receivedTestInteraction = receiver.getTestInteraction();
         Assert.assertNotNull(receivedTestInteraction);
 
-        // NOT SUBSCRIBED BY Receiver, SO receivedTestInteraction.get_BooleanValue1() HAS DEFAULT VALUE OF false,
-        // BUT localEmbeddedMessagingOmnetFederateInteraction.get_BooleanValue1 IS INCIDENTALLY false
+        // NOT SUBSCRIBED BY Receiver, SO receivedTestInteraction.get_BoolValue1() HAS DEFAULT VALUE OF false,
+        // BUT localEmbeddedMessagingOmnetFederateInteraction.get_BoolValue1 IS INCIDENTALLY false
         Assert.assertEquals(receivedTestInteraction.get_BoolValue1(), senderTestInteraction.get_BoolValue1());
         Assert.assertEquals(receivedTestInteraction.get_BoolValue2(), senderTestInteraction.get_BoolValue2());
         Assert.assertEquals(receivedTestInteraction.get_ByteValue(), senderTestInteraction.get_ByteValue());
@@ -196,6 +199,6 @@ public class EmbeddedMessagingInteractionTests {
         Assert.assertEquals(receivedTestInteraction.get_LongValue(), senderTestInteraction.get_LongValue());
         Assert.assertEquals(receivedTestInteraction.get_ShortValue(), senderTestInteraction.get_ShortValue());
         Assert.assertEquals(receivedTestInteraction.get_StringValue(), senderTestInteraction.get_StringValue());
-        Assert.assertEquals(receivedTestInteraction.get_StringListValue(), senderTestInteraction.get_StringListValue());
+        Assert.assertEquals(receivedTestInteraction.get_JSONValue(), senderTestInteraction.get_JSONValue());
     }
 }

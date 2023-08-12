@@ -41,7 +41,8 @@ import org.apache.logging.log4j.Logger;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import hla.rti.ReceivedInteraction;
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 
 /**
@@ -186,13 +187,13 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "IntValue"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue"
-        ));
-        classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringListValue"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringValue"
@@ -235,15 +236,15 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "LongValue"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.TestInteraction", "ShortValue"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.TestInteraction", "StringListValue"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -290,14 +291,14 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
         key = new ClassAndPropertyName(get_hla_class_name(), "IntValue");
         _classAndPropertyNameInitialValueMap.put(key, 0);
 
+        key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue");
+        _classAndPropertyNameInitialValueMap.put(key, new TextNode(""));
+
         key = new ClassAndPropertyName(get_hla_class_name(), "LongValue");
         _classAndPropertyNameInitialValueMap.put(key, (long)0);
 
         key = new ClassAndPropertyName(get_hla_class_name(), "ShortValue");
         _classAndPropertyNameInitialValueMap.put(key, (short)0);
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue");
-        _classAndPropertyNameInitialValueMap.put(key, new ArrayList<String>());
 
         key = new ClassAndPropertyName(get_hla_class_name(), "StringValue");
         _classAndPropertyNameInitialValueMap.put(key, "");
@@ -663,6 +664,27 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
 
 
     /**
+     * Set the value of the "JSONValue" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue" parameter
+     */
+    public void set_JSONValue(JsonNode value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue");
+        classAndPropertyNameValueMap.put(key, value);
+    }
+
+    /**
+     * Returns the value of the "JSONValue" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue" parameter
+     */
+    public JsonNode get_JSONValue() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue");
+        return (JsonNode)classAndPropertyNameValueMap.get(key);
+    }
+
+
+    /**
      * Set the value of the "LongValue" parameter to "value" for this parameter.
      *
      * @param value the new value for the "LongValue" parameter
@@ -701,27 +723,6 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
     public short get_ShortValue() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "ShortValue");
         return (short)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "StringListValue" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "StringListValue" parameter
-     */
-    public void set_StringListValue(List<String> value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "StringListValue" parameter of this interaction.
-     *
-     * @return the value of the "StringListValue" parameter
-     */
-    public List<String> get_StringListValue() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "StringListValue");
-        return (List<String>)classAndPropertyNameValueMap.get(key);
     }
 
 

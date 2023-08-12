@@ -52,7 +52,7 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate.load();
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.load();
     }
 
@@ -67,10 +67,10 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         enableTimeRegulation(getLookahead());
 
         // DIRECT INTERACTION PUBLICATIONS
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate.publish_interaction(getRTI());
 
         // SOFT INTERACTION PUBLICATIONS
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.add_federate_name_soft_publish("OmnetFederate");
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.add_federate_name_soft_publish("TestOmnetFederate");
     }
 
     public edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction create_InteractionRoot_C2WInteractionRoot_TestInteraction() {

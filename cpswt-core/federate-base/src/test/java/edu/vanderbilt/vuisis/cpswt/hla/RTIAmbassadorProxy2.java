@@ -152,7 +152,7 @@ public class RTIAmbassadorProxy2 {
         interactionClassNameHandleMap.put("InteractionRoot", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", uniqueNo++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate", uniqueNo++);
+        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.TestOmnetFederate", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.Receiver", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.FederateJoinInteraction", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.TestInteraction", uniqueNo++);
@@ -253,7 +253,7 @@ public class RTIAmbassadorProxy2 {
                 uniqueNo++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "StringListValue"),
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.TestInteraction", "JSONValue"),
                 uniqueNo++
         );
     }
@@ -315,10 +315,10 @@ public class RTIAmbassadorProxy2 {
 
     static{
         objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue1"), uniqueNo++
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "BoolValue1"), uniqueNo++
         );
         objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "BooleanValue2"), uniqueNo++
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "BoolValue2"), uniqueNo++
         );
         objectClassAndPropertyNameHandleMap.put(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "ByteValue"), uniqueNo++
@@ -345,10 +345,10 @@ public class RTIAmbassadorProxy2 {
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringValue"), uniqueNo++
         );
         objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue1"), uniqueNo++
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "JSONValue1"), uniqueNo++
         );
         objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "StringListValue2"), uniqueNo++
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.TestObject", "JSONValue2"), uniqueNo++
         );
     }
 

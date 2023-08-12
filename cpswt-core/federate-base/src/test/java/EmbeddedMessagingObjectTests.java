@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import hla.rti.AttributeHandleSet;
 import hla.rti.ReceivedInteraction;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
@@ -13,7 +16,6 @@ import hla.rti.ReflectedAttributes;
 import hla.rti.SuppliedAttributes;
 import hla.rti.jlc.RtiFactory;
 import hla.rti.jlc.RtiFactoryFactory;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class EmbeddedMessagingObjectTests {
+
+    public static ObjectMapper objectMapper = ObjectRoot.objectMapper;
 
     static {
         Sender.load();
@@ -57,7 +61,7 @@ public class EmbeddedMessagingObjectTests {
         // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
         //
         int embeddedMessagingOmnetFederateInteractionClassHandle = InteractionRoot.get_class_handle(
-                EmbeddedMessaging.get_hla_class_name() + ".OmnetFederate"
+                EmbeddedMessaging.get_hla_class_name() + ".TestOmnetFederate"
         );
 
         //
@@ -133,16 +137,16 @@ public class EmbeddedMessagingObjectTests {
 
         // THE ATTRIBUTES THAT ARE PUBLISHED FOR THE REGISTERED OBJECT SHOULD HAVE THE SAME VALUES
         // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
-        Assert.assertEquals(senderTestObject.get_BooleanValue1(), localTestObjectObject.get_BooleanValue1());
-        Assert.assertEquals(senderTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
+        Assert.assertEquals(senderTestObject.get_BoolValue1(), localTestObjectObject.get_BoolValue1());
+        Assert.assertEquals(senderTestObject.get_BoolValue2(), localTestObjectObject.get_BoolValue2());
         Assert.assertEquals(senderTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
         Assert.assertEquals(senderTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
         Assert.assertEquals(senderTestObject.get_FloatValue(), localTestObjectObject.get_FloatValue(), 0.001);
         Assert.assertEquals(senderTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
         Assert.assertEquals(senderTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
         Assert.assertEquals(senderTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
-        Assert.assertEquals(senderTestObject.get_StringListValue1(), localTestObjectObject.get_StringListValue1());
-        Assert.assertEquals(senderTestObject.get_StringListValue2(), localTestObjectObject.get_StringListValue2());
+        Assert.assertEquals(senderTestObject.get_JSONValue1(), localTestObjectObject.get_JSONValue1());
+        Assert.assertEquals(senderTestObject.get_JSONValue2(), localTestObjectObject.get_JSONValue2());
 
         // THE ATTRIBUTES THAT ARE *NOT* PUBLISHED FOR THE REGISTERED OBJECT SHOULD *NOT* HAVE THE SAME VALUES
         // AS THE CORRESPONDING ATTRIBUTES IN THE LOCAL OBJECT
@@ -150,7 +154,7 @@ public class EmbeddedMessagingObjectTests {
         Assert.assertNotEquals(senderTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
 
         // WHEN THE SENDER CALLED "updateAttributes" FOR THE REGISTERED OBJECT, IT SHOULD ALSO HAVE
-        // SENT AN EmbeddedMessaging.OmnetFederate INTERACTION TO SEND THE UPDATED ATTRIBUTES THROUGH
+        // SENT AN EmbeddedMessaging.TestOmnetFederate INTERACTION TO SEND THE UPDATED ATTRIBUTES THROUGH
         // A SIMULATED NETWORK.
         Assert.assertEquals(1, sentInteractionDataList.size());
 
@@ -159,7 +163,7 @@ public class EmbeddedMessagingObjectTests {
                 sentInteractionDataList.get(0);
 
         // THE CLASS HANDLE OF THE INTERACTION ASSOCIATED WITH THE ATTRIBUTES UPDATE SHOULD
-        // THAT OF THE OmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
+        // THAT OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging INTERACTION
         int updateAttributesEmbeddedMessagingOmnetFederateClassHandle =
                 updatedAttributesEmbeddedMessagingOmnetFederateData.getInteractionClassHandle();
         Assert.assertEquals(
@@ -175,19 +179,19 @@ public class EmbeddedMessagingObjectTests {
                 updateAttributesEmbeddedMessagingOmnetFederateReceivedInteraction
         );
 
-        // THE LOCAL INTERACTION SHOULD BE OF THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
+        // THE LOCAL INTERACTION SHOULD BE OF THE TestOmnetFederate-SPECIFIC EmbeddedMessaging CLASS
         Assert.assertTrue(
                 localEmbeddedMessagingOmnetFederateInteractionRoot instanceof
-                        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
+                        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate
         );
 
-        // CAST THE LOCAL INTERACTION TO THE OmnetFederate-SPECIFIC EmbeddedMessaging CLASS
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
+        // CAST THE LOCAL INTERACTION TO THE TestOmnetFederate-SPECIFIC EmbeddedMessaging CLASS
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate
                 localEmbeddedMessagingOmnetFederateInteraction =
-                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate)
+                (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate)
                         localEmbeddedMessagingOmnetFederateInteractionRoot;
 
-        // THE command FOR THE LOCAL EmbeddedMessaging.OmnetFederate INTERACTION SHOULD BE "object"
+        // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
         Assert.assertEquals(localEmbeddedMessagingOmnetFederateInteraction.get_command(), "object");
 
         // THE hlaClassName SHOULD BE FOR TestObject
@@ -195,10 +199,10 @@ public class EmbeddedMessagingObjectTests {
                 localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestObject.get_hla_class_name()
         );
 
-        JSONObject objectReflectorJson =
-                new JSONObject(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
-        Map<String, Object> objectReflectorJsonPropertiesMap =
-                ((JSONObject)objectReflectorJson.get("properties")).toMap();
+        ObjectNode objectReflectorJson =
+                (ObjectNode)objectMapper.readTree(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
+
+        ObjectNode objectReflectorJsonPropertiesMap = (ObjectNode)objectReflectorJson.get("properties");
 
         // THE messagingJson SHOULD BE FOR ALL OF THE PUBLISHED ATTRIBUTES
         Assert.assertEquals(10, objectReflectorJsonPropertiesMap.size());
@@ -218,8 +222,8 @@ public class EmbeddedMessagingObjectTests {
                 testObjectPublishedClassAndPropertyNameSet
         ) {
             Object attributeObject = senderTestObject.getAttribute(classAndPropertyName);
-            Object jsonObject = objectReflectorJsonPropertiesMap.get(classAndPropertyName.toString());
-            Object jsonObjectConversion = ObjectRoot.convertToDesiredType(jsonObject, attributeObject.getClass());
+            JsonNode jsonNode = objectReflectorJsonPropertiesMap.get(classAndPropertyName.toString());
+            Object jsonObjectConversion = ObjectRoot.castJsonToType(jsonNode, attributeObject.getClass());
             Assert.assertEquals(attributeObject, jsonObjectConversion);
         }
 
@@ -272,9 +276,9 @@ public class EmbeddedMessagingObjectTests {
         TestObject receivedTestObject = receiver.getTestObject();
         Assert.assertNotNull(receivedTestObject);
 
-        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
-        // BUT localTestObjectObject.get_BooleanValue1 IS INCIDENTALLY false
-        Assert.assertEquals(receivedTestObject.get_BooleanValue1(), localTestObjectObject.get_BooleanValue1());
+        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
+        // BUT localTestObjectObject.get_BoolValue1 IS INCIDENTALLY false
+        Assert.assertEquals(receivedTestObject.get_BoolValue1(), localTestObjectObject.get_BoolValue1());
         // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
         Assert.assertEquals(receivedTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
         // NOT SUBSCRIBED BY Receiver
@@ -283,16 +287,16 @@ public class EmbeddedMessagingObjectTests {
         Assert.assertEquals(receivedTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
 
         // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
-        Assert.assertEquals(receivedTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
+        Assert.assertEquals(receivedTestObject.get_BoolValue2(), localTestObjectObject.get_BoolValue2());
         Assert.assertEquals(receivedTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
         Assert.assertEquals(receivedTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
-        Assert.assertEquals(receivedTestObject.get_StringListValue1(), localTestObjectObject.get_StringListValue1());
+        Assert.assertEquals(receivedTestObject.get_JSONValue1(), localTestObjectObject.get_JSONValue1());
 
         // THESE ARE UPDATED THROUGH THE NETWORK, SO NOT RECEIVED YET
         Assert.assertNotEquals(receivedTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
         Assert.assertNotEquals(receivedTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
         Assert.assertNotEquals(receivedTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
-        Assert.assertNotEquals(receivedTestObject.get_StringListValue2(), localTestObjectObject.get_StringListValue2());
+        Assert.assertNotEquals(receivedTestObject.get_JSONValue2(), localTestObjectObject.get_JSONValue2());
 
         // SEND THE RECEIVER THE EmbeddedMessaging.Receiver INTERACTION THAT CONTAINS THE ATTRIBUTES UPDATE
         // FOR THE DISCOVERED OBJECT
@@ -308,9 +312,9 @@ public class EmbeddedMessagingObjectTests {
         // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
         receiver.execute();
 
-        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BooleanValue1() HAS DEFAULT VALUE OF false,
-        // BUT localTestObjectObject.get_BooleanValue1 IS INCIDENTALLY false
-        Assert.assertEquals(receivedTestObject.get_BooleanValue1(), localTestObjectObject.get_BooleanValue1());
+        // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
+        // BUT localTestObjectObject.get_BoolValue1 IS INCIDENTALLY false
+        Assert.assertEquals(receivedTestObject.get_BoolValue1(), localTestObjectObject.get_BoolValue1());
         // NOT PUBLISHED BY Sender, SO BOTH HAVE DEFAULT VALUE
         Assert.assertEquals(receivedTestObject.get_DoubleValue(), localTestObjectObject.get_DoubleValue(), 0.001);
         // NOT SUBSCRIBED BY Receiver
@@ -319,14 +323,14 @@ public class EmbeddedMessagingObjectTests {
         Assert.assertEquals(receivedTestObject.get_StringValue(), localTestObjectObject.get_StringValue());
 
         // BOTH PUBLISHED BY SENDER AND SUBSCRIBED BY RECEIVER
-        Assert.assertEquals(receivedTestObject.get_BooleanValue2(), localTestObjectObject.get_BooleanValue2());
+        Assert.assertEquals(receivedTestObject.get_BoolValue2(), localTestObjectObject.get_BoolValue2());
         Assert.assertEquals(receivedTestObject.get_ByteValue(), localTestObjectObject.get_ByteValue());
         Assert.assertEquals(receivedTestObject.get_CharValue(), localTestObjectObject.get_CharValue());
-        Assert.assertEquals(receivedTestObject.get_StringListValue1(), localTestObjectObject.get_StringListValue1());
+        Assert.assertEquals(receivedTestObject.get_JSONValue1(), localTestObjectObject.get_JSONValue1());
 
         Assert.assertEquals(receivedTestObject.get_IntValue(), localTestObjectObject.get_IntValue());
         Assert.assertEquals(receivedTestObject.get_LongValue(), localTestObjectObject.get_LongValue());
         Assert.assertEquals(receivedTestObject.get_ShortValue(), localTestObjectObject.get_ShortValue());
-        Assert.assertEquals(receivedTestObject.get_StringListValue2(), localTestObjectObject.get_StringListValue2());
+        Assert.assertEquals(receivedTestObject.get_JSONValue2(), localTestObjectObject.get_JSONValue2());
     }
 }

@@ -61,6 +61,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.logging.log4j.LogManager;
@@ -126,7 +127,7 @@ public class InteractionRoot implements InteractionRootInterface {
         }
     }
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    public static final ObjectMapper objectMapper = new ObjectMapper();
     static {
         DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
         DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
@@ -805,8 +806,8 @@ public class InteractionRoot implements InteractionRootInterface {
                 stringValue = (Boolean)value ? "1" : "0";
             } else if (value instanceof Character) {
                 stringValue = String.valueOf((short) ((Character) value).charValue());
-//            } else if (value instanceof List) {
-//                stringValue = new JSONArray((List<Object>)value).toString();
+            } else if (value instanceof JsonNode) {
+                stringValue = ((JsonNode)value).toPrettyString();
             } else {
                 stringValue = value.toString();
             }
@@ -917,7 +918,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        if (get_is_published(hlaClassName)) {
+        if (Boolean.TRUE.equals(get_is_published(hlaClassName))) {
             return;
         }
 
@@ -953,7 +954,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        if (get_is_subscribed(hlaClassName)) {
+        if (Boolean.TRUE.equals(get_is_subscribed(hlaClassName))) {
             return;
         }
 
@@ -998,7 +999,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        if (!get_is_published(hlaClassName)) {
+        if (Boolean.FALSE.equals(get_is_published(hlaClassName))) {
             return;
         }
 
@@ -1037,7 +1038,7 @@ public class InteractionRoot implements InteractionRootInterface {
             return;
         }
 
-        if (!get_is_subscribed(hlaClassName)) {
+        if (Boolean.FALSE.equals(get_is_subscribed(hlaClassName))) {
             return;
         }
 
@@ -1108,7 +1109,8 @@ public class InteractionRoot implements InteractionRootInterface {
         // STRING CAN BE CONVERTED TO A NUMBER.
         if (value instanceof String) {
 
-            String stringValue = ((String)value).toLowerCase();
+            String stringValue = (String)value;
+            String stringValueLower = stringValue.toLowerCase();
             Object newValue = null;
 
             if (initialValueForType instanceof Number) {
@@ -1130,29 +1132,33 @@ public class InteractionRoot implements InteractionRootInterface {
                         if (dotPosition > 0) {
                             stringValue = stringValue.substring(0, dotPosition);
                         }
-                        int ePosition = stringValue.indexOf("e");
+                        int ePosition = stringValueLower.indexOf("e");
                         if (ePosition > 0) {
                             stringValue = stringValue.substring(0, ePosition);
                         }
                     }
                     newValue = method.invoke(null, stringValue);
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
             } else if (initialValueForType instanceof Character) {
                 try {
                     newValue = (char)Short.valueOf(stringValue).shortValue();
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
             } else if (initialValueForType instanceof Boolean) {
                 try {
                     newValue = Double.parseDouble(stringValue) != 0;
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
                 if (newValue == null) {
                     newValue = Boolean.valueOf(stringValue);
                 }
-//            } else if (initialValueForType instanceof List) {
-//                newValue = new JSONArray(stringValue).toList();
+            } else if (initialValueForType instanceof JsonNode) {
+                try {
+                    newValue = objectMapper.readTree(stringValue);
+                } catch(JsonProcessingException jsonProcessingException) {
+                    logger.error("Could not parse JSON string \"{}\": {}", stringValue, jsonProcessingException);
+                }
             }
 
             if (newValue != null) {
@@ -1161,9 +1167,9 @@ public class InteractionRoot implements InteractionRootInterface {
         }
 
         if (
-                initialValueForType.getClass() != value.getClass() && (
-                        !List.class.isAssignableFrom(initialValueForType.getClass()) ||
-                                !List.class.isAssignableFrom(value.getClass())
+                initialValueForType.getClass() != value.getClass() && !(
+                        JsonNode.class.isAssignableFrom(initialValueForType.getClass()) &&
+                                JsonNode.class.isAssignableFrom(value.getClass())
                 )
         ) {
             logger.error(
@@ -1849,40 +1855,7 @@ public class InteractionRoot implements InteractionRootInterface {
         return new InteractionRoot();
     }
 
-//    public static Object convertToDesiredType(Object object, Class<?> desiredType) {
-//        if (List.class.isAssignableFrom(desiredType)) {
-//            if (object instanceof JSONArray) {
-//                return ((JSONArray)object).toList();
-//            }
-//            if (object instanceof List) {
-//                return object;
-//            }
-//            List<String> stringList = new ArrayList<>();
-//            stringList.add(object.toString());
-//            return stringList;
-//        }
-//        if (!desiredType.isInstance(object)) {
-//            if (Number.class.isAssignableFrom(desiredType)) {
-//                if (object instanceof Character) {
-//                    object = (int) (Character) object;
-//                }
-//                if (object instanceof Number) {
-//                    String desiredTypeName = desiredType.getSimpleName().toLowerCase();
-//                    Method conversionMethod;
-//                    try {
-//                        conversionMethod = object.getClass().getMethod(desiredTypeName + "Value");
-//                        return conversionMethod.invoke(object);
-//                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
-//                    }
-//                }
-//            } else if (Character.class.equals(desiredType)) {
-//                if (object instanceof Number) {
-//                    return (char)((Number)object).doubleValue();
-//                } else if (object instanceof String) {
-//                    return ((String)object).charAt(0);
-//                }
-
-    private static Object castJsonToType(JsonNode jsonNode, Class<?> desiredType) {
+    public static Object castJsonToType(JsonNode jsonNode, Class<?> desiredType) {
         Object object = null;
 
         // FOR ANY OF THE INTEGRAL TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS LONG
@@ -1898,7 +1871,7 @@ public class InteractionRoot implements InteractionRootInterface {
 
         // CHARACTER TYPE SHOULD ALSO BE JSON ENCODED AS AN INTEGRAL TYPE
         } else if (desiredType.equals(Character.class)) {
-            object = jsonNode.asBoolean();
+            object = (char)jsonNode.asLong();
 
         // FOR THE FLOATING-POINT TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS DOUBLE
         // (THE FLOATING-POINT TYPE WITH THE HIGHEST PRECISION), AND CAST TO THE DESIRED TYPE
@@ -1920,6 +1893,10 @@ public class InteractionRoot implements InteractionRootInterface {
         // FOR A STRINGS, JUST RETRIEVE AS STRING (TEXT)
         } else if (desiredType.equals(String.class)) {
             object = jsonNode.asText();
+
+        // FOR JsonNode, MAKE SURE IT IS ASSIGNABLE TO JsonNode
+        } else if (JsonNode.class.isAssignableFrom(desiredType)) {
+            object = jsonNode;
         }
 
         return object;
@@ -2049,9 +2026,18 @@ public class InteractionRoot implements InteractionRootInterface {
 
         ObjectNode propertyJSONObject = objectMapper.createObjectNode();
         topLevelJSONObject.set("properties", propertyJSONObject);
-        for(ClassAndPropertyName key : classAndPropertyNameValueMap.keySet()) {
-            Object value = classAndPropertyNameValueMap.get(key);
-            propertyJSONObject.putPOJO(key.toString(), value);
+        for(Map.Entry<ClassAndPropertyName, Object> entry : classAndPropertyNameValueMap.entrySet()) {
+            String key = entry.getKey().toString();
+            Object value = entry.getValue();
+
+            if (value instanceof JsonNode) {
+                propertyJSONObject.set(key, (JsonNode)value);
+            } else if (value instanceof Character) {
+                int intValue = (int)(char)value;
+                propertyJSONObject.put(key, intValue);
+            } else {
+                propertyJSONObject.putPOJO(key, value);
+            }
         }
 
         return topLevelJSONObject.toPrettyString();
@@ -2163,6 +2149,7 @@ public class InteractionRoot implements InteractionRootInterface {
         _typeInitialValueMap.put("long", (long)0);
         _typeInitialValueMap.put("short", (short)0);
         _typeInitialValueMap.put("String", "");
+        _typeInitialValueMap.put("JSON", new TextNode(""));
     }
 
     public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {

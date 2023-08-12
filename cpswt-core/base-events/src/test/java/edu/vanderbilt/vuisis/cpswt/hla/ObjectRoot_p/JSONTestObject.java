@@ -42,13 +42,15 @@ import hla.rti.AttributeHandleSet;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import hla.rti.ReflectedAttributes;
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
 
 /**
- * Implements edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject
+ * Implements edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject
  */
 @SuppressWarnings("unused")
-public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
+public class JSONTestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -61,7 +63,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -70,7 +72,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
      * @return the fully-qualified Java class name for this object class
      */
     public static String get_java_class_name() {
-        return "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject";
+        return "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject";
     }
 
     /**
@@ -86,7 +88,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      *
      * @return the name of this object class
      */
@@ -96,7 +98,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * ObjectRoot.StringListTestObject object class.
+     * ObjectRoot.JSONTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -105,7 +107,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
      * @return the fully-qualified federation (HLA) class name for this object class
      */
     public static String get_hla_class_name() {
-        return "ObjectRoot.StringListTestObject";
+        return "ObjectRoot.JSONTestObject";
     }
 
     /**
@@ -120,7 +122,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden attributes in the
-     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -138,7 +140,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Returns a sorted list containing the names of all of the attributes in the
-     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -160,12 +162,12 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        StringListTestObject instance = new StringListTestObject(noInstanceInit);
+        JSONTestObject instance = new JSONTestObject(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.StringListTestObject", "stringListAttribute"
+            "ObjectRoot.JSONTestObject", "JSONAttribute"
         ));
 
         // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
@@ -177,7 +179,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.StringListTestObject", "stringListAttribute"
+            "ObjectRoot.JSONTestObject", "JSONAttribute"
         ));
 
 
@@ -187,17 +189,17 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
         ClassAndPropertyName key;
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "stringListAttribute");
-        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new ArrayList<String>()));
+        key = new ClassAndPropertyName(get_hla_class_name(), "JSONAttribute");
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new TextNode("")));
 
         commonInit(get_hla_class_name());
 
         logger.info(
-          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -213,7 +215,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -227,7 +229,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Returns the handle of an attribute (RTI assigned) of
-     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject") given the attribute's name.
+     * this object class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject") given the attribute's name.
      *
      * @param propertyName name of attribute
      * @return the handle (RTI assigned) of the attribute "propertyName" of object class "className"
@@ -262,7 +264,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -275,7 +277,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -285,7 +287,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     }
 
     /**
-     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -306,7 +308,7 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -356,12 +358,12 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.StringListTestObject object class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject object class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -370,21 +372,21 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     //-------------
     // CONSTRUCTORS
     //-------------
-    public StringListTestObject() {
+    public JSONTestObject() {
         this(get_hla_class_name());
     }
 
-    public StringListTestObject(LogicalTime logicalTime) {
+    public JSONTestObject(LogicalTime logicalTime) {
         this();
         setTime(logicalTime);
     }
 
-    public StringListTestObject(ReflectedAttributes propertyMap) {
+    public JSONTestObject(ReflectedAttributes propertyMap) {
         this();
         setAttributes( propertyMap );
     }
 
-    public StringListTestObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+    public JSONTestObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
         this(propertyMap);
         setTime(logicalTime);
     }
@@ -397,35 +399,35 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     //-----------------
     // CREATION METHODS
     //-----------------
-    public static StringListTestObject create_object() {
-        return new StringListTestObject();
+    public static JSONTestObject create_object() {
+        return new JSONTestObject();
     }
 
-    public StringListTestObject createObject() {
+    public JSONTestObject createObject() {
         return create_object();
     }
 
-    public static StringListTestObject create_object(LogicalTime logicalTime) {
-        return new StringListTestObject(logicalTime);
+    public static JSONTestObject create_object(LogicalTime logicalTime) {
+        return new JSONTestObject(logicalTime);
     }
 
-    public StringListTestObject createObject(LogicalTime logicalTime) {
+    public JSONTestObject createObject(LogicalTime logicalTime) {
         return create_object(logicalTime);
     }
 
-    public static StringListTestObject create_object(ReflectedAttributes propertyMap) {
-        return new StringListTestObject(propertyMap);
+    public static JSONTestObject create_object(ReflectedAttributes propertyMap) {
+        return new JSONTestObject(propertyMap);
     }
 
-    public StringListTestObject createObject(ReflectedAttributes propertyMap) {
+    public JSONTestObject createObject(ReflectedAttributes propertyMap) {
         return create_object(propertyMap);
     }
 
-    public static StringListTestObject create_object(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
-        return new StringListTestObject(propertyMap, logicalTime);
+    public static JSONTestObject create_object(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+        return new JSONTestObject(propertyMap, logicalTime);
     }
 
-    public StringListTestObject createObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
+    public JSONTestObject createObject(ReflectedAttributes propertyMap, LogicalTime logicalTime) {
         return create_object(propertyMap, logicalTime);
     }
 
@@ -444,35 +446,35 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
 
 
     /**
-     * Set the value of the "stringListAttribute" parameter to "value" for this parameter.
+     * Set the value of the "JSONAttribute" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "stringListAttribute" parameter
+     * @param value the new value for the "JSONAttribute" parameter
      */
-    public void set_stringListAttribute(List<String> value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "stringListAttribute");
+    public void set_JSONAttribute(JsonNode value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONAttribute");
         Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
         attribute.setValue(value);
         attribute.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "stringListAttribute" parameter of this interaction.
+     * Returns the value of the "JSONAttribute" parameter of this interaction.
      *
-     * @return the value of the "stringListAttribute" parameter
+     * @return the value of the "JSONAttribute" parameter
      */
-    public List<String> get_stringListAttribute() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "stringListAttribute");
-        return (List<String>)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+    public JsonNode get_JSONAttribute() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONAttribute");
+        return (JsonNode)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
     }
 
     /**
-     * Returns the current timestamp of the "stringListAttribute" attribute of this object.
+     * Returns the current timestamp of the "JSONAttribute" attribute of this object.
      *
-     * @return the current timestamp of the "stringListAttribute" attribute
+     * @return the current timestamp of the "JSONAttribute" attribute
      */
-    public double get_stringListAttribute_time() {
+    public double get_JSONAttribute_time() {
         return ((Attribute<Object>)classAndPropertyNameValueMap.get(
-          new ClassAndPropertyName(get_hla_class_name(), "stringListAttribute")
+          new ClassAndPropertyName(get_hla_class_name(), "JSONAttribute")
         )).getTime();
     }
 
@@ -529,103 +531,103 @@ public class StringListTestObject extends edu.vanderbilt.vuisis.cpswt.hla.Object
     }
 
     /**
-    * Publishes the "stringListAttribute" attribute of the attribute's containing object
+    * Publishes the "JSONAttribute" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "stringListAttribute" attribute for publication.
+    * Note:  This method only marks the "JSONAttribute" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_stringListAttribute_attribute() {
-        publish_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void publish_JSONAttribute_attribute() {
+        publish_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
     /**
-    * Unpublishes the "stringListAttribute" attribute of the attribute's containing object
+    * Unpublishes the "JSONAttribute" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "stringListAttribute" attribute for unpublication.
+    * Note:  This method only marks the "JSONAttribute" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_stringListAttribute_attribute() {
-        unpublish_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void unpublish_JSONAttribute_attribute() {
+        unpublish_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
     /**
-    * Subscribes a federate to the "stringListAttribute" attribute of the attribute's
+    * Subscribes a federate to the "JSONAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "stringListAttribute" attribute for subscription.
+    * Note:  This method only marks the "JSONAttribute" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_stringListAttribute_attribute() {
-        subscribe_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void subscribe_JSONAttribute_attribute() {
+        subscribe_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
     /**
-    * Unsubscribes a federate from the "stringListAttribute" attribute of the attribute's
+    * Unsubscribes a federate from the "JSONAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "stringListAttribute" attribute for unsubscription.
+    * Note:  This method only marks the "JSONAttribute" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_stringListAttribute_attribute() {
-        unsubscribe_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void unsubscribe_JSONAttribute_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
     /**
-    * Soft subscribes a federate to the "stringListAttribute" attribute of the attribute's
+    * Soft subscribes a federate to the "JSONAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "stringListAttribute" attribute for soft subscription.
+    * Note:  This method only marks the "JSONAttribute" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_subscribe_stringListAttribute_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void soft_subscribe_JSONAttribute_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
     /**
-    * Soft unsubscribes a federate from the "stringListAttribute" attribute of the attribute's
+    * Soft unsubscribes a federate from the "JSONAttribute" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "stringListAttribute" attribute for soft unsubscription.
+    * Note:  This method only marks the "JSONAttribute" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_unsubscribe_stringListAttribute_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "stringListAttribute");
+    public static void soft_unsubscribe_JSONAttribute_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "JSONAttribute");
     }
 
-    protected StringListTestObject(NoInstanceInit noInstanceInit) {
+    protected JSONTestObject(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
 
     /**
-    * Creates an instance of the StringListTestObject object class, using
+    * Creates an instance of the JSONTestObject object class, using
     * "datamemberMap" to initialize its attribute values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * attributes of this new StringListTestObject object class instance
+    * attributes of this new JSONTestObject object class instance
     */
-    protected StringListTestObject( String hlaClassName ) {
+    protected JSONTestObject( String hlaClassName ) {
         super( hlaClassName );
     }
 
     /**
-    * Creates a new StringListTestObject object class instance that is a duplicate
+    * Creates a new JSONTestObject object class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var StringListTestObject object class instance of which
-    * this newly created StringListTestObject object class instance will be a
+    * @param messaging_var JSONTestObject object class instance of which
+    * this newly created JSONTestObject object class instance will be a
     * duplicate
     */
-    public StringListTestObject(StringListTestObject messaging_var) {
+    public JSONTestObject(JSONTestObject messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
