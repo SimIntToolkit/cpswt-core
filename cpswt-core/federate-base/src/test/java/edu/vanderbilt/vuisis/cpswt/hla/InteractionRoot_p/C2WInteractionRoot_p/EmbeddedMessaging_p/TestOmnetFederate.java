@@ -44,10 +44,10 @@ import hla.rti.ReceivedInteraction;
 
 
 /**
- * Implements edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate
+ * Implements edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate
  */
 @SuppressWarnings("unused")
-public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging {
+public class TestOmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -60,7 +60,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * Returns the fully-qualified (dot-delimited) name of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -69,7 +69,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
      * @return the fully-qualified Java class name for this interaction class
      */
     public static String get_java_class_name() {
-        return "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate";
+        return "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate";
     }
 
     /**
@@ -85,7 +85,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Returns the simple name (the last name in the dot-delimited fully-qualified
-     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * class name) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      *
      * @return the name of this interaction class
      */
@@ -95,7 +95,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Returns the fully-qualified (dot-delimited) hla class name of the
-     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate interaction class.
+     * InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.TestOmnetFederate interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the federation name of the class pertaining to the reference,
      * rather than the name of the class for the instance referred to by the reference.
@@ -104,7 +104,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
      * @return the fully-qualified federation (HLA) class name for this interaction class
      */
     public static String get_hla_class_name() {
-        return "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.OmnetFederate";
+        return "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.TestOmnetFederate";
     }
 
     /**
@@ -119,7 +119,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Returns a sorted list containing the names of all of the non-hidden parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -137,7 +137,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Returns a sorted list containing the names of all of the parameters in the
-     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      * The property names are paired with name of the hla class in which they are defined in a
      * ClassAndPropertyName POJO.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
@@ -159,7 +159,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     static {
         _hlaClassNameSet.add(get_hla_class_name());
 
-        OmnetFederate instance = new OmnetFederate(noInstanceInit);
+        TestOmnetFederate instance = new TestOmnetFederate(noInstanceInit);
         _hlaClassNameInstanceMap.put(get_hla_class_name(), instance);
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
@@ -204,11 +204,11 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
         commonInit(get_hla_class_name());
 
         logger.info(
-          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate\" (hla class \"{}\") loaded", get_hla_class_name()
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate\" (hla class \"{}\") loaded", get_hla_class_name()
         );
 
         System.err.println(
-          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate\" (hla class \"" +
+          "Class \"edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate\" (hla class \"" +
           get_hla_class_name() + "\") loaded"
         );
     }
@@ -224,7 +224,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     // ----------------------------------------------------------------------------
 
     /**
-     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * Returns the handle (RTI assigned) of the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      * Note: As this is a static method, it is NOT polymorphic, and so, if called on
      * a reference will return the handle of the class pertaining to the reference,
      * rather than the handle of the class for the instance referred to by the reference.
@@ -238,7 +238,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Returns the handle of an parameter (RTI assigned) of
-     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate") given the parameter's name.
+     * this interaction class (i.e. "edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate") given the parameter's name.
      *
      * @param propertyName name of parameter
      * @return the handle (RTI assigned) of the parameter "propertyName" of interaction class "className"
@@ -257,7 +257,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     //-------------------------------------------------
 
     /**
-     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class for a federate.
+     * Publishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -270,7 +270,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     }
 
     /**
-     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class for a federate.
+     * Unpublishes the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class for a federate.
      *
      * @param rti handle to the Local RTI Component, usu. obtained through the
      *            {@link SynchronizedFederate#getRTI()} call
@@ -280,7 +280,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     }
 
     /**
-     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * Subscribes a federate to the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -301,7 +301,7 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     }
 
     /**
-     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class.
+     * Unsubscribes a federate from the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class.
      *
      * @param rti handle to the Local RTI Component
      */
@@ -327,12 +327,12 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
 
     /**
      * Return true if "handle" is equal to the handle (RTI assigned) of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class).
      *
      * @param handle handle to compare to the value of the handle (RTI assigned) of
-     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class).
+     * this class (the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class).
      * @return "true" if "handle" matches the value of the handle of this class
-     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate interaction class).
+     * (that is, the edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate interaction class).
      */
     public static boolean match(int handle) {
         return handle == get_class_handle();
@@ -341,21 +341,21 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     //-------------
     // CONSTRUCTORS
     //-------------
-    public OmnetFederate() {
+    public TestOmnetFederate() {
         this(get_hla_class_name());
     }
 
-    public OmnetFederate(LogicalTime logicalTime) {
+    public TestOmnetFederate(LogicalTime logicalTime) {
         this();
         setTime(logicalTime);
     }
 
-    public OmnetFederate(ReceivedInteraction propertyMap) {
+    public TestOmnetFederate(ReceivedInteraction propertyMap) {
         this();
         setParameters( propertyMap );
     }
 
-    public OmnetFederate(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public TestOmnetFederate(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         this(propertyMap);
         setTime(logicalTime);
     }
@@ -368,35 +368,35 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     //-----------------
     // CREATION METHODS
     //-----------------
-    public static OmnetFederate create_interaction() {
-        return new OmnetFederate();
+    public static TestOmnetFederate create_interaction() {
+        return new TestOmnetFederate();
     }
 
-    public OmnetFederate createInteraction() {
+    public TestOmnetFederate createInteraction() {
         return create_interaction();
     }
 
-    public static OmnetFederate create_interaction(LogicalTime logicalTime) {
-        return new OmnetFederate(logicalTime);
+    public static TestOmnetFederate create_interaction(LogicalTime logicalTime) {
+        return new TestOmnetFederate(logicalTime);
     }
 
-    public OmnetFederate createInteraction(LogicalTime logicalTime) {
+    public TestOmnetFederate createInteraction(LogicalTime logicalTime) {
         return create_interaction(logicalTime);
     }
 
-    public static OmnetFederate create_interaction(ReceivedInteraction propertyMap) {
-        return new OmnetFederate(propertyMap);
+    public static TestOmnetFederate create_interaction(ReceivedInteraction propertyMap) {
+        return new TestOmnetFederate(propertyMap);
     }
 
-    public OmnetFederate createInteraction(ReceivedInteraction propertyMap) {
+    public TestOmnetFederate createInteraction(ReceivedInteraction propertyMap) {
         return create_interaction(propertyMap);
     }
 
-    public static OmnetFederate create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
-        return new OmnetFederate(propertyMap, logicalTime);
+    public static TestOmnetFederate create_interaction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+        return new TestOmnetFederate(propertyMap, logicalTime);
     }
 
-    public OmnetFederate createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
+    public TestOmnetFederate createInteraction(ReceivedInteraction propertyMap, LogicalTime logicalTime) {
         return create_interaction(propertyMap, logicalTime);
     }
 
@@ -417,32 +417,32 @@ public class OmnetFederate extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRo
     // END PROPERTY MANIPULATION METHODS
     //----------------------------------
 
-    protected OmnetFederate(NoInstanceInit noInstanceInit) {
+    protected TestOmnetFederate(NoInstanceInit noInstanceInit) {
         super(noInstanceInit);
     }
 
     /**
-    * Creates an instance of the OmnetFederate interaction class, using
+    * Creates an instance of the TestOmnetFederate interaction class, using
     * "datamemberMap" to initialize its parameter values.
     * "datamemberMap" is usually acquired as an argument to an RTI federate
     * callback method, such as "receiveInteraction".
     *
     * @param datamemberMap data structure containing initial values for the
-    * parameters of this new OmnetFederate interaction class instance
+    * parameters of this new TestOmnetFederate interaction class instance
     */
-    protected OmnetFederate( String hlaClassName ) {
+    protected TestOmnetFederate( String hlaClassName ) {
         super( hlaClassName );
     }
 
     /**
-    * Creates a new OmnetFederate interaction class instance that is a duplicate
+    * Creates a new TestOmnetFederate interaction class instance that is a duplicate
     * of the instance referred to by messaging_var.
     *
-    * @param messaging_var OmnetFederate interaction class instance of which
-    * this newly created OmnetFederate interaction class instance will be a
+    * @param messaging_var TestOmnetFederate interaction class instance of which
+    * this newly created TestOmnetFederate interaction class instance will be a
     * duplicate
     */
-    public OmnetFederate(OmnetFederate messaging_var) {
+    public TestOmnetFederate(TestOmnetFederate messaging_var) {
     
         // SHALLOW COPY
         classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);

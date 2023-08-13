@@ -42,6 +42,8 @@ import hla.rti.AttributeHandleSet;
 import hla.rti.LogicalTime;
 import hla.rti.RTIambassador;
 import hla.rti.ReflectedAttributes;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 
 /**
@@ -165,10 +167,10 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         Set<ClassAndPropertyName> classAndPropertyNameSet = new HashSet<>();
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.TestObject", "BooleanValue1"
+            "ObjectRoot.TestObject", "BoolValue1"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.TestObject", "BooleanValue2"
+            "ObjectRoot.TestObject", "BoolValue2"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "ByteValue"
@@ -184,6 +186,12 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "IntValue"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "JSONValue1"
+        ));
+        classAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "JSONValue2"
         ));
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "LongValue"
@@ -204,11 +212,11 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.TestObject", "BooleanValue1"
+            "ObjectRoot.TestObject", "BoolValue1"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "ObjectRoot.TestObject", "BooleanValue2"
+            "ObjectRoot.TestObject", "BoolValue2"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -229,6 +237,14 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "ObjectRoot.TestObject", "IntValue"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "JSONValue1"
+        ));
+
+        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
+            "ObjectRoot.TestObject", "JSONValue2"
         ));
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
@@ -250,10 +266,10 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         ClassAndPropertyName key;
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue1");
+        key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue1");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(false));
 
-        key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue2");
+        key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue2");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(false));
 
         key = new ClassAndPropertyName(get_hla_class_name(), "ByteValue");
@@ -270,6 +286,12 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
         key = new ClassAndPropertyName(get_hla_class_name(), "IntValue");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(0));
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue1");
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new TextNode("")));
+
+        key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue2");
+        _classAndPropertyNameInitialValueMap.put(key, new Attribute<>(new TextNode("")));
 
         key = new ClassAndPropertyName(get_hla_class_name(), "LongValue");
         _classAndPropertyNameInitialValueMap.put(key, new Attribute<>((long)0));
@@ -534,69 +556,69 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
 
     /**
-     * Set the value of the "BooleanValue1" parameter to "value" for this parameter.
+     * Set the value of the "BoolValue1" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "BooleanValue1" parameter
+     * @param value the new value for the "BoolValue1" parameter
      */
-    public void set_BooleanValue1(Boolean value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue1");
+    public void set_BoolValue1(Boolean value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue1");
         Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
         attribute.setValue(value);
         attribute.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "BooleanValue1" parameter of this interaction.
+     * Returns the value of the "BoolValue1" parameter of this interaction.
      *
-     * @return the value of the "BooleanValue1" parameter
+     * @return the value of the "BoolValue1" parameter
      */
-    public boolean get_BooleanValue1() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue1");
+    public boolean get_BoolValue1() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue1");
         return (boolean)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
     }
 
     /**
-     * Returns the current timestamp of the "BooleanValue1" attribute of this object.
+     * Returns the current timestamp of the "BoolValue1" attribute of this object.
      *
-     * @return the current timestamp of the "BooleanValue1" attribute
+     * @return the current timestamp of the "BoolValue1" attribute
      */
-    public double get_BooleanValue1_time() {
+    public double get_BoolValue1_time() {
         return ((Attribute<Object>)classAndPropertyNameValueMap.get(
-          new ClassAndPropertyName(get_hla_class_name(), "BooleanValue1")
+          new ClassAndPropertyName(get_hla_class_name(), "BoolValue1")
         )).getTime();
     }
 
 
     /**
-     * Set the value of the "BooleanValue2" parameter to "value" for this parameter.
+     * Set the value of the "BoolValue2" parameter to "value" for this parameter.
      *
-     * @param value the new value for the "BooleanValue2" parameter
+     * @param value the new value for the "BoolValue2" parameter
      */
-    public void set_BooleanValue2(Boolean value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue2");
+    public void set_BoolValue2(Boolean value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue2");
         Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
         attribute.setValue(value);
         attribute.setTime(getTime());
     }
 
     /**
-     * Returns the value of the "BooleanValue2" parameter of this interaction.
+     * Returns the value of the "BoolValue2" parameter of this interaction.
      *
-     * @return the value of the "BooleanValue2" parameter
+     * @return the value of the "BoolValue2" parameter
      */
-    public boolean get_BooleanValue2() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BooleanValue2");
+    public boolean get_BoolValue2() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "BoolValue2");
         return (boolean)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
     }
 
     /**
-     * Returns the current timestamp of the "BooleanValue2" attribute of this object.
+     * Returns the current timestamp of the "BoolValue2" attribute of this object.
      *
-     * @return the current timestamp of the "BooleanValue2" attribute
+     * @return the current timestamp of the "BoolValue2" attribute
      */
-    public double get_BooleanValue2_time() {
+    public double get_BoolValue2_time() {
         return ((Attribute<Object>)classAndPropertyNameValueMap.get(
-          new ClassAndPropertyName(get_hla_class_name(), "BooleanValue2")
+          new ClassAndPropertyName(get_hla_class_name(), "BoolValue2")
         )).getTime();
     }
 
@@ -772,6 +794,74 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
 
 
     /**
+     * Set the value of the "JSONValue1" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue1" parameter
+     */
+    public void set_JSONValue1(JsonNode value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue1");
+        Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+        attribute.setValue(value);
+        attribute.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "JSONValue1" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue1" parameter
+     */
+    public JsonNode get_JSONValue1() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue1");
+        return (JsonNode)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+    }
+
+    /**
+     * Returns the current timestamp of the "JSONValue1" attribute of this object.
+     *
+     * @return the current timestamp of the "JSONValue1" attribute
+     */
+    public double get_JSONValue1_time() {
+        return ((Attribute<Object>)classAndPropertyNameValueMap.get(
+          new ClassAndPropertyName(get_hla_class_name(), "JSONValue1")
+        )).getTime();
+    }
+
+
+    /**
+     * Set the value of the "JSONValue2" parameter to "value" for this parameter.
+     *
+     * @param value the new value for the "JSONValue2" parameter
+     */
+    public void set_JSONValue2(JsonNode value) {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue2");
+        Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
+        attribute.setValue(value);
+        attribute.setTime(getTime());
+    }
+
+    /**
+     * Returns the value of the "JSONValue2" parameter of this interaction.
+     *
+     * @return the value of the "JSONValue2" parameter
+     */
+    public JsonNode get_JSONValue2() {
+        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "JSONValue2");
+        return (JsonNode)((Attribute<Object>)classAndPropertyNameValueMap.get(key)).getValue();
+    }
+
+    /**
+     * Returns the current timestamp of the "JSONValue2" attribute of this object.
+     *
+     * @return the current timestamp of the "JSONValue2" attribute
+     */
+    public double get_JSONValue2_time() {
+        return ((Attribute<Object>)classAndPropertyNameValueMap.get(
+          new ClassAndPropertyName(get_hla_class_name(), "JSONValue2")
+        )).getTime();
+    }
+
+
+    /**
      * Set the value of the "LongValue" parameter to "value" for this parameter.
      *
      * @param value the new value for the "LongValue" parameter
@@ -925,147 +1015,147 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     }
 
     /**
-    * Publishes the "BooleanValue1" attribute of the attribute's containing object
+    * Publishes the "BoolValue1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue1" attribute for publication.
+    * Note:  This method only marks the "BoolValue1" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_BooleanValue1_attribute() {
-        publish_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void publish_BoolValue1_attribute() {
+        publish_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Unpublishes the "BooleanValue1" attribute of the attribute's containing object
+    * Unpublishes the "BoolValue1" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue1" attribute for unpublication.
+    * Note:  This method only marks the "BoolValue1" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_BooleanValue1_attribute() {
-        unpublish_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void unpublish_BoolValue1_attribute() {
+        unpublish_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Subscribes a federate to the "BooleanValue1" attribute of the attribute's
+    * Subscribes a federate to the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for subscription.
+    * Note:  This method only marks the "BoolValue1" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_BooleanValue1_attribute() {
-        subscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void subscribe_BoolValue1_attribute() {
+        subscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Unsubscribes a federate from the "BooleanValue1" attribute of the attribute's
+    * Unsubscribes a federate from the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for unsubscription.
+    * Note:  This method only marks the "BoolValue1" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_BooleanValue1_attribute() {
-        unsubscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void unsubscribe_BoolValue1_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Soft subscribes a federate to the "BooleanValue1" attribute of the attribute's
+    * Soft subscribes a federate to the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for soft subscription.
+    * Note:  This method only marks the "BoolValue1" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_subscribe_BooleanValue1_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void soft_subscribe_BoolValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Soft unsubscribes a federate from the "BooleanValue1" attribute of the attribute's
+    * Soft unsubscribes a federate from the "BoolValue1" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue1" attribute for soft unsubscription.
+    * Note:  This method only marks the "BoolValue1" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_unsubscribe_BooleanValue1_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue1");
+    public static void soft_unsubscribe_BoolValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BoolValue1");
     }
 
     /**
-    * Publishes the "BooleanValue2" attribute of the attribute's containing object
+    * Publishes the "BoolValue2" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue2" attribute for publication.
+    * Note:  This method only marks the "BoolValue2" attribute for publication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void publish_BooleanValue2_attribute() {
-        publish_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void publish_BoolValue2_attribute() {
+        publish_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Unpublishes the "BooleanValue2" attribute of the attribute's containing object
+    * Unpublishes the "BoolValue2" attribute of the attribute's containing object
     * class for a federate.
-    * Note:  This method only marks the "BooleanValue2" attribute for unpublication.
+    * Note:  This method only marks the "BoolValue2" attribute for unpublication.
     * To actually publish the attribute, the federate must (re)publish its containing
     * object class.
     * (using <objectClassName>.publish_object( RTIambassador rti ) ).
     */
-    public static void unpublish_BooleanValue2_attribute() {
-        unpublish_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void unpublish_BoolValue2_attribute() {
+        unpublish_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Subscribes a federate to the "BooleanValue2" attribute of the attribute's
+    * Subscribes a federate to the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for subscription.
+    * Note:  This method only marks the "BoolValue2" attribute for subscription.
     * To actually subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void subscribe_BooleanValue2_attribute() {
-        subscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void subscribe_BoolValue2_attribute() {
+        subscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Unsubscribes a federate from the "BooleanValue2" attribute of the attribute's
+    * Unsubscribes a federate from the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for unsubscription.
+    * Note:  This method only marks the "BoolValue2" attribute for unsubscription.
     * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
     */
-    public static void unsubscribe_BooleanValue2_attribute() {
-        unsubscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void unsubscribe_BoolValue2_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Soft subscribes a federate to the "BooleanValue2" attribute of the attribute's
+    * Soft subscribes a federate to the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for soft subscription.
+    * Note:  This method only marks the "BoolValue2" attribute for soft subscription.
     * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_subscribe_BooleanValue2_attribute() {
-        soft_subscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void soft_subscribe_BoolValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
-    * Soft unsubscribes a federate from the "BooleanValue2" attribute of the attribute's
+    * Soft unsubscribes a federate from the "BoolValue2" attribute of the attribute's
     * containing object class.
-    * Note:  This method only marks the "BooleanValue2" attribute for soft unsubscription.
+    * Note:  This method only marks the "BoolValue2" attribute for soft unsubscription.
     * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
     * containing object class.
     * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
     */
-    public static void soft_unsubscribe_BooleanValue2_attribute() {
-        soft_unsubscribe_attribute(get_hla_class_name(), "BooleanValue2");
+    public static void soft_unsubscribe_BoolValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "BoolValue2");
     }
 
     /**
@@ -1426,6 +1516,150 @@ public class TestObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     */
     public static void soft_unsubscribe_IntValue_attribute() {
         soft_unsubscribe_attribute(get_hla_class_name(), "IntValue");
+    }
+
+    /**
+    * Publishes the "JSONValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue1" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_JSONValue1_attribute() {
+        publish_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Unpublishes the "JSONValue1" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue1" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_JSONValue1_attribute() {
+        unpublish_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Subscribes a federate to the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_JSONValue1_attribute() {
+        subscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Unsubscribes a federate from the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_JSONValue1_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Soft subscribes a federate to the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_JSONValue1_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "JSONValue1" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue1" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_JSONValue1_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "JSONValue1");
+    }
+
+    /**
+    * Publishes the "JSONValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue2" attribute for publication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void publish_JSONValue2_attribute() {
+        publish_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Unpublishes the "JSONValue2" attribute of the attribute's containing object
+    * class for a federate.
+    * Note:  This method only marks the "JSONValue2" attribute for unpublication.
+    * To actually publish the attribute, the federate must (re)publish its containing
+    * object class.
+    * (using <objectClassName>.publish_object( RTIambassador rti ) ).
+    */
+    public static void unpublish_JSONValue2_attribute() {
+        unpublish_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Subscribes a federate to the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for subscription.
+    * To actually subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void subscribe_JSONValue2_attribute() {
+        subscribe_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Unsubscribes a federate from the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for unsubscription.
+    * To actually unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.subscribe_object( RTIambassador rti ) ).
+    */
+    public static void unsubscribe_JSONValue2_attribute() {
+        unsubscribe_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Soft subscribes a federate to the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for soft subscription.
+    * To actually soft subscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.soft_subscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_subscribe_JSONValue2_attribute() {
+        soft_subscribe_attribute(get_hla_class_name(), "JSONValue2");
+    }
+
+    /**
+    * Soft unsubscribes a federate from the "JSONValue2" attribute of the attribute's
+    * containing object class.
+    * Note:  This method only marks the "JSONValue2" attribute for soft unsubscription.
+    * To actually soft unsubscribe to the attribute, the federate must (re)subscribe to its
+    * containing object class.
+    * (using <objectClassName>.unsubscribe_object( RTIambassador rti ) ).
+    */
+    public static void soft_unsubscribe_JSONValue2_attribute() {
+        soft_unsubscribe_attribute(get_hla_class_name(), "JSONValue2");
     }
 
     /**

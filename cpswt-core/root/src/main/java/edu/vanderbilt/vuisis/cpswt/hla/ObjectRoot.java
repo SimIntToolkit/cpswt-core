@@ -62,6 +62,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.logging.log4j.LogManager;
@@ -127,7 +128,7 @@ public class ObjectRoot implements ObjectRootInterface {
         }
     }
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    public static final ObjectMapper objectMapper = new ObjectMapper();
     static {
         DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
         DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
@@ -522,9 +523,19 @@ public class ObjectRoot implements ObjectRootInterface {
 
             ObjectNode propertyJSONObject = objectMapper.createObjectNode();
             for(Map.Entry<ClassAndPropertyName, Object> entry : _classAndPropertyNameValueMap.entrySet()) {
-                propertyJSONObject.putPOJO(entry.getKey().toString(), entry.getValue());
+                String key = entry.getKey().toString();
+                Object value = entry.getValue();
+
+                if (value instanceof JsonNode) {
+                    propertyJSONObject.set(key, (JsonNode)value);
+                } else if (value instanceof Character) {
+                    int intValue = (int)(char)value;
+                    propertyJSONObject.put(key, intValue);
+                } else {
+                    propertyJSONObject.putPOJO(key, value);
+                }
             }
-            topLevelJSONObject.put("properties", propertyJSONObject);
+            topLevelJSONObject.set("properties", propertyJSONObject);
             return topLevelJSONObject.toPrettyString();
         }
 
@@ -1391,6 +1402,8 @@ public class ObjectRoot implements ObjectRootInterface {
                     stringValue = (Boolean)value ? "1" : "0";
                 } else if (value instanceof Character) {
                     stringValue = String.valueOf((short) ((Character) value).charValue());
+                } else if (value instanceof JsonNode) {
+                    stringValue = ((JsonNode)value).toPrettyString();
                 } else {
                     stringValue = value.toString();
                 }
@@ -1536,7 +1549,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        if (get_is_published(hlaClassName)) {
+        if (Boolean.TRUE.equals(get_is_published(hlaClassName))) {
             return;
         }
 
@@ -1605,7 +1618,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        if (get_is_subscribed(hlaClassName)) {
+        if (Boolean.TRUE.equals(get_is_subscribed(hlaClassName))) {
             return;
         }
 
@@ -1671,7 +1684,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        if (!get_is_published(hlaClassName)) {
+        if (Boolean.FALSE.equals(get_is_published(hlaClassName))) {
             return;
         }
 
@@ -1710,7 +1723,7 @@ public class ObjectRoot implements ObjectRootInterface {
             return;
         }
 
-        if (!get_is_subscribed(hlaClassName)) {
+        if (Boolean.FALSE.equals(get_is_subscribed(hlaClassName))) {
             return;
         }
 
@@ -2135,7 +2148,8 @@ public class ObjectRoot implements ObjectRootInterface {
         // STRING CAN BE CONVERTED TO A NUMBER.
         if (value instanceof String) {
 
-            String stringValue = ((String)value).toLowerCase();
+            String stringValue = (String)value;
+            String stringValueLower = stringValue.toLowerCase();
             Object newValue = null;
 
             if (initialValueForType instanceof Number) {
@@ -2157,26 +2171,32 @@ public class ObjectRoot implements ObjectRootInterface {
                         if (dotPosition > 0) {
                             stringValue = stringValue.substring(0, dotPosition);
                         }
-                        int ePosition = stringValue.indexOf("e");
+                        int ePosition = stringValueLower.indexOf("e");
                         if (ePosition > 0) {
                             stringValue = stringValue.substring(0, ePosition);
                         }
                     }
                     newValue = method.invoke(null, stringValue);
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
             } else if (initialValueForType instanceof Character) {
                 try {
                     newValue = (char)Short.valueOf(stringValue).shortValue();
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
             } else if (initialValueForType instanceof Boolean) {
                 try {
                     newValue = Double.parseDouble(stringValue) != 0;
-                } catch (Exception e) { }
+                } catch (Exception ignored) { }
 
                 if (newValue == null) {
                     newValue = Boolean.valueOf(stringValue);
+                }
+            } else if (initialValueForType instanceof JsonNode) {
+                try {
+                    newValue = objectMapper.readTree(stringValue);
+                } catch(JsonProcessingException jsonProcessingException) {
+                    logger.error("Could not parse JSON string \"{}\": {}", stringValue, jsonProcessingException);
                 }
             }
 
@@ -2185,7 +2205,12 @@ public class ObjectRoot implements ObjectRootInterface {
             }
         }
 
-        if (initialValueForType.getClass() != value.getClass()) {
+        if (
+                initialValueForType.getClass() != value.getClass() && !(
+                        JsonNode.class.isAssignableFrom(initialValueForType.getClass()) &&
+                                JsonNode.class.isAssignableFrom(value.getClass())
+                )
+        ) {
             logger.error(
                     "setAttribute(\"{}\", {} value): \"value\" is incorrect type \"{}\" for \"{}\" " +
                             "attribute, should be of type \"{}\".",
@@ -2780,11 +2805,9 @@ public class ObjectRoot implements ObjectRootInterface {
         this();
         _time = other._time;
         _instanceHlaClassName = other._instanceHlaClassName;
-        for(ClassAndPropertyName key: classAndPropertyNameValueMap.keySet()) {
-            classAndPropertyNameValueMap.put(
-                key, new Attribute<>((Attribute<Object>)classAndPropertyNameValueMap.get(key))
-            );
-        }
+        classAndPropertyNameValueMap.replaceAll(
+                (k, v) -> new Attribute<>((Attribute<Object>) classAndPropertyNameValueMap.get(k))
+        );
     }
 
     //-----------------
@@ -2973,7 +2996,7 @@ public class ObjectRoot implements ObjectRootInterface {
         return new ObjectRoot();
     }
 
-    private static Object castJsonToType(JsonNode jsonNode, Class<?> desiredType) {
+    public static Object castJsonToType(JsonNode jsonNode, Class<?> desiredType) {
         Object object = null;
 
         // FOR ANY OF THE INTEGRAL TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS LONG
@@ -2989,7 +3012,7 @@ public class ObjectRoot implements ObjectRootInterface {
 
         // CHARACTER TYPE SHOULD ALSO BE JSON ENCODED AS AN INTEGRAL TYPE
         } else if (desiredType.equals(Character.class)) {
-            object = jsonNode.asBoolean();
+            object = (char)jsonNode.asLong();
 
         // FOR THE FLOATING-POINT TYPES, THE JsonNode SHOULD BE A NUMBER.  RETRIEVE AS DOUBLE
         // (THE FLOATING-POINT TYPE WITH THE HIGHEST PRECISION), AND CAST TO THE DESIRED TYPE
@@ -3011,6 +3034,10 @@ public class ObjectRoot implements ObjectRootInterface {
         // FOR A STRINGS, JUST RETRIEVE AS STRING (TEXT)
         } else if (desiredType.equals(String.class)) {
             object = jsonNode.asText();
+
+        // FOR JsonNode, MAKE SURE IT IS ASSIGNABLE TO JsonNode
+        } else if (JsonNode.class.isAssignableFrom(desiredType)) {
+            object = jsonNode;
         }
 
         return object;
@@ -3166,7 +3193,14 @@ public class ObjectRoot implements ObjectRootInterface {
             Attribute<Object> attribute = (Attribute<Object>)classAndPropertyNameValueMap.get(key);
             if (attribute.getShouldBeUpdated(force)) {
                 Object value = attribute.getValue();
-                propertyJSONObject.putPOJO(key.toString(), value);
+                if (value instanceof JsonNode) {
+                    propertyJSONObject.set(key.toString(), (JsonNode)value);
+                } else if (value instanceof Character) {
+                    int intValue = (int)(char)value;
+                    propertyJSONObject.put(key.toString(), intValue);
+                } else {
+                    propertyJSONObject.putPOJO(key.toString(), value);
+                }
             }
         }
         return topLevelJSONObject.toPrettyString();
@@ -3215,7 +3249,7 @@ public class ObjectRoot implements ObjectRootInterface {
         return objectReflector;
     }
 
-    private static Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
+    private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();
 
     public static void add_federate_name_soft_publish_direct(String hlaClassName, String federateName) {
         if (!_classNameHandleMap.containsKey(hlaClassName)) {
@@ -3327,6 +3361,7 @@ public class ObjectRoot implements ObjectRootInterface {
         _typeInitialValueMap.put("long", new Attribute<>((long)0));
         _typeInitialValueMap.put("short", new Attribute<>((short)0));
         _typeInitialValueMap.put("String", new Attribute<>(""));
+        _typeInitialValueMap.put("JSON", new Attribute<>(new TextNode("")));
     }
 
     public static void readFederateDynamicMessageClasses(File dynamicMessageTypesJsonFile) {

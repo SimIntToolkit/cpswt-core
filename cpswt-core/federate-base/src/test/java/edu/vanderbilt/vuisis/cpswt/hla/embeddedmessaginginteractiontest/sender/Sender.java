@@ -28,57 +28,58 @@
  * OR MODIFICATIONS.
  */
 
-package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
-import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot;
-import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
-import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 
 
 // Define the  type of federate for the federation.
 
 @SuppressWarnings("unused")
-public class Receiver extends ReceiverBase {
-    public static void load() {}
+public class Sender extends SenderBase {
+
+    public static ObjectMapper objectMapper = InteractionRoot.objectMapper;
+
 
     private final static Logger log = LogManager.getLogger();
 
-    public Receiver(FederateConfig params) throws Exception {
+    private final TestInteraction _testInteraction = create_InteractionRoot_C2WInteractionRoot_TestInteraction();
+
+    public TestInteraction getTestInteraction() {
+        return _testInteraction;
+    }
+
+    public Sender(FederateConfig params) throws Exception {
         super(params);
     }
 
-    private TestObject testObject = null;
-    public TestObject getTestObject() {
-        return testObject;
-    }
-
-    private void handleObjectClass_ObjectRoot_TestObject(ObjectRoot objectRoot) {
-        testObject = (TestObject)objectRoot;
-    }
-
-    private void checkReceivedSubscriptions() {
-
-        ObjectReflector reflector;
-        while ((reflector = getNextObjectReflectorNoWait()) != null) {
-            reflector.reflect();
-            ObjectRoot objectRoot = reflector.getObjectRoot();
-
-            if (objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.TestObject")) {
-                handleObjectClass_ObjectRoot_TestObject(objectRoot);
-                continue;
-            }
-
-            log.debug("unhandled object reflection: {}", objectRoot.getJavaClassName());
-        }
-    }
-
     public void execute() throws Exception {
+        _testInteraction.set_BoolValue1(false);
+        _testInteraction.set_BoolValue2(true);
+        _testInteraction.set_ByteValue((byte) 42);
+        _testInteraction.set_CharValue('X');
+        _testInteraction.set_DoubleValue(2.7181);
+        _testInteraction.set_FloatValue(3.16f);
+        _testInteraction.set_IntValue(1000000);
+        _testInteraction.set_LongValue(1000000000000000000L);
+        _testInteraction.set_ShortValue((short) 300);
 
-        checkReceivedSubscriptions();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add("this");
+        arrayNode.add("that");
+        arrayNode.add("other");
+        _testInteraction.set_JSONValue(arrayNode);
+
+        _testInteraction.set_StringValue("Hello");
+        _testInteraction.set_actualLogicalGenerationTime(0.0);
+        _testInteraction.set_federateFilter("");
+        sendInteraction(_testInteraction, 0.0);
     }
 }

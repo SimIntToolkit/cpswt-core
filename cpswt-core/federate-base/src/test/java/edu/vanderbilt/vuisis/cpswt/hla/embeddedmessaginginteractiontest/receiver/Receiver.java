@@ -28,12 +28,11 @@
  * OR MODIFICATIONS.
  */
 
-package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver;
+package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.receiver;
 
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
-import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot;
-import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
-import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +43,8 @@ import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("unused")
 public class Receiver extends ReceiverBase {
-    public static void load() {}
+    public static void load() {
+    }
 
     private final static Logger log = LogManager.getLogger();
 
@@ -52,33 +52,34 @@ public class Receiver extends ReceiverBase {
         super(params);
     }
 
-    private TestObject testObject = null;
-    public TestObject getTestObject() {
-        return testObject;
+    private TestInteraction testInteraction = null;
+
+    public TestInteraction getTestInteraction() {
+        return testInteraction;
     }
 
-    private void handleObjectClass_ObjectRoot_TestObject(ObjectRoot objectRoot) {
-        testObject = (TestObject)objectRoot;
+    private void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot interactionRoot) {
+
+        testInteraction = (TestInteraction) interactionRoot;
     }
 
     private void checkReceivedSubscriptions() {
 
-        ObjectReflector reflector;
-        while ((reflector = getNextObjectReflectorNoWait()) != null) {
-            reflector.reflect();
-            ObjectRoot objectRoot = reflector.getObjectRoot();
+        InteractionRoot interactionRoot;
+        while ((interactionRoot = getNextInteractionNoWait()) != null) {
+        
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass("InteractionRoot.C2WInteractionRoot.TestInteraction")) {
 
-            if (objectRoot.isInstanceHlaClassDerivedFromHlaClass("ObjectRoot.TestObject")) {
-                handleObjectClass_ObjectRoot_TestObject(objectRoot);
+                handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(interactionRoot);
                 continue;
             }
 
-            log.debug("unhandled object reflection: {}", objectRoot.getJavaClassName());
+            log.debug("unhandled interaction: {}", interactionRoot.getJavaClassName());
         }
     }
 
     public void execute() throws Exception {
 
-        checkReceivedSubscriptions();
+            checkReceivedSubscriptions();
     }
 }

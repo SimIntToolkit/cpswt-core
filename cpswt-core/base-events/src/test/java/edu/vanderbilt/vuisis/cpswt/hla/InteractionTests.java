@@ -32,8 +32,10 @@ package edu.vanderbilt.vuisis.cpswt.hla;
 
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import hla.rti.*;
 import org.junit.Test;
 import org.junit.Assert;
@@ -43,9 +45,11 @@ import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Si
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.JSONTestInteraction;
 
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject;
 
 import java.util.*;
 
@@ -67,7 +71,9 @@ public class InteractionTests {
         HighPrio.load();
         SimEnd.load();
         FederateObject.load();
+        JSONTestInteraction.load();
         DerivedObjectClass.load();
+        JSONTestObject.load();
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
     }
@@ -82,6 +88,7 @@ public class InteractionTests {
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio");
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimulationControl");
         expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd");
+        expectedInteractionClassNameSet.add("InteractionRoot.C2WInteractionRoot.JSONTestInteraction");
 
         Set<String> actualInteractionClassNameSet = InteractionRoot.get_interaction_hla_class_name_set();
         Assert.assertEquals(expectedInteractionClassNameSet, actualInteractionClassNameSet);
@@ -503,5 +510,54 @@ public class InteractionTests {
         List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
 
         Assert.assertEquals(federateNameList, federateSequenceList3);
+    }
+
+    @Test
+    public void jsonTest() {
+        InteractionRoot jsonTestInteractionRoot = InteractionRoot.create_interaction(
+                "InteractionRoot.C2WInteractionRoot.JSONTestInteraction"
+        );
+
+        JsonNode emptyList = new TextNode("");
+
+        JsonNode jsonParameterGetParameterEmptyList =
+                (JsonNode)jsonTestInteractionRoot.getParameter("JSONParameter");
+
+        Assert.assertEquals(emptyList, jsonParameterGetParameterEmptyList);
+
+        JSONTestInteraction jsonTestInteraction = (JSONTestInteraction)jsonTestInteractionRoot;
+
+        JsonNode jsonParameterGetParameterDirectEmptyList =
+                jsonTestInteraction.get_JSONParameter();
+
+        Assert.assertEquals(emptyList, jsonParameterGetParameterDirectEmptyList);
+
+        ArrayNode thingList = objectMapper.createArrayNode();
+        thingList.add("this");
+        thingList.add("that");
+        thingList.add("other");
+        jsonTestInteractionRoot.setParameter("JSONParameter", thingList);
+
+        JsonNode jsonParameterGetParameterThingList =
+                (JsonNode)jsonTestInteractionRoot.getParameter("JSONParameter");
+        Assert.assertEquals(thingList, jsonParameterGetParameterThingList);
+
+        JsonNode jsonParameterGetParameterDirectThingList =
+                jsonTestInteraction.get_JSONParameter();
+        Assert.assertEquals(thingList, jsonParameterGetParameterDirectThingList);
+
+        ArrayNode stoogeList = objectMapper.createArrayNode();
+        stoogeList.add("Moe");
+        stoogeList.add("Larry");
+        stoogeList.add("Curly");
+        jsonTestInteraction.set_JSONParameter(stoogeList);
+
+        JsonNode JSONParameterGetParameterStoogeList =
+                (JsonNode)jsonTestInteractionRoot.getParameter("JSONParameter");
+        Assert.assertEquals(stoogeList, JSONParameterGetParameterStoogeList);
+
+        JsonNode jsonParameterGetParameterDirectStoogeList =
+                jsonTestInteraction.get_JSONParameter();
+        Assert.assertEquals(stoogeList, jsonParameterGetParameterDirectStoogeList);
     }
 }

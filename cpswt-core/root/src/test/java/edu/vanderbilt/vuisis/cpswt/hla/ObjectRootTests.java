@@ -30,6 +30,7 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import hla.rti.AttributeHandleSet;
 import hla.rti.HandleIterator;
 import hla.rti.RTIambassador;
@@ -93,84 +94,84 @@ public class ObjectRootTests {
         {
             String federationJson =
                     "{\n" +
-                    "    \"objects\": {\n" +
-                    "        \"ObjectRoot\": {},\n" +
-                    "        \"ObjectRoot.TestBase\": {\n" +
-                    "             \"field1\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"String\"\n" +
-                    "             },\n" +
-                    "             \"field2\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"int\"\n" +
-                    "             }\n" +
-                    "        },\n" +
-                    "        \"ObjectRoot.TestBase.TestDerived\": {\n" +
-                    "             \"field3\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"boolean\"\n" +
-                    "             },\n" +
-                    "             \"field4\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"long\"\n" +
-                    "             },\n" +
-                    "             \"field5\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"double\"\n" +
-                    "             },\n" +
-                    "             \"field6\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"byte\"\n" +
-                    "             },\n" +
-                    "             \"field7\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"char\"\n" +
-                    "             }\n" +
-                    "        },\n" +
-                    "        \"ObjectRoot.OtherClass\": {\n" +
-                    "             \"field1\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"boolean\"\n" +
-                    "             },\n" +
-                    "             \"field2\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"long\"\n" +
-                    "             },\n" +
-                    "             \"field3\": {\n" +
-                    "                 \"Delivery\": \"reliable\",\n" +
-                    "                 \"Hidden\": false,\n" +
-                    "                 \"Order\": \"timestamp\",\n" +
-                    "                 \"ParameterType\": \"double\"\n" +
-                    "             }\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "}\n";
+                            "    \"objects\": {\n" +
+                            "        \"ObjectRoot\": {},\n" +
+                            "        \"ObjectRoot.TestBase\": {\n" +
+                            "             \"field1\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"String\"\n" +
+                            "             },\n" +
+                            "             \"field2\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"int\"\n" +
+                            "             }\n" +
+                            "        },\n" +
+                            "        \"ObjectRoot.TestBase.TestDerived\": {\n" +
+                            "             \"field3\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"boolean\"\n" +
+                            "             },\n" +
+                            "             \"field4\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"long\"\n" +
+                            "             },\n" +
+                            "             \"field5\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"double\"\n" +
+                            "             },\n" +
+                            "             \"field6\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"byte\"\n" +
+                            "             },\n" +
+                            "             \"field7\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"char\"\n" +
+                            "             }\n" +
+                            "        },\n" +
+                            "        \"ObjectRoot.OtherClass\": {\n" +
+                            "             \"field1\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"boolean\"\n" +
+                            "             },\n" +
+                            "             \"field2\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"long\"\n" +
+                            "             },\n" +
+                            "             \"field3\": {\n" +
+                            "                 \"Delivery\": \"reliable\",\n" +
+                            "                 \"Hidden\": false,\n" +
+                            "                 \"Order\": \"timestamp\",\n" +
+                            "                 \"ParameterType\": \"double\"\n" +
+                            "             }\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "}\n";
 
             String dynamicMessageTypes =
                     "{\n" +
-                    "    \"objects\": [\n" +
-                    "        \"ObjectRoot.TestBase\",\n" +
-                    "        \"ObjectRoot.TestBase.TestDerived\"\n" +
-                    "    ]\n" +
-                    "}\n";
+                            "    \"objects\": [\n" +
+                            "        \"ObjectRoot.TestBase\",\n" +
+                            "        \"ObjectRoot.TestBase.TestDerived\"\n" +
+                            "    ]\n" +
+                            "}\n";
 
             StringReader federationJsonStringReader = new StringReader(federationJson);
             StringReader dynamicMessagingTypesStringReader = new StringReader(dynamicMessageTypes);
@@ -287,5 +288,4 @@ public class ObjectRootTests {
         Assert.assertEquals((byte) -17, testDerived.getAttribute("field6"));
         Assert.assertEquals('Q', testDerived.getAttribute("field7"));
     }
-
 }

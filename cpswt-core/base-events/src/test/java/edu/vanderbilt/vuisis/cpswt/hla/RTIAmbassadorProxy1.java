@@ -72,7 +72,8 @@ public class RTIAmbassadorProxy1 {
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog", value++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimLog.HighPrio", value++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl", value++);
-        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd", value);
+        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.SimulationControl.SimEnd", value++);
+        interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.StringTestInteraction", value);
     }
     public HashMap<String, Integer> getInteractionClassNameHandleMap(){
         return interactionClassNameHandleMap;
@@ -139,6 +140,10 @@ public class RTIAmbassadorProxy1 {
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.FederateResignInteraction", "IsLateJoiner"),
                 value++
         );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.StringListTestInteraction", "stringListParameter"),
+                value++
+        );
         objectClassAndPropertyNameHandleMap.put(
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHandle"), value++
         );
@@ -146,7 +151,10 @@ public class RTIAmbassadorProxy1 {
                 new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateHost"), value++
         );
         objectClassAndPropertyNameHandleMap.put(
-                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType"), value
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.FederateObject", "FederateType"), value++
+        );
+        objectClassAndPropertyNameHandleMap.put(
+                new ObjectRootInterface.ClassAndPropertyName("ObjectRoot.StringListTestObject", "stringListAttribute"), value
         );
     }
 
@@ -159,7 +167,8 @@ public class RTIAmbassadorProxy1 {
         objectClassNameHandleMap = new HashMap<>();
         int value = 0;
         objectClassNameHandleMap.put("ObjectRoot", value++);
-        objectClassNameHandleMap.put("ObjectRoot.FederateObject", value);
+        objectClassNameHandleMap.put("ObjectRoot.FederateObject", value++);
+        objectClassNameHandleMap.put("ObjectRoot.StringListTestObject", value);
     }
 
 
