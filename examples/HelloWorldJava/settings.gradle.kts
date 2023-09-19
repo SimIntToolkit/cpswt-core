@@ -65,6 +65,6 @@ buildscript {
 
 include("PingCounter")
 
-include("Source")
-
 include("Sink")
+
+include("Source")
