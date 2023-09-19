@@ -51,6 +51,10 @@ dependencies {
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
+    implementation(group="com.fasterxml.jackson", name="jackson-bom", version="2.13.4.20221013")
+
+    implementation(group="com.fasterxml.jackson.core", name="jackson-databind", version="2.13.4.1")
+
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
 
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="root", version=version)
