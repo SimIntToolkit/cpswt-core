@@ -112,7 +112,7 @@ fun spawnProcessBatch() {
 
     val statusDirectory = File(projectDir, "StatusDirectory")
     if (!statusDirectory.exists()) {
-        Files.createDirectory(statusDirectory.toPath());
+        Files.createDirectory(statusDirectory.toPath())
     }
     val stdoutFile = File(statusDirectory, "stdout")
     val stderrFile = File(statusDirectory, "stderr")
@@ -171,23 +171,31 @@ val runFederatesInteractive = tasks.register("runFederatesInteractive") {
     }
 }
 
-tasks.register("runFederation") {
-    mustRunAfter(runFederatesInteractive)
-    dependsOn(runFederatesInteractive)
+tasks.register("killFederates") {
     dependsOn(":PingCounter:killFederate")
     dependsOn(":Sink:killFederate")
     dependsOn(":Source:killFederate")
 }
 
-val runFederationBatch = tasks.register("runFederationBatch") {
-    mustRunAfter(runFederatesAsynchronousBatch)
-    dependsOn(runFederatesAsynchronousBatch)
+tasks.register("runFederation") {
+    mustRunAfter(runFederatesInteractive)
+    dependsOn(runFederatesInteractive)
+    finalizedBy("killFederates")
+}
+
+tasks.register("waitForFederates") {
     dependsOn(":PingCounter:waitForFederate")
     dependsOn(":Sink:waitForFederate")
     dependsOn(":Source:waitForFederate")
     doLast {
         spawnedProcess.waitFor()
     }
+}
+
+val runFederationBatch = tasks.register("runFederationBatch") {
+    mustRunAfter(runFederatesAsynchronousBatch)
+    dependsOn(runFederatesAsynchronousBatch)
+    finalizedBy("waitForFederates")
 }
 
 tasks.named("clean") {
