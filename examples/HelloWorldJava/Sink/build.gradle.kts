@@ -37,7 +37,9 @@ plugins {
     application
 }
 
-val rtiHome = System.getenv("RTI_HOME")
+// THE EXPLICIT TYPE OF NULLABLE-STRING (String?) IS NEEDED HERE BECAUSE KOTLIN-SCRIPT CANNOT
+// DETERMINE THE RETURN TYPE OF "System.getenv()" (WHICH IS INDEED String?) THROUGH TYPE-INFERENCE
+val rtiHome: String? = System.getenv("RTI_HOME")
 
 val archivaHostId: String by project
 val archivaPort: String by project
@@ -45,7 +47,7 @@ val archivaPort: String by project
 val version: String by project
 
 dependencies {
-    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
+    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.17.1")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
@@ -73,10 +75,13 @@ fun getCommandList(): List<String> {
     val runTask = tasks.named<JavaExec>("run").get()
 
     val mainClass: String = runTask.mainClass.get()
-    val jvmArgs: List<String>? = runTask.jvmArgs
-    val argList: List<String>? = runTask.args
 
-    val commandList: List<String> = listOf("java") + (jvmArgs ?: listOf()) + listOf(mainClass) + (argList ?: listOf())
+    // EXPLICIT TYPE OF List<String> IS NEEDED HERE, AS IS THE NON-NULL ASSERTION (!!) (DESPITE WHAT INTELLISENSE SAYS)
+    // OTHERWISE THE INFERRED TYPE OF commandList (BELOW) IS List<Any> INSTEAD OF List<String>
+    val jvmArgs: List<String> = runTask.jvmArgs!!
+    val argList: List<String> = runTask.args!!
+
+    val commandList: List<String> = listOf("java") + jvmArgs + listOf(mainClass) + argList
 
     return commandList
 }
@@ -91,7 +96,7 @@ fun getXTermCommandList(): List<String> {
     return xtermCommandList
 }
 
-var spawnedProcess: Process? = null
+lateinit var spawnedProcess: Process
 
 fun configureProcessBuilder(processBuilder: ProcessBuilder) {
     val runTask = tasks.named<JavaExec>("run").get()
@@ -100,7 +105,7 @@ fun configureProcessBuilder(processBuilder: ProcessBuilder) {
     processBuilder.directory(projectDir)
 
     val environment = processBuilder.environment()
-    environment.put("CLASSPATH", classPath)
+    environment["CLASSPATH"] = classPath
 }
 
 fun spawnProcess() {
@@ -120,7 +125,7 @@ fun spawnProcessBatch() {
 
     val statusDirectory = File(projectDir, "StatusDirectory")
     if (!statusDirectory.exists()) {
-        Files.createDirectory(statusDirectory.toPath());
+        Files.createDirectory(statusDirectory.toPath())
     }
     val stdoutFile = File(statusDirectory, "stdout")
     val stderrFile = File(statusDirectory, "stderr")
@@ -130,7 +135,7 @@ fun spawnProcessBatch() {
 
     spawnedProcess = processBuilder.start()
 
-    val pid = spawnedProcess?.pid()
+    val pid = spawnedProcess.pid()
 
     PrintWriter(File(statusDirectory, "pid")).use {
         it.println(pid)
@@ -138,12 +143,14 @@ fun spawnProcessBatch() {
 }
 
 tasks.register("runAsynchronous") {
+    dependsOn("build")
     doLast {
         spawnProcess()
     }
 }
 
 val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
+    dependsOn("build")
     doLast {
         spawnProcessBatch()
     }
@@ -151,12 +158,12 @@ val runAsynchronousBatch = tasks.register("runAsynchronousBatch") {
 
 tasks.register("waitForFederate") {
     doLast {
-        spawnedProcess?.waitFor()
+        spawnedProcess.waitFor()
     }
 }
 
 tasks.register("killFederate") {
     doLast {
-        spawnedProcess?.destroy()
+        spawnedProcess.destroy()
     }
 }

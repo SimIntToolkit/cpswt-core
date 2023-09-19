@@ -88,11 +88,11 @@ public class Source extends SourceBase {
             atr.requestSyncStart();
 
             System.out.println("Source:  sending ping");
-            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Ping Ping0 =
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Ping ping0 =
                     create_InteractionRoot_C2WInteractionRoot_Ping();
-            Ping0.set_actualLogicalGenerationTime( currentTime );
-            Ping0.set_federateFilter( "" );
-            sendInteraction(Ping0, currentTime + getLookahead());
+            ping0.set_actualLogicalGenerationTime(currentTime);
+            ping0.set_federateFilter("");
+            sendInteraction(ping0, currentTime + getLookahead());
 
             if (!exitCondition) {
                 currentTime += super.getStepSize();
