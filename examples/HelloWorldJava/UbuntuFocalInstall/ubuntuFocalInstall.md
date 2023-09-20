@@ -466,11 +466,15 @@ where we perform the building/testing/publishing.
 following command in your shell:
 
 ```default
-gradle wrapper --gradle-version=7.3
+gradle wrapper --gradle-version=8.0
 ```
+    2. To install the necessary packages for Gradle. We need to change the Java version to 17
 
+    echo $JAVA_HOME
+    sudo update-java-alternatives –list
+    export JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
 
-    2. To execute the gradle-wrapper, use the following command while in the given directory:
+    3. To execute the gradle-wrapper, use the following command while in the given directory:
 
 ```default
 ./gradlew <options> [arguments]
@@ -520,10 +524,10 @@ cd <CPSWT-HOME>/cpswt-core/cpswt-core
 ```
 
 
-3. Install the gradle wrapper:
+3. Install the gradle wrapper version 8.0:
 
 ```bash
-gradle wrapper --gradle-version=7.3
+gradle wrapper --gradle-version=8.0
 ```
 
 
@@ -533,9 +537,9 @@ gradle wrapper --gradle-version=7.3
 ./gradlew :utils:publish
 ./gradlew :root:publish
 ./gradlew :base-events:publish
-./gradlew :coa:publish
 ./gradlew :config:publish
 ./gradlew :federate-base:publish
+./gradlew :coa:publish
 ./gradlew :federation-manager:publish
 ./gradlew :fedmanager-host:publish
 ```
