@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                echo 'Cloning Forked CPSWT-Core..'
+                echo 'Cloning CPSWT-Core..'
                 deleteDir() // Delete workspace before cloning
                 sh 'git clone git@github.com:SimIntToolkit/cpswt-core.git'
             }
