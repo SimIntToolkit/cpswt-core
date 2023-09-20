@@ -1,13 +1,3 @@
-// Do NOT place within the pipeline block 
-properties([ [ $class: 'ThrottleJobProperty',
-               categories: ['ci_cpswt_build'], 
-               limitOneJobWithMatchingParams: false,
-               maxConcurrentPerNode: 1,
-               maxConcurrentTotal: 1,
-               paramsToUseForLimit: '',
-               throttleEnabled: true,
-               throttleOption: 'category' ] ])
-
 pipeline {
     agent any
     triggers {
@@ -19,13 +9,13 @@ pipeline {
             steps {
                 echo 'Cloning Forked CPSWT-Core..'
                 deleteDir() // Delete workspace before cloning
-                sh 'git clone git@github.com:justinyeh1995/CI_with_Jenkins.git'
+                sh 'git clone git@github.com:SimIntToolkit/cpswt-core.git'
             }
         }
         stage('Build image') {
             steps {
                 echo 'Start a Docker Container for this experiment, which should start the experiment and a archiva server, a inet server, and a omnet++ server..'
-                dir("CI_with_Jenkins/cpswt-core") {
+                dir("cpswt-core") {
                     sh 'docker build -t cpswt-core:latest -f Dockerfile .'
                 }
             }
