@@ -114,6 +114,9 @@ sudo apt upgrade -y
     * openjdk-8-jdk
 
 
+    * openjdk-17-jdk
+
+
     * openscenegraph-plugin-osgearth
 
 
@@ -158,7 +161,7 @@ sudo apt upgrade -y
 They can be installed with the following command:
 
 ```bash
-sudo apt install -y apt-transport-https bison build-essential ca-certificates clang curl doxygen flex gcc gdb git gradle graphviz libboost1.71-all-dev libcppunit-dev libjsoncpp-dev libosgearth-dev libqt5opengl5-dev libwebkit2gtk-4.0-37 libxml2-dev lld make mongodb mpi-default-dev openjdk-8-jdk openscenegraph-plugin-osgearth perl python2 python3 python3-pip python-is-python2 qt5-qmake qtbase5-dev qtbase5-dev-tools qtchooser software-properties-common wget xterm zlib1g-dev
+sudo apt install -y apt-transport-https bison build-essential ca-certificates clang curl doxygen flex gcc gdb git gradle graphviz libboost1.71-all-dev libcppunit-dev libjsoncpp-dev libosgearth-dev libqt5opengl5-dev libwebkit2gtk-4.0-37 libxml2-dev lld make mongodb mpi-default-dev openjdk-8-jdk openjdk-17-jdk openscenegraph-plugin-osgearth perl python2 python3 python3-pip python-is-python2 qt5-qmake qtbase5-dev qtbase5-dev-tools qtchooser software-properties-common wget xterm zlib1g-dev
 ```
 
 
@@ -195,10 +198,10 @@ sudo python3 -m pip install --system --upgrade jinja2 matplotlib numpy pandas po
 ```
 
 
-3. Set `java-8-openjdk-amd64` to be the default java used by your system by executing the following command:
+3. Set `java-17-openjdk-amd64` to be the default java used by your system by executing the following command:
 
 ```bash
-sudo update-java-alternatives -s java-1.8.0-openjdk-amd64
+sudo update-java-alternatives -s java-1.17.0-openjdk-amd64
 ```
 
 **NOTE**: Ignore any errors output by the above command.
@@ -207,10 +210,10 @@ sudo update-java-alternatives -s java-1.8.0-openjdk-amd64
 4. There will be several modifications to your `.bashrc` file in these instructions.  The first is set your `JAVA_HOME` to the directory of your
 `Java` installation.
 
-Granted the `openjdk-8-jdk` package was installed in step 1, the following command should be appended to your `.bashrc` file in your home directory:
+Granted the `openjdk-17-jdk` package was installed in step 1, the following command should be appended to your `.bashrc` file in your home directory:
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ```
 
 **NOTE**: Whenever command is added in your .bashrc file, it will only have an effect when you spawn and use a new shell, and this effect is needed **immediately**.
@@ -222,7 +225,7 @@ So, whenever a command is added to your .bashrc in these instructions either:
 
     * Type the command directly into your current shell, in this case
 
-*export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64*.
+*export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64*.
 
 
 ## Install Portico 2.1.0
@@ -468,13 +471,9 @@ following command in your shell:
 ```default
 gradle wrapper --gradle-version=8.0
 ```
-    2. To install the necessary packages for Gradle. We need to change the Java version to 17
 
-    echo $JAVA_HOME
-    sudo update-java-alternatives –list
-    export JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
 
-    3. To execute the gradle-wrapper, use the following command while in the given directory:
+    2. To execute the gradle-wrapper, use the following command while in the given directory:
 
 ```default
 ./gradlew <options> [arguments]
