@@ -1,22 +1,24 @@
-## To run the HelloWorld example:
+# To Run the HelloWorldJava Example
 
-[Note: Steps below assume that you have installed CPSWT on your computer as shown in [CPSWT Installation Instructions for HelloWorldJava example on Ubuntu 20.04 (Focal Fossa)](https://github.com/SimIntToolkit/cpswt-docs/blob/Add-new-documentation-for-CPSWT/Manual/build/markdown/UbuntuFocalInstall/ubuntuFocalInstall.md)]
+#### NOTE
+Steps below assume that you have installed CPSWT on your computer as shown in
+[CPSWT Software Installation and Instructions to Build and Publish cpswt-core Modules on Ubuntu 20.04 LTS (Focal Fossa)](../../README.md#cpswtjavasoftwareinstallation)
 
 * Open a terminal and change directory to the HelloWorldJava directory
-
 * For the first run only, enter the following command:
-
-          gradle wrapper --gradle-version=7.4
-
+  ```bash
+  gradle wrapper --gradle-version=8.0
+  ```
 * To run the federation, enter the following command:
+  ```bash
+  ./gradlew :runFederation
+  ```
 
-          ./gradlew :runFederation
-
-### Explanation of HelloWorld example:
+## Explanation of HelloWorld example
 
 In its CPSWT model, the FOM of the HelloWorld example is shown in the figure below:
 
-![HelloWorldJavaFOM](Images/HelloWorldJavaFOM.png)
+![WebGME HelloWorldJava FOM](Images/HelloWorldJavaFOM.png)
 
 The Source federate published the Ping interaction and sends out an infinite sequence of them, printing a message for
 each Ping it sends.
