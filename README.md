@@ -1,3 +1,11 @@
+<!-- DO NOT MODIFY THIS FILE IN THE cpswt-core PROJECT.
+IT WAS GENERATED IN THE cpswt-docs PROJECT.  TO MODIFY, ONLY MODIFY THE "README.rst" FILES
+(WHICH ARE reStructuredText) IN THE <cpswt-docs>/DocsMain/ProjectDocs/cpswt-core DIRECTORY,
+WHERE <cpswt-docs> IS THE TOP-LEVEL DIRECTORY OF THE cpswt-docs PROJECT.
+THEN, IN A TERMINAL, CD TO THE <cpswt-docs>/DocsMain DIRECTORY AND EXECUTE
+"./gradlew :ProjectDocs:cpswt-core:build".  ONCE THIS COMMAND FINISHES, CD TO THE TOP-LEVEL
+cpswt-core DIRECTORY AND EXECUTE "unzip -oq <cpswt-docs>/DocsMain/ProjectDocs/cpswt-core/Zipfile/cpswt-core.zip" -->
+
 # Project `"cpswt-core"` for CPSWT
 
 The cpswt-core project contains all software needed to run Java-based federates in CPSWT.
@@ -441,9 +449,9 @@ represents “`<YOUR-HOME-DIRECTORY>/cpswt`”.
    ./gradlew :utils:publish
    ./gradlew :root:publish
    ./gradlew :base-events:publish
-   ./gradlew :coa:publish
    ./gradlew :config:publish
    ./gradlew :federate-base:publish
+   ./gradlew :coa:publish
    ./gradlew :federation-manager:publish
    ./gradlew :fedmanager-host:publish
    ```
