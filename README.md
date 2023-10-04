@@ -485,8 +485,7 @@ They define or modify important environment variables needed for CPSWT.
 
 Make the following substitutions in the values for these environment variables:
 
-* Substitute your actual home directory (e.g. /home/vagrant) for <YOUR-HOME-DIRECTORY>
-* Substitute your top-level CPSWT directory (e.g. /home/vagrant/cpswt) for <CPSWT-HOME>
+* Substitute your actual home directory (e.g. /home/vagrant) for `<YOUR-HOME-DIRECTORY>`
 
 ```bash
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
