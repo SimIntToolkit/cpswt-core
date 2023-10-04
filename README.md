@@ -29,6 +29,7 @@ The cpswt-core project contains all software needed to run Java-based federates 
 >     * [Software for Java-based Federates](#software-for-java-based-federates)
 >       * [Working with Gradle](#working-with-gradle)
 >       * [Build CPSWT Java Packages and Publish to Archiva](#build-cpswt-java-packages-and-publish-to-archiva)
+> * [Summary of Environment Variable Definitions and Modifications Needed for CPSWT](#summary-of-environment-variable-definitions-and-modifications-needed-for-cpswt)
 
 ## Constituent Modules
 
@@ -232,7 +233,7 @@ This sections contains instructions for the installation of 3rd-party software t
 
    #### NOTE
    To see a list of all environment variables that need to be defined or modified in your `.bashrc` file,
-   see environmentvariablesummary at the end of this document.
+   see [Summary of Environment Variable Definitions and Modifications Needed for CPSWT](#environmentvariablesummary) at the end of this document.
 
    <a id="modify-environment"></a>
 
@@ -271,7 +272,7 @@ This sections contains instructions for the installation of 3rd-party software t
 
    #### NOTE
    To see a list of all environment variables that need to be defined or modified in your `.bashrc` file,
-   see environmentvariablesummary
+   see [Summary of Environment Variable Definitions and Modifications Needed for CPSWT](#environmentvariablesummary)
 
    <a id="archiva-install"></a>
 
@@ -474,3 +475,20 @@ represents “`<YOUR-HOME-DIRECTORY>/cpswt`”.
       * utils
 
 **This concludes the setup for CPSWT for the HelloWorldJava example!**
+
+<a id="environmentvariablesummary"></a>
+
+# Summary of Environment Variable Definitions and Modifications Needed for CPSWT
+
+The following lines must be added to the end of the `.bashrc` file in your home directory.
+They define or modify important environment variables needed for CPSWT.
+
+Make the following substitutions in the values for these environment variables:
+
+* Substitute your actual home directory (e.g. /home/vagrant) for <YOUR-HOME-DIRECTORY>
+* Substitute your top-level CPSWT directory (e.g. /home/vagrant/cpswt) for <CPSWT-HOME>
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export RTI_HOME="<YOUR-HOME-DIRECTORY>/portico-2.1.0"
+```
