@@ -30,17 +30,23 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
+
 
 
 // Define the  type of federate for the federation.
 
 @SuppressWarnings("unused")
 public class Sender extends SenderBase {
+
+    public static ObjectMapper objectMapper = InteractionRoot.objectMapper;
 
     public static void load() {}
 
@@ -61,16 +67,24 @@ public class Sender extends SenderBase {
 
     public void execute() throws Exception {
 
-        TestObject_0.set_BooleanValue1(false);
-        TestObject_0.set_BooleanValue2(true);
+        TestObject_0.set_BoolValue1(false);
+        TestObject_0.set_BoolValue2(true);
         TestObject_0.set_ByteValue((byte)42);
         TestObject_0.set_CharValue('X');
         TestObject_0.set_DoubleValue(2.7181);
         TestObject_0.set_FloatValue(3.14f);
         TestObject_0.set_IntValue(1000000);
-        TestObject_0.set_ShortValue((short)300);
         TestObject_0.set_LongValue(1000000000000000000L);
+        TestObject_0.set_ShortValue((short)300);
         TestObject_0.set_StringValue("Hello");
+        TestObject_0.set_JSONValue1(objectMapper.createArrayNode());
+
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        arrayNode.add("this");
+        arrayNode.add("that");
+        arrayNode.add("other");
+        TestObject_0.set_JSONValue2(arrayNode);
+
         updateAttributeValues(TestObject_0, 0.0);
     }
 }

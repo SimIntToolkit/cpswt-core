@@ -21,7 +21,7 @@ local.properties
 .settings/
 .loadpath
 **/.gradle/
-**/gradle/
+**/StatusDirectory
 
 # Eclipse Core
 .project

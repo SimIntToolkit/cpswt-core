@@ -43,11 +43,12 @@ val archivaPort: String by project
 
 
 dependencies {
-    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
+    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.17.1")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
-    implementation(group="org.json", name="json", version="20210307")
+    implementation(group="com.fasterxml.jackson", name="jackson-bom", version="2.13.4.20221013")
+    implementation(group="com.fasterxml.jackson.core", name="jackson-databind", version="2.13.4.1")
     implementation(group="edu.vanderbilt.vuisis.cpswt", name="utils", version=version)
 
 
@@ -72,7 +73,7 @@ publishing {
             name = "rootPublish"
             val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
             val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
-            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
+            url = uri(if (version.endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
 
             logger.info("URL = \"$url\"")
             isAllowInsecureProtocol = true

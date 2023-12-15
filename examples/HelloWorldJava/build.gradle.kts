@@ -28,16 +28,23 @@
  * OR MODIFICATIONS.
  */
 
+import java.io.PrintWriter
+import java.nio.file.Files
+
+
 plugins {
     java
     application
 }
 
+// THE EXPLICIT TYPE OF NULLABLE-STRING (String?) IS NEEDED HERE BECAUSE KOTLIN-SCRIPT CANNOT
+// DETERMINE THE RETURN TYPE OF "System.getenv()" (WHICH IS INDEED String?) THROUGH TYPE-INFERENCE
 val rtiHome = System.getenv("RTI_HOME")
+
 val version: String by project
 
 dependencies {
-    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.14.1")
+    implementation(group="org.apache.logging.log4j", name="log4j-core", version="2.17.1")
 
     implementation(files("$rtiHome/lib/portico.jar"))
 
@@ -53,60 +60,146 @@ tasks.named<JavaExec>("run") {
     args = listOf("-configFile", "federationManagerConfig.json")
 }
 
-var spawnedProcess: Process? = null
-
-fun spawnProcess() {
+fun getCommandList(): List<String> {
     val runTask = tasks.named<JavaExec>("run").get()
 
     val mainClass: String = runTask.mainClass.get()
-    val jvmArgs: List<String>? = runTask.jvmArgs
-    val argList: List<String>? = runTask.args
-    val classPath = runTask.classpath.asPath
 
-    val commandList: List<String> = listOf("java") + (jvmArgs ?: listOf()) + listOf(mainClass) + (argList ?: listOf())
+    // EXPLICIT TYPE OF List<String> IS NEEDED HERE, AS IS THE NON-NULL ASSERTION (!!) (DESPITE WHAT INTELLISENSE SAYS)
+    // OTHERWISE THE INFERRED TYPE OF commandList (BELOW) IS List<Any> INSTEAD OF List<String>
+    val jvmArgs: List<String> = runTask.jvmArgs!!
+    val argList: List<String> = runTask.args!!
+
+    val commandList: List<String> = listOf("java") + jvmArgs + listOf(mainClass) + argList
+
+    return commandList
+}
+
+fun getXTermCommandList(): List<String> {
+    val commandList = getCommandList()
 
     val xtermCommandList = listOf(
-        "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
+            "xterm", "-geometry", "220x80", "-fg", "black", "-bg", "white", "-e", commandList.joinToString(" ")
     )
 
-    val processBuilder = ProcessBuilder(xtermCommandList)
+    return xtermCommandList
+}
+
+lateinit var spawnedProcess: Process
+
+fun configureProcessBuilder(processBuilder: ProcessBuilder) {
+    val runTask = tasks.named<JavaExec>("run").get()
+    val classPath = runTask.classpath.asPath
+
     val environment = processBuilder.environment()
     environment.put("CLASSPATH", classPath)
+}
+
+fun spawnProcess() {
+    val xtermCommandList = getXTermCommandList()
+
+    val processBuilder = ProcessBuilder(xtermCommandList)
+    configureProcessBuilder(processBuilder)
 
     spawnedProcess = processBuilder.start()
 }
 
-val runAsynchronous = tasks.register("runAsynchronous") {
+fun spawnProcessBatch() {
+    val commandList = getCommandList()
+
+    val processBuilder = ProcessBuilder(commandList)
+    configureProcessBuilder(processBuilder)
+
+    val statusDirectory = File(projectDir, "StatusDirectory")
+    if (!statusDirectory.exists()) {
+        Files.createDirectory(statusDirectory.toPath())
+    }
+    val stdoutFile = File(statusDirectory, "stdout")
+    val stderrFile = File(statusDirectory, "stderr")
+
+    processBuilder.redirectOutput(stdoutFile)
+    processBuilder.redirectError(stderrFile)
+    spawnedProcess = processBuilder.start()
+
+    val pid = spawnedProcess.pid()
+
+    PrintWriter(File(statusDirectory, "pid")).use {
+        it.println(pid)
+    }
+}
+
+val runFederationManagerAsynchronous = tasks.register("runFederationManagerAsynchronous") {
     doLast {
         spawnProcess()
         Thread.sleep(10000)
     }
 }
 
-val runFederates = tasks.register("runFederates") {
-    mustRunAfter(runAsynchronous)
+val runFederationManagerAsynchronousBatch = tasks.register("runFederationManagerAsynchronousBatch") {
+    doLast {
+        spawnProcessBatch()
+        Thread.sleep(15000)
+    }
+}
+
+val runFederatesAsynchronous = tasks.register("runFederatesAsynchronous") {
+    mustRunAfter(runFederationManagerAsynchronous)
+    dependsOn(runFederationManagerAsynchronous)
     dependsOn(":PingCounter:runAsynchronous")
-    dependsOn(":Source:runAsynchronous")
     dependsOn(":Sink:runAsynchronous")
+    dependsOn(":Source:runAsynchronous")
+}
+
+val runFederatesAsynchronousBatch = tasks.register("runFederatesAsynchronousBatch") {
+    mustRunAfter(runFederationManagerAsynchronousBatch)
+    dependsOn(runFederationManagerAsynchronousBatch)
+    dependsOn(":PingCounter:runAsynchronousBatch")
+    dependsOn(":Sink:runAsynchronousBatch")
+    dependsOn(":Source:runAsynchronousBatch")
+}
+
+val runFederatesInteractive = tasks.register("runFederatesInteractive") {
+    mustRunAfter(runFederatesAsynchronous)
+    dependsOn(runFederatesAsynchronous)
 
     doLast {
         print("Press ENTER to terminate: ")
         System.out.flush()
         System.`in`.read()
 
-        spawnedProcess?.destroy()
+        spawnedProcess.destroy()
     }
 }
 
 tasks.register("killFederates") {
-    mustRunAfter(runFederates)
     dependsOn(":PingCounter:killFederate")
-    dependsOn(":Source:killFederate")
     dependsOn(":Sink:killFederate")
+    dependsOn(":Source:killFederate")
 }
 
 tasks.register("runFederation") {
-    dependsOn(":runAsynchronous")
-    dependsOn(":runFederates")
-    dependsOn(":killFederates")
+    mustRunAfter(runFederatesInteractive)
+    dependsOn(runFederatesInteractive)
+    finalizedBy("killFederates")
+}
+
+tasks.register("waitForFederates") {
+    dependsOn(":PingCounter:waitForFederate")
+    dependsOn(":Sink:waitForFederate")
+    dependsOn(":Source:waitForFederate")
+    doLast {
+        spawnedProcess.waitFor()
+    }
+}
+
+val runFederationBatch = tasks.register("runFederationBatch") {
+    mustRunAfter(runFederatesAsynchronousBatch)
+    dependsOn(runFederatesAsynchronousBatch)
+    finalizedBy("waitForFederates")
+}
+
+tasks.named("clean") {
+    dependsOn(":PingCounter:clean")
+    dependsOn(":Sink:clean")
+    dependsOn(":Source:clean")
 }

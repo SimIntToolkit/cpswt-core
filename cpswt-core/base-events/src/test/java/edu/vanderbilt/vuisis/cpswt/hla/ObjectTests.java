@@ -30,23 +30,35 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import hla.rti.RTIambassador;
 import hla.rti.SuppliedAttributes;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimLog_p.HighPrio;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.BaseObjectClass_p.DerivedObjectClass;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.FederateObject;
+import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.JSONTestObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class ObjectTests {
+
+    protected static ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        DefaultPrettyPrinter.Indenter indenter = new DefaultIndenter().withIndent("    ");
+        DefaultPrettyPrinter defaultPrettyPrinter = new DefaultPrettyPrinter();
+        defaultPrettyPrinter.indentArraysWith(indenter);
+        defaultPrettyPrinter.indentObjectsWith(indenter);
+        objectMapper.setDefaultPrettyPrinter(defaultPrettyPrinter);
+    }
 
     private static final RTIAmbassadorProxy1 mock = new RTIAmbassadorProxy1();
     private static final RTIambassador rtiambassador = mock.getRTIAmbassador();
@@ -56,6 +68,8 @@ public class ObjectTests {
         SimEnd.load();
         FederateObject.load();
         DerivedObjectClass.load();
+        JSONTestObject.load();
+
         InteractionRoot.init(rtiambassador);
         ObjectRoot.init(rtiambassador);
     }
@@ -68,6 +82,7 @@ public class ObjectTests {
         expectedObjectClassNameSet.add("ObjectRoot.FederateObject");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass");
         expectedObjectClassNameSet.add("ObjectRoot.BaseObjectClass.DerivedObjectClass");
+        expectedObjectClassNameSet.add("ObjectRoot.JSONTestObject");
 
         Set<String> actualObjectClassNameSet = ObjectRoot.get_object_hla_class_name_set();
         Assert.assertEquals(expectedObjectClassNameSet, actualObjectClassNameSet);
@@ -318,7 +333,9 @@ public class ObjectTests {
         Assert.assertEquals(FederateObject.get_class_handle(), mock.getCurrentClassHandle());
 
         // DISCOVER OBJECT INSTANCE TO CREATE A SECOND INSTANCE
-        ObjectRoot objectRoot1 = ObjectRoot.discover(mock.getCurrentClassHandle(), mock.getCurrentObjectHandle());
+        ObjectRoot objectRoot1 = ObjectRoot.discover(
+                mock.getCurrentClassHandle(), mock.getCurrentDiscoverObjectHandle()
+        );
         Assert.assertTrue(objectRoot1 instanceof FederateObject);
 
         // INITIALLY, SECOND INSTANCE SHOULD HAVE DEFAULT VALUES
@@ -339,7 +356,7 @@ public class ObjectTests {
         Assert.assertEquals(3, currentSuppliedAttributes.size());
 
         // REFLECT UPDATED ATTRIBUTE VALUES TO SECOND INSTANCE
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("test", federateObject2.get_FederateType());
@@ -357,9 +374,58 @@ public class ObjectTests {
         Assert.assertEquals(1, currentSuppliedAttributes.size());
 
         // REFLECT CHANGED ATTRIBUTE INTO SECOND INSTANCE, CHECK VALUES
-        FederateObject.reflect(mock.getCurrentObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
+        FederateObject.reflect(mock.getCurrentDiscoverObjectHandle(), mock.getCurrentReflectedAttributes(), mock.getCurrentDoubleTime());
         Assert.assertEquals(2, federateObject2.get_FederateHandle());
         Assert.assertEquals("localhost", federateObject2.get_FederateHost());
         Assert.assertEquals("foobar", federateObject2.get_FederateType());
+    }
+
+    @Test
+    public void jsonTest() {
+        ObjectRoot jsonTestObjectRoot = ObjectRoot.create_object(
+                "ObjectRoot.JSONTestObject"
+        );
+
+        JsonNode emptyList = new TextNode("");
+
+        JsonNode jsonAttributeGetAttributeEmptyList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
+
+        Assert.assertEquals(emptyList, jsonAttributeGetAttributeEmptyList);
+
+        JSONTestObject jsonTestObject = (JSONTestObject)jsonTestObjectRoot;
+
+        JsonNode jsonAttributeGetAttributeDirectEmptyList =
+                jsonTestObject.get_JSONAttribute();
+
+        Assert.assertEquals(emptyList, jsonAttributeGetAttributeDirectEmptyList);
+
+        ArrayNode thingList = objectMapper.createArrayNode();
+        thingList.add("this");
+        thingList.add("that");
+        thingList.add("other");
+        jsonTestObjectRoot.setAttribute("JSONAttribute", thingList);
+
+       JsonNode jsonAttributeGetAttributeThingList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
+        Assert.assertEquals(thingList, jsonAttributeGetAttributeThingList);
+
+        JsonNode jsonAttributeGetAttributeDirectThingList =
+                jsonTestObject.get_JSONAttribute();
+        Assert.assertEquals(thingList, jsonAttributeGetAttributeDirectThingList);
+
+        ArrayNode stoogeList = objectMapper.createArrayNode();
+        stoogeList.add("Moe");
+        stoogeList.add("Larry");
+        stoogeList.add("Curly");
+        jsonTestObject.set_JSONAttribute(stoogeList);
+
+        JsonNode jsonAttributeGetAttributeStoogeList =
+                (JsonNode)jsonTestObjectRoot.getAttribute("JSONAttribute");
+        Assert.assertEquals(stoogeList, jsonAttributeGetAttributeStoogeList);
+
+        JsonNode jsonAttributeGetAttributeDirectStoogeList =
+                jsonTestObject.get_JSONAttribute();
+        Assert.assertEquals(stoogeList, jsonAttributeGetAttributeDirectStoogeList);
     }
 }

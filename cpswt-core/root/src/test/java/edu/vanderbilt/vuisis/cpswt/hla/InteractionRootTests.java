@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 import java.util.HashMap;
@@ -146,9 +147,13 @@ public class InteractionRootTests {
 
             StringReader federationJsonStringReader = new StringReader(federationJson);
             StringReader dynamicMessagingTypesStringReader = new StringReader(dynamicMessageTypes);
-            InteractionRoot.loadDynamicClassFederationData(
-                    federationJsonStringReader, dynamicMessagingTypesStringReader
-            );
+            try {
+                InteractionRoot.loadDynamicClassFederationData(
+                        federationJsonStringReader, dynamicMessagingTypesStringReader
+                );
+            } catch (IOException ioException) {
+                System.err.println("Caught exception: " + ioException);
+            }
         }
     }
 

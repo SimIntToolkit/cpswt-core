@@ -51,7 +51,7 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate.load();
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.load();
     }
 
@@ -66,21 +66,23 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         enableTimeRegulation(getLookahead());
 
         // DIRECT INTERACTION PUBLICATIONS
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.OmnetFederate.publish_interaction(getRTI());
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate.publish_interaction(getRTI());
 
         // OBJECT PUBLICATIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "BooleanValue1");
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "BooleanValue2");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "BoolValue1");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "BoolValue2");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "ByteValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "CharValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "FloatValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "IntValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "LongValue");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "ShortValue");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "JSONValue1");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_attribute("ObjectRoot.TestObject", "JSONValue2");
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.publish_object(getRTI());
 
         // SOFT OBJECT PUBLICATIONS
-        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish("OmnetFederate");
+        edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject.add_federate_name_soft_publish("TestOmnetFederate");
     }
 
     public edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject create_ObjectRoot_TestObject() {

@@ -52,24 +52,24 @@ public class Sink extends SinkBase {
     ////////////////////////////////////////////////////////////////////////
     // TODO instantiate objects that must be sent every logical time step //
     ////////////////////////////////////////////////////////////////////////
-    edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter PingCounter_0 =
-            new edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter();
+    edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter pingCounter0 =
+        new edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.PingCounter();
 
     public Sink(FederateConfig params) throws Exception {
         super(params);
 
-        registerObject(PingCounter_0);
+        registerObject(pingCounter0);
     }
 
     private void handleInteractionClass_InteractionRoot_C2WInteractionRoot_Ping(InteractionRoot interactionRoot) {
-        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Ping ping1 =
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Ping ping =
             (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Ping)interactionRoot;
 
         System.out.println("Sink:  Received ping.  Updating ping count to " + ++pingCount);
 
-        PingCounter_0.set_pingCount(pingCount);
+        pingCounter0.set_pingCount(pingCount);
         try {
-            updateAttributeValues(PingCounter_0, currentTime + getLookahead());
+            updateAttributeValues(pingCounter0, currentTime + getLookahead());
         } catch (Exception exception) {
             System.err.println("Received Exception:  " + exception.getMessage());
             exception.printStackTrace();
@@ -126,7 +126,6 @@ public class Sink extends SinkBase {
 
         while (!exitCondition) {
             atr.requestSyncStart();
-            enteredTimeGrantedState();
 
             checkReceivedSubscriptions();
 
@@ -136,6 +135,8 @@ public class Sink extends SinkBase {
                 putAdvanceTimeRequest(newATR);
                 atr.requestSyncEnd();
                 atr = newATR;
+            } else {
+                terminateAdvanceTimeThread(atr);
             }
         }
 

@@ -37,7 +37,7 @@ import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Test;
+
 
 
 // Define the  type of federate for the federation.
