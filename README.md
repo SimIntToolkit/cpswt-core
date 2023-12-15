@@ -161,45 +161,58 @@ This sections contains instructions for the installation of 3rd-party software t
    * build-essential
    * ca-certificates
    * clang
+   * cmake
    * curl
    * doxygen
    * flex
    * gcc
    * gdb
+   * gettext
    * git
    * gradle
    * graphviz
    * libboost1.71-all-dev
    * libcppunit-dev
+   * libeigen3-dev
+   * libffmpeg-ocaml-dev
+   * libfox-1.6-dev
+   * libgdal-dev
+   * libgl2ps-dev
+   * libgtest-dev
    * libjsoncpp-dev
    * libosgearth-dev
+   * libproj-dev
    * libqt5opengl5-dev
    * libwebkit2gtk-4.0-37
+   * libxerces-c-dev
    * libxml2-dev
    * lld
    * make
+   * maven
    * mongodb
    * mpi-default-dev
    * openjdk-8-jdk
+   * openjdk-11-jdk
    * openjdk-17-jdk
    * openscenegraph-plugin-osgearth
    * perl
    * python2
    * python3
    * python3-pip
-   * python-is-python2
+   * python-is-python3
    * qt5-qmake
    * qtbase5-dev
    * qtbase5-dev-tools
    * qtchooser
    * software-properties-common
+   * swig
    * wget
    * xterm
    * zlib1g-dev
 
    They can be installed with the following command:
    ```bash
-   sudo apt install -y apt-transport-https bison build-essential ca-certificates clang curl doxygen flex gcc gdb git gradle graphviz libboost1.71-all-dev libcppunit-dev libjsoncpp-dev libosgearth-dev libqt5opengl5-dev libwebkit2gtk-4.0-37 libxml2-dev lld make mongodb mpi-default-dev openjdk-8-jdk openjdk-17-jdk openscenegraph-plugin-osgearth perl python2 python3 python3-pip python-is-python2 qt5-qmake qtbase5-dev qtbase5-dev-tools qtchooser software-properties-common wget xterm zlib1g-dev
+   apt install -y apt-transport-https bison build-essential ca-certificates clang cmake curl doxygen flex gcc gdb gettext git gradle graphviz libboost1.71-all-dev libcppunit-dev libeigen3-dev libffmpeg-ocaml-dev libfox-1.6-dev libgdal-dev libgl2ps-dev libgtest-dev libjsoncpp-dev libosgearth-dev libproj-dev libqt5opengl5-dev libwebkit2gtk-4.0-37 libxerces-c-dev libxml2-dev lld make maven mongodb mpi-default-dev openjdk-8-jdk openjdk-17-jdk openscenegraph-plugin-osgearth perl python2 python3 python3-dev python3-pip python-is-python3 qt5-qmake qtbase5-dev qtbase5-dev-tools qtchooser software-properties-common swig wget xterm zlib1g-dev
    ```
 2. The following python packages (for python3) must also be installed:
    * jinja2
