@@ -70,19 +70,15 @@ publishing {
             val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
             val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
-            /*
-	    *val internalRepoUrl = "http://localhost:8080/repository/internal"
-            *val snapshotsRepoUrl = "http://localhost:8080/repository/snapshots"
-            *url = uri(snapshotsRepoUrl)
-            */
+
             logger.info("URL = \"$url\"")
             isAllowInsecureProtocol = true
             authentication {
                 create<BasicAuthentication>("basic")
             }
             credentials {
-                username = "admin"
-                password = "adminpass123"
+                username = archivaUser
+                password = archivaPassword
             }
         }
     }
