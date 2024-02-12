@@ -36,11 +36,13 @@ import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeThread;
 import edu.vanderbilt.vuisis.cpswt.hla.base.ATRComparator;
 import edu.vanderbilt.vuisis.cpswt.hla.base.ATRQueue;
 import edu.vanderbilt.vuisis.cpswt.hla.base.TimeAdvanceMode;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.AddProxy;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateJoinInteraction;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.FederateResignInteraction;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.DeleteProxy;
 import edu.vanderbilt.vuisis.cpswt.utils.CpswtDefaults;
 import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 import edu.vanderbilt.vuisis.cpswt.utils.FederateIdUtility;
@@ -111,6 +113,8 @@ import org.portico.impl.hla13.types.DoubleTimeInterval;
 public class SynchronizedFederate extends NullFederateAmbassador {
 
     static {
+        AddProxy.load();
+        DeleteProxy.load();
         SimEnd.load();
     }
 
@@ -238,6 +242,58 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * to the RTIExec process that manages the whole federation.
      */
     public static final String FEDERATION_MANAGER_NAME = "FederationManager";
+
+    private final Map<String, String> federateNameToProxyFederateNameMap = new HashMap<>();
+    private final Map<String, Set<String>> proxyFederateNameToFederateNameSetMap = new HashMap<>();
+
+    private void addProxy(String federateName, String proxyFederateName) {
+        if (hasProxy(federateName)) {
+            String currentProxyFederateName = federateNameToProxyFederateNameMap.get(federateName);
+            logger.warn(
+                    "Federate \"{}\" is already proxied by federate \"{}\".  " +
+                            "You should delete this proxy before establishing a new one.  " +
+                            "Federate \"{}\" will now be proxied by federate \"{}\"",
+                    federateName, currentProxyFederateName,
+                    federateName, proxyFederateName
+            );
+            deleteProxy(federateName);
+        }
+
+        if (!proxyFederateNameToFederateNameSetMap.containsKey(proxyFederateName)) {
+            proxyFederateNameToFederateNameSetMap.put(proxyFederateName, new HashSet<>());
+        }
+        proxyFederateNameToFederateNameSetMap.get(proxyFederateName).add(federateName);
+    }
+
+    private void deleteProxy(String federateName) {
+        if (!hasProxy(federateName)) {
+            logger.warn(
+                    "deleteProxy:  There is currently no proxy for federate \"{}\".  Nothing to delete.", federateName
+            );
+            return;
+        }
+
+        String currentProxyFederateName = federateNameToProxyFederateNameMap.get(federateName);
+        federateNameToProxyFederateNameMap.remove(federateName);
+
+        Set<String> proxiedFederateNameSet = proxyFederateNameToFederateNameSetMap.get(currentProxyFederateName);
+        proxiedFederateNameSet.remove(federateName);
+        if (proxiedFederateNameSet.isEmpty()) {
+            proxyFederateNameToFederateNameSetMap.remove(currentProxyFederateName);
+        }
+    }
+
+    protected boolean hasProxy(String federateName) {
+        return federateNameToProxyFederateNameMap.containsKey(federateName);
+    }
+
+    protected String getProxyFor(String federateName) {
+        return federateNameToProxyFederateNameMap.getOrDefault(federateName, null);
+    }
+
+    protected Set<String> getProxiedFederateNameSet(String federateName) {
+        return proxyFederateNameToFederateNameSetMap.getOrDefault(federateName, new HashSet<>());
+    }
 
     protected RTIambassador rti = null;
 
@@ -1468,6 +1524,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (interactionRoot.isInstanceOfHlaClass(SimEnd.get_hla_class_name())) {
             exitImmediately();
+        }
+
+        if (interactionRoot.isInstanceOfHlaClass(AddProxy.get_hla_class_name())) {
+            AddProxy addProxy = (AddProxy)interactionRoot;
+            addProxy(addProxy.get_federateName(), addProxy.get_proxyFederateName());
+            return;
+        }
+
+        if (interactionRoot.isInstanceOfHlaClass(DeleteProxy.get_hla_class_name())) {
+            DeleteProxy deleteProxy = (DeleteProxy)interactionRoot;
+            deleteProxy(deleteProxy.get_federateName());
+            return;
         }
 
         receiveInteractionSFAux(interactionRoot);

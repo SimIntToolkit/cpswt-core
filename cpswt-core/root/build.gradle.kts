@@ -73,7 +73,7 @@ publishing {
             name = "rootPublish"
             val internalRepoUrl = "http://$archivaHostId:$archivaPort/repository/internal"
             val snapshotsRepoUrl = "http://$archivaHostId:$archivaPort/repository/snapshots"
-            url = uri(if (version.endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else internalRepoUrl)
 
             logger.info("URL = \"$url\"")
             isAllowInsecureProtocol = true
