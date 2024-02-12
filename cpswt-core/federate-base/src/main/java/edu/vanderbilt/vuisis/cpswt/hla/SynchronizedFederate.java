@@ -576,6 +576,12 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         this.ensureSimEndPubsub();
 
+        AddProxy.subscribe_interaction(getRTI());
+        AddProxy.publish_interaction(getRTI());
+
+        DeleteProxy.subscribe_interaction(getRTI());
+        DeleteProxy.publish_interaction(getRTI());
+
         this.notifyFederationOfJoin();
     }
 

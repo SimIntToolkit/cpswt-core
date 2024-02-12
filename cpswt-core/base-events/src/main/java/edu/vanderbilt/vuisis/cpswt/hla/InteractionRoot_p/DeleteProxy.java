@@ -166,9 +166,6 @@ public class DeleteProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
         classAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.DeleteProxy", "federateName"
         ));
-        classAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.DeleteProxy", "proxyFederateName"
-        ));
 
         // ADD THIS CLASS'S classAndPropertyNameSet TO _classNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
@@ -182,10 +179,6 @@ public class DeleteProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
             "InteractionRoot.DeleteProxy", "federateName"
         ));
 
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.DeleteProxy", "proxyFederateName"
-        ));
-
 
         // ADD THIS CLASS'S _allClassAndPropertyNameSet TO _allClassNamePropertyNameSetMap DEFINED
         // IN InteractionRoot
@@ -194,9 +187,6 @@ public class DeleteProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
         ClassAndPropertyName key;
 
         key = new ClassAndPropertyName(get_hla_class_name(), "federateName");
-        _classAndPropertyNameInitialValueMap.put(key, "");
-
-        key = new ClassAndPropertyName(get_hla_class_name(), "proxyFederateName");
         _classAndPropertyNameInitialValueMap.put(key, "");
 
         commonInit(get_hla_class_name());
@@ -429,27 +419,6 @@ public class DeleteProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
      */
     public String get_federateName() {
         ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "federateName");
-        return (String)classAndPropertyNameValueMap.get(key);
-    }
-
-
-    /**
-     * Set the value of the "proxyFederateName" parameter to "value" for this parameter.
-     *
-     * @param value the new value for the "proxyFederateName" parameter
-     */
-    public void set_proxyFederateName(String value) {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "proxyFederateName");
-        classAndPropertyNameValueMap.put(key, value);
-    }
-
-    /**
-     * Returns the value of the "proxyFederateName" parameter of this interaction.
-     *
-     * @return the value of the "proxyFederateName" parameter
-     */
-    public String get_proxyFederateName() {
-        ClassAndPropertyName key = new ClassAndPropertyName(get_hla_class_name(), "proxyFederateName");
         return (String)classAndPropertyNameValueMap.get(key);
     }
 
