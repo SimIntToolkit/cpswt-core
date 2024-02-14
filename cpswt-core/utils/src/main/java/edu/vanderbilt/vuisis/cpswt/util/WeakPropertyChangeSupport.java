@@ -243,8 +243,7 @@ public class WeakPropertyChangeSupport {
         if (oldValue == newValue) {
             return;
         }
-        firePropertyChange(propertyName, new Integer(oldValue), new Integer(
-                newValue));
+        firePropertyChange(propertyName, Integer.valueOf(oldValue), Integer.valueOf(newValue));
     }
 
     public void firePropertyChange(String propertyName, boolean oldValue,
@@ -258,8 +257,7 @@ public class WeakPropertyChangeSupport {
 
     public void firePropertyChange(String propertyName, Object oldValue,
             Object newValue) {
-        if ((oldValue != null) && (newValue != null)
-                && oldValue.equals(newValue)) {
+        if ((oldValue != null) && oldValue.equals(newValue)) {
             return;
         }
 

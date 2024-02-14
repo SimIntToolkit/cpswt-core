@@ -102,7 +102,7 @@ public class Geometry
             error += pointLineDist( avg_pos, p2, p[i] );
         error /= (double)p.length;
         
-        return new Object[] {avg_pos, avg_dir, new Double(error)};
+        return new Object[] {avg_pos, avg_dir, error};
     }
         
     public static boolean areFourPointsInOnePlane( Vec3D[] p )

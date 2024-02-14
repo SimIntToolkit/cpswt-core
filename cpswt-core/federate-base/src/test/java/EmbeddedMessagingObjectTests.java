@@ -1,8 +1,6 @@
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import hla.rti.AttributeHandleSet;
-import hla.rti.ReceivedInteraction;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
@@ -12,6 +10,8 @@ import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.receiver.Receiver;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessagingobjecttest.sender.Sender;
+import hla.rti.AttributeHandleSet;
+import hla.rti.ReceivedInteraction;
 import hla.rti.ReflectedAttributes;
 import hla.rti.SuppliedAttributes;
 import hla.rti.jlc.RtiFactory;
@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class EmbeddedMessagingObjectTests {
@@ -191,16 +190,16 @@ public class EmbeddedMessagingObjectTests {
                 (edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate)
                         localEmbeddedMessagingOmnetFederateInteractionRoot;
 
-        // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
-        Assert.assertEquals(localEmbeddedMessagingOmnetFederateInteraction.get_command(), "object");
-
-        // THE hlaClassName SHOULD BE FOR TestObject
-        Assert.assertEquals(
-                localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestObject.get_hla_class_name()
-        );
-
         ObjectNode objectReflectorJson =
                 (ObjectNode)objectMapper.readTree(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
+
+        // THE messaging_type FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
+        String message_type = objectReflectorJson.get("messaging_type").asText();
+        Assert.assertEquals(message_type, "object");
+
+        // THE messaging_name SHOULD BE FOR TestObject
+        String messaging_name = objectReflectorJson.get("messaging_name").asText();
+        Assert.assertEquals(messaging_name, TestObject.get_hla_class_name());
 
         ObjectNode objectReflectorJsonPropertiesMap = (ObjectNode)objectReflectorJson.get("properties");
 

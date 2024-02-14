@@ -189,14 +189,6 @@ public class RTIAmbassadorProxy2 {
                 uniqueNo++
         );
         interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"),
-                uniqueNo++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
-                new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"),
-                uniqueNo++
-        );
-        interactionClassAndPropertyNameHandleMap.put(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"),
                 uniqueNo++
         );

@@ -2019,10 +2019,12 @@ public class InteractionRoot implements InteractionRootInterface {
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    public String toJson() {
+    public String toJson(double time) {
+
         ObjectNode topLevelJSONObject = objectMapper.createObjectNode();
         topLevelJSONObject.put("messaging_type", "interaction");
         topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
+        topLevelJSONObject.put("time", time);
 
         ObjectNode propertyJSONObject = objectMapper.createObjectNode();
         topLevelJSONObject.set("properties", propertyJSONObject);
@@ -2043,19 +2045,16 @@ public class InteractionRoot implements InteractionRootInterface {
         return topLevelJSONObject.toPrettyString();
     }
 
-    public static InteractionRoot fromJson(String jsonString) {
-        ObjectNode jsonObject;
-        try {
-            jsonObject = (ObjectNode)objectMapper.readTree(jsonString);
-        } catch (JsonProcessingException jsonProcessingException) {
-            logger.error("Exception parsing JSON for interaction: ", jsonProcessingException);
-            return null;
-        }
+    public String toJson() {
+        return toJson(-1);
+    }
+
+    public static InteractionRoot fromJson(ObjectNode jsonObject) {
 
         String className = jsonObject.get("messaging_name").asText();
         InteractionRoot interactionRoot = create_interaction(className);
         if (interactionRoot == null) {
-            logger.error("InteractionRoot:  fromJson(String):  no such interaction class \"{}\"", className);
+            logger.error("InteractionRoot:  fromJson:  no such interaction class \"{}\"", className);
             return null;
         }
 
@@ -2070,7 +2069,22 @@ public class InteractionRoot implements InteractionRootInterface {
             interactionRoot.classAndPropertyNameValueMap.put(classAndPropertyName, object);
         }
 
+        double time = jsonObject.get("time").asDouble();
+        interactionRoot.setTime(time);
+
         return interactionRoot;
+    }
+
+    public static InteractionRoot fromJson(String jsonString) {
+        ObjectNode jsonObject;
+        try {
+            jsonObject = (ObjectNode)objectMapper.readTree(jsonString);
+        } catch (JsonProcessingException jsonProcessingException) {
+            logger.error("Exception parsing JSON for interaction: ", jsonProcessingException);
+            return null;
+        }
+
+        return fromJson(jsonObject);
     }
 
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishSetMap = new HashMap<>();

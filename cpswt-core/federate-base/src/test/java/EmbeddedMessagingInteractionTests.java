@@ -10,13 +10,12 @@ import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.Te
 import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.receiver.Receiver;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender.Sender;
-import hla.rti.SuppliedParameters;
 import hla.rti.ReceivedInteraction;
+import hla.rti.SuppliedParameters;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 public class EmbeddedMessagingInteractionTests {
 
@@ -105,7 +104,7 @@ public class EmbeddedMessagingInteractionTests {
         // SuppliedParameters SHOULD BE PRESENT IN THE SENT INTERACTION DATA, AND SHOULD
         // CONTAIN DATA FOR 6 PARAMETERS -- ALL THOSE PRESENT IN AN EMBEDDEDMESSAGING INTERACTION.
         Assert.assertNotNull(sentInteractionEmbeddedMessagingOmnetFederateSuppliedParameters);
-        Assert.assertEquals(6, sentInteractionEmbeddedMessagingOmnetFederateSuppliedParameters.size());
+        Assert.assertEquals(4, sentInteractionEmbeddedMessagingOmnetFederateSuppliedParameters.size());
 
         // ReceivedInteraction OBJECT IS CREATED FROM SuppliedParameters OBJECT AND IS NEEDED TO BUILD
         // AN INTERACTION
@@ -126,16 +125,17 @@ public class EmbeddedMessagingInteractionTests {
         TestOmnetFederate localEmbeddedMessagingOmnetFederateInteraction =
                 (TestOmnetFederate)localEmbeddedMessagingOmnetFederateInteractionRoot;
 
-        // THE command FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "object"
-        Assert.assertEquals(localEmbeddedMessagingOmnetFederateInteraction.get_command(), "interaction");
-
-        // THE hlaClassName SHOULD BE FOR TestObject
-        Assert.assertEquals(
-                localEmbeddedMessagingOmnetFederateInteraction.get_hlaClassName(), TestInteraction.get_hla_class_name()
-        );
-
         ObjectNode sentInteractionJson =
                 (ObjectNode)objectMapper.readTree(localEmbeddedMessagingOmnetFederateInteraction.get_messagingJson());
+
+        // THE messaging_type FOR THE LOCAL EmbeddedMessaging.TestOmnetFederate INTERACTION SHOULD BE "interaction"
+        String message_type = sentInteractionJson.get("messaging_type").asText();
+        Assert.assertEquals(message_type, "interaction");
+
+        // THE messaging_name SHOULD BE FOR TestInteraction
+        String messaging_name = sentInteractionJson.get("messaging_name").asText();
+        Assert.assertEquals(messaging_name, TestInteraction.get_hla_class_name());
+
         ObjectNode sentInteractionJsonPropertiesMap = (ObjectNode)sentInteractionJson.get("properties");
 
         // THE messagingJson SHOULD BE FOR ALL OF THE PARAMETERS, INCLUDING THOSE INHERITED FROM C2WINTERACTIONROOT

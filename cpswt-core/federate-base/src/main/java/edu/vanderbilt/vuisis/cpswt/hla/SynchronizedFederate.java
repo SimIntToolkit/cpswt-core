@@ -30,6 +30,9 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import hla.rti.*;
 import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeThread;
@@ -591,7 +594,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
         if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
 
-            String interactionJson = interactionRoot.toJson();
+            String interactionJson = interactionRoot.toJson(time);
 
             for (String federateName : federateNameSet) {
                 String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
@@ -605,10 +608,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                     );
                     embeddedMessagingForNetworkFederate.setFederateAppendedToFederateSequence(true);
                 }
-                embeddedMessagingForNetworkFederate.setParameter("command", "interaction");
-                embeddedMessagingForNetworkFederate.setParameter(
-                        "hlaClassName", interactionRoot.getInstanceHlaClassName()
-                );
                 embeddedMessagingForNetworkFederate.setParameter("messagingJson", interactionJson);
 
                 if (time >= 0) {
@@ -665,17 +664,19 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     private void sendInteraction(
-            String objectJson, String hlaClassName, String federateSequence, Set<String> federateNameSet, double time
+            String objectReflectorJson,
+            String hlaClassName,
+            String federateSequence,
+            Set<String> federateNameSet,
+            double time
     ) throws Exception {
         for(String federateName : federateNameSet) {
             String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
             InteractionRoot embeddedMessagingForNetworkFederate = new InteractionRoot(
                     embeddedMessagingHlaClassName
             );
-            embeddedMessagingForNetworkFederate.setParameter("command", "object");
-            embeddedMessagingForNetworkFederate.setParameter("hlaClassName", hlaClassName);
             embeddedMessagingForNetworkFederate.setParameter("federateSequence", federateSequence);
-            embeddedMessagingForNetworkFederate.setParameter("messagingJson", objectJson);
+            embeddedMessagingForNetworkFederate.setParameter("messagingJson", objectReflectorJson);
 
             if (time >= 0) {
                 sendInteraction(embeddedMessagingForNetworkFederate, time);
@@ -689,7 +690,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             ObjectReflector objectReflector, Set<String> federateNameSet, double time
     ) throws Exception {
         sendInteraction(
-                objectReflector.toJson(),
+                objectReflector.toJson(time),
                 objectReflector.getHlaClassName(),
                 objectReflector.getFederateSequence(),
                 federateNameSet,
@@ -701,7 +702,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             ObjectRoot objectRoot, Set<String> federateNameSet, double time, boolean force
     ) throws Exception {
         sendInteraction(
-                objectRoot.toJson(force),
+                objectRoot.toJson(force, time),
                 objectRoot.getInstanceHlaClassName(),
                 "[]",
                 federateNameSet,
@@ -1492,7 +1493,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return false;
     }
 
-
     /**
      * RTI callback -- DO NOT OVERRIDE.  SynchronizedFederate uses this method
      * to accept receive-order interactions from the RTI.
@@ -1509,42 +1509,14 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      */
     @Override
     public void receiveInteraction(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
-        logger.trace("SynchronizedFederate::receiveInteraction (no time) for interactionHandle: {}", interactionClass);
-        receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag);
-    }
-
-    public final void receiveInteractionSF(int interactionClass, ReceivedInteraction theInteraction, byte[] userSuppliedTag) {
-        logger.trace("SynchronizedFederate::receiveInteractionSF (no time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
-
-        // Himanshu: We normally use only TSO updates, so this shouldn't be
-        // called, but due to an RTI bug, it seemingly is getting called. So,
-        // for now, use the federate's current time or LBTS whichever is greater
-        // as the timestamp
-        DoubleTime assumedTimestamp = new DoubleTime();
-        assumedTimestamp.setTime(Math.max(getLBTS(), getCurrentTime()));
+        logger.trace("SynchronizedFederate::receiveInteraction (no time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
 
         InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction);
         logger.trace(
                 "SynchronizedFederate::receiveInteractionSF (no time): Created interaction root as: {}", interactionRoot
         );
 
-        if (interactionRoot.isInstanceOfHlaClass(SimEnd.get_hla_class_name())) {
-            exitImmediately();
-        }
-
-        if (interactionRoot.isInstanceOfHlaClass(AddProxy.get_hla_class_name())) {
-            AddProxy addProxy = (AddProxy)interactionRoot;
-            addProxy(addProxy.get_federateName(), addProxy.get_proxyFederateName());
-            return;
-        }
-
-        if (interactionRoot.isInstanceOfHlaClass(DeleteProxy.get_hla_class_name())) {
-            DeleteProxy deleteProxy = (DeleteProxy)interactionRoot;
-            deleteProxy(deleteProxy.get_federateName());
-            return;
-        }
-
-        receiveInteractionSFAux(interactionRoot);
+        receiveInteractionAux(interactionRoot);
     }
 
     /**
@@ -1572,18 +1544,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             LogicalTime theTime,
             EventRetractionHandle retractionHandle
     ) {
-        logger.trace("SynchronizedFederate::receiveInteraction (with time) for interactionHandle: {}", interactionClass);
-        this.receiveInteractionSF(interactionClass, theInteraction, userSuppliedTag, theTime, retractionHandle);
-    }
-
-    public final void receiveInteractionSF(
-            int interactionClass,
-            ReceivedInteraction theInteraction,
-            byte[] userSuppliedTag,
-            LogicalTime theTime,
-            EventRetractionHandle retractionHandle
-    ) {
-        logger.trace("SynchronizedFederate::receiveInteractionSF (with time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
+        logger.trace("SynchronizedFederate::receiveInteraction (with time): Received interactionClass as: {} and interaction as: {}", interactionClass, theInteraction);
 
         InteractionRoot interactionRoot = InteractionRoot.create_interaction(interactionClass, theInteraction, theTime);
         logger.trace(
@@ -1591,12 +1552,30 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 interactionRoot
         );
 
-        receiveInteractionSFAux(interactionRoot);
+        receiveInteractionAux(interactionRoot);
     }
-    private void receiveInteractionSFAux(InteractionRoot interactionRoot) {
+
+    private void receiveInteractionAux(InteractionRoot interactionRoot) {
+
+        if (interactionRoot.isInstanceOfHlaClass(SimEnd.get_hla_class_name())) {
+            exitImmediately();
+        }
+
+        if (interactionRoot.isInstanceOfHlaClass(AddProxy.get_hla_class_name())) {
+            AddProxy addProxy = (AddProxy)interactionRoot;
+            addProxy(addProxy.get_federateName(), addProxy.get_proxyFederateName());
+            return;
+        }
+
+        if (interactionRoot.isInstanceOfHlaClass(DeleteProxy.get_hla_class_name())) {
+            DeleteProxy deleteProxy = (DeleteProxy)interactionRoot;
+            deleteProxy(deleteProxy.get_federateName());
+            return;
+        }
+
         if (!unmatchingFedFilterProvided(interactionRoot)) {
             if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
-                receiveEmbeddedInteraction((EmbeddedMessaging)interactionRoot);
+                receiveEmbeddedMessagingInteraction((EmbeddedMessaging)interactionRoot);
                 return;
             }
 
@@ -1605,45 +1584,65 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    private void receiveEmbeddedInteraction(EmbeddedMessaging embeddedMessaging) {
-        String command = embeddedMessaging.get_command();
-        String hlaClassName = embeddedMessaging.get_hlaClassName();
-        String federateSequence = embeddedMessaging.get_federateSequence();
+    private void processEmbeddedMessagingInteraction(ObjectNode jsonObject) {
 
-        if ("interaction".equals(command)) {
+        String messagingType = jsonObject.get("messaging_type").asText();
+        String hlaClassName = jsonObject.get("messaging_name").asText();
+
+        if ("interaction".equals(messagingType)) {
             if (!InteractionRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
-                        "SynchronizedFederate.receiveEmbeddedInteraction:  interaction class \"{}\" " +
+                        "SynchronizedFederate.processEmbeddedMessagingInteraction:  interaction class \"{}\" " +
                                 "not soft subscribed",
                         hlaClassName
                 );
                 return;
             }
-            InteractionRoot embeddedInteraction = InteractionRoot.fromJson(embeddedMessaging.get_messagingJson());
-            embeddedInteraction.setTime(embeddedMessaging.getTime());
+            InteractionRoot unwrappedInteraction = InteractionRoot.fromJson(jsonObject);
 
-            receiveInteractionSFAux(embeddedInteraction);
+            receiveInteractionAux(unwrappedInteraction);
             return;
         }
 
-        if ("object".equals(command)) {
+        if ("object".equals(messagingType)) {
             if (!ObjectRoot.get_is_soft_subscribed(hlaClassName)) {
                 logger.warn(
-                        "SynchronizedFederate.receiveEmbeddedInteraction:  object class \"{}\" " +
+                        "SynchronizedFederate.processEmbeddedMessagingInteraction:  object class \"{}\" " +
                                 "is not soft subscribed",
                         hlaClassName
                 );
                 return;
             }
-            ObjectReflector objectReflector = ObjectRoot.fromJson(embeddedMessaging.get_messagingJson());
-            objectReflector.setFederateSequence(federateSequence);
-            objectReflector.setTime(embeddedMessaging.getTime());
+            ObjectReflector objectReflector = ObjectRoot.fromJson(jsonObject);
 
             _objectReflectionQueue.add(objectReflector);
             return;
         }
 
-        logger.warn("SynchronizedFederate.receiveEmbeddedInteraction, unrecognized command \"{}\"", command);
+        logger.warn(
+                "SynchronizedFederate.processEmbeddedMessagingInteraction, unrecognized messaging type \"{}\"",
+                messagingType
+        );
+    }
+
+    private void receiveEmbeddedMessagingInteraction(EmbeddedMessaging embeddedMessaging) {
+
+        String jsonObjectString = embeddedMessaging.get_messagingJson();
+        JsonNode jsonNode;
+        try {
+            jsonNode = InteractionRoot.objectMapper.readTree(jsonObjectString);
+        } catch (JsonProcessingException jsonProcessingException) {
+            logger.error("Exception parsing JSON for interaction: ", jsonProcessingException);
+            return;
+        }
+
+        if (jsonNode.isArray()) {
+            for(JsonNode item: jsonNode) {
+                processEmbeddedMessagingInteraction((ObjectNode)item);
+            }
+        } else {
+            processEmbeddedMessagingInteraction((ObjectNode)jsonNode);
+        }
     }
 
     private static final PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue =

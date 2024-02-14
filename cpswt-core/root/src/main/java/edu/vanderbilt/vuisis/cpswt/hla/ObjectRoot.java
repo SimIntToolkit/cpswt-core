@@ -514,10 +514,11 @@ public class ObjectRoot implements ObjectRootInterface {
             return _federateSequence;
         }
 
-        public String toJson() {
+        public String toJson(double time) {
             ObjectNode topLevelJSONObject = objectMapper.createObjectNode();
             topLevelJSONObject.put("messaging_type", "object");
             topLevelJSONObject.put("messaging_name", _hlaClassName);
+            topLevelJSONObject.put("time", time);
             topLevelJSONObject.put("object_handle", _objectHandle);
             topLevelJSONObject.put("federateSequence", _federateSequence);
 
@@ -537,6 +538,10 @@ public class ObjectRoot implements ObjectRootInterface {
             }
             topLevelJSONObject.set("properties", propertyJSONObject);
             return topLevelJSONObject.toPrettyString();
+        }
+
+        public String toJson() {
+            return toJson(-1);
         }
 
         /**
@@ -3180,10 +3185,12 @@ public class ObjectRoot implements ObjectRootInterface {
     // END INSTANCE VERSIONS OF STATIC METHODS DEFINED IN DERIVED CLASSES
     //-------------------------------------------------------------------
 
-    public String toJson(boolean force) {
+    public String toJson(boolean force, double time) {
+
         ObjectNode topLevelJSONObject = objectMapper.createObjectNode();
         topLevelJSONObject.put("messaging_type", "object");
         topLevelJSONObject.put("messaging_name", getInstanceHlaClassName());
+        topLevelJSONObject.put("time", time);
         topLevelJSONObject.put("federateSequence", "[]");
         topLevelJSONObject.put("object_handle", getObjectHandle());
 
@@ -3206,18 +3213,20 @@ public class ObjectRoot implements ObjectRootInterface {
         return topLevelJSONObject.toPrettyString();
     }
 
-    public String toJson() {
-        return toJson(false);
+    public String toJson(boolean force) {
+        return toJson(force, -1);
     }
 
-    public static ObjectReflector fromJson(String jsonString) {
-        ObjectNode jsonObject;
-        try {
-            jsonObject = (ObjectNode)objectMapper.readTree(jsonString);
-        } catch (JsonProcessingException jsonProcessingException) {
-            logger.error("Exception parsing JSON for object reflector: ", jsonProcessingException);
-            return null;
-        }
+    public String toJson(double time) {
+        return toJson(false, time);
+    }
+
+    public String toJson() {
+        return toJson(-1);
+    }
+
+    public static ObjectReflector fromJson(ObjectNode jsonObject) {
+
         int objectHandle = jsonObject.get("object_handle").asInt();
         String className = jsonObject.get("messaging_name").asText();
         String federateSequence = jsonObject.get("federateSequence").asText();
@@ -3246,7 +3255,23 @@ public class ObjectRoot implements ObjectRootInterface {
         }
         ObjectReflector objectReflector = new ObjectReflector(objectHandle, className, classAndPropertyNameValueMap);
         objectReflector.setFederateSequence(federateSequence);
+
+        double time = jsonObject.get("time").asDouble();
+        objectReflector.setTime(time);
+
         return objectReflector;
+    }
+
+    public static ObjectReflector fromJson(String jsonString) {
+        ObjectNode jsonObject;
+        try {
+            jsonObject = (ObjectNode)objectMapper.readTree(jsonString);
+        } catch (JsonProcessingException jsonProcessingException) {
+            logger.error("Exception parsing JSON for object reflector: ", jsonProcessingException);
+            return null;
+        }
+
+        return fromJson(jsonObject);
     }
 
     private static final Map<String, Set<String>> _hlaClassNameToFederateNameSoftPublishDirectSetMap = new HashMap<>();

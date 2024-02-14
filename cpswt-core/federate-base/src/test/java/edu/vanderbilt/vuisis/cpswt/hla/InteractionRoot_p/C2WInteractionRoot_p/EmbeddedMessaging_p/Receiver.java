@@ -173,14 +173,6 @@ public class Receiver extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.
         Set<ClassAndPropertyName> allClassAndPropertyNameSet = new HashSet<>();
 
         allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "command"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
-            "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "hlaClassName"
-        ));
-
-        allClassAndPropertyNameSet.add(new ClassAndPropertyName(
             "InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", "messagingJson"
         ));
 
