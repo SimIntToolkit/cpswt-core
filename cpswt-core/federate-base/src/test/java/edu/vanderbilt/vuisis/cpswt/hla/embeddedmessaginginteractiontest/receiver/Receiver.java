@@ -34,9 +34,12 @@ import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
 
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 // Define the  type of federate for the federation.
@@ -48,19 +51,22 @@ public class Receiver extends ReceiverBase {
 
     private final static Logger log = LogManager.getLogger();
 
+    List<TestInteraction> testInteractionList = new ArrayList<>();
+
     public Receiver(FederateConfig params) throws Exception {
         super(params);
     }
 
-    private TestInteraction testInteraction = null;
-
-    public TestInteraction getTestInteraction() {
-        return testInteraction;
+    public List<TestInteraction> getTestInteractionList() {
+        List<TestInteraction> localTestInteractionList = new ArrayList<>(testInteractionList);
+        testInteractionList.clear();
+        return localTestInteractionList;
     }
 
     private void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot interactionRoot) {
 
-        testInteraction = (TestInteraction) interactionRoot;
+        TestInteraction testInteraction = (TestInteraction) interactionRoot;
+        testInteractionList.add(testInteraction);
     }
 
     private void checkReceivedSubscriptions() {
@@ -78,8 +84,65 @@ public class Receiver extends ReceiverBase {
         }
     }
 
+    private int state = 0;
+
+    private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
+    private double currentTime = 0;
+
     public void execute() throws Exception {
 
+        if (state == 0) {
+            putAdvanceTimeRequest(atr);
+
+            startAdvanceTimeThread();
+
+            atr.requestSyncStart();
+
             checkReceivedSubscriptions();
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            ++state;
+            return;
+        }
+
+        if (state == 1) {
+            atr.requestSyncStart();
+
+            checkReceivedSubscriptions();
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            ++state;
+            return;
+        }
+
+        if (state == 2) {
+            atr.requestSyncStart();
+
+            checkReceivedSubscriptions();
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            ++state;
+            return;
+        }
+
+        if (state == 3) {
+            atr.requestSyncStart();
+            terminateAdvanceTimeThread(atr);
+        }
     }
 }

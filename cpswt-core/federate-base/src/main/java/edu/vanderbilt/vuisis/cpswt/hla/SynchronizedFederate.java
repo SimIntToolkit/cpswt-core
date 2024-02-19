@@ -523,7 +523,9 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 sendInteraction(joinInteraction);
             }
             catch (Exception ex) {
-                logger.error("Error while sending FederateJoinInteraction for federate {}", this.federateId);
+                logger.error(
+                        "Error while sending FederateJoinInteraction for federate \"{}\": , {}", this.federateId, ex
+                );
             }
         }
     }
@@ -631,7 +633,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
 
         if (interactionRoot.getIsPublished()) {
-            interactionRoot.sendInteraction(getRTI(), time);
+            if (_advanceTimeThread == null) {
+                logger.warn(
+                        "AdvanceTimeThread not started:  sending time-based \"{}\" interaction directly",
+                        interactionRoot.getHlaClassName()
+                );
+                interactionRoot.sendInteraction(getRTI(), time);
+            } else {
+                _advanceTimeThread.sendInteraction(interactionRoot, time);
+            }
         }
 
         sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(), time);
@@ -1335,6 +1345,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                 advanceTimeThreadNotExited = false;
             }
         }
+        _advanceTimeThreadNotStarted = true;
     }
 
     protected void terminateAdvanceTimeThread(AdvanceTimeRequest advanceTimeRequest) {
@@ -1342,13 +1353,13 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         waitForAdvanceTimeThreadToTerminate();
     }
 
-    private static final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithoutTime =
+    private final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithoutTime =
             new UniquePriorityBlockingQueue<>(10, new InteractionRootComparator());
 
-    private static final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithTime =
+    private final UniquePriorityBlockingQueue<InteractionRoot> _interactionQueueWithTime =
             new UniquePriorityBlockingQueue<>(10, new InteractionRootComparator());
 
-    private static final PriorityBlockingMultiQueue<InteractionRoot> _fullInteractionQueue =
+    private final PriorityBlockingMultiQueue<InteractionRoot> _fullInteractionQueue =
             new PriorityBlockingMultiQueue<>();
 
     /**
@@ -1363,7 +1374,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                        instance of any interaction in the federation, as InteractionRoot will
      *                        always be its highest super class.
      */
-    public static void addInteraction(InteractionRoot interactionRoot) {
+    public void addInteraction(InteractionRoot interactionRoot) {
         logger.trace("Received: {}", interactionRoot);
         if (interactionRoot.getTime() >= 0) {
             _interactionQueueWithTime.add(interactionRoot);
@@ -1391,7 +1402,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @return the next interaction received from the RTI in order of timestamp,
      * where receive-order interactions have a timestamp of -1.
      */
-    public static InteractionRoot getNextInteraction() {
+    public InteractionRoot getNextInteraction() {
         return _fullInteractionQueue.take();
     }
 
@@ -1403,7 +1414,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @return true if there are interactions available on the queue internal
      * to the {@link InteractionRoot} class.  False, otherwise.
      */
-    public static boolean isNotEmpty() {
+    public boolean isNotEmpty() {
         return !_fullInteractionQueue.isEmpty();
     }
 
@@ -1415,13 +1426,20 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * where receive-order interactions have a timestamp of -1, or null if there
      * are no interactions currently available
      */
-    public static InteractionRoot getNextInteractionNoWait() {
+    public InteractionRoot getNextInteractionNoWait() {
+        InteractionRoot peekInteractionRoot = _fullInteractionQueue.peek();
+        if (peekInteractionRoot == null) {
+            return null;
+        }
+        if (peekInteractionRoot.getTime() > getCurrentTime()) {
+            return null;
+        }
         InteractionRoot interactionRoot = _fullInteractionQueue.poll();
         logger.trace("Removed interaction from queue (poll), size now = {}", _fullInteractionQueue.size());
         return interactionRoot;
     }
 
-    public static InteractionRoot getNextInteractionWithTime() {
+    public InteractionRoot getNextInteractionWithTime() {
         InteractionRoot interactionRoot = null;
         boolean takeNotComplete = true;
         while (takeNotComplete) {
@@ -1434,17 +1452,24 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return interactionRoot;
     }
 
-    public static boolean isNotEmptyWithTime() {
+    public boolean isNotEmptyWithTime() {
         return !_interactionQueueWithTime.isEmpty();
     }
 
-    public static InteractionRoot getNextInteractionWithTimeNoWait() {
+    public InteractionRoot getNextInteractionWithTimeNoWait() {
+        InteractionRoot peekInteractionRoot = _interactionQueueWithTime.peek();
+        if (peekInteractionRoot == null) {
+            return null;
+        }
+        if (peekInteractionRoot.getTime() > getCurrentTime()) {
+            return null;
+        }
         InteractionRoot interactionRoot = _interactionQueueWithTime.poll();
         logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueueWithTime.size());
         return interactionRoot;
     }
 
-    public static InteractionRoot getNextInteractionWithoutTime() {
+    public InteractionRoot getNextInteractionWithoutTime() {
         InteractionRoot interactionRoot = null;
         boolean takeNotComplete = true;
         while (takeNotComplete) {
@@ -1458,11 +1483,18 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         return interactionRoot;
     }
 
-    public static boolean isNotEmptyWithoutTime() {
+    public boolean isNotEmptyWithoutTime() {
         return !_interactionQueueWithoutTime.isEmpty();
     }
 
-    public static InteractionRoot getNextInteractionWithoutTimeNoWait() {
+    public InteractionRoot getNextInteractionWithoutTimeNoWait() {
+        InteractionRoot peekInteractionRoot = _interactionQueueWithoutTime.peek();
+        if (peekInteractionRoot == null) {
+            return null;
+        }
+        if (peekInteractionRoot.getTime() > getCurrentTime()) {
+            return null;
+        }
         InteractionRoot interactionRoot = _interactionQueueWithoutTime.poll();
         logger.trace("Removed interaction from queue (poll), size now = {}", _interactionQueueWithoutTime.size());
         return interactionRoot;
@@ -1483,7 +1515,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             String fedFilter = (String) interactionRoot.getParameter("federateFilter");
             if (fedFilter != null) {
                 fedFilter = fedFilter.trim();
-                if ((fedFilter.length() > 0) && (fedFilter.compareTo(getFederateId()) != 0)) {
+                if (!fedFilter.isEmpty() && (fedFilter.compareTo(getFederateId()) != 0)) {
                     logger.trace("Filtering due to fed filter: {}", fedFilter);
                     logger.trace("Filtered interaction was: {}", interactionRoot);
                     return true;
@@ -1645,7 +1677,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
-    private static final PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue =
+    private final PriorityBlockingQueue<ObjectReflector> _objectReflectionQueue =
             new PriorityBlockingQueue<>(10, new ObjectReflectorComparator());
 
 
@@ -1663,7 +1695,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * @param reflectedAttributes attribute reflections for the object class
      *                            instance corresponding to objectHandle
      */
-    public static void addObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
+    public void addObjectReflector(int objectHandle, ReflectedAttributes reflectedAttributes) {
         _objectReflectionQueue.add(new ObjectReflector(objectHandle, reflectedAttributes));
     }
 
@@ -1678,7 +1710,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *                            instance corresponding to objectHandle
      * @param logicalTime         timestamp of the attribute reflections
      */
-    public static void addObjectReflector(
+    public void addObjectReflector(
             int objectHandle, ReflectedAttributes reflectedAttributes, LogicalTime logicalTime
     ) {
         _objectReflectionQueue.add(new ObjectReflector(objectHandle, reflectedAttributes, logicalTime));
@@ -1696,7 +1728,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      * of timestamp of their contained attribute reflections, where receive-order
      * attribute reflections have a timestamp of -1.
      */
-    public static ObjectReflector getNextObjectReflector() {
+    public ObjectReflector getNextObjectReflector() {
         ObjectReflector objectReflection = null;
         boolean takeNotComplete = true;
         while (takeNotComplete) {
@@ -1716,8 +1748,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
      *
      * @return An object reflector is one was available on the queue, null otherwise.
      */
-    public static ObjectReflector getNextObjectReflectorNoWait() {
-        return _objectReflectionQueue.poll();
+    public ObjectReflector getNextObjectReflectorNoWait() {
+        ObjectReflector peekObjectReflector = _objectReflectionQueue.peek();
+        if (peekObjectReflector == null) {
+            return null;
+        }
+        if (peekObjectReflector.getTime() > getCurrentTime()) {
+            return null;
+        }
+        ObjectReflector objectReflector = _objectReflectionQueue.poll();
+        logger.trace("Removed object reflector from queue (poll), size now = {}", _objectReflectionQueue.size());
+        return objectReflector;
     }
 
     /**

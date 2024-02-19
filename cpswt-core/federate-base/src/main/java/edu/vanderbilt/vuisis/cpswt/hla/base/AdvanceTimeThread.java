@@ -30,6 +30,10 @@
 
 package edu.vanderbilt.vuisis.cpswt.hla.base;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.SynchronizedFederate;
@@ -37,6 +41,9 @@ import hla.rti.FederationTimeAlreadyPassed;
 import hla.rti.RTIambassador;
 import edu.vanderbilt.vuisis.cpswt.utils.CpswtUtils;
 import org.portico.impl.hla13.types.DoubleTime;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * This class is run in a separate thread and is responsible for temporal
@@ -112,11 +119,25 @@ public class AdvanceTimeThread extends Thread {
     private final RTIambassador _rti;
     private final TimeAdvanceMode _timeAdvanceMode;
 
+    private final ConcurrentSkipListMap<Double, List<InteractionRoot>> _timeToSentInteractionListMap =
+            new ConcurrentSkipListMap<>();
+
     public AdvanceTimeThread(SynchronizedFederate synchronizedFederate, ATRQueue atrQueue, TimeAdvanceMode timeAdvanceMode) {
         _synchronizedFederate = synchronizedFederate;
         _rti = _synchronizedFederate.getRTI();
         _atrQueue = atrQueue;
         _timeAdvanceMode = timeAdvanceMode;
+    }
+
+    //
+    // OMLY TIME-BASED INTERACTIONS ARE SENT USING THE ADVANCE-TIME-THREAD!!
+    //
+    public void sendInteraction(InteractionRoot interactionRoot, double time) {
+
+        if (!_timeToSentInteractionListMap.containsKey(time)) {
+            _timeToSentInteractionListMap.put(time, new ArrayList<>());
+        }
+        _timeToSentInteractionListMap.get(time).add(interactionRoot);
     }
 
     public void run() {
@@ -141,10 +162,84 @@ public class AdvanceTimeThread extends Thread {
                 }
             }
 
-            DoubleTime timeRequest = null;
+            double requestedTime = advanceTimeRequest.getRequestedTime();
+
+            Map<String, List<InteractionRoot>> hlaClassNameToInteractionListMap = new HashMap<>();
+
+            Set<Double> keySet = new TreeSet<>(_timeToSentInteractionListMap.keySet());
+
+            for (double key : keySet) {
+                if (key > requestedTime) {
+                    break;
+                }
+
+                List<InteractionRoot> interactionRootList = _timeToSentInteractionListMap.get(key);
+                for (InteractionRoot interactionRoot : interactionRootList) {
+
+                    interactionRoot.setTime(key);
+
+                    String hlaClassName = interactionRoot.getHlaClassName();
+                    if (!hlaClassNameToInteractionListMap.containsKey(hlaClassName)) {
+                        hlaClassNameToInteractionListMap.put(hlaClassName, new ArrayList<>());
+                    }
+                    hlaClassNameToInteractionListMap.get(hlaClassName).add(interactionRoot);
+                }
+
+                _timeToSentInteractionListMap.remove(key);
+            }
+
+            ArrayNode dummyArrayNode = InteractionRoot.objectMapper.createArrayNode();
+            for(List<InteractionRoot> interactionRootList : hlaClassNameToInteractionListMap.values()) {
+                if (
+                        interactionRootList.size() > 1 &&
+                                interactionRootList.get(0).isInstanceHlaClassDerivedFromHlaClass(
+                                        EmbeddedMessaging.get_hla_class_name()
+                                )
+                ) {
+                    double minTime = Double.MAX_VALUE;
+                    ArrayNode arrayNode = InteractionRoot.objectMapper.createArrayNode();
+                    for (InteractionRoot interactionRoot : interactionRootList) {
+                        double time = interactionRoot.getTime();
+                        if (time < minTime) {
+                            minTime = time;
+                        }
+                        String messagingJson = (String)interactionRoot.getParameter("messagingJson");
+
+                        JsonNode jsonNode = dummyArrayNode;
+                        try {
+                            jsonNode = InteractionRoot.objectMapper.readTree(messagingJson);
+                        } catch (Exception e) { }
+
+                        if (jsonNode.isArray()) {
+                            for(JsonNode item : jsonNode) {
+                                arrayNode.add(item);
+                            }
+                        } else {
+                            arrayNode.add(jsonNode);
+                        }
+                    }
+
+                    String newMessagingJson = arrayNode.toPrettyString();
+                    InteractionRoot sendInteractionRoot = interactionRootList.get(0);
+                    sendInteractionRoot.setParameter("messagingJson", newMessagingJson);
+                    try {
+                        sendInteractionRoot.sendInteraction(_synchronizedFederate.getRTI(), minTime);
+                    } catch (Exception e) { }
+
+                } else {
+                    for(InteractionRoot interactionRoot: interactionRootList) {
+                        double time = interactionRoot.getTime();
+                        try {
+                            interactionRoot.sendInteraction(_synchronizedFederate.getRTI(), time);
+                        } catch (Exception e) { }
+                    }
+                }
+            }
+
+            DoubleTime timeRequest;
             // System.out.println("Current time = " + currentTime + ", and ATR's requested time = " + advanceTimeRequest.getRequestedTime());
-            if (advanceTimeRequest.getRequestedTime() > currentTime) {
-                timeRequest = new DoubleTime(advanceTimeRequest.getRequestedTime());
+            if (requestedTime > currentTime) {
+                timeRequest = new DoubleTime(requestedTime);
             } else {
                 advanceTimeRequest.threadSyncStart(currentTime);
                 advanceTimeRequest.threadSyncEnd();

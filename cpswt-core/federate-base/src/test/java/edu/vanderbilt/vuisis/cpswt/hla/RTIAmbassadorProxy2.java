@@ -1,16 +1,6 @@
 package edu.vanderbilt.vuisis.cpswt.hla;
 
-import hla.rti.ArrayIndexOutOfBounds;
-import hla.rti.EventRetractionHandle;
-import hla.rti.FederateAmbassador;
-import hla.rti.LogicalTime;
-import hla.rti.MobileFederateServices;
-import hla.rti.RTIambassador;
-import hla.rti.ReceivedInteraction;
-import hla.rti.ReflectedAttributes;
-import hla.rti.Region;
-import hla.rti.SuppliedAttributes;
-import hla.rti.SuppliedParameters;
+import hla.rti.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.portico.impl.hla13.types.DoubleTime;
 import org.portico.impl.hla13.types.DoubleTimeInterval;
@@ -22,10 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import static edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface.ClassAndPropertyName;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -131,11 +118,12 @@ public class RTIAmbassadorProxy2 {
         }
     }
 
+
     static class EventRetractionHandleImpl implements EventRetractionHandle { }
 
 
-
     private final RTIambassador rtiambassador;
+
     public RTIambassador getRTIAmbassador(){
         return rtiambassador;
     }
@@ -143,6 +131,12 @@ public class RTIAmbassadorProxy2 {
     private static final RTIAmbassadorProxy2 rtiAmbassadorProxy1 = new RTIAmbassadorProxy2();
     public static RTIAmbassadorProxy2 get_instance() {
         return rtiAmbassadorProxy1;
+    }
+
+    private SynchronizedFederate synchronizedFederate = null;
+
+    public void setSynchronizedFederate(SynchronizedFederate localSynchronizedFederate) {
+        synchronizedFederate = localSynchronizedFederate;
     }
 
     private static int uniqueNo = 0;
@@ -411,14 +405,21 @@ public class RTIAmbassadorProxy2 {
         getUpdatedObjectDataList().clear();
     }
 
-    Set<FederateAmbassador> federateAmbassadorList = new HashSet<>();
-    boolean timeConstrainedRequestOutstanding = false;
-    boolean timeRegulationRequestOutstanding = false;
+    private final Set<FederateAmbassador> federateAmbassadorList = new HashSet<>();
+    private boolean timeConstrainedRequestOutstanding = false;
+    private boolean timeRegulationRequestOutstanding = false;
 
-    LogicalTime defaultLogicalTime = new DoubleTime(0);
+    private final LogicalTime defaultLogicalTime = new DoubleTime(0);
+
+    private DoubleTime currentTime = new DoubleTime(0);
+
+    public void resetCurrentTime() {
+        currentTime.setTime(0);
+    }
 
     public RTIAmbassadorProxy2() {
         // change to static
+
 
         //add the all the whens.
         rtiambassador = mock(RTIambassador.class);
@@ -467,6 +468,9 @@ public class RTIAmbassadorProxy2 {
                         return 0;
                     }
             );
+            when(rtiambassador.queryFederateTime()).thenAnswer(
+                    (InvocationOnMock invocationOnMock) -> currentTime
+            );
             when(rtiambassador.registerObjectInstance(anyInt())).thenAnswer(
                     (InvocationOnMock invocationOnMock) -> {
                         int classHandle = invocationOnMock.getArgument(0);
@@ -513,6 +517,11 @@ public class RTIAmbassadorProxy2 {
                 }
                 return null;
             }).when(rtiambassador).tick();
+            doAnswer(invocation -> {
+                currentTime = invocation.getArgument(0);
+                synchronizedFederate.timeAdvanceGrant(currentTime);
+                return null;
+            }).when(rtiambassador).timeAdvanceRequest(any(LogicalTime.class));
             when(rtiambassador.updateAttributeValues(
                     anyInt(), any(SuppliedAttributes.class), nullable(byte[].class), any(LogicalTime.class)
             )).thenAnswer(

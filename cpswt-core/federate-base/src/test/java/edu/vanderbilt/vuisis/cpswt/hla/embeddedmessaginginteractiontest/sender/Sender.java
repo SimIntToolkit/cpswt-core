@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
@@ -58,9 +59,7 @@ public class Sender extends SenderBase {
 
     public Sender(FederateConfig params) throws Exception {
         super(params);
-    }
 
-    public void execute() throws Exception {
         _testInteraction.set_BoolValue1(false);
         _testInteraction.set_BoolValue2(true);
         _testInteraction.set_ByteValue((byte) 42);
@@ -80,6 +79,74 @@ public class Sender extends SenderBase {
         _testInteraction.set_StringValue("Hello");
         _testInteraction.set_actualLogicalGenerationTime(0.0);
         _testInteraction.set_federateFilter("");
-        sendInteraction(_testInteraction, 0.0);
+    }
+
+    private int state = 0;
+
+    private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
+    private double currentTime = 0;
+
+    public void execute() throws Exception {
+        // WE NOW NEED AN AdvanceTimeThread, AS IT IS RESPONSIBLE FOR SENDING SENT-INTERACTIONS
+        if (state == 0) {
+            putAdvanceTimeRequest(atr);
+
+            startAdvanceTimeThread();
+
+            atr.requestSyncStart();
+
+            // FIRST SENT-INTERACTION SHOULD BE SENT ON FIRST ADVANCE-TIME-REQUEST (TO 1 SEC)
+            sendInteraction(_testInteraction, 0.5);
+
+            // SECOND AND THIRD SENT-INTERACTIONS SHOULD BE SENT ON NEXT ADVANCE-TIME-REQUEST (TO 2 SEC)
+            // SEE state == 1 BELOW
+            sendInteraction(_testInteraction, 1.5);
+            sendInteraction(_testInteraction, 1.6);
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
+            // THE SENDING OF THE INTERACTION(S) BEFORE WE RETURN FROM execute
+            atr.requestSyncStart();
+            putAdvanceTimeRequest(atr);
+            atr.requestSyncEnd();
+
+            ++state;
+            return;
+        }
+
+        if (state == 1) {
+
+            atr.requestSyncStart();
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+
+            // SECOND INTERACTION SHOULD BE SENT HERE
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
+            // THE SENDING OF THE INTERACTION(S) BEFORE WE RETURN FROM execute
+            atr.requestSyncStart();
+            putAdvanceTimeRequest(atr);
+            atr.requestSyncEnd();
+
+            ++state;
+            return;
+        }
+
+        // THIS STATE IS MEANT TO KILL THE AdvanceTimeThread
+        if (state == 2) {
+
+            atr.requestSyncStart();
+            terminateAdvanceTimeThread(atr);
+
+        }
     }
 }

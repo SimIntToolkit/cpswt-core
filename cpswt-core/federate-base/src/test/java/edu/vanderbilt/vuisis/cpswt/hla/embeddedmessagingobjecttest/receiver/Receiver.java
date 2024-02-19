@@ -35,6 +35,7 @@ import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot;
 import static edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.ObjectReflector;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
 
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,8 +78,68 @@ public class Receiver extends ReceiverBase {
         }
     }
 
+    private int state = 0;
+
+    private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
+    private double currentTime = 0;
+
+
     public void execute() throws Exception {
 
-        checkReceivedSubscriptions();
+        if (state == 0) {
+            putAdvanceTimeRequest(atr);
+
+            startAdvanceTimeThread();
+
+            atr.requestSyncStart();
+
+            checkReceivedSubscriptions();
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            ++state;
+            return;
+        }
+
+        // WE'LL BE SPLITTING THE RECEPTION OF THE DIRECT ATTRIBUTE UPDATES AND SOFT (INDIRECT) ATTRIBUTE UPDATES
+        if (state == 1) {
+            atr.requestSyncStart();
+
+            // DIRECT ATTRIBUTE UPDATES
+            checkReceivedSubscriptions();
+
+            // NO NEED TO UPDATE THE TIME -- WE'VE ONLY GIVEN THE DIRECT UPDATES AT TIME 0.5
+            // AND IT'S ALREADY TIME 1
+            putAdvanceTimeRequest(atr);
+            atr.requestSyncEnd();
+
+            ++state;
+            return;
+        }
+
+        if (state == 2) {
+            atr.requestSyncStart();
+
+            // SOFT (INDIRECT) ATTRIBUTE UPDATES
+            checkReceivedSubscriptions();
+
+            // AGAIN, NO NEED TO UPDATE THE TIME -- NOW WE'VE ONLY GIVEN THE INDIRECT UPDATES (ALSO AT TIME 0.5)
+            // AND IT'S ALREADY TIME 1
+            putAdvanceTimeRequest(atr);
+            atr.requestSyncEnd();
+
+            ++state;
+            return;
+        }
+
+        if (state == 3) {
+            atr.requestSyncStart();
+            terminateAdvanceTimeThread(atr);
+        }
+
     }
 }

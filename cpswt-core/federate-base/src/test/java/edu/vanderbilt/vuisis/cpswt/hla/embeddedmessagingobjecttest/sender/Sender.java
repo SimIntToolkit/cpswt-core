@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot_p.TestObject;
@@ -58,15 +59,6 @@ public class Sender extends SenderBase {
     public Sender(FederateConfig params) throws Exception {
         super(params);
 
-        registerObject(TestObject_0);
-    }
-
-    public TestObject getTestObject() {
-        return TestObject_0;
-    }
-
-    public void execute() throws Exception {
-
         TestObject_0.set_BoolValue1(false);
         TestObject_0.set_BoolValue2(true);
         TestObject_0.set_ByteValue((byte)42);
@@ -83,8 +75,56 @@ public class Sender extends SenderBase {
         arrayNode.add("this");
         arrayNode.add("that");
         arrayNode.add("other");
+
         TestObject_0.set_JSONValue2(arrayNode);
 
-        updateAttributeValues(TestObject_0, 0.0);
+        registerObject(TestObject_0);
+    }
+
+    public TestObject getTestObject() {
+        return TestObject_0;
+    }
+
+    private int state = 0;
+
+    private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
+    private double currentTime = 0;
+
+    public void execute() throws Exception {
+
+        if (state == 0) {
+            putAdvanceTimeRequest(atr);
+
+            startAdvanceTimeThread();
+
+            atr.requestSyncStart();
+
+            // FIRST SENT-INTERACTION SHOULD BE SENT ON FIRST ADVANCE-TIME-REQUEST (TO 1 SEC)
+            updateAttributeValues(TestObject_0, 0.5);
+
+            currentTime += getStepSize();
+            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+            putAdvanceTimeRequest(newATR);
+            atr.requestSyncEnd();
+            atr = newATR;
+
+            // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
+            // THE SENDING OF THE UPDATED OBJECT(S) BEFORE WE RETURN FROM execute
+            atr.requestSyncStart();
+            putAdvanceTimeRequest(atr);
+            atr.requestSyncEnd();
+
+            ++state;
+            return;
+        }
+
+        // THIS STATE IS MEANT TO KILL THE AdvanceTimeThread
+        if (state == 1) {
+
+            atr.requestSyncStart();
+            terminateAdvanceTimeThread(atr);
+
+        }
+
     }
 }

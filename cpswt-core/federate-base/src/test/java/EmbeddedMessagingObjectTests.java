@@ -56,6 +56,8 @@ public class EmbeddedMessagingObjectTests {
         FederateConfig senderFederateConfig = getNewFederateConfig("Sender");
         Sender sender = new Sender(senderFederateConfig);
 
+        rtiAmbassadorProxy2.setSynchronizedFederate(sender);
+
         //
         // CLASS HANDLES FOR FEDERATE-SPECIFIC EmbeddedMessaging INTERACTIONS
         //
@@ -108,6 +110,8 @@ public class EmbeddedMessagingObjectTests {
 
         // NUMBER OF OBJECTS UPDATED BY SENDER SHOULD BE 1
         Assert.assertEquals(1, updatedObjectDataList.size());
+
+        sender.execute();
 
         // GET THE DATA ASSOCIATED WITH THE UPDATED ATTRIBUTES OF THE REGISTERED OBJECT
         RTIAmbassadorProxy2.UpdatedObjectData updatedObjectData = updatedObjectDataList.get(0);
@@ -232,10 +236,15 @@ public class EmbeddedMessagingObjectTests {
 
         // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
         rtiAmbassadorProxy2.clear();
+        rtiAmbassadorProxy2.resetCurrentTime();
 
+        //
         // CREATE THE RECEIVER FEDERATE
+        //
         FederateConfig receiverFederateConfig = getNewFederateConfig("Receiver");
         Receiver receiver = new Receiver(receiverFederateConfig);
+
+        rtiAmbassadorProxy2.setSynchronizedFederate(receiver);
 
         // THE RECEIVER SHOULD NOT HAVE THE TestObject YET
         Assert.assertNull(receiver.getTestObject());
@@ -268,11 +277,17 @@ public class EmbeddedMessagingObjectTests {
                 null
         );
 
-        // THE Receiver SHOULD IGNORE THE "reflectAttributeValues" CALL ABOVE, SO PERFORMED THE ACTIONS ASSOCIATED T
+        // THE FIRST EXECUTE ONLY ADVANCES THE CLOCK -- CURRENTLY AT 0, ADVANCES TO 1.  REFLECTION IS AT 0.5
         receiver.execute();
 
-        // THE RECEIVER SHOULD NOW HAVE THE OBJECT
+        // THE RECEIVER SHOULD NOt HAVE THE OBJECT YET
         TestObject receivedTestObject = receiver.getTestObject();
+        Assert.assertNull(receivedTestObject);
+
+        // THE Receiver SHOULD ONLY UPDATE THOSE ATTRIBUTES THAT ARE DIRECTLY SUBSCRIBED (NOT SOFT SUBSCRIBED
+        receiver.execute();
+
+        receivedTestObject = receiver.getTestObject();
         Assert.assertNotNull(receivedTestObject);
 
         // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
@@ -309,6 +324,9 @@ public class EmbeddedMessagingObjectTests {
 
         // THIS WILL CAUSE THE Receiver TO APPLY THE ObjectReflector TO ITS LOCAL COPY OF THE TestObject INSTANCE
         // AND MAKE THE INSTANCE ACCESSIBLE THROUGH ITS getTestObject() METHOD
+        receiver.execute();
+
+        // STOP ADVANCE-TIME-THREAD
         receiver.execute();
 
         // NOT SUBSCRIBED BY Receiver, SO receivedTestObject.get_BoolValue1() HAS DEFAULT VALUE OF false,
