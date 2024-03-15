@@ -166,6 +166,22 @@ public class EmbeddedMessagingInteractionTests {
 
         rtiAmbassadorProxy2.clear();
 
+        // SENDER RECEIVES
+        // edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate
+        // INTERACTION
+        // NOTE:  THIS SHOULD REALLY BE A
+        // edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Sender
+        // INTERACTION, BUT AS WE A NOT IN AN ACTUAL FEDERATION, IT DOESN'T GET FILTERED BY THE RTI AND FUNCTIONS
+        // JUST AS WELL IN THIS TEST SCENARIO
+        sender.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getReceivedInteraction(),
+                null,
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getLogicalTime(),
+                null
+
+        );
+
         // 2 INTERACTIONS SHOULD BE SENT TO RTI
         sender.executeForProxyFederateInteractions();
 
@@ -187,7 +203,7 @@ public class EmbeddedMessagingInteractionTests {
         Assert.assertEquals(sender.virtualFederateName1, deleteProxy1.get_federateName());
 
 
-        // THIS SHOULD BE SECOND addProxy INTERACTION
+        // THIS SHOULD BE SECOND deleteProxy INTERACTION
         RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData5 =
                 sentInteractionDataList.get(1);
 
@@ -208,7 +224,20 @@ public class EmbeddedMessagingInteractionTests {
         Set<String> actualProxiedFederateNameSet2 = sender.getProxiedFederateNameSetCopy();
         Assert.assertEquals(new HashSet<>(), actualProxiedFederateNameSet2);
 
-        // THIS SHOULD BE FIRST addProxy INTERACTION
+        // THE SENDER SHOULD NOW HAVE AN INTERACTION
+        List<TestInteraction> testInteractionList = sender.getTestInteractionList();
+        Assert.assertEquals(1, testInteractionList.size());
+
+        TestInteraction testInteraction1 = testInteractionList.get(0);
+
+        // IN THE RECEIVER, THERE SHOULD BE NO PROXIED FEDERATE NAME BECAUSE IT, THE RECEIVER FEDERATE
+        // IS NOT A PROXY FOR ANY OTHER FEDERATES.
+        Assert.assertEquals(sender.virtualFederateName2, testInteraction1.getProxiedFederateName());
+
+        List<String> federateSequence1 = List.of(
+                sender.virtualFederateName2, sender.getFederateType(), sender.virtualFederateName2
+        );
+        Assert.assertEquals(federateSequence1, testInteraction1.getFederateSequenceList());
 
         //
         // CREATE THE RECEIVER FEDERATE
@@ -241,7 +270,13 @@ public class EmbeddedMessagingInteractionTests {
         Set<String> actualProxiedFederateNameSet3 = receiver.getProxiedFederateNameSetCopy(sender.getFederateType());
         Assert.assertEquals(expectedProxiedFederateNameSet3, actualProxiedFederateNameSet3);
 
-        // RECEIVE TESTOMNETFEDERATE INTERACTION
+        // RECEIVER RECEIVES
+        // edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate
+        // INTERACTION
+        // NOTE:  THIS SHOULD REALLY BE A
+        // edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Receiver
+        // INTERACTION, BUT AS WE A NOT IN AN ACTUAL FEDERATION, IT DOESN'T GET FILTERED BY THE RTI AND FUNCTIONS
+        // JUST AS WELL IN THIS TEST SCENARIO
         receiver.receiveInteraction(
                 sentInteractionEmbeddedMessagingOmnetFederateData3.getInteractionClassHandle(),
                 sentInteractionEmbeddedMessagingOmnetFederateData3.getReceivedInteraction(),
@@ -254,24 +289,28 @@ public class EmbeddedMessagingInteractionTests {
         receiver.executeForProxyFederateInteractions();
 
         // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
-        List<TestInteraction> testInteractionList = receiver.getTestInteractionList();
-        Assert.assertEquals(1, testInteractionList.size());
+        List<TestInteraction> testInteractionList1 = receiver.getTestInteractionList();
+        Assert.assertEquals(1, testInteractionList1.size());
 
-        TestInteraction testInteraction1 = testInteractionList.get(0);
+        TestInteraction testInteraction2 = testInteractionList1.get(0);
 
-        List<String> federateSequence1 = List.of(
+        // IN THE RECEIVER, THERE SHOULD BE NO PROXIED FEDERATE NAME BECAUSE IT, THE RECEIVER FEDERATE
+        // IS NOT A PROXY FOR ANY OTHER FEDERATES.
+        Assert.assertNull(testInteraction2.getProxiedFederateName());
+
+        List<String> federateSequence2 = List.of(
                 sender.virtualFederateName2, sender.getFederateType(), sender.virtualFederateName2
         );
-        Assert.assertEquals(federateSequence1, testInteraction1.getFederateSequenceList());
+        Assert.assertEquals(federateSequence2, testInteraction2.getFederateSequenceList());
 
-        // RECEIVER FIRST ADDPROXY INTERACTION
+        // RECEIVE FIRST DELETEPROXY INTERACTION
         receiver.receiveInteraction(
                 sentInteractionEmbeddedMessagingOmnetFederateData4.getInteractionClassHandle(),
                 sentInteractionEmbeddedMessagingOmnetFederateData4.getReceivedInteraction(),
                 null
         );
 
-        // RECEIVER SECOND ADDPROXY INTERACTION
+        // RECEIVE SECOND DELETEPROXY INTERACTION
         receiver.receiveInteraction(
                 sentInteractionEmbeddedMessagingOmnetFederateData5.getInteractionClassHandle(),
                 sentInteractionEmbeddedMessagingOmnetFederateData5.getReceivedInteraction(),
@@ -489,10 +528,10 @@ public class EmbeddedMessagingInteractionTests {
         receiver.executeForInteractionNetworkPropagation();
 
         // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
-        List<TestInteraction> testInteractionList = receiver.getTestInteractionList();
-        Assert.assertEquals(1, testInteractionList.size());
+        List<TestInteraction> testInteractionList2 = receiver.getTestInteractionList();
+        Assert.assertEquals(1, testInteractionList2.size());
 
-        TestInteraction receivedTestInteraction = testInteractionList.get(0);
+        TestInteraction receivedTestInteraction = testInteractionList2.get(0);
 
         Assert.assertEquals(0.5, receivedTestInteraction.getTime(), 0.001);
 
@@ -514,10 +553,10 @@ public class EmbeddedMessagingInteractionTests {
         receiver.executeForInteractionNetworkPropagation();
 
         // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
-        testInteractionList = receiver.getTestInteractionList();
-        Assert.assertEquals(2, testInteractionList.size());
+        testInteractionList2 = receiver.getTestInteractionList();
+        Assert.assertEquals(2, testInteractionList2.size());
 
-        Assert.assertEquals(1.5, testInteractionList.get(0).getTime(), 0.001);
-        Assert.assertEquals(1.6, testInteractionList.get(1).getTime(), 0.001);
+        Assert.assertEquals(1.5, testInteractionList2.get(0).getTime(), 0.001);
+        Assert.assertEquals(1.6, testInteractionList2.get(1).getTime(), 0.001);
     }
 }

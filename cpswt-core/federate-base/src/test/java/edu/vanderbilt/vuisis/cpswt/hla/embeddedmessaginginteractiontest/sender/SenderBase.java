@@ -53,6 +53,7 @@ public class SenderBase extends SynchronizedFederateMockRTI {
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.SimulationControl_p.SimEnd.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.load();
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate.load();
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Sender.load();
         edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.load();
     }
 
@@ -71,6 +72,19 @@ public class SenderBase extends SynchronizedFederateMockRTI {
 
         // SOFT INTERACTION PUBLICATIONS
         edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.add_federate_name_soft_publish("TestOmnetFederate");
+
+        // DIRECT INTERACTION SUBSCRIPTIONS
+
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.Sender.subscribe_interaction(getRTI());
+
+        // SOFT INTERACTION SUBSCRIPTIONS
+
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.soft_subscribe_interaction(getRTI());
+        _subscribedInteractionFilter.setFedFilters(
+            edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction.get_class_handle(),
+            SubscribedInteractionFilter.OriginFedFilter.ORIGIN_FILTER_DISABLED,
+            SubscribedInteractionFilter.SourceFedFilter.SOURCE_FILTER_DISABLED
+        );
     }
 
     public edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction create_InteractionRoot_C2WInteractionRoot_TestInteraction() {

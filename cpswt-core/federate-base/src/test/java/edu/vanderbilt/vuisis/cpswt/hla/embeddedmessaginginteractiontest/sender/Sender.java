@@ -35,11 +35,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
+
 import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -84,6 +87,35 @@ public class Sender extends SenderBase {
         _testInteraction.set_StringValue("Hello");
         _testInteraction.set_actualLogicalGenerationTime(0.0);
         _testInteraction.set_federateFilter("");
+    }
+
+    List<TestInteraction> testInteractionList = new ArrayList<>();
+
+    public List<TestInteraction> getTestInteractionList() {
+        List<TestInteraction> localTestInteractionList = new ArrayList<>(testInteractionList);
+        testInteractionList.clear();
+        return localTestInteractionList;
+    }
+
+    private void handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(InteractionRoot interactionRoot) {
+
+        TestInteraction testInteraction = (TestInteraction) interactionRoot;
+        testInteractionList.add(testInteraction);
+    }
+
+    private void checkReceivedSubscriptions() {
+
+        InteractionRoot interactionRoot;
+        while ((interactionRoot = getNextInteractionNoWait()) != null) {
+
+            if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass("InteractionRoot.C2WInteractionRoot.TestInteraction")) {
+
+                handleInteractionClass_InteractionRoot_C2WInteractionRoot_TestInteraction(interactionRoot);
+                continue;
+            }
+
+            log.debug("unhandled interaction: {}", interactionRoot.getJavaClassName());
+        }
     }
 
     public String getProxyFederateName(String federateName) {
@@ -153,6 +185,8 @@ public class Sender extends SenderBase {
         if (state == 1) {
             deleteProxiedFederate(virtualFederateName1);
             deleteProxiedFederate(virtualFederateName2);
+
+            checkReceivedSubscriptions();
 
             atr.requestSyncStart();
             terminateAdvanceTimeThread(atr);

@@ -59,14 +59,6 @@ public class Receiver extends ReceiverBase {
         super(params);
     }
 
-    public String getProxyFederateName(String federateName) {
-        return getProxyFor(federateName);
-    }
-
-    public Set<String> getProxiedFederateNameSetCopy(String federateName) {
-        return new HashSet<>(getProxiedFederateNameSet(federateName));
-    }
-
     public List<TestInteraction> getTestInteractionList() {
         List<TestInteraction> localTestInteractionList = new ArrayList<>(testInteractionList);
         testInteractionList.clear();
@@ -92,6 +84,14 @@ public class Receiver extends ReceiverBase {
 
             log.debug("unhandled interaction: {}", interactionRoot.getJavaClassName());
         }
+    }
+
+    public String getProxyFederateName(String federateName) {
+        return getProxyFor(federateName);
+    }
+
+    public Set<String> getProxiedFederateNameSetCopy(String federateName) {
+        return new HashSet<>(getProxiedFederateNameSet(federateName));
     }
 
     private int state = 0;
@@ -165,14 +165,12 @@ public class Receiver extends ReceiverBase {
 
             advanceTime();
 
-            ++state;
-            return;
-        }
-
-        if (state == 3) {
+            // SHUT DOWN THE AdvanceTimeThread
             atr.requestSyncStart();
             terminateAdvanceTimeThread(atr);
             reset();
+
+            ++state;
         }
     }
 }
