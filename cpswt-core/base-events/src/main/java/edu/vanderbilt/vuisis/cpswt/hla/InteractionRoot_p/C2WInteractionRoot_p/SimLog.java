@@ -526,9 +526,10 @@ public class SimLog extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2
     * duplicate
     */
     public SimLog(SimLog messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public SimLog create_interaction( SimLog messaging_var ) {
+        return (SimLog)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

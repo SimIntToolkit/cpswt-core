@@ -431,9 +431,10 @@ public class SimResume extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p
     * duplicate
     */
     public SimResume(SimResume messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public SimResume create_interaction( SimResume messaging_var ) {
+        return (SimResume)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

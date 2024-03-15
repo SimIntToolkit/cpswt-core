@@ -431,9 +431,10 @@ public class SimEnd extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2
     * duplicate
     */
     public SimEnd(SimEnd messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public SimEnd create_interaction( SimEnd messaging_var ) {
+        return (SimEnd)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

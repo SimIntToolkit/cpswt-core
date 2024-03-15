@@ -526,9 +526,10 @@ public class FederateResignInteraction extends edu.vanderbilt.vuisis.cpswt.hla.I
     * duplicate
     */
     public FederateResignInteraction(FederateResignInteraction messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public FederateResignInteraction create_interaction( FederateResignInteraction messaging_var ) {
+        return (FederateResignInteraction)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

@@ -526,9 +526,10 @@ public class FederateJoinInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Int
     * duplicate
     */
     public FederateJoinInteraction(FederateJoinInteraction messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public FederateJoinInteraction create_interaction( FederateJoinInteraction messaging_var ) {
+        return (FederateJoinInteraction)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

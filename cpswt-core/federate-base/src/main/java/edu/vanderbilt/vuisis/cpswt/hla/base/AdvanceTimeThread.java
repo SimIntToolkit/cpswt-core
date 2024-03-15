@@ -146,8 +146,7 @@ public class AdvanceTimeThread extends Thread {
         if (currentTime < 0) return;
 
         while (true) {
-            AdvanceTimeRequest advanceTimeRequest = null;
-            advanceTimeRequest = _atrQueue.peek();
+            AdvanceTimeRequest advanceTimeRequest = _atrQueue.peek();
             if (advanceTimeRequest == null) {
                 break;
             }

@@ -858,14 +858,10 @@ public class FederateObject extends edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot {
     * duplicate
     */
     public FederateObject(FederateObject messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
-        // DEEP(ER) COPY FOR OBJECTS
-        for(ClassAndPropertyName key: classAndPropertyNameValueMap.keySet()) {
-            classAndPropertyNameValueMap.put(key, new Attribute<>((Attribute<Object>)classAndPropertyNameValueMap.get(key)));
-        }
-
+    public FederateObject create_object( FederateObject messaging_var ) {
+        return (FederateObject)edu.vanderbilt.vuisis.cpswt.hla.ObjectRoot.create_object(messaging_var);
     }
 }

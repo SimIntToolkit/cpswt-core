@@ -431,9 +431,10 @@ public class SimPause extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.
     * duplicate
     */
     public SimPause(SimPause messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public SimPause create_interaction( SimPause messaging_var ) {
+        return (SimPause)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

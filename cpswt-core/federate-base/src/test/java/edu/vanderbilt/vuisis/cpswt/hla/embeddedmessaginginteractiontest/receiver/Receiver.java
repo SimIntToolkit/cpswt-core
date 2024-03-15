@@ -39,7 +39,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 // Define the  type of federate for the federation.
@@ -55,6 +57,14 @@ public class Receiver extends ReceiverBase {
 
     public Receiver(FederateConfig params) throws Exception {
         super(params);
+    }
+
+    public String getProxyFederateName(String federateName) {
+        return getProxyFor(federateName);
+    }
+
+    public Set<String> getProxiedFederateNameSetCopy(String federateName) {
+        return new HashSet<>(getProxiedFederateNameSet(federateName));
     }
 
     public List<TestInteraction> getTestInteractionList() {
@@ -89,7 +99,38 @@ public class Receiver extends ReceiverBase {
     private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
     private double currentTime = 0;
 
-    public void execute() throws Exception {
+    void reset() {
+        state = 0;
+        currentTime = 0;
+        atr = new AdvanceTimeRequest(currentTime);
+    }
+
+    void advanceTime() {
+        currentTime += getStepSize();
+        AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+        putAdvanceTimeRequest(newATR);
+        atr.requestSyncEnd();
+        atr = newATR;
+    }
+
+    public void executeForProxyFederateInteractions() throws Exception {
+
+        putAdvanceTimeRequest(atr);
+
+        startAdvanceTimeThread();
+
+        atr.requestSyncStart();
+
+        checkReceivedSubscriptions();
+
+        advanceTime();
+
+        atr.requestSyncStart();
+        terminateAdvanceTimeThread(atr);
+        reset();
+    }
+
+    public void executeForInteractionNetworkPropagation() throws Exception {
 
         if (state == 0) {
             putAdvanceTimeRequest(atr);
@@ -100,11 +141,7 @@ public class Receiver extends ReceiverBase {
 
             checkReceivedSubscriptions();
 
-            currentTime += getStepSize();
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
-            putAdvanceTimeRequest(newATR);
-            atr.requestSyncEnd();
-            atr = newATR;
+            advanceTime();
 
             ++state;
             return;
@@ -115,11 +152,7 @@ public class Receiver extends ReceiverBase {
 
             checkReceivedSubscriptions();
 
-            currentTime += getStepSize();
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
-            putAdvanceTimeRequest(newATR);
-            atr.requestSyncEnd();
-            atr = newATR;
+            advanceTime();
 
             ++state;
             return;
@@ -130,11 +163,7 @@ public class Receiver extends ReceiverBase {
 
             checkReceivedSubscriptions();
 
-            currentTime += getStepSize();
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
-            putAdvanceTimeRequest(newATR);
-            atr.requestSyncEnd();
-            atr = newATR;
+            advanceTime();
 
             ++state;
             return;
@@ -143,6 +172,7 @@ public class Receiver extends ReceiverBase {
         if (state == 3) {
             atr.requestSyncStart();
             terminateAdvanceTimeThread(atr);
+            reset();
         }
     }
 }

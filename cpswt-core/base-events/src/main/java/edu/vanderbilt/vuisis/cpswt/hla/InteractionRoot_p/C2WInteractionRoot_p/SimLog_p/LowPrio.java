@@ -443,9 +443,10 @@ public class LowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C
     * duplicate
     */
     public LowPrio(LowPrio messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public LowPrio create_interaction( LowPrio messaging_var ) {
+        return (LowPrio)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

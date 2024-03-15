@@ -452,9 +452,10 @@ public class DeleteProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
     * duplicate
     */
     public DeleteProxy(DeleteProxy messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public DeleteProxy create_interaction( DeleteProxy messaging_var ) {
+        return (DeleteProxy)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

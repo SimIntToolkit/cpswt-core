@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRootInterface;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.AddProxy;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.EmbeddedMessaging_p.TestOmnetFederate;
 import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.DeleteProxy;
 import edu.vanderbilt.vuisis.cpswt.hla.RTIAmbassadorProxy2;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.receiver.Receiver;
 import edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender.Sender;
@@ -17,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.portico.impl.hla13.types.DoubleTime;
 
-import java.util.List;
+import java.util.*;
 
 public class EmbeddedMessagingInteractionTests {
 
@@ -85,6 +87,207 @@ public class EmbeddedMessagingInteractionTests {
     }
 
     @Test
+    public void testProxyFederateInteractions() throws Exception {
+        FederateConfig senderFederateConfig = getNewFederateConfig("Sender");
+        Sender sender = new Sender(senderFederateConfig);
+
+        rtiAmbassadorProxy2.setSynchronizedFederate(sender);
+
+        //
+        // LIST OF INTERACTION-DATA FOR INTERACTIONS SENT BY SENDER
+        //
+        List<RTIAmbassadorProxy2.SentInteractionData> sentInteractionDataList =
+                rtiAmbassadorProxy2.getSentInteractionDataList();
+
+        // ERASE FederateJoinInteraction INTERACTION
+        sentInteractionDataList.clear();
+
+        // 3 INTERACTIONS SHOULD BE SENT TO RTI
+        sender.executeForProxyFederateInteractions();
+
+        Assert.assertEquals(3, sentInteractionDataList.size());
+
+
+        // THIS SHOULD BE FIRST addProxy INTERACTION
+        RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData1 =
+                sentInteractionDataList.get(0);
+
+        InteractionRoot interactionRoot1 = InteractionRoot.create_interaction(
+                sentInteractionEmbeddedMessagingOmnetFederateData1.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData1.getReceivedInteraction()
+        );
+
+        Assert.assertTrue(interactionRoot1 instanceof AddProxy);
+        AddProxy addProxy1 = (AddProxy)interactionRoot1;
+
+        Assert.assertEquals(sender.getFederateType(), addProxy1.get_proxyFederateName());
+        Assert.assertEquals(sender.virtualFederateName1, addProxy1.get_federateName());
+
+
+        // THIS SHOULD BE SECOND addProxy INTERACTION
+        RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData2 =
+                sentInteractionDataList.get(1);
+
+        InteractionRoot interactionRoot2 = InteractionRoot.create_interaction(
+                sentInteractionEmbeddedMessagingOmnetFederateData2.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData2.getReceivedInteraction()
+        );
+        Assert.assertTrue(interactionRoot2 instanceof AddProxy);
+        AddProxy addProxy2 = (AddProxy)interactionRoot2;
+
+        Assert.assertEquals(sender.getFederateType(), addProxy2.get_proxyFederateName());
+        Assert.assertEquals(sender.virtualFederateName2, addProxy2.get_federateName());
+
+
+        // CHECK OUT PROXY FEDERATE TABLES IN SENDER
+        Assert.assertEquals(sender.getFederateType(), sender.getProxyFederateName(sender.virtualFederateName1));
+        Assert.assertEquals(sender.getFederateType(), sender.getProxyFederateName(sender.virtualFederateName2));
+
+        Set<String> expectedProxiedFederateNameSet1 =
+                new HashSet<>(Arrays.asList(sender.virtualFederateName1, sender.virtualFederateName2));
+        Set<String> actualProxiedFederateNameSet1 = sender.getProxiedFederateNameSetCopy();
+        Assert.assertEquals(expectedProxiedFederateNameSet1, actualProxiedFederateNameSet1);
+
+
+        // THIRD SHOULD BE TestOmnetFederate INTERACTION
+        RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData3 =
+                sentInteractionDataList.get(2);
+
+        InteractionRoot interactionRoot3 = InteractionRoot.create_interaction(
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getReceivedInteraction()
+        );
+
+        Assert.assertTrue(interactionRoot3 instanceof TestOmnetFederate);
+        TestOmnetFederate testOmnetFederate1 = (TestOmnetFederate)interactionRoot3;
+
+        List<String> federateSequenceList1 = List.of("Sender");
+        Assert.assertEquals(federateSequenceList1, testOmnetFederate1.getFederateSequenceList());
+
+        rtiAmbassadorProxy2.clear();
+
+        // 2 INTERACTIONS SHOULD BE SENT TO RTI
+        sender.executeForProxyFederateInteractions();
+
+        Assert.assertEquals(2, sentInteractionDataList.size());
+
+
+        // THIS SHOULD BE FIRST deleteProxy INTERACTION
+        RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData4 =
+                sentInteractionDataList.get(0);
+
+        InteractionRoot interactionRoot4 = InteractionRoot.create_interaction(
+                sentInteractionEmbeddedMessagingOmnetFederateData4.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData4.getReceivedInteraction()
+        );
+
+        Assert.assertTrue(interactionRoot4 instanceof DeleteProxy);
+        DeleteProxy deleteProxy1 = (DeleteProxy)interactionRoot4;
+
+        Assert.assertEquals(sender.virtualFederateName1, deleteProxy1.get_federateName());
+
+
+        // THIS SHOULD BE SECOND addProxy INTERACTION
+        RTIAmbassadorProxy2.SentInteractionData sentInteractionEmbeddedMessagingOmnetFederateData5 =
+                sentInteractionDataList.get(1);
+
+        InteractionRoot interactionRoot5 = InteractionRoot.create_interaction(
+                sentInteractionEmbeddedMessagingOmnetFederateData5.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData5.getReceivedInteraction()
+        );
+        Assert.assertTrue(interactionRoot5 instanceof DeleteProxy);
+        DeleteProxy deleteProxy2 = (DeleteProxy)interactionRoot5;
+
+        Assert.assertEquals(sender.virtualFederateName2, deleteProxy2.get_federateName());
+
+
+        // CHECK OUT PROXY FEDERATE TABLES IN SENDER
+        Assert.assertNull(sender.getProxyFederateName(sender.virtualFederateName1));
+        Assert.assertNull(sender.getProxyFederateName(sender.virtualFederateName2));
+
+        Set<String> actualProxiedFederateNameSet2 = sender.getProxiedFederateNameSetCopy();
+        Assert.assertEquals(new HashSet<>(), actualProxiedFederateNameSet2);
+
+        // THIS SHOULD BE FIRST addProxy INTERACTION
+
+        //
+        // CREATE THE RECEIVER FEDERATE
+        //
+        FederateConfig receiverFederateConfig = getNewFederateConfig("Receiver");
+        Receiver receiver = new Receiver(receiverFederateConfig);
+
+        rtiAmbassadorProxy2.setSynchronizedFederate(receiver);
+
+        // RECEIVER FIRST ADDPROXY INTERACTION
+        receiver.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData1.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData1.getReceivedInteraction(),
+                null
+        );
+
+        // RECEIVER SECOND ADDPROXY INTERACTION
+        receiver.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData2.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData2.getReceivedInteraction(),
+                null
+        );
+
+        // CHECK OUT PROXY FEDERATE TABLES IN RECEIVER
+        Assert.assertEquals(sender.getFederateType(), receiver.getProxyFederateName(sender.virtualFederateName1));
+        Assert.assertEquals(sender.getFederateType(), receiver.getProxyFederateName(sender.virtualFederateName2));
+
+        Set<String> expectedProxiedFederateNameSet3 =
+                new HashSet<>(Arrays.asList(sender.virtualFederateName1, sender.virtualFederateName2));
+        Set<String> actualProxiedFederateNameSet3 = receiver.getProxiedFederateNameSetCopy(sender.getFederateType());
+        Assert.assertEquals(expectedProxiedFederateNameSet3, actualProxiedFederateNameSet3);
+
+        // RECEIVE TESTOMNETFEDERATE INTERACTION
+        receiver.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getReceivedInteraction(),
+                null,
+                sentInteractionEmbeddedMessagingOmnetFederateData3.getLogicalTime(),
+                null
+
+        );
+
+        receiver.executeForProxyFederateInteractions();
+
+        // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
+        List<TestInteraction> testInteractionList = receiver.getTestInteractionList();
+        Assert.assertEquals(1, testInteractionList.size());
+
+        TestInteraction testInteraction1 = testInteractionList.get(0);
+
+        List<String> federateSequence1 = List.of(
+                sender.virtualFederateName2, sender.getFederateType(), sender.virtualFederateName2
+        );
+        Assert.assertEquals(federateSequence1, testInteraction1.getFederateSequenceList());
+
+        // RECEIVER FIRST ADDPROXY INTERACTION
+        receiver.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData4.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData4.getReceivedInteraction(),
+                null
+        );
+
+        // RECEIVER SECOND ADDPROXY INTERACTION
+        receiver.receiveInteraction(
+                sentInteractionEmbeddedMessagingOmnetFederateData5.getInteractionClassHandle(),
+                sentInteractionEmbeddedMessagingOmnetFederateData5.getReceivedInteraction(),
+                null
+        );
+
+        // CHECK OUT PROXY FEDERATE TABLES IN RECEIVER
+        Assert.assertNull(sender.getFederateType(), receiver.getProxyFederateName(sender.virtualFederateName1));
+        Assert.assertNull(sender.getFederateType(), receiver.getProxyFederateName(sender.virtualFederateName2));
+
+        Set<String> actualProxiedFederateNameSet4 = receiver.getProxiedFederateNameSetCopy(sender.getFederateType());
+        Assert.assertEquals(new HashSet<>(), actualProxiedFederateNameSet4);
+
+    }
+
+    @Test
     public void testInteractionNetworkPropagation() throws Exception {
 
         //
@@ -120,7 +323,7 @@ public class EmbeddedMessagingInteractionTests {
 
         // EXECUTE THE SENDER -- SHOULD ASSIGN PARAMETER VALUES TO TestInteraction INSTANCE AND
         // SEND IT TO THE RTI
-        sender.execute();
+        sender.executeForInteractionNetworkPropagation();
 
         // GET THE SEND INTERACTION DIRECTLY FROM THE SENDER
         // ** THIS WILL BE AN EMBEDDEDMESSSAGING INTERACTION CONTAINING A JSON-ENCODED TESTINTERACTION
@@ -182,7 +385,7 @@ public class EmbeddedMessagingInteractionTests {
         rtiAmbassadorProxy2.clear();
 
         // THE NEXT TWO INTERACTIONS SHOULD BE SENT ON THE NEXT execute() CALL OF THE SENDER
-        sender.execute();
+        sender.executeForInteractionNetworkPropagation();
 
         // NUMBER OF INTERACTIONS SENT BY SENDER SHOULD BE 1 EVEN THOUGH 2 WERE SENT BY SENDER --
         // THEY SHOULD BE COMBINED INTO A SINGLE INTERACTION
@@ -242,7 +445,7 @@ public class EmbeddedMessagingInteractionTests {
         checkTestInteractionJson(senderTestInteraction, (ObjectNode)sentInteractionJson2.get(1), 1.6);
 
         // TERMINATE ADVANCE-TIME-THREAD
-        sender.execute();
+        sender.executeForInteractionNetworkPropagation();
 
         // CLEAR THE AMBASSADOR PROXY FOR THE Receiver FEDERATE
         rtiAmbassadorProxy2.clear();
@@ -277,13 +480,13 @@ public class EmbeddedMessagingInteractionTests {
         );
 
         // THE Receiver SHOULD GET NO INTERACTIONS ON FIRST EXECUTION
-        receiver.execute();
+        receiver.executeForInteractionNetworkPropagation();
 
         // THE RECEIVER SHOULD NOT HAVE THE TestInteraction YET
         Assert.assertEquals(0, receiver.getTestInteractionList().size());
 
         // THE Receiver SHOULD GET 1 INTERACTION
-        receiver.execute();
+        receiver.executeForInteractionNetworkPropagation();
 
         // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
         List<TestInteraction> testInteractionList = receiver.getTestInteractionList();
@@ -308,7 +511,7 @@ public class EmbeddedMessagingInteractionTests {
         Assert.assertEquals(receivedTestInteraction.get_JSONValue(), senderTestInteraction.get_JSONValue());
 
         // THE Receiver SHOULD GET 2 INTERACTION2
-        receiver.execute();
+        receiver.executeForInteractionNetworkPropagation();
 
         // THE RECEIVER SHOULD NOW HAVE AN INTERACTION
         testInteractionList = receiver.getTestInteractionList();

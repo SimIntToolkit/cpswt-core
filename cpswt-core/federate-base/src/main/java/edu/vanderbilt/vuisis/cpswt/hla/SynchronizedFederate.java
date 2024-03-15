@@ -262,6 +262,8 @@ public class SynchronizedFederate extends NullFederateAmbassador {
             deleteProxy(federateName);
         }
 
+        federateNameToProxyFederateNameMap.put(federateName, proxyFederateName);
+
         if (!proxyFederateNameToFederateNameSetMap.containsKey(proxyFederateName)) {
             proxyFederateNameToFederateNameSetMap.put(proxyFederateName, new HashSet<>());
         }
@@ -286,6 +288,34 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
     }
 
+    protected void addProxiedFederate(String federateName) {
+        addProxy(federateName, getFederateType());
+
+        AddProxy addProxyInteraction = new AddProxy();
+        addProxyInteraction.set_proxyFederateName(getFederateType());
+        addProxyInteraction.set_federateName(federateName);
+
+        try {
+            sendInteraction(addProxyInteraction);
+            getRTI().tick();
+        } catch (Exception e) {
+            logger.warn("Could not send \"AddProxy\" interaction: ", e);
+        }
+    }
+
+    protected void deleteProxiedFederate(String federateName) {
+        deleteProxy(federateName);
+
+        DeleteProxy deleteProxyInteraction = new DeleteProxy();
+        deleteProxyInteraction.set_federateName(federateName);
+        try {
+            sendInteraction(deleteProxyInteraction);
+            getRTI().tick();
+        } catch (Exception e) {
+            logger.warn("Could not send \"DeleteProxy\" interaction: ", e);
+        }
+    }
+
     protected boolean hasProxy(String federateName) {
         return federateNameToProxyFederateNameMap.containsKey(federateName);
     }
@@ -296,6 +326,10 @@ public class SynchronizedFederate extends NullFederateAmbassador {
 
     protected Set<String> getProxiedFederateNameSet(String federateName) {
         return proxyFederateNameToFederateNameSetMap.getOrDefault(federateName, new HashSet<>());
+    }
+
+    protected Set<String> getProxiedFederateNameSet() {
+        return getProxiedFederateNameSet(getFederateType());
     }
 
     protected RTIambassador rti = null;
@@ -405,6 +439,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     protected final int federateRTIInitWaitTime;
 
     public SynchronizedFederate(FederateConfig federateConfig) {
+
         this.federationId = federateConfig.federationId;
         this.federateType = federateConfig.federateType;
         this.federateId = federateConfig.name == null || federateConfig.name.isEmpty() ?
@@ -590,13 +625,37 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         this.notifyFederationOfJoin();
     }
 
+    public InteractionRoot updateFederateSequence(InteractionRoot interactionRoot) {
+
+        String proxiedFederateName = interactionRoot.getProxiedFederateName();
+
+        List<String> federateTypeList = new ArrayList<>();
+
+        if ( proxiedFederateName != null && hasProxy(proxiedFederateName) ) {
+
+            String proxyFederateName = getProxyFor(proxiedFederateName);
+            if (proxyFederateName.equals(getFederateType())) {
+                federateTypeList.add(proxiedFederateName);
+            }
+            federateTypeList.addAll(List.of(proxyFederateName, proxiedFederateName));
+
+        } else {
+
+            federateTypeList.add(getFederateType());
+        }
+
+        return C2WInteractionRoot.update_federate_sequence(interactionRoot, federateTypeList);
+
+    }
+
     public void sendInteraction(
             InteractionRoot interactionRoot, Set<String> federateNameSet, double time
     ) throws Exception {
 
         if (!interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
 
-            String interactionJson = interactionRoot.toJson(time);
+            InteractionRoot newInteractionRoot = updateFederateSequence(interactionRoot);
+            String interactionJson = newInteractionRoot.toJson(time);
 
             for (String federateName : federateNameSet) {
                 String embeddedMessagingHlaClassName = EmbeddedMessaging.get_hla_class_name() + "." + federateName;
@@ -608,7 +667,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
                             "federateSequence",
                             interactionRoot.getParameter("federateSequence")
                     );
-                    embeddedMessagingForNetworkFederate.setFederateAppendedToFederateSequence(true);
                 }
                 embeddedMessagingForNetworkFederate.setParameter("messagingJson", interactionJson);
 
@@ -622,7 +680,6 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction(InteractionRoot interactionRoot, String federateName, double time) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
 
         Set<String> stringSet = new HashSet<>();
         stringSet.add(federateName);
@@ -630,17 +687,17 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction( InteractionRoot interactionRoot, double time ) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
-
         if (interactionRoot.getIsPublished()) {
+            InteractionRoot newInteractionRoot = updateFederateSequence(interactionRoot);
             if (_advanceTimeThread == null) {
                 logger.warn(
                         "AdvanceTimeThread not started:  sending time-based \"{}\" interaction directly",
-                        interactionRoot.getHlaClassName()
+                        newInteractionRoot.getHlaClassName()
                 );
-                interactionRoot.sendInteraction(getRTI(), time);
+                newInteractionRoot.sendInteraction(getRTI(), time);
             } else {
-                _advanceTimeThread.sendInteraction(interactionRoot, time);
+                _advanceTimeThread.sendInteraction(newInteractionRoot, time);
+//                newInteractionRoot.sendInteraction(getRTI(), time);
             }
         }
 
@@ -648,17 +705,15 @@ public class SynchronizedFederate extends NullFederateAmbassador {
     }
 
     public void sendInteraction(InteractionRoot interactionRoot) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
-
         if (interactionRoot.getIsPublished()) {
-            interactionRoot.sendInteraction(getRTI());
+            InteractionRoot newInteractionRoot = updateFederateSequence(interactionRoot);
+            newInteractionRoot.sendInteraction(getRTI());
         }
 
         sendInteraction(interactionRoot, interactionRoot.getFederateNameSoftPublishSet(),-1);
     }
 
     public void sendInteraction(InteractionRoot interactionRoot, String federateName) throws Exception {
-        C2WInteractionRoot.update_federate_sequence(interactionRoot, getFederateType());
 
         Set<String> stringSet = new HashSet<>();
         stringSet.add(federateName);
@@ -1606,6 +1661,16 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         }
 
         if (!unmatchingFedFilterProvided(interactionRoot)) {
+
+            String sourceFederateId = C2WInteractionRoot.get_source_federate_id(interactionRoot);
+            if (
+                    sourceFederateId != null &&
+                            hasProxy(sourceFederateId) &&
+                            getProxyFor(sourceFederateId).equals(getFederateType())
+            ) {
+                interactionRoot.setProxiedFederateName(sourceFederateId);
+            }
+
             if (interactionRoot.isInstanceHlaClassDerivedFromHlaClass(EmbeddedMessaging.get_hla_class_name())) {
                 receiveEmbeddedMessagingInteraction((EmbeddedMessaging)interactionRoot);
                 return;
@@ -1889,6 +1954,7 @@ public class SynchronizedFederate extends NullFederateAmbassador {
         try {
             logger.trace("Sending SimEnd for federate {}", this.federateId);
             sendInteraction(simEnd);
+            getRTI().tick();
         }
         catch(Exception ex) {
             logger.error("Error while sending SimEnd for federate {}", this.federateId);

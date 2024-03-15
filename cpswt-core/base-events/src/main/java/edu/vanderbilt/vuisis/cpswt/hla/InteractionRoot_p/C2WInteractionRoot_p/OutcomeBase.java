@@ -431,9 +431,10 @@ public class OutcomeBase extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
     * duplicate
     */
     public OutcomeBase(OutcomeBase messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public OutcomeBase create_interaction( OutcomeBase messaging_var ) {
+        return (OutcomeBase)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

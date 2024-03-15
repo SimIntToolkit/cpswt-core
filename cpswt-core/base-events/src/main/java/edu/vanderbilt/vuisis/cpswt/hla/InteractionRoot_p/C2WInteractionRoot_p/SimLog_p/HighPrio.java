@@ -443,9 +443,10 @@ public class HighPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.
     * duplicate
     */
     public HighPrio(HighPrio messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public HighPrio create_interaction( HighPrio messaging_var ) {
+        return (HighPrio)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

@@ -483,9 +483,10 @@ public class AddProxy extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot {
     * duplicate
     */
     public AddProxy(AddProxy messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public AddProxy create_interaction( AddProxy messaging_var ) {
+        return (AddProxy)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

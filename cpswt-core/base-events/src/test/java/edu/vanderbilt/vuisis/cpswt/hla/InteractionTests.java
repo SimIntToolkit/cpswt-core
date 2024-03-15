@@ -372,13 +372,15 @@ public class InteractionTests {
         String string2 = "string2";
         double doubleValue2 = 3.4;
 
-        C2WInteractionRoot.update_federate_sequence(dynamicSimLogInteraction, string2);
-        dynamicSimLogInteraction.setParameter("Time", doubleValue2);
+        InteractionRoot newDynamicSimLogInteraction = C2WInteractionRoot.update_federate_sequence(
+                dynamicSimLogInteraction, string2
+        );
+        newDynamicSimLogInteraction.setParameter("Time", doubleValue2);
 
-        List<String> federateSequenceList = C2WInteractionRoot.get_federate_sequence_list(dynamicSimLogInteraction);
+        List<String> federateSequenceList = C2WInteractionRoot.get_federate_sequence_list(newDynamicSimLogInteraction);
         Assert.assertEquals(string1, federateSequenceList.get(0));
         Assert.assertEquals(string2, federateSequenceList.get(1));
-        Assert.assertEquals(doubleValue2, (double)dynamicSimLogInteraction.getParameter("Time"), 0.01);
+        Assert.assertEquals(doubleValue2, (double)newDynamicSimLogInteraction.getParameter("Time"), 0.01);
 
         InteractionRoot staticSimLogInteraction1 = InteractionRoot.create_interaction(SimLog.get_hla_class_name());
         Assert.assertFalse(staticSimLogInteraction1.isDynamicInstance());
@@ -389,15 +391,15 @@ public class InteractionTests {
         double doubleValue3 = 5.6;
 
         SimLog simLogInteraction = (SimLog)staticSimLogInteraction1;
-        C2WInteractionRoot.update_federate_sequence(simLogInteraction, string3);
-        simLogInteraction.setParameter("Time", doubleValue3);
+        SimLog newSimLogInteraction1 = (SimLog)C2WInteractionRoot.update_federate_sequence(simLogInteraction, string3);
+        newSimLogInteraction1.setParameter("Time", doubleValue3);
 
-        federateSequenceList = simLogInteraction.getFederateSequenceList();
+        federateSequenceList = newSimLogInteraction1.getFederateSequenceList();
         Assert.assertEquals(string3, federateSequenceList.get(0));
-        Assert.assertEquals(doubleValue3, simLogInteraction.getParameter("Time"));
+        Assert.assertEquals(doubleValue3, newSimLogInteraction1.getParameter("Time"));
 
-        Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
-        Assert.assertEquals(doubleValue3, simLogInteraction.get_Time(), 0.01);
+        Assert.assertEquals(string3, newSimLogInteraction1.getOriginFederateId());
+        Assert.assertEquals(doubleValue3, newSimLogInteraction1.get_Time(), 0.01);
 
         String string4 = "string4";
         double doubleValue4 = 17.3;
@@ -406,17 +408,17 @@ public class InteractionTests {
         // "InteractionRoot.C2WInteractionRoot" USING EITHER THE "update_federate_sequence" or "updateFederateSequence"
         // METHODS, THESE METHODS WILL NOT CHANGE THE "federateSequence" FOR simLogInteraction AFTER THE
         // CALL TO "update_federate_sequence" ABOVE
-        simLogInteraction.updateFederateSequence(string4);
-        simLogInteraction.set_Time(doubleValue4);
+        SimLog newSimLogInteraction2 = (SimLog)newSimLogInteraction1.updateFederateSequence(string4);
+        newSimLogInteraction2.set_Time(doubleValue4);
 
-        federateSequenceList = simLogInteraction.getFederateSequenceList();
+        federateSequenceList = newSimLogInteraction2.getFederateSequenceList();
         Assert.assertEquals(string3, federateSequenceList.get(0));
-        Assert.assertEquals(string3, federateSequenceList.get(federateSequenceList.size() - 1));
-        Assert.assertEquals(doubleValue4, simLogInteraction.getParameter("Time"));
+        Assert.assertEquals(string4, federateSequenceList.get(federateSequenceList.size() - 1));
+        Assert.assertEquals(doubleValue4, newSimLogInteraction2.getParameter("Time"));
 
-        Assert.assertEquals(string3, simLogInteraction.getSourceFederateId());
-        Assert.assertEquals(string3, simLogInteraction.getOriginFederateId());
-        Assert.assertEquals(doubleValue4, simLogInteraction.get_Time(), 0.01);
+        Assert.assertEquals(string4, newSimLogInteraction2.getSourceFederateId());
+        Assert.assertEquals(string3, newSimLogInteraction2.getOriginFederateId());
+        Assert.assertEquals(doubleValue4, newSimLogInteraction2.get_Time(), 0.01);
     }
 
     @Test
@@ -465,19 +467,21 @@ public class InteractionTests {
         String federateName1 = "federateName1";
 
         // ADD federateName1 TO federateSequence
-        C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
+        InteractionRoot newInteractionRoot1 =
+                C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
 
         // MAKE SURE IT'S THERE
-        List<String> federateSequenceList1 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot1);
+        List<String> federateSequenceList1 = C2WInteractionRoot.get_federate_sequence_list(newInteractionRoot1);
 
         Assert.assertEquals(1, federateSequenceList1.size());
         Assert.assertEquals(federateName1, federateSequenceList1.get(0));
 
         // ADD IT AGAIN
-        C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
+        newInteractionRoot1 =
+                C2WInteractionRoot.update_federate_sequence(interactionRoot1, federateName1);
 
         // MAKE SURE federateSequence IS UNCHANGED
-        List<String> federateSequenceList2 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot1);
+        List<String> federateSequenceList2 = C2WInteractionRoot.get_federate_sequence_list(newInteractionRoot1);
 
         Assert.assertEquals(1, federateSequenceList2.size());
         Assert.assertEquals(federateName1, federateSequenceList2.get(0));
@@ -495,21 +499,22 @@ public class InteractionTests {
         interactionRoot2.setParameter("federateSequence", jsonArray.toString());
 
         // ADD federateName1 TO federateSequence
-        C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
+        InteractionRoot newInteractionRoot2 =
+                C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
 
         // MAKE SURE IT'S THERE
-        List<String> federateSequenceList3 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
+        List<String> federateSequenceList3 = C2WInteractionRoot.get_federate_sequence_list(newInteractionRoot2);
         federateNameList.add(federateName1);
 
         Assert.assertEquals(federateNameList, federateSequenceList3);
 
         // ADD IT AGAIN
-        C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
+        newInteractionRoot2 = C2WInteractionRoot.update_federate_sequence(interactionRoot2, federateName1);
 
         // MAKE SURE federateSequence IS UNCHANGED
-        List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(interactionRoot2);
+        List<String> federateSequenceList4 = C2WInteractionRoot.get_federate_sequence_list(newInteractionRoot2);
 
-        Assert.assertEquals(federateNameList, federateSequenceList3);
+        Assert.assertEquals(federateNameList, federateSequenceList4);
     }
 
     @Test

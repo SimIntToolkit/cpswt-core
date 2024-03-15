@@ -435,9 +435,10 @@ public class Receiver extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.
     * duplicate
     */
     public Receiver(Receiver messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public Receiver create_interaction( Receiver messaging_var ) {
+        return (Receiver)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

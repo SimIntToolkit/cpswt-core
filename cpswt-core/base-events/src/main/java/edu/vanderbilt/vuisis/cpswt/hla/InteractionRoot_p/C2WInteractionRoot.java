@@ -512,14 +512,14 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
         return true;
     }
 
-    private static void update_federate_sequence_aux(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
+    private static edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot update_federate_sequence_aux(
+      edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, List<String> federateTypeList
+    ) {
 
-        if (interactionRoot.getFederateAppendedToFederateSequence()) {
-            return;
-        }
-        interactionRoot.setFederateAppendedToFederateSequence(true);
+        edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot newInteractionRoot
+          = edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(interactionRoot);
 
-        String federateSequence = (String)interactionRoot.getParameter("federateSequence");
+        String federateSequence = (String)newInteractionRoot.getParameter("federateSequence");
 
         ArrayNode jsonArray = objectMapper.createArrayNode();
         if (is_federate_sequence(federateSequence)) {
@@ -529,20 +529,37 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
             }
         }
 
-        jsonArray.add(federateId);
-        interactionRoot.setParameter("federateSequence", jsonArray.toString());
-    }
-
-    public static void update_federate_sequence(edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, String federateId) {
-        String instanceHlaClassName = interactionRoot.getInstanceHlaClassName();
-
-        if ( instanceHlaClassName.startsWith("InteractionRoot.C2WInteractionRoot") ) {
-            update_federate_sequence_aux(interactionRoot, federateId);
+        for(String item : federateTypeList) {
+            if (jsonArray.isEmpty() || !jsonArray.get(jsonArray.size() - 1).asText().equals(item)) {
+                jsonArray.add(item);
+            }
         }
+        newInteractionRoot.setParameter("federateSequence", jsonArray.toString());
+
+        return newInteractionRoot;
     }
 
-    public void updateFederateSequence(String federateId) {
-        update_federate_sequence_aux(this, federateId);
+    public static edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot update_federate_sequence(
+      edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, List<String> federateTypeList
+    ) {
+
+        return interactionRoot.isInstanceHlaClassDerivedFromHlaClass(C2WInteractionRoot.get_hla_class_name()) ?
+          update_federate_sequence_aux(interactionRoot, federateTypeList) :
+          edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(interactionRoot);
+    }
+
+    public static edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot update_federate_sequence(
+      edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot interactionRoot, String federateType
+    ) {
+        return update_federate_sequence(interactionRoot, List.of(federateType));
+    }
+
+    public edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot updateFederateSequence(List<String> federateTypeList) {
+        return update_federate_sequence_aux(this, federateTypeList);
+    }
+
+    public edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot updateFederateSequence(String federateType) {
+        return updateFederateSequence(List.of(federateType));
     }
 
     public static List<String> get_federate_sequence_list(String federateSequence) {
@@ -652,9 +669,10 @@ public class C2WInteractionRoot extends edu.vanderbilt.vuisis.cpswt.hla.Interact
     * duplicate
     */
     public C2WInteractionRoot(C2WInteractionRoot messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public C2WInteractionRoot create_interaction( C2WInteractionRoot messaging_var ) {
+        return (C2WInteractionRoot)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

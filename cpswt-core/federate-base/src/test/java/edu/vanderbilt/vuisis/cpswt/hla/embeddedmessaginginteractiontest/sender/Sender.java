@@ -33,12 +33,14 @@ package edu.vanderbilt.vuisis.cpswt.hla.embeddedmessaginginteractiontest.sender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import edu.vanderbilt.vuisis.cpswt.config.FederateConfig;
-
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
 import edu.vanderbilt.vuisis.cpswt.hla.base.AdvanceTimeRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_p.C2WInteractionRoot_p.TestInteraction;
-import edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 // Define the  type of federate for the federation.
@@ -48,6 +50,9 @@ public class Sender extends SenderBase {
 
     public static ObjectMapper objectMapper = InteractionRoot.objectMapper;
 
+
+    public final String virtualFederateName1 = "VirtualFederate1";
+    public final String virtualFederateName2 = "VirtualFederate2";
 
     private final static Logger log = LogManager.getLogger();
 
@@ -81,14 +86,52 @@ public class Sender extends SenderBase {
         _testInteraction.set_federateFilter("");
     }
 
+    public String getProxyFederateName(String federateName) {
+        return getProxyFor(federateName);
+    }
+
+    public Set<String> getProxiedFederateNameSetCopy() {
+        return new HashSet<>(getProxiedFederateNameSet());
+    }
+
     private int state = 0;
 
     private AdvanceTimeRequest atr = new AdvanceTimeRequest(0);
     private double currentTime = 0;
 
-    public void execute() throws Exception {
-        // WE NOW NEED AN AdvanceTimeThread, AS IT IS RESPONSIBLE FOR SENDING SENT-INTERACTIONS
+    void reset() {
+        state = 0;
+        currentTime = 0;
+        atr = new AdvanceTimeRequest(currentTime);
+    }
+
+    public void advanceTimeEnhanced() {
+
+        // AFTER THE atr.requestSyncEnD(), THE AdvanceTimeThread SENDS THE QUEUED INTERACTIONS,
+        // *BUT IN A DIFFERENT THREAD*.  IF WE RETURN RIGHT AFTER THE atr.requestSyncEnd(), I.E. BACK TO THE TEST
+        // CODE, WE ARE NOT GUARANTEED THAT SENT INTERACTION WILL BE IN THE MOCK RTI WHEN WE CHECK FOR THEIR
+        // PRESENCE.  THAT IS, WE HAVE A RACE CONDITION.
+        currentTime += getStepSize();
+        AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
+        putAdvanceTimeRequest(newATR);
+        atr.requestSyncEnd();
+        atr = newATR;
+
+        // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
+        // THE SENDING OF THE INTERACTION(S) BEFORE WE RETURN FROM execute BY SUBMITTING A "NULL"
+        // AdvanceTimeRequest, I.E. AN AdvanceTimeRequest THAT DOESN'T ADVANCE THE TIME, BUT
+        // MAKES SURE THAT THE SENT INTERACTION ARE IN THE MOCK RTI FOR THE TEST TO CHECK
+        atr.requestSyncStart();
+        putAdvanceTimeRequest(atr);
+        atr.requestSyncEnd();
+    }
+
+    public void executeForProxyFederateInteractions() throws Exception {
+
         if (state == 0) {
+            addProxiedFederate(virtualFederateName1);
+            addProxiedFederate(virtualFederateName2);
+
             putAdvanceTimeRequest(atr);
 
             startAdvanceTimeThread();
@@ -96,24 +139,49 @@ public class Sender extends SenderBase {
             atr.requestSyncStart();
 
             // FIRST SENT-INTERACTION SHOULD BE SENT ON FIRST ADVANCE-TIME-REQUEST (TO 1 SEC)
-            sendInteraction(_testInteraction, 0.5);
+            TestInteraction testInteraction = new TestInteraction();
+            testInteraction.setProxiedFederateName(virtualFederateName2);
+
+            sendInteraction(testInteraction, 0);
+
+            advanceTimeEnhanced();
+
+            ++state;
+            return;
+        }
+
+        if (state == 1) {
+            deleteProxiedFederate(virtualFederateName1);
+            deleteProxiedFederate(virtualFederateName2);
+
+            atr.requestSyncStart();
+            terminateAdvanceTimeThread(atr);
+            reset();
+
+            ++state;
+        }
+    }
+
+    public void executeForInteractionNetworkPropagation() throws Exception {
+
+        // WE NOW NEED AN AdvanceTimeThread, AS IT IS RESPONSIBLE FOR SENDING SENT-INTERACTIONS
+        if (state == 0) {
+
+            putAdvanceTimeRequest(atr);
+
+            startAdvanceTimeThread();
+
+            atr.requestSyncStart();
+
+            // FIRST SENT-INTERACTION SHOULD BE SENT ON FIRST ADVANCE-TIME-REQUEST (TO 1 SEC)
+            sendInteraction(_testInteraction, currentTime + 0.5);
 
             // SECOND AND THIRD SENT-INTERACTIONS SHOULD BE SENT ON NEXT ADVANCE-TIME-REQUEST (TO 2 SEC)
             // SEE state == 1 BELOW
-            sendInteraction(_testInteraction, 1.5);
-            sendInteraction(_testInteraction, 1.6);
+            sendInteraction(_testInteraction, currentTime + 1.5);
+            sendInteraction(_testInteraction, currentTime + 1.6);
 
-            currentTime += getStepSize();
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
-            putAdvanceTimeRequest(newATR);
-            atr.requestSyncEnd();
-            atr = newATR;
-
-            // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
-            // THE SENDING OF THE INTERACTION(S) BEFORE WE RETURN FROM execute
-            atr.requestSyncStart();
-            putAdvanceTimeRequest(atr);
-            atr.requestSyncEnd();
+            advanceTimeEnhanced();
 
             ++state;
             return;
@@ -123,19 +191,8 @@ public class Sender extends SenderBase {
 
             atr.requestSyncStart();
 
-            currentTime += getStepSize();
-            AdvanceTimeRequest newATR = new AdvanceTimeRequest(currentTime);
-
             // SECOND INTERACTION SHOULD BE SENT HERE
-            putAdvanceTimeRequest(newATR);
-            atr.requestSyncEnd();
-            atr = newATR;
-
-            // TO AVOID A RACE CONDITION IN THE TEST, WE MAKE THE ADVANCE-TIME-THREAD COMPLETE
-            // THE SENDING OF THE INTERACTION(S) BEFORE WE RETURN FROM execute
-            atr.requestSyncStart();
-            putAdvanceTimeRequest(atr);
-            atr.requestSyncEnd();
+            advanceTimeEnhanced();
 
             ++state;
             return;
@@ -146,7 +203,7 @@ public class Sender extends SenderBase {
 
             atr.requestSyncStart();
             terminateAdvanceTimeThread(atr);
-
+            reset();
         }
     }
 }

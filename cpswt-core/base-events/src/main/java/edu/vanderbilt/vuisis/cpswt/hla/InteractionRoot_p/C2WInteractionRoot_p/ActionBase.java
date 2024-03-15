@@ -431,9 +431,10 @@ public class ActionBase extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_
     * duplicate
     */
     public ActionBase(ActionBase messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public ActionBase create_interaction( ActionBase messaging_var ) {
+        return (ActionBase)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

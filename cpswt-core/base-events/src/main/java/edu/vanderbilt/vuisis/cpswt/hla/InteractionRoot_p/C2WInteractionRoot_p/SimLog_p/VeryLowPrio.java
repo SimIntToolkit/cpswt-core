@@ -443,9 +443,10 @@ public class VeryLowPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot
     * duplicate
     */
     public VeryLowPrio(VeryLowPrio messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public VeryLowPrio create_interaction( VeryLowPrio messaging_var ) {
+        return (VeryLowPrio)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

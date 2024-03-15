@@ -431,9 +431,10 @@ public class SimulationControl extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
     * duplicate
     */
     public SimulationControl(SimulationControl messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public SimulationControl create_interaction( SimulationControl messaging_var ) {
+        return (SimulationControl)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

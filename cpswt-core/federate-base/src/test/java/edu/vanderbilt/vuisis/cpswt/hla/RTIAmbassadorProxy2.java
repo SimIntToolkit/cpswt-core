@@ -144,6 +144,8 @@ public class RTIAmbassadorProxy2 {
     private static final HashMap<String, Integer> interactionClassNameHandleMap = new HashMap<>();
     static {
         interactionClassNameHandleMap.put("InteractionRoot", uniqueNo++);
+        interactionClassNameHandleMap.put("InteractionRoot.AddProxy", uniqueNo++);
+        interactionClassNameHandleMap.put("InteractionRoot.DeleteProxy", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging", uniqueNo++);
         interactionClassNameHandleMap.put("InteractionRoot.C2WInteractionRoot.EmbeddedMessaging.TestOmnetFederate", uniqueNo++);
@@ -158,6 +160,18 @@ public class RTIAmbassadorProxy2 {
     private static final HashMap<ClassAndPropertyName, Integer> interactionClassAndPropertyNameHandleMap =
             new HashMap<>();
     static {
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.AddProxy", "federateName"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.AddProxy", "proxyFederateName"),
+                uniqueNo++
+        );
+        interactionClassAndPropertyNameHandleMap.put(
+                new ClassAndPropertyName("InteractionRoot.DeleteProxy", "federateName"),
+                uniqueNo++
+        );
         interactionClassAndPropertyNameHandleMap.put(
                 new ClassAndPropertyName("InteractionRoot.C2WInteractionRoot", "actualLogicalGenerationTime"),
                 uniqueNo++

@@ -272,15 +272,22 @@ public class InteractionRoot implements InteractionRootInterface {
         _instanceHlaClassName = instanceHlaClassName;
     }
 
-    // FOR INTERACTIONS DERIVED FROM InteractionRoot.C2WInteractionRoot
-    protected boolean federateAppendedToFederateSequence = false;
+    private String proxiedFederateName = null;
 
-    public void setFederateAppendedToFederateSequence(boolean value) {
-        federateAppendedToFederateSequence = value;
+    public void setProxiedFederateName(String localProxiedFederateName) {
+        proxiedFederateName = localProxiedFederateName;
     }
 
-    public boolean getFederateAppendedToFederateSequence() {
-        return federateAppendedToFederateSequence;
+    public String getProxiedFederateName() {
+        return proxiedFederateName;
+    }
+
+    public boolean hasProxiedFederateName() {
+        return proxiedFederateName != null;
+    }
+
+    public void deleteProxiedFederateName() {
+        proxiedFederateName = null;
     }
 
     public static String get_simple_class_name(String hlaClassName) {
@@ -616,6 +623,15 @@ public class InteractionRoot implements InteractionRootInterface {
           ? _classNameHandleMap.containsKey(hlaClassName)
             ? new InteractionRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createInteraction( propertyMap, logicalTime );
+    }
+
+    public static InteractionRoot create_interaction(InteractionRoot messaging_var) {
+        InteractionRoot newMessaging_var = create_interaction(messaging_var.getInstanceHlaClassName());
+        newMessaging_var._time =  messaging_var._time;
+        newMessaging_var.proxiedFederateName = messaging_var.proxiedFederateName;
+        newMessaging_var.classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+
+        return newMessaging_var;
     }
 
     //----------------------------
@@ -1723,7 +1739,9 @@ public class InteractionRoot implements InteractionRootInterface {
     public InteractionRoot( InteractionRoot other ) {
         this();
         _time = other._time;
+        proxiedFederateName = other.proxiedFederateName;
         _instanceHlaClassName = other._instanceHlaClassName;
+
         classAndPropertyNameValueMap = new HashMap<>(other.classAndPropertyNameValueMap);
     }
 

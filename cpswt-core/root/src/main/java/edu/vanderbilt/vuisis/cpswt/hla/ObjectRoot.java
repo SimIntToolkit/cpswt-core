@@ -303,6 +303,24 @@ public class ObjectRoot implements ObjectRootInterface {
         _instanceHlaClassName = instanceHlaClassName;
     }
 
+    private String proxiedFederateName = null;
+
+    public void setProxiedFederateName(String localProxiedFederateName) {
+        proxiedFederateName = localProxiedFederateName;
+    }
+
+    public String getProxiedFederateName() {
+        return proxiedFederateName;
+    }
+
+    public boolean hasProxiedFederateName() {
+        return proxiedFederateName != null;
+    }
+
+    public void deleteProxiedFederateName() {
+        proxiedFederateName = null;
+    }
+
     public static String get_simple_class_name(String hlaClassName) {
         if (hlaClassName == null) {
             return null;
@@ -916,6 +934,19 @@ public class ObjectRoot implements ObjectRootInterface {
           ? _classNameHandleMap.containsKey(hlaClassName)
             ? new ObjectRoot( hlaClassName, propertyMap, logicalTime ) : null
           : instance.createObject( propertyMap, logicalTime );
+    }
+
+    public static ObjectRoot create_object(ObjectRoot messaging_var) {
+        ObjectRoot newMessaging_var = create_object(messaging_var.getInstanceHlaClassName());
+        newMessaging_var._time =  messaging_var._time;
+        newMessaging_var.proxiedFederateName = messaging_var.proxiedFederateName;
+        newMessaging_var.classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+
+        newMessaging_var.classAndPropertyNameValueMap.replaceAll(
+            (k, v) -> new Attribute<>((Attribute<Object>) newMessaging_var.classAndPropertyNameValueMap.get(k))
+        );
+
+        return newMessaging_var;
     }
 
     //----------------------------
@@ -2809,7 +2840,11 @@ public class ObjectRoot implements ObjectRootInterface {
     public ObjectRoot( ObjectRoot other ) {
         this();
         _time = other._time;
+        proxiedFederateName = other.proxiedFederateName;
         _instanceHlaClassName = other._instanceHlaClassName;
+
+        classAndPropertyNameValueMap = new HashMap<>(other.classAndPropertyNameValueMap);
+
         classAndPropertyNameValueMap.replaceAll(
                 (k, v) -> new Attribute<>((Attribute<Object>) classAndPropertyNameValueMap.get(k))
         );

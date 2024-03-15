@@ -776,9 +776,10 @@ public class TestInteraction extends edu.vanderbilt.vuisis.cpswt.hla.Interaction
     * duplicate
     */
     public TestInteraction(TestInteraction messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public TestInteraction create_interaction( TestInteraction messaging_var ) {
+        return (TestInteraction)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

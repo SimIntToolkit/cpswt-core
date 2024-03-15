@@ -443,9 +443,10 @@ public class MediumPrio extends edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot_
     * duplicate
     */
     public MediumPrio(MediumPrio messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public MediumPrio create_interaction( MediumPrio messaging_var ) {
+        return (MediumPrio)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }

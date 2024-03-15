@@ -464,9 +464,10 @@ public class EmbeddedMessaging extends edu.vanderbilt.vuisis.cpswt.hla.Interacti
     * duplicate
     */
     public EmbeddedMessaging(EmbeddedMessaging messaging_var) {
-    
-        // SHALLOW COPY
-        classAndPropertyNameValueMap = new HashMap<>(messaging_var.classAndPropertyNameValueMap);
+        super(messaging_var);
+    }
 
+    public EmbeddedMessaging create_interaction( EmbeddedMessaging messaging_var ) {
+        return (EmbeddedMessaging)edu.vanderbilt.vuisis.cpswt.hla.InteractionRoot.create_interaction(messaging_var);
     }
 }
